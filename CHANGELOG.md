@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.7.1
+- jsdom headless UI test (41 checks, id/jv/en, 4 scenarios) for the real web/app.js; CI installs jsdom.
+
 ## 2026-10-30 23:50 · v1.7.0
 - "Under the hood" panel: every session JSON now has `trace` (one row per pipeline stage: tool, kind meta/open/tts/code, status, ms) from the new `api/trace.py`. The result and guide pages show it as a collapsible list (id/jv/en) and the PDF report prints it, so judges can see exactly which Meta model did what and where plain-code safety gates and edge-tts take over. Replaces the old one-line model list. 5 new tests (`test_trace.py`) plus a Playwright assertion (skipped here, no Chromium).
 

@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 00:20 WIB (v1.7.1)
+- **New:** headless UI check without a browser. `api/tests/dom/dom_flow.mjs` runs the real `web/app.js` in jsdom against a live mock server (`api/tests/test_dom_jsdom.py`, CI installs jsdom): 41 checks across id/jv/en and all four scenarios (result page, hood panel rows and names, no raw i18n keys, follow-up question for the motorbike, red stop box for the rice cooker, next-step button, no uncaught JS errors). This verifies the Under the hood panel and Try again wiring in a DOM for the first time. Skips cleanly if node/jsdom are missing (local install: `cd /tmp/jd && npm install jsdom`).
+- **Checks (real runs, 00:15 WIB):** ruff clean, `mypy api` strict no issues in 45 files, pytest **159 passed, 6 skipped** (Playwright, no Chromium downloadable on this arm64 sandbox), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (159/165).
+- **Next up (Malik):** re-take demo screenshots/video with the Under the hood panel (needs a Chromium; do it when one exists); Render preview smoke once deployed; prompt tuning when real photos arrive. Malik-side steps unchanged.
+
 ## State on 2026-10-30 23:50 WIB (v1.7.0)
 - **New:** "Under the hood" panel (`api/trace.py`, `trace` in session JSON, collapsible list on result + guide pages in id/jv/en, section in the PDF report). Shows which Meta model ran each stage and where code gates / edge-tts are used. Report PDF page inspected visually.
 - **Checks (real runs, 23:45 WIB):** ruff clean, `mypy api` strict no issues in 44 files, pytest **158 passed, 6 skipped** (Playwright, no Chromium here; new hood assertions unverified in a browser), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED.

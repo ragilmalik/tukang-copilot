@@ -32,4 +32,5 @@ Owner: **M** = Malik, **H** = Malik.
 - [x] Shopping links (Tokopedia/Shopee) + WhatsApp share of the parts list (v1.4.0)
 - [x] Friendly errors + Try again + fault-injection tests (v1.5.0)
 - [x] Workshop mode: large-print one-step-per-page PDF (v1.6.0)
+- [x] jsdom headless UI test of web/app.js (v1.7.1)
 - [x] "Under the hood" stage-to-model panel + PDF section (v1.7.0)
