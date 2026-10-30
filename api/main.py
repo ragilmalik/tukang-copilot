@@ -21,7 +21,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import __version__, errors, guard, shop
 from .trace import build_trace
-from .pipeline import engine, media, mock
+from .pipeline import engine, media, mock, photos
 from .settings import ROOT, settings
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -43,7 +43,7 @@ SAMPLE_TEXT = {
              "en": "My rice cooker won't heat, the light is off even though it's plugged in."},
 }
 CATEGORIES = {"", "motor", "pump", "appliance", "plumbing", "other"}
-IMAGE_TYPES = {".jpg", ".jpeg", ".png", ".webp"}
+IMAGE_TYPES = photos.allowed_exts()
 AUDIO_TYPES = {".webm", ".ogg", ".wav", ".mp3", ".m4a", ".mp4", ".aac", ".opus"}
 VIDEO_TYPES = {".mp4", ".mov", ".webm", ".3gp", ".mkv", ".m4v"}
 MAX_PHOTO, MAX_AUDIO, MAX_VIDEO = 15 * 1024 * 1024, 20 * 1024 * 1024, 40 * 1024 * 1024
@@ -108,7 +108,15 @@ async def _save_upload(up: UploadFile, allowed: set[str], limit: int, default_ex
     except BaseException:
         Path(name).unlink(missing_ok=True)
         raise
-    return Path(name)
+    path = Path(name)
+    if allowed is IMAGE_TYPES and photos.is_heif(path):
+        try:  # iPhone HEIC -> JPEG so every later stage sees a normal photo
+            return photos.heif_to_jpeg(path)
+        except OSError as e:
+            raise HTTPException(400, str(e) if not photos.HEIF_OK else "Could not read that photo. Try a JPG or PNG.")
+        finally:
+            path.unlink(missing_ok=True)
+    return path
 
 
 def _load(sid: str) -> dict[str, Any]:

@@ -15,7 +15,7 @@ curl localhost:8000/health
 ## `POST /api/sessions` (multipart)
 | Field | Required | Notes |
 |---|---|---|
-| `photos` | yes (1–3), unless `video` is sent | jpg/png/webp ≤ 15 MB each |
+| `photos` | yes (1–3), unless `video` is sent | jpg/png/webp, plus iPhone HEIC/HEIF (converted to JPEG on the server) ≤ 15 MB each |
 | `video` | no | mp4/mov/webm/3gp/mkv/m4v ≤ 40 MB, ≤ 30 s. The server keeps the sharpest frame from each third of the clip (3 frames; photos first, max 3 in total). If there is no `audio` and no `text`, the clip's own sound is used as the voice description. |
 | `audio` | text or audio | webm/ogg/wav/mp3/m4a/mp4/aac/opus ≤ 20 MB |
 | `text` | text or audio | ≤ 2000 chars |

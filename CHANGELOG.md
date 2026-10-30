@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.16.0 (2026-10-31 05:30 WIB)
+- Real-phone photo formats. New `api/pipeline/photos.py`: iPhone HEIC/HEIF uploads (repair photos and the step check photo) are converted to JPEG on the server with the optional `pillow-heif` package (added to requirements.txt); without it HEIC gets a clear 400 message ("set the camera to JPG") instead of a crash. `.jfif` and upper-case extensions accepted. 7 new tests in `test_photo_formats.py` (HEIC round trip incl. check photo, EXIF-rotated JPEG, corrupt file gives 400, unsupported types, decoder-missing message).
+
 ## 1.15.0 (2026-10-31 05:05 WIB)
 - Weak-signal handling in the phone UI. Network failures (start, answer, step photo check, re-plan, Try again) now show a friendly id/jv/en sentence instead of "Failed to fetch" or a stuck "Checking photo..."; an offline banner appears on the home and guide pages while the phone has no connection and disappears when it returns. Step photo check and answer no longer end in an unhandled promise rejection. 18 new jsdom checks (3 languages: banner shows and hides, fetch rejection gives friendly text, Start button usable again). Not verified in a real browser with airplane mode (no Chromium here).
 

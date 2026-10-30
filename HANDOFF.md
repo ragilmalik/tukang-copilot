@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 05:30 WIB (v1.16.0)
+- **New:** HEIC/HEIF (iPhone) upload support via optional `pillow-heif` (`api/pipeline/photos.py`), friendly refusal when the decoder is missing, `.jfif` accepted, 7 tests (`test_photo_formats.py`). See CHANGELOG 1.16.0.
+- **Checks (real runs, 05:28 WIB):** ruff clean, `mypy api` strict no issues in 53 files, pytest **226 passed, 7 skipped**, `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (226/233). pillow-heif must be in the Render build (it is in requirements.txt; wheels exist for linux x86_64/arm64).
+- **Next up (Malik):** after first live key run: eval_fixtures live, tune prompts; re-take screenshots/video when a Chromium exists; Render preview smoke once deployed; real phone tests (airplane mode, TalkBack, HEIC) by Malik.
+
 ## State on 2026-10-31 05:05 WIB (v1.15.0)
 - **New:** weak-signal handling. Friendly id/jv/en network error text on every fetch path (start, answer, check, re-plan, retry), offline banner on home and guide pages, no more stuck "Checking photo..." when the signal drops. jsdom checks added (offline bar show/hide, rejected fetch gives friendly message). See CHANGELOG 1.15.0.
 - **Checks (real runs, 05:00 WIB):** ruff clean, `mypy api` strict no issues in 51 files, pytest **220 passed, 6 skipped** (Playwright only; jsdom test now has 108 checks), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` run. Offline behaviour only jsdom-verified (no Chromium here).
