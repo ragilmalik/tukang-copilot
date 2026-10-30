@@ -9,7 +9,7 @@
 
 ## Hard stops (in code, `api/pipeline/safety.py`)
 Three independent layers, so a model mistake can't produce a dangerous guide:
-1. **Text gate** on what the user said or typed, before any paid call: gas (elpiji, LPG, regulator, bau gas), house wiring (MCB, panel, kWh meter, kabel dalam tembok, korsleting, melted socket), high-energy parts (microwave, CRT, high voltage, airbag, brake fluid / hydraulic brakes, fuel leak), and anything medical (luka, berdarah, obat, dokter…). Also applied to "still broken" reports.
+1. **Text gate** on what the user said or typed, before any paid call: gas (elpiji, LPG, regulator, bau gas), house wiring (MCB, panel, kWh meter, kabel dalam tembok, korsleting, melted socket), high-energy parts (microwave, CRT, high voltage, airbag, brake fluid / hydraulic brakes, fuel leak), electric shock (kesetrum, tersengat), fire, smoke or swollen batteries (fire service 113), refrigerant gas, and anything medical (luka, berdarah, obat, dokter…). Also applied to "still broken" reports.
 2. **Model level**: `diagnose.md` defines red; a red Diagnosis stops the session.
 3. **Plan gate**: every generated plan is scanned for hard-stop actions (opening 220 V casings / heating elements, opening rice cookers, microwaves, fridges, AC, dispensers; bleeding brake lines; splicing into wall/panel wiring; gas hoses). A hit forces red even if the model said green.
 

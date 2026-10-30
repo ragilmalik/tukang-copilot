@@ -45,6 +45,17 @@ def test_gate_stops_before_any_model_call(samples):
     assert s["object_report"] is None
 
 
+@pytest.mark.parametrize("text,word", [
+    ("tadi saya kesetrum waktu colok pompa", "setrum"),
+    ("the charger caught fire", "113"),
+])
+def test_shock_and_fire_stop_before_any_model_call(samples, text, word):
+    lang = "id" if "setrum" in text else "en"
+    s = engine.run(engine.create([samples["pump"]], lang, text)["id"])
+    assert s["status"] == "stopped" and s["stages"]["gate"]["status"] == "stopped"
+    assert s["object_report"] is None and word in s["stop_reason"]
+
+
 @pytest.mark.parametrize("lang", ["id", "jv", "en"])
 def test_languages(samples, lang):
     s = engine.run(_new(samples, "faucet", lang)["id"])

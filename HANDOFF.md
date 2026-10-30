@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 01:30 WIB (v1.8.1)
+- **New:** wider text safety gate: electric shock (kesetrum, tersengat), fire/smoke/swollen battery (fire service 113), short circuit variants (konslet, korslet), refrigerant (freon, AC compressor). New `shock` and `fire` stop messages in id/jv/en. 14 new tests (gate + engine stop before any model call). Everyday phrases ("api kompor kecil", "knalpot putih") still pass.
+- **Checks (real runs, 01:25 WIB):** ruff clean, `mypy api` strict no issues in 47 files, pytest **183 passed, 7 skipped** (Playwright/jsdom, no Chromium installable here as non-root arm64), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (183/190).
+- **Next up (Malik):** re-take demo screenshots/video with the Under the hood panel when a Chromium exists; Render preview smoke once deployed; prompt tuning on real photos / first live key run. Malik-side steps unchanged.
+
 ## State on 2026-10-31 00:55 WIB (v1.8.0)
 - **New:** `api/coerce.py` model-drift tolerance (tolerant JSON extraction, enum/number/list repair, caps on causes/steps/components) wired into `engine._chat_json` and `meta_client._extract_json`; a no-JSON reply retries once. Never invents content. 11 tests in `test_coerce.py`.
 - **Checks (real runs, 00:50 WIB):** ruff clean, `mypy api` strict no issues in 47 files, pytest **169 passed, 7 skipped** (Playwright and jsdom, none installable as root/arm64 here), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (169/176).

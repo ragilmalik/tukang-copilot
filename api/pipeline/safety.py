@@ -26,6 +26,14 @@ _MSG = {
         "id": "Bagian ini menyimpan energi berbahaya (tegangan tinggi, rem hidrolik, bahan bakar, atau airbag). Bawa ke servis resmi.",
         "jv": "Bagean iki nyimpen energi mbebayani (tegangan dhuwur, rem hidrolik, bensin, utawa airbag). Gawanen menyang servis resmi.",
         "en": "This part stores dangerous energy (high voltage, brake hydraulics, fuel, or an airbag). Take it to a service centre."},
+    "fire": {
+        "id": "Ada api, asap, atau baterai menggembung. Jauhi barangnya, matikan listrik dari sumbernya bila aman, dan hubungi pemadam kebakaran (113).",
+        "jv": "Ana geni, kukus, utawa baterai mlembung. Adohana barange, pateni listrik saka sumbere yen aman, lan hubungi pemadam kebakaran (113).",
+        "en": "Fire, smoke or a swollen battery. Keep away from it, cut power at the source only if it is safe, and call the fire service (113)."},
+    "shock": {
+        "id": "Kena setrum itu serius. Jangan sentuh alatnya, matikan MCB bila aman, dan hubungi tenaga medis (119) bila pusing, nyeri dada, atau luka bakar.",
+        "jv": "Kena setrum iku serius. Aja nyenthuh piranti, pateni MCB yen aman, lan hubungi tenaga medis (119) yen mumet, nyeri dhadha, utawa kobong.",
+        "en": "An electric shock is serious. Don't touch the device, switch off the breaker if it is safe, and call a medical professional (119) if you feel dizzy, have chest pain or burns."},
     "medical": {
         "id": "Tukang Copilot hanya untuk memperbaiki barang, bukan kesehatan. Untuk luka atau sakit, hubungi tenaga medis (119).",
         "jv": "Tukang Copilot mung kanggo ndandani barang, dudu kesehatan. Yen tatu utawa lara, hubungi tenaga medis (119).",
@@ -35,8 +43,10 @@ _MSG = {
 _TEXT_RULES: list[tuple[str, str]] = [
     # "gas" alone also means the throttle on a motorbike ("tarik gas"), so only cooking/LPG gas contexts stop
     (r"\b(elpiji|lpg|tabung gas|selang gas|regulator gas|bau gas|gas bocor|bocor gas|kompor gas|gas leak|gas smell|smell gas|gas line|gas hose)\b", "gas"),
-    (r"\b(mcb|panel listrik|sekring utama|meteran pln|kwh meter|fuse box|breaker box|kabel (di )?dalam tembok|instalasi listrik|stop ?kontak (terbakar|meleleh)|korsleting)\b", "mains"),
-    (r"\b(microwave|magnetron|crt|kapasitor tegangan tinggi|high voltage|airbag|minyak rem|rem hidrolik|brake fluid|brake hydraulic|bensin bocor|fuel leak)\b", "hv"),
+    (r"\b(mcb|panel listrik|sekring utama|meteran pln|kwh meter|fuse box|breaker box|kabel (di )?dalam tembok|instalasi listrik|stop ?kontak (terbakar|meleleh)|korsleting|konsleting|konslet|korslet|short circuit)\b", "mains"),
+    (r"\b(microwave|magnetron|crt|kapasitor tegangan tinggi|high voltage|airbag|minyak rem|rem hidrolik|brake fluid|brake hydraulic|bensin bocor|fuel leak|freon|refrigerant|kompresor ac|ac compressor)\b", "hv"),
+    (r"\b(kesetrum|ke setrum|tersetrum|disetrum|kena setrum|tersengat listrik|sengatan listrik|electric shock|electrocut\w*|got shocked|shocked me)\b", "shock"),
+    (r"\b(kebakaran|terbakar|api menyala|keluar api|keluar asap|berasap|on fire|caught fire|catching fire|flames?|smoke coming|baterai( \w+)? (menggembung|kembung|mlembung)|swollen battery|battery swelling)\b", "fire"),
     (r"\b(luka|berdarah|sakit|obat|dokter|demam|pingsan|patah tulang|injury|bleeding|medicine|doctor|symptom)\b", "medical"),
 ]
 
