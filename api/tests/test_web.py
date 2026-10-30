@@ -43,3 +43,12 @@ def test_no_inline_secrets():
     assert texts
     for f in texts:
         assert "MODEL_API_KEY" not in f.read_text(encoding="utf-8"), f
+
+
+def test_accessibility_hooks_present():
+    css = (WEB / "style.css").read_text(encoding="utf-8")
+    assert "focus-visible" in css and "prefers-reduced-motion" in css and ".sr-only" in css
+    for needle in ('id="progressStatus"', 'aria-live="polite"', 'role="alert"', 'aria-pressed="false"', 'id="stepPhotoLabel"'):
+        assert needle in INDEX, needle
+    assert 'lang === "jv" ? "jv"' in JS  # Javanese UI must not be tagged as Indonesian for screen readers
+    assert "setAttribute(\"aria-pressed\"" in JS

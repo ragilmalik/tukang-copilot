@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.14.0 (2026-10-31 04:35 WIB)
+- Accessibility pass on the phone UI. Page language is now tagged `jv` for Basa Jawa (was `id`, so screen readers mispronounced it); photo, video and step-check pickers are reachable by keyboard (tab + Enter/Space); category chips and the mic button expose `aria-pressed`; progress has a short screen-reader status line instead of re-reading the whole list; check results, errors and recording state are live regions; focus moves to the new section heading on each screen change; visible focus ring, 44 px touch targets, reduced-motion support. 8 new jsdom checks per language run plus a static test. Not verified with a real screen reader or in Chromium (none available here).
+
 ## 1.13.0 (2026-10-31 04:10 WIB)
 - Hostile input and hostile model output hardening. (1) Prompt-injection rule appended to the look, diagnose, plan and replan prompts (owner text and text in photos are data, never orders; `api/prompts.py`). (2) jsdom XSS check: every free-text field of a real session is poisoned with `<img onerror>` and `<script>` payloads and the guide page must run none of it (verified to fail when an `esc()` is removed). (3) `api/tests/test_security.py` (16 tests): guide page title escaping, odd session ids, path traversal on `/files`, private `session.json`, a prompt-injection sentence cannot lift the code safety gate. (4) Small fixes: parts list label now escaped, duplicate `sTire` key removed. Documented in docs/SAFETY.md.
 

@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 04:40 WIB (v1.14.0)
+- **New:** accessibility pass (html lang `jv`, keyboard-reachable pickers, aria-pressed on chips and mic, screen-reader progress status, live regions, focus to new section heading, focus ring, 44 px targets, reduced motion). See CHANGELOG 1.14.0.
+- **Checks (real runs, 04:38 WIB):** ruff clean, `mypy api` strict no issues in 51 files, pytest **220 passed, 6 skipped** (Playwright only), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (220/226). No Chromium downloadable here, so screenshots and video are unchanged and the a11y changes are only jsdom-verified.
+- **Next up (Malik):** after first live key run: eval_fixtures live, tune prompts; re-take screenshots/video with hood panel, tyre, erase button when a Chromium exists; Render preview smoke once deployed; try a real screen reader pass on a phone (Malik: TalkBack on, one repair).
+
 ## State on 2026-10-31 04:10 WIB (v1.13.0)
 - **New:** hostile input hardening: untrusted-input rule in the four owner-text prompts, jsdom XSS test (poisons all free text of a real session; confirmed it fails when `esc()` is removed), `api/tests/test_security.py` (16 tests: escaping, odd ids, traversal, injection vs code gate). docs/SAFETY.md section added.
 - **Checks (real runs, 04:05 WIB):** ruff clean, `mypy api` strict no issues in 51 files, pytest **219 passed, 6 skipped** (Playwright only; jsdom runs after `npm install --prefix /tmp/jd jsdom`), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (219/225). No Chromium downloadable here, so screenshots and video are unchanged.

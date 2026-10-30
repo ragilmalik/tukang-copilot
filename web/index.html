@@ -46,8 +46,8 @@
       <button type="button" class="chip" data-cat="other" data-t="catOther">Lainnya</button>
     </div>
     <div class="row">
-      <button id="micBtn" class="btn big" type="button">🎙️ <span data-t="record">Tahan untuk bicara</span></button>
-      <span id="recState" class="muted"></span>
+      <button id="micBtn" class="btn big" type="button" aria-pressed="false">🎙️ <span data-t="record">Tahan untuk bicara</span></button>
+      <span id="recState" class="muted" aria-live="polite"></span>
     </div>
     <textarea id="text" rows="3" maxlength="2000" data-tp="typeHere" placeholder="…atau ketik masalahnya di sini"></textarea>
 
@@ -58,7 +58,7 @@
       <button class="btn link sample" type="button" data-sample="faucet" data-t="sFaucet">kran menetes</button> ·
       <button class="btn link sample" type="button" data-sample="rice" data-t="sRice">rice cooker mati</button> ·
       <button class="btn link sample" type="button" data-sample="tire" data-t="sTire">ban kempes</button></p>
-    <p id="formErr" class="err"></p>
+    <p id="formErr" class="err" role="alert"></p>
   </section>
 
   <!-- 1b. My garage: past repairs, kept only on this phone (localStorage) -->
@@ -72,6 +72,7 @@
   <!-- 2. Progress -->
   <section id="progress" class="card hidden">
     <h2 data-t="working">Sedang memeriksa…</h2>
+    <p id="progressStatus" class="sr-only" aria-live="polite"></p>
     <ol id="stageList" class="stages"></ol>
     <div id="question" class="hidden">
       <p class="q" id="questionText"></p>
@@ -111,9 +112,9 @@
       <p id="stepCaution" class="caution hidden"></p>
       <p id="stepWhy" class="muted small"></p>
       <p id="stepCheck" class="check"></p>
-      <label class="btn">📸 <span data-t="checkStep">Cek langkah ini</span>
+      <label class="btn" id="stepPhotoLabel">📸 <span data-t="checkStep">Cek langkah ini</span>
         <input id="stepPhoto" type="file" accept="image/*" capture="environment" hidden></label>
-      <div id="checkResult" class="hidden"></div>
+      <div id="checkResult" class="hidden" aria-live="polite"></div>
       <div class="row nav">
         <button id="prevBtn" class="btn" type="button">◀</button>
         <button id="playBtn" class="btn" type="button">🔊 <span data-t="listen">Dengarkan</span></button>
@@ -125,10 +126,10 @@
     <div class="card">
       <p><b data-t="done">Selesai kalau:</b> <span id="gDone"></span></p>
       <p class="muted" id="gPro"></p>
-      <p id="verifiedCount" class="small"></p>
+      <p id="verifiedCount" class="small" aria-live="polite"></p>
       <textarea id="stuckText" rows="2" maxlength="500" data-tp="stuckHere" placeholder="Apa yang terjadi? (mis. sudah dicoba, tetap mati)"></textarea>
       <button id="stuckBtn" class="btn" type="button" data-t="stuck">Masih rusak, coba rencana lain</button>
-      <p id="stuckMsg" class="muted"></p>
+      <p id="stuckMsg" class="muted" aria-live="polite"></p>
     </div>
 
     <div class="row">

@@ -32,6 +32,15 @@ async function run(lang, sample) {
   await until(() => d.readyState === "complete");
   await sleep(300);
   check(`${lang}: demo badge`, await until(() => !d.getElementById("modeBadge").classList.contains("hidden"), 5000));
+  check(`${lang}: html lang attribute`, d.documentElement.lang === lang, d.documentElement.lang);
+  check(`${lang}: pickers reachable by keyboard`, ["photoBox", "videoBox", "stepPhotoLabel"].every((i) => d.getElementById(i).tabIndex === 0));
+  check(`${lang}: mic button has aria-pressed`, d.getElementById("micBtn").getAttribute("aria-pressed") === "false");
+  const chip = d.querySelector('#cats .chip[data-cat="pump"]');
+  chip.click();
+  check(`${lang}: category chip aria-pressed toggles`, chip.getAttribute("aria-pressed") === "true"
+    && d.querySelector('#cats .chip[data-cat="motor"]').getAttribute("aria-pressed") === "false");
+  chip.click();
+  d.getElementById("photoBox").dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
   d.querySelector(`button.sample[data-sample="${sample}"]`).click();
   const shown = (id) => !d.getElementById(id).classList.contains("hidden");
   if (sample === "rice") {  // red safety stop: no repair steps, a stop box with a service-centre card
@@ -59,6 +68,7 @@ async function run(lang, sample) {
     check(`${lang}/${sample}: no raw i18n keys in hood`, !/hs_/.test(d.getElementById("hoodList").textContent));
     check(`${lang}/${sample}: PDF + workshop links`, (d.getElementById("workshopBtn") || {}).href !== undefined);
     check(`${lang}/${sample}: erase button has a translated label`, !!d.getElementById("eraseBtn") && !/^erase$/.test(d.getElementById("eraseBtn").textContent) && d.getElementById("eraseBtn").textContent.length > 8);
+    check(`${lang}/${sample}: focus moved to result heading`, d.activeElement && d.activeElement.tagName === "H2", d.activeElement && d.activeElement.tagName);
     check(`${lang}/${sample}: safety badge`, d.getElementById("safetyBadge").textContent.trim().length > 0);
     // next step button moves on
     const before = d.getElementById("stepNo").textContent;

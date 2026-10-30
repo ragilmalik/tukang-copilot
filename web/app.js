@@ -74,7 +74,7 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const on = (id, ev, fn) => $(id) && $(id).addEventListener(ev, fn);
 
 function applyLang() {
-  document.documentElement.lang = lang === "en" ? "en" : "id";
+  document.documentElement.lang = lang === "en" ? "en" : lang === "jv" ? "jv" : "id";
   document.querySelectorAll("[data-t]").forEach((el) => (el.textContent = t(el.dataset.t)));
   document.querySelectorAll("[data-tp]").forEach((el) => (el.placeholder = t(el.dataset.tp)));
   if ($("lang")) $("lang").value = lang;
@@ -115,8 +115,10 @@ function setupCapture() {
   });
   document.querySelectorAll("#cats .chip").forEach((b) => b.addEventListener("click", () => {
     category = category === b.dataset.cat ? "" : b.dataset.cat;
-    document.querySelectorAll("#cats .chip").forEach((x) => x.classList.toggle("on", x.dataset.cat === category));
+    document.querySelectorAll("#cats .chip").forEach((x) => { x.classList.toggle("on", x.dataset.cat === category); x.setAttribute("aria-pressed", String(x.dataset.cat === category)); });
   }));
+  document.querySelectorAll("#cats .chip").forEach((x) => x.setAttribute("aria-pressed", "false"));
+  setupKeyboardPickers();
   on("micBtn", "click", toggleRec);
   on("goBtn", "click", () => submit(""));
   document.querySelectorAll(".sample").forEach((b) => b.addEventListener("click", () => submit(b.dataset.sample)));
@@ -140,9 +142,9 @@ async function toggleRec() {
     rec.onstop = () => {
       stream.getTracks().forEach((tr) => tr.stop());
       audioBlob = new Blob(chunks, { type: rec.mimeType || "audio/webm" });
-      $("micBtn").classList.remove("rec"); $("micBtn").innerHTML = "🎙️ " + esc(t("record")); $("recState").textContent = t("recorded");
+      $("micBtn").classList.remove("rec"); $("micBtn").setAttribute("aria-pressed", "false"); $("micBtn").innerHTML = "🎙️ " + esc(t("record")); $("recState").textContent = t("recorded");
     };
-    rec.start(); $("micBtn").classList.add("rec"); $("micBtn").innerHTML = "⏹️ " + esc(t("stop")); $("recState").textContent = t("recording");
+    rec.start(); $("micBtn").classList.add("rec"); $("micBtn").setAttribute("aria-pressed", "true"); $("micBtn").innerHTML = "⏹️ " + esc(t("stop")); $("recState").textContent = t("recording");
     setTimeout(() => rec && rec.state === "recording" && rec.stop(), 60000); // spec: max 60 s
   } catch (_) { $("formErr").textContent = t("micErr"); }
 }
@@ -191,8 +193,26 @@ async function submit(sample) {
   finally { $("goBtn").disabled = false; }
 }
 
+/* Keyboard and screen-reader access: the hidden file inputs sit inside labels, which a keyboard cannot reach. */
+function setupKeyboardPickers() {
+  ["photoBox", "videoBox", "stepPhotoLabel"].forEach((id) => {
+    const el = $(id); if (!el) return;
+    el.tabIndex = 0; el.setAttribute("role", "button");
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); const inp = el.querySelector("input"); if (inp) inp.click(); }
+    });
+  });
+}
+
+let firstShow = true;
 function show(which) {
   ["capture", "progress", "result"].forEach((s) => $(s) && $(s).classList.toggle("hidden", s !== which));
+  // Move focus to the new section's heading so screen-reader and keyboard users land on it (not on first load).
+  if (!firstShow) {
+    const h = $(which) && $(which).querySelector("h1, h2");
+    if (h) { h.tabIndex = -1; try { h.focus({ preventScroll: true }); } catch (_) { /* old browsers */ } }
+  }
+  firstShow = false;
   if ($("garage")) $("garage").classList.toggle("hidden", which !== "capture" || !loadGarage().length);
 }
 
@@ -227,6 +247,11 @@ function renderProgress(s) {
   if (!$("stageList") || !s.stages) return;
   $("stageList").innerHTML = Object.entries(s.stages).map(([k, v]) =>
     `<li class="${esc(v.status)}">${esc(t("stages")[k] || k)}<span class="note">${esc(v.note || "")}</span></li>`).join("");
+  if ($("progressStatus")) {  // short screen-reader status instead of re-announcing the whole list
+    const run = Object.entries(s.stages).find(([, v]) => v.status === "running");
+    const nDone = Object.values(s.stages).filter((v) => v.status === "done").length;
+    $("progressStatus").textContent = run ? `${nDone}/${Object.keys(s.stages).length}: ${t("stages")[run[0]] || run[0]}` : "";
+  }
   $("question").classList.toggle("hidden", s.status !== "needs_answer");
   if (s.status === "needs_answer") $("questionText").textContent = s.question;
   const stopped = ["stopped", "exhausted"].includes(s.status);
