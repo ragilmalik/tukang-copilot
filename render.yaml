@@ -1,0 +1,16 @@
+# One-click deploy on Render (render.com -> New -> Blueprint -> pick this repo).
+services:
+  - type: web
+    name: tukang-copilot
+    runtime: docker
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: MODEL_API_KEY
+        sync: false
+      - key: BASETEN_API_KEY
+        sync: false
+      - key: USE_OPEN_WEIGHTS
+        value: "0"
+      - key: MAX_COST_PER_SESSION_USD
+        value: "0.50"

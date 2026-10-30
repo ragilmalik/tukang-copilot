@@ -1,0 +1,131 @@
+# 🔧 Tukang Copilot
+
+**Point your phone at something broken, say what's wrong in Bahasa Indonesia, Javanese or English, and Tukang Copilot finds the exact part, works out the fault, and walks you through the fix step by step, checking each step with your camera.**
+
+Meta Global AI Developer Hackathon 2026 (Meta × Cerebral Valley) · Indie Developer track · Theme: **Push the Frontier** (give a machine a new capability: understanding and repairing physical systems).
+
+| | |
+|---|---|
+| Live app | _add your Render URL here after deploy_ |
+| 3-minute demo video | _add YouTube link_ |
+| X post | _add link_ |
+| License | MIT |
+
+![Parts highlighted by SAM 3.1 on the user's own photo (demo-mode sample)](docs/img/sample-motor-parts.jpg)
+
+---
+
+## Why
+
+Indonesia runs on ~130 million motorbikes, water pumps, rice cookers, fans and household plumbing. A small fault costs a day's wage at a bengkel, or days without water. Repair videos are rarely for your exact model, rarely in your language, and they can't see *your* problem.
+
+Tukang Copilot looks at the actual object, marks the actual parts on your own photo, and checks every step you do. It also says clearly, in your language, when a job is dangerous and needs a professional.
+
+## What it does
+
+1. **Snap + speak.** 1–3 photos and a voice note (≤60 s) or typed text. Pick a category chip (Motor, Pompa air, Elektronik rumah, Pipa/keran, Lainnya).
+2. **Sees the parts.** SAM 3.1 segments each relevant part; they're tinted and numbered on your photo.
+3. **Diagnoses.** Top causes with confidence and evidence, tools and parts with estimated rupiah prices, difficulty 1–5, time estimate, and a **safety level**: 🟢 safe / 🟠 caution / 🔴 stop.
+4. **Asks when unsure.** If the top cause is below 60% it asks one sharp follow-up question before planning (agentic).
+5. **Guided repair.** One step per screen: the right picture (your photo with that part highlighted, or a Muse Image diagram for hidden steps), short instruction, why it matters, warnings, and voice readout (hands-free mode).
+6. **Check my step.** Snap a photo after each step; Muse Spark compares it to the expected state: ✅ next, or ⚠️ a specific correction. Repeated fails escalate.
+7. **Still broken?** Say what happened and it re-plans for the next likely cause. When every safe cause is used up, it tells you to see a mechanic and gives you the report to show them.
+8. **Report + share.** A shareable read-only guide link with steps verified by camera.
+
+Hard safety stops (gas, house wiring, opening 220 V internals, high voltage, brake hydraulics, fuel leaks, airbags, anything medical) are enforced in code, not just in prompts. See [docs/SAFETY.md](docs/SAFETY.md).
+
+## Meta models used (and how)
+
+| Stage | Meta model | What it does here |
+|---|---|---|
+| Listen | **Muse Voice Transcribe** (`muse-voice-transcribe-1.0`) | Indonesian/English voice note → text, with repair keywords as biasing |
+| Listen (Javanese) | **Muse Spark 1.2** audio input | Javanese isn't one of Voice Transcribe's 25 languages, so Spark 1.2 transcribes it |
+| Look | **Muse Spark 1.3** vision + structured output | Photos → `ObjectReport`: object, visible components (with boxes), visible issues |
+| Find parts | **SAM 3.1** (`sam-3.1`) | One box-prompt call for all located parts (phrase fallback) → pixel masks → numbered overlay |
+| Diagnose / Plan | **Muse Spark 1.3**, or **Muse Spark Open** on Baseten (`USE_OPEN_WEIGHTS=1`) | `Diagnosis` and `RepairPlan` JSON, re-plan on failure |
+| Illustrate | **Muse Image** (`muse-image-1.0`, `/v1/images/edits`) | Edits the user's own photo into a clean diagram for steps the photo can't show; Spark reviews and redraws a bad one once |
+| Verify | **Muse Spark 1.3** vision | New photo vs. expected state → pass / correction |
+
+Narration: Meta's API has no text-to-speech, so steps are read by free Edge neural voices (`edge-tts`, has Indonesian *and* Javanese) with the browser's voice as fallback. Details: [docs/AI_PIPELINE.md](docs/AI_PIPELINE.md), [docs/META_API_NOTES.md](docs/META_API_NOTES.md).
+
+## Architecture (short)
+
+```mermaid
+flowchart LR
+  Phone["Phone browser<br/>web/ (HTML+JS, no build)"] -->|photos, voice, text| API["FastAPI<br/>api/main.py"]
+  API --> Engine["Pipeline<br/>api/pipeline/engine.py"]
+  Engine --> MC["meta_client.py<br/>(only file that calls Meta)"]
+  MC --> ASR[Muse Voice Transcribe]
+  MC --> Spark[Muse Spark 1.3 / 1.2]
+  MC --> SAM[SAM 3.1]
+  MC --> Img[Muse Image]
+  MC -.optional.-> Open[Muse Spark Open on Baseten]
+  Engine --> Disk[("data/sessions/&lt;id&gt;<br/>auto-deleted after 24 h")]
+  API -->|SSE progress, JSON, images| Phone
+```
+
+Full diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Quick start
+
+**No key needed to try it.** Without `MODEL_API_KEY` the app runs in free **demo mode** with recorded answers for three scenarios.
+
+```bash
+# Mac / Linux
+./start.sh
+# Windows: double-click start.bat
+```
+Then open http://localhost:8000 and tap a "Try a sample" link.
+
+Go live with real Meta models (one step):
+```bash
+python scripts/set_keys.py      # paste your key (hidden), writes .env, then checks every model
+```
+
+Run the tests:
+```bash
+pip install -r requirements-dev.txt
+python -m pytest api/tests -q
+```
+
+Step-by-step for non-developers (accounts, keys, deploy to Render, phone testing): **[docs/SETUP_FOR_MALIK.md](docs/SETUP_FOR_MALIK.md)**. End-user guide: **[docs/HOW_TO_USE.md](docs/HOW_TO_USE.md)**.
+
+## Documentation map
+
+| Doc | For |
+|---|---|
+| [HANDOFF.md](HANDOFF.md) | Anyone picking the project up: state, decisions, what's left |
+| [TODO.md](TODO.md) | Remaining work, ordered, with owner |
+| [CHANGELOG.md](CHANGELOG.md) | Dated build log |
+| [docs/SETUP_FOR_MALIK.md](docs/SETUP_FOR_MALIK.md) | Click-by-click tutorial: keys, run, deploy, update |
+| [docs/HOW_TO_USE.md](docs/HOW_TO_USE.md) | Using the app (English + Bahasa) |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Components, sequence, data, deployment |
+| [docs/AI_PIPELINE.md](docs/AI_PIPELINE.md) | Every stage, model, prompt, schema, failure mode |
+| [docs/META_API_NOTES.md](docs/META_API_NOTES.md) | Verified endpoints, model ids, prices, doc links |
+| [docs/API.md](docs/API.md) | HTTP endpoints with curl examples |
+| [docs/SAFETY.md](docs/SAFETY.md) | Safety levels, hard stops, privacy |
+| [docs/TESTING.md](docs/TESTING.md) | How to test, manual QA checklist |
+| [docs/TEST_REPORT.md](docs/TEST_REPORT.md) | Latest automated test results |
+| [docs/VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md) | Every requirement → evidence, and what is still unverified |
+| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Errors and fixes |
+| [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) | 3-minute video script + shot list + backup plan |
+| [docs/SUBMISSION.md](docs/SUBMISSION.md) | Ready-to-paste submission text + X posts |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | After the hackathon |
+| [docs/ATTRIBUTIONS.md](docs/ATTRIBUTIONS.md) | Third-party libraries and assets |
+| [docs/DECISIONS.md](docs/DECISIONS.md) | Why things are built the way they are |
+
+## Built during the hackathon
+
+Everything in this repository was written from scratch during the event window (Oct 26 – Nov 4, 2026). Dated list in [CHANGELOG.md](CHANGELOG.md); the git history shows the commit dates.
+
+- 2026-10-30: spec, Meta API verification, backend pipeline (listen → look → SAM → diagnose → plan → safety → illustrate → narrate → verify → re-plan), phone web app, fake Meta server, 77 automated tests, CI, Docker/Render deploy files, full docs.
+
+## Team
+
+Ragil Artza Rozaksyah ("Malik"), Semarang, Indonesia. Solo.
+
+## License
+
+MIT, see [LICENSE](LICENSE). Third-party notices in [docs/ATTRIBUTIONS.md](docs/ATTRIBUTIONS.md).
+
+> Tukang Copilot gives AI-generated guidance that can be wrong. You are responsible for your safety. For gas, house wiring, or high voltage, call a professional.

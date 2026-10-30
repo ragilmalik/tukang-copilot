@@ -1,0 +1,572 @@
+"""The repair pipeline (SPEC §6). One Session per broken thing, stored as data/sessions/<id>/session.json;
+every stage writes its status there so the phone UI can follow along (SSE or polling).
+
+  1 listen     Muse Voice Transcribe (id/en) | Muse Spark 1.2 audio (Javanese)     -> transcript
+  -  gate      keyword safety gate on the user's words (free, offline)
+  2 look       Muse Spark 1.3 vision                                                 -> ObjectReport
+  3 segment    SAM 3.1, one concept prompt per visible component                     -> masks + overlay
+  4 diagnose   Muse Spark 1.3 (or Muse Spark Open on Baseten)                        -> Diagnosis
+               agentic: top cause < 60% -> asks ONE follow-up question and waits
+  5 plan       Muse Spark 1.3 (or Open)                                              -> RepairPlan
+  9 safety     plan scanned for hard-stop actions; red level ends guidance
+  6 illustrate Muse Image edits the user's photo into a diagram for hidden steps,
+               Muse Spark reviews each diagram and redraws a bad one once
+  7 narrate    edge-tts (Meta has no TTS) per step
+  8 verify     per step, on demand: user's new photo -> Muse Spark StepCheck;
+               repeated fails -> re-plan to the next cause, or escalate to a pro
+"""
+from __future__ import annotations
+
+import json
+import logging
+import threading
+import time
+import traceback
+import uuid
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+from typing import Any
+
+from pydantic import BaseModel, ValidationError
+
+from .. import cost, prompts
+from ..render import overlay
+from ..schemas import Diagnosis, DiagramReview, ObjectReport, RepairPlan, StepCheck, json_schema
+from ..settings import settings
+from . import media, mock, safety
+
+log = logging.getLogger("tukang.engine")
+STAGES = ["listen", "gate", "look", "segment", "diagnose", "plan", "safety", "illustrate", "narrate"]
+_locks: dict[str, threading.Lock] = {}
+_save_lock = threading.Lock()
+
+
+# =========================================================================== storage
+def session_dir(sid: str) -> Path:
+    if not sid or not sid.isalnum() or len(sid) > 32:
+        raise ValueError("bad session id")
+    return settings.data_dir / "sessions" / sid
+
+
+def load(sid: str) -> dict[str, Any]:
+    p = session_dir(sid) / "session.json"
+    if not p.exists():
+        raise FileNotFoundError(sid)
+    return json.loads(p.read_text(encoding="utf-8"))
+
+
+def save(s: dict[str, Any]) -> None:
+    d = session_dir(s["id"])
+    d.mkdir(parents=True, exist_ok=True)
+    s["updated"] = time.time()
+    with _save_lock:
+        tmp = d / f"session.{threading.get_ident()}.tmp"
+        tmp.write_text(json.dumps(s, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp.replace(d / "session.json")
+
+
+def _stage(s: dict[str, Any], name: str, status: str, note: str = "", ms: int | None = None) -> None:
+    s["stages"][name] = {"status": status, "note": note, **({"ms": ms} if ms is not None else {})}
+    save(s)
+
+
+def models_used() -> dict[str, str]:
+    brain = f"{settings.open_model} (open weights via Baseten)" if settings.open_weights_active else settings.reason_model
+    return {"listen": settings.asr_model, "listen_javanese": settings.audio_model, "look": settings.vision_model,
+            "segment": settings.sam_model, "diagnose": brain, "plan": brain, "illustrate": settings.image_model,
+            "verify": settings.vision_model}
+
+
+def create(photos: list[Path], lang: str, text: str = "", audio: Path | None = None, category: str = "") -> dict[str, Any]:
+    """Store the inputs and return a new session (not started)."""
+    if not photos:
+        raise ValueError("at least one photo is required")
+    sid = uuid.uuid4().hex[:12]
+    d = session_dir(sid)
+    d.mkdir(parents=True, exist_ok=True)
+    names = []
+    for i, p in enumerate(photos[:3]):
+        name = f"photo{i + 1}.jpg"
+        overlay.normalize_photo(p, d / name, settings.max_image_side)
+        names.append(name)
+    if audio is not None:
+        media.to_wav(audio, d / "voice.wav")
+    s = {"id": sid, "created": time.time(), "lang": lang, "category": category, "status": "created", "mode": settings.mode,
+         "text": text.strip(), "has_audio": audio is not None, "transcript": "", "answer": "", "question": None,
+         "photos": names, "stages": {k: {"status": "waiting", "note": ""} for k in STAGES},
+         "object_report": None, "parts": {}, "parts_image": None, "diagnosis": None, "plan": None, "cause_index": 0,
+         "diagrams": {}, "audio": {}, "checks": {}, "safety": {"level": None, "reason": "", "disclaimer": safety.DISCLAIMER[lang]},
+         "stop_reason": None, "error": None, "cost": None, "models": models_used(), "history": []}
+    save(s)
+    return s
+
+
+# =========================================================================== model calls (live or mock)
+def _photo_part(path: Path) -> dict[str, Any]:
+    if settings.offline:
+        return {"type": "text", "text": f"[photo {path.name}]"}
+    from .. import meta_client
+
+    return meta_client.image_part(path)
+
+
+def _chat_json(cls: type[BaseModel], system: str, content: list[dict[str, Any]], name: str, mock_value: dict, *,
+               model: str | None = None, effort: str = "medium", allow_open: bool = False) -> Any:
+    """Structured call + pydantic validation; on invalid output, one retry with the error fed back."""
+    if settings.offline:
+        return cls.model_validate(mock_value)
+    from .. import meta_client
+
+    use_open = allow_open and settings.open_weights_active
+    messages: list[dict[str, Any]] = [{"role": "system", "content": system}, {"role": "user", "content": content}]
+    last: Exception | None = None
+    for _ in range(2):
+        raw = meta_client.chat_json(messages, json_schema(cls), name, model=model, reasoning_effort=effort, open_weights=use_open)
+        try:
+            return cls.model_validate(raw)
+        except ValidationError as e:
+            last = e
+            messages += [{"role": "assistant", "content": json.dumps(raw, ensure_ascii=False)[:6000]},
+                         {"role": "user", "content": f"That JSON failed validation: {str(e)[:1500]}. Return corrected JSON only."}]
+    raise RuntimeError(f"model returned invalid {name}: {last}")
+
+
+def description(s: dict[str, Any]) -> str:
+    bits = [b for b in (s.get("text"), s.get("transcript")) if b]
+    if s.get("category"):
+        bits.append(f"Category hint: {s['category']}")
+    if s.get("answer"):
+        bits.append(f"Owner's answer to the follow-up question: {s['answer']}")
+    for h in s.get("history", []):
+        bits.append(f"Earlier attempt: {h}")
+    return "\n".join(bits) or "(no description; judge from the photos)"
+
+
+def _scenario(s: dict[str, Any]) -> str:
+    return mock.scenario(description(s), s.get("category", ""))
+
+
+# =========================================================================== stages
+def stage_listen(s: dict[str, Any]) -> None:
+    if not s["has_audio"]:
+        _stage(s, "listen", "skipped", "typed")
+        return
+    t0 = time.time()
+    _stage(s, "listen", "running")
+    wav = session_dir(s["id"]) / "voice.wav"
+    if settings.offline:
+        text = mock.TRANSCRIPTS[s["lang"]]
+    else:
+        from .. import meta_client
+
+        if s["lang"] == "jv":
+            text = meta_client.transcribe_with_spark_audio(wav, "Javanese")
+        else:
+            text = meta_client.transcribe(wav, media.wav_seconds(wav), language_bias=[{"id": "Indonesian", "en": "English"}[s["lang"]]],
+                                          keywords=["busi", "cop busi", "karburator", "aki", "kampas", "van belt", "kran", "seal", "pompa air", "magic com"])
+    s["transcript"] = text
+    wav.unlink(missing_ok=True)  # privacy: the recording is deleted right after transcription
+    _stage(s, "listen", "done", text[:90], int((time.time() - t0) * 1000))
+
+
+def stage_gate(s: dict[str, Any]) -> bool:
+    g = safety.check_text(description(s), s["lang"])
+    if not g.allowed:
+        _stop(s, g.reason, "gate")
+        return False
+    _stage(s, "gate", "done")
+    return True
+
+
+def stage_look(s: dict[str, Any]) -> ObjectReport:
+    t0 = time.time()
+    _stage(s, "look", "running")
+    d = session_dir(s["id"])
+    content = [_photo_part(d / p) for p in s["photos"]] + [{"type": "text", "text": f"Owner's description:\n{description(s)}"}]
+    rep = _chat_json(ObjectReport, prompts.get("look", lang_name=prompts.LANG_NAME[s["lang"]]), content, "object_report",
+                     mock.object_report(_scenario(s), s["lang"]), model=settings.vision_model, effort="medium")
+    s["object_report"] = rep.model_dump()
+    _stage(s, "look", "done", rep.object[:90], int((time.time() - t0) * 1000))
+    return rep
+
+
+def stage_segment(s: dict[str, Any], rep: ObjectReport) -> None:
+    if not rep.components:
+        _stage(s, "segment", "skipped", "no visible components")
+        return
+    t0 = time.time()
+    _stage(s, "segment", "running")
+    d = session_dir(s["id"])
+    photo = d / s["photos"][0]
+    meter = cost.current()
+
+    by_box = segment_boxes(photo, rep) if not settings.offline else {}
+
+    def one(c):
+        cost.use(meter)
+        if by_box.get(c.id):
+            return by_box[c.id]
+        try:  # fallback: concept (noun phrase) prompt, one request per part as the docs require
+            if settings.offline:
+                return mock.segment(photo, c.sam_phrase)
+            from .. import meta_client
+
+            return meta_client.segment(photo, c.sam_phrase)
+        except Exception as e:  # one missing part must not sink the session
+            log.warning("SAM failed for %r: %s", c.sam_phrase, e)
+            return []
+
+    with ThreadPoolExecutor(max_workers=3) as ex:
+        results = list(ex.map(one, rep.components))
+    found = []
+    for i, (c, segs) in enumerate(zip(rep.components, results), 1):
+        segs = sorted(segs, key=lambda x: -(x.get("confidence") or 0))
+        s["parts"][c.id] = {"label": i, "name": c.name, "found": bool(segs), "image": None}
+        found.append({"id": c.id, "label": i, "name": c.name, "segs": segs})
+    overlay.draw_parts(photo, found, d / "parts.jpg")
+    s["parts_image"] = "parts.jpg"
+    for f in found:  # one image per part for the guided steps
+        if f["segs"]:
+            overlay.draw_parts(photo, found, d / f"part_{f['id']}.jpg", only=f["id"])
+            s["parts"][f["id"]]["image"] = f"part_{f['id']}.jpg"
+    hit = sum(1 for v in s["parts"].values() if v["found"])
+    _stage(s, "segment", "done", f"{hit}/{len(found)}", int((time.time() - t0) * 1000))
+
+
+def box_prompt(size: tuple[int, int], rep: ObjectReport) -> tuple[str, dict[int, str]]:
+    """Build ONE SAM box-prompt for every component Look located (Meta's grammar via meta_sam_parser).
+    Returns (prompt text, {object id -> component id}); empty text if no component has a box."""
+    from meta_sam_parser import FramePrompt, PromptBox, PromptObject, build_object_prompt
+
+    w, h = size
+    objs, ids = [], {}
+    for i, c in enumerate(rep.components, 1):
+        if not c.prompt_box:
+            continue
+        x1, y1, x2, y2 = c.prompt_box
+        l, t = min(int(x1 * w), w - 2), min(int(y1 * h), h - 2)
+        r, b = max(min(int(x2 * w), w), l + 1), max(min(int(y2 * h), h), t + 1)
+        objs.append(PromptObject(id=i, prompts=[FramePrompt(box=PromptBox(left=l, top=t, right=r, bottom=b))]))
+        ids[i] = c.id
+    if not objs:
+        return "", {}
+    return build_object_prompt(size=(w, h), objects=objs), ids
+
+
+def segment_boxes(photo: Path, rep: ObjectReport) -> dict[str, list[dict[str, Any]]]:
+    """One SAM 3.1 call with box prompts for all located parts (up to 16). {} on any failure."""
+    from PIL import Image
+
+    from .. import meta_client
+
+    with Image.open(photo) as im:
+        size = im.size
+    text, ids = box_prompt(size, rep)
+    if not text:
+        return {}
+    try:
+        recs = meta_client.segment(photo, text)
+    except Exception as e:
+        log.warning("SAM box prompt failed, falling back to phrases: %s", e)
+        return {}
+    out: dict[str, list[dict[str, Any]]] = {}
+    for r in recs:
+        cid = ids.get(int(r["object_id"])) if str(r["object_id"]).isdigit() else None
+        if cid:
+            out.setdefault(cid, []).append(r)
+    return out
+
+
+def stage_diagnose(s: dict[str, Any], rep: ObjectReport) -> Diagnosis:
+    t0 = time.time()
+    _stage(s, "diagnose", "running")
+    content = [_photo_part(session_dir(s["id"]) / s["photos"][0]),
+               {"type": "text", "text": "Object report:\n" + json.dumps(rep.model_dump(), ensure_ascii=False) + f"\n\nOwner's description:\n{description(s)}"}]
+    dx = _chat_json(Diagnosis, prompts.get("diagnose", lang_name=prompts.LANG_NAME[s["lang"]]), content, "diagnosis",
+                    mock.diagnosis(_scenario(s), s["lang"]), model=settings.reason_model, effort="high", allow_open=True)
+    s["diagnosis"] = dx.model_dump() | {"cost_estimate_idr": dx.cost_estimate_idr}
+    s["safety"]["level"], s["safety"]["reason"] = dx.safety_level, dx.safety_reason
+    _stage(s, "diagnose", "done", dx.causes[0].title[:90], int((time.time() - t0) * 1000))
+    return dx
+
+
+def stage_plan(s: dict[str, Any], rep: ObjectReport, dx: Diagnosis, replan_report: str = "") -> RepairPlan:
+    t0 = time.time()
+    _stage(s, "plan", "running")
+    idx = min(s["cause_index"], len(dx.causes) - 1)
+    lang_name = prompts.LANG_NAME[s["lang"]]
+    system = prompts.get("plan", lang_name=lang_name)
+    if replan_report:
+        system += "\n\n" + prompts.get("replan", tried_cause=dx.causes[max(0, idx - 1)].title, report=replan_report,
+                                       next_cause=dx.causes[idx].title)
+    content = [{"type": "text", "text": "Object report:\n" + json.dumps(rep.model_dump(), ensure_ascii=False)
+                + "\n\nDiagnosis:\n" + json.dumps(dx.model_dump(), ensure_ascii=False)
+                + f"\n\nPlan for this cause: {dx.causes[idx].title}\nOwner's description:\n{description(s)}"}]
+    plan = _chat_json(RepairPlan, system, content, "repair_plan", mock.plan(_scenario(s), s["lang"], idx),
+                      model=settings.reason_model, effort="medium", allow_open=True)
+    s["plan"] = plan.model_dump()
+    s["checks"], s["diagrams"], s["audio"] = {}, {}, {}
+    _stage(s, "plan", "done", f"{len(plan.steps)} steps", int((time.time() - t0) * 1000))
+    return plan
+
+
+def stage_safety(s: dict[str, Any], dx: Diagnosis, plan: RepairPlan) -> bool:
+    g = safety.check_plan([st.instruction for st in plan.steps], s["lang"])
+    if dx.safety_level == "red" or not g.allowed:
+        reason = g.reason if not g.allowed else (dx.safety_reason + " " + safety.RED_MESSAGE[s["lang"]]).strip()
+        s["safety"]["level"] = "red"
+        _stop(s, reason, "safety")
+        return False
+    _stage(s, "safety", "done", dx.safety_level)
+    return True
+
+
+def _review(img: Path, step) -> DiagramReview:
+    return _chat_json(DiagramReview, prompts.get("diagram_review"),
+                      [_photo_part(img), {"type": "text", "text": f"Step: {step.instruction}"}], "diagram_review", {"ok": True},
+                      model=settings.vision_model, effort="low")
+
+
+def make_diagram(s: dict[str, Any], step) -> dict[str, Any]:
+    d = session_dir(s["id"])
+    out = d / f"diagram_{step.n}.png"
+    photo = d / s["photos"][0]
+    if settings.offline:
+        mock.diagram(photo, step.n, out)
+        return {"file": out.name, "attempts": 1, "review": "ok"}
+    from .. import meta_client
+
+    refs = [photo] + ([d / s["parts"][step.component_id]["image"]] if s["parts"].get(step.component_id, {}).get("image") else [])
+    brief = step.diagram_prompt or step.instruction
+    note, attempts = "ok", 0
+    for attempts in (1, 2):
+        meta_client.edit_image(prompts.get("diagram", brief=brief), refs, out, fast=attempts == 1)
+        if not settings.diagram_checker:
+            break
+        rv = _review(out, step)
+        if rv.ok:
+            note = "ok"
+            break
+        note, brief = ("; ".join(rv.problems)[:160] or "redrawn"), (rv.fix_prompt or brief)
+    return {"file": out.name, "attempts": attempts, "review": note}
+
+
+def stage_illustrate(s: dict[str, Any], plan: RepairPlan) -> None:
+    wanted = [st for st in plan.steps if st.needs_diagram][: settings.max_diagrams]
+    if not settings.illustrate or not wanted:
+        _stage(s, "illustrate", "skipped", "photo is enough" if settings.illustrate else "ILLUSTRATE=0")
+        return
+    t0 = time.time()
+    _stage(s, "illustrate", "running")
+    meter = cost.current()
+
+    def one(st):
+        cost.use(meter)
+        try:
+            return st.n, make_diagram(s, st)
+        except Exception as e:  # budget or API error: the step falls back to the annotated photo
+            log.warning("diagram %s failed: %s", st.n, e)
+            return st.n, {"file": None, "review": str(e)[:160]}
+
+    with ThreadPoolExecutor(max_workers=2) as ex:
+        for n, res in ex.map(one, wanted):
+            s["diagrams"][str(n)] = res
+    made = sum(1 for v in s["diagrams"].values() if v.get("file"))
+    _stage(s, "illustrate", "done", f"{made}/{len(wanted)}", int((time.time() - t0) * 1000))
+
+
+def stage_narrate(s: dict[str, Any], plan: RepairPlan) -> None:
+    if not settings.narration_voice:
+        _stage(s, "narrate", "skipped", "browser voice")
+        return
+    t0 = time.time()
+    _stage(s, "narrate", "running")
+    d = session_dir(s["id"])
+    for st in plan.steps:
+        f = media.speak(st.voice_text or st.instruction, s["lang"], d / f"voice_{s['cause_index']}_{st.n}.mp3")
+        if f:
+            s["audio"][str(st.n)] = f.name
+    _stage(s, "narrate", "done", f"{len(s['audio'])}/{len(plan.steps)}", int((time.time() - t0) * 1000))
+
+
+def _stop(s: dict[str, Any], reason: str, at: str) -> None:
+    s["status"], s["stop_reason"] = "stopped", reason
+    s["safety"]["level"] = "red"
+    s["stages"][at] = {"status": "stopped", "note": reason[:90]}
+    for k, v in s["stages"].items():
+        if v["status"] in {"waiting", "running"}:
+            s["stages"][k] = {"status": "skipped", "note": "safety stop"}
+    save(s)
+
+
+# =========================================================================== orchestration
+def run(sid: str) -> dict[str, Any]:
+    """Run (or resume after a follow-up answer) the full analysis."""
+    lock = _locks.setdefault(sid, threading.Lock())
+    with lock:
+        s = load(sid)
+        meter = cost.Meter(settings.max_cost_usd)
+        if s.get("cost"):  # resuming after a follow-up answer: keep what was already spent
+            meter.spent = s["cost"].get("spent_usd", 0.0)
+            meter.items = dict(s["cost"].get("by_model", {}))
+        cost.use(meter)
+        s["status"] = "running"
+        save(s)
+        try:
+            if s["stages"]["listen"]["status"] in {"waiting", "running"}:
+                stage_listen(s)
+            if not stage_gate(s):
+                return s
+            rep = ObjectReport.model_validate(s["object_report"]) if s.get("object_report") else stage_look(s)
+            if s["stages"]["segment"]["status"] in {"waiting", "running"}:
+                stage_segment(s, rep)
+            dx = stage_diagnose(s, rep)
+            if dx.safety_level == "red":
+                s["safety"]["level"] = "red"
+                _stop(s, (dx.safety_reason + " " + safety.RED_MESSAGE[s["lang"]]).strip(), "diagnose")
+                return s
+            if dx.causes[0].confidence < 60 and dx.follow_up_question and not s.get("answer"):
+                s["status"], s["question"] = "needs_answer", dx.follow_up_question
+                save(s)
+                return s
+            plan = stage_plan(s, rep, dx)
+            if not stage_safety(s, dx, plan):
+                return s
+            stage_illustrate(s, plan)
+            stage_narrate(s, plan)
+            s["status"] = "ready"
+        except cost.BudgetExceeded as e:
+            s["status"], s["error"] = "error", str(e)
+        except Exception as e:
+            log.error("session %s failed: %s", sid, traceback.format_exc())
+            s["status"], s["error"] = "error", str(e)[:400]
+        finally:
+            s["cost"] = meter.summary()
+            save(s)
+            cost.use(None)
+        return s
+
+
+def start(sid: str) -> None:
+    threading.Thread(target=run, args=(sid,), daemon=True, name=f"session-{sid}").start()
+
+
+def answer(sid: str, text: str) -> dict[str, Any]:
+    s = load(sid)
+    if s["status"] != "needs_answer":
+        raise ValueError("this session is not waiting for an answer")
+    s["answer"], s["question"], s["status"] = text.strip()[:500], None, "running"
+    save(s)
+    return s
+
+
+def check_step(sid: str, n: int, photo: Path) -> dict[str, Any]:
+    """Stage 8: compare the user's new photo with the step's expected state."""
+    s = load(sid)
+    if not s.get("plan"):
+        raise ValueError("no plan yet")
+    plan = RepairPlan.model_validate(s["plan"])
+    step = next((st for st in plan.steps if st.n == n), None)
+    if step is None:
+        raise ValueError("no such step")
+    d = session_dir(sid)
+    name = f"check_{s['cause_index']}_{n}_{len(s['checks'].get(str(n), {}).get('tries', [])) + 1}.jpg"
+    overlay.normalize_photo(photo, d / name, settings.max_image_side)
+    meter = cost.Meter(0.05)
+    cost.use(meter)
+    try:
+        content = [{"type": "text", "text": f"Step {n}: {step.instruction}\nEXPECTED: {step.expected_state}\nREFERENCE (before):"},
+                   _photo_part(d / s["photos"][0])]
+        if s["parts"].get(step.component_id, {}).get("image"):
+            content += [{"type": "text", "text": "Highlighted part:"}, _photo_part(d / s["parts"][step.component_id]["image"])]
+        content += [{"type": "text", "text": "NEW photo:"}, _photo_part(d / name)]
+        if settings.offline:
+            res = StepCheck.model_validate(mock.step_check(d / name, s["lang"]))
+        else:
+            res = _chat_json(StepCheck, prompts.get("verify_step", lang_name=prompts.LANG_NAME[s["lang"]]), content, "step_check", {},
+                             model=settings.vision_model, effort="medium")
+    finally:
+        cost.use(None)
+    rec = s["checks"].setdefault(str(n), {"passed": False, "fails": 0, "tries": []})
+    rec["tries"].append({"photo": name, **res.model_dump()})
+    rec["passed"] = res.passed
+    if not res.passed:
+        rec["fails"] += 1
+    escalate = rec["fails"] >= settings.max_check_fails
+    out = res.model_dump() | {"fails": rec["fails"], "escalate": escalate}
+    if escalate:
+        out["escalate_hint"] = {"id": "Sudah dicoba beberapa kali. Ketuk 'Masih rusak' untuk rencana lain, atau panggil teknisi.",
+                                "jv": "Wis dijajal kaping pirang-pirang. Tutul 'Isih rusak' kanggo rencana liya, utawa undang teknisi.",
+                                "en": "Tried a few times. Tap 'Still broken' for another plan, or call a professional."}[s["lang"]]
+    save(s)
+    return out
+
+
+def replan(sid: str, report: str) -> dict[str, Any]:
+    """'Stuck / didn't work': move to the next likely cause and plan again (agentic re-plan)."""
+    s = load(sid)
+    if not s.get("diagnosis"):
+        raise ValueError("no diagnosis yet")
+    dx = Diagnosis.model_validate({k: v for k, v in s["diagnosis"].items() if k != "cost_estimate_idr"})
+    rep = ObjectReport.model_validate(s["object_report"])
+    report = (report or "").strip()[:500]
+    gate = safety.check_text(report, s["lang"])
+    if not gate.allowed:
+        _stop(s, gate.reason, "gate")
+        return s
+    s["history"].append(f"Tried '{dx.causes[min(s['cause_index'], len(dx.causes) - 1)].title}', result: {report or 'still broken'}")
+    if s["cause_index"] + 1 >= len(dx.causes):
+        s["status"], s["stop_reason"] = "exhausted", {
+            "id": "Semua kemungkinan yang aman sudah dicoba. Bawa ke bengkel/servis dan tunjukkan laporan ini.",
+            "jv": "Kabeh kemungkinan sing aman wis dijajal. Gawanen menyang bengkel/servis lan tuduhna laporan iki.",
+            "en": "All safe causes have been tried. Take it to a repair shop and show them this report."}[s["lang"]]
+        save(s)
+        return s
+    s["cause_index"] += 1
+    meter = cost.Meter(settings.max_cost_usd)
+    cost.use(meter)
+    try:
+        plan = stage_plan(s, rep, dx, replan_report=report or "still broken")
+        if stage_safety(s, dx, plan):
+            stage_illustrate(s, plan)
+            stage_narrate(s, plan)
+            s["status"] = "ready"
+    finally:
+        prev = s.get("cost") or {}
+        by_model = dict(prev.get("by_model", {}))
+        for k, v in meter.items.items():
+            by_model[k] = round(by_model.get(k, 0) + v, 4)
+        s["cost"] = {"spent_usd": round(prev.get("spent_usd", 0) + meter.spent, 4), "budget_usd": settings.max_cost_usd, "by_model": by_model}
+        save(s)
+        cost.use(None)
+    return s
+
+
+def report(sid: str) -> dict[str, Any]:
+    """Finish summary (SPEC §5.7)."""
+    s = load(sid)
+    plan, dx = s.get("plan") or {}, s.get("diagnosis") or {}
+    steps = plan.get("steps", [])
+    verified = sum(1 for st in steps if s["checks"].get(str(st["n"]), {}).get("passed"))
+    return {"id": sid, "object": (s.get("object_report") or {}).get("object", ""), "problem": dx.get("problem_summary", ""),
+            "fix": plan.get("cause_title", ""), "steps_total": len(steps), "steps_verified": verified,
+            "tools": dx.get("tools", []), "parts": dx.get("parts", []), "cost_estimate_idr": dx.get("cost_estimate_idr", 0),
+            "minutes_estimate": dx.get("minutes_estimate"), "safety_level": s["safety"]["level"], "attempts": s.get("history", []),
+            "status": s["status"], "created": s["created"], "lang": s["lang"]}
+
+
+def cleanup(max_age_hours: float | None = None) -> int:
+    """Delete sessions older than RETENTION_HOURS (privacy, SPEC §7). Returns how many were removed."""
+    import shutil
+
+    root = settings.data_dir / "sessions"
+    if not root.exists():
+        return 0
+    cutoff = time.time() - 3600 * (settings.retention_hours if max_age_hours is None else max_age_hours)
+    n = 0
+    for d in root.iterdir():
+        f = d / "session.json"
+        if d.is_dir() and f.exists() and f.stat().st_mtime < cutoff:
+            shutil.rmtree(d, ignore_errors=True)
+            n += 1
+    return n

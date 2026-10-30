@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{{TITLE}} · Tukang Copilot</title>
+  <meta name="description" content="Foto barang rusak, ceritakan masalahnya, dapat panduan perbaikan langkah demi langkah.">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body data-sid="{{SID}}">
+<header class="top">
+  <div class="brand">🔧 <b>Tukang Copilot</b></div>
+  <select id="lang" aria-label="Language">
+    <option value="id">Bahasa Indonesia</option>
+    <option value="jv">Basa Jawa</option>
+    <option value="en">English</option>
+  </select>
+</header>
+<div id="modeBadge" class="badge hidden"></div>
+
+<main>
+  <!-- 1. Capture -->
+  <section id="capture" class="card hidden">
+    <h1 data-t="hero">Apa yang rusak?</h1>
+    <p class="muted" data-t="heroSub">Foto barangnya, ceritakan masalahnya, dapat panduan perbaikan.</p>
+
+    <label class="photoBox" id="photoBox">
+      <input id="photo" type="file" accept="image/*" capture="environment" multiple hidden>
+      <img id="photoPreview" alt="" class="hidden">
+      <span id="photoHint">📷 <span data-t="takePhoto">Ambil foto</span></span>
+    </label>
+
+    <div class="chips" id="cats">
+      <button type="button" class="chip" data-cat="motor" data-t="catMotor">Motor</button>
+      <button type="button" class="chip" data-cat="pump" data-t="catPump">Pompa air</button>
+      <button type="button" class="chip" data-cat="appliance" data-t="catAppliance">Elektronik rumah</button>
+      <button type="button" class="chip" data-cat="plumbing" data-t="catPlumbing">Pipa/keran</button>
+      <button type="button" class="chip" data-cat="other" data-t="catOther">Lainnya</button>
+    </div>
+    <div class="row">
+      <button id="micBtn" class="btn big" type="button">🎙️ <span data-t="record">Tahan untuk bicara</span></button>
+      <span id="recState" class="muted"></span>
+    </div>
+    <textarea id="text" rows="3" maxlength="2000" data-tp="typeHere" placeholder="…atau ketik masalahnya di sini"></textarea>
+
+    <button id="goBtn" class="btn primary big" type="button" data-t="go">Diagnosa sekarang</button>
+    <p class="small muted"><span data-t="samples">Coba contoh:</span>
+      <button class="btn link sample" type="button" data-sample="motor" data-t="sMotor">motor mogok</button> ·
+      <button class="btn link sample" type="button" data-sample="faucet" data-t="sFaucet">kran menetes</button> ·
+      <button class="btn link sample" type="button" data-sample="rice" data-t="sRice">rice cooker mati</button></p>
+    <p id="formErr" class="err"></p>
+  </section>
+
+  <!-- 2. Progress -->
+  <section id="progress" class="card hidden">
+    <h2 data-t="working">Sedang memeriksa…</h2>
+    <ol id="stageList" class="stages"></ol>
+    <div id="question" class="hidden">
+      <p class="q" id="questionText"></p>
+      <input id="answerText" maxlength="500" data-tp="answerHere" placeholder="Jawaban kamu">
+      <button id="answerBtn" class="btn primary" type="button" data-t="send">Kirim</button>
+    </div>
+    <p id="stopBox" class="stop hidden"></p>
+    <p id="jobErr" class="err"></p>
+  </section>
+
+  <!-- 3. Result -->
+  <section id="result">
+    <div class="card">
+      <p class="muted small"><span data-t="diagnosis">Diagnosa</span> <span id="safetyBadge" class="level"></span></p>
+      <h2 id="dxObject"></h2>
+      <p id="dxSummary"></p>
+      <ul id="dxCauses" class="causes"></ul>
+      <div id="partsWrap" class="hidden"><img id="partsImg" alt="Highlighted parts" class="partsImg"><ul id="partsList" class="legend"></ul></div>
+    </div>
+
+    <div class="card">
+      <h2 id="gTitle"></h2>
+      <p class="muted" id="safetyReason"></p>
+      <p class="chips"><span id="gDiff" class="chip"></span><span id="gTime" class="chip"></span><span id="gCost" class="chip"></span></p>
+      <div class="safety"><b>⚠️ <span data-t="safetyFirst">Keselamatan dulu</span></b><ul id="gSafety"></ul></div>
+      <div class="cols">
+        <div><b data-t="tools">Alat</b><ul id="gTools"></ul></div>
+        <div><b data-t="materials">Bahan</b><ul id="gMats"></ul></div>
+      </div>
+    </div>
+
+    <div class="card" id="stepCard">
+      <div class="stepHead"><span id="stepNo" class="stepNo"></span><h3 id="stepTitle"></h3></div>
+      <img id="stepImg" class="stepImg hidden" alt="">
+      <p id="stepText" class="stepText"></p>
+      <p id="stepCaution" class="caution hidden"></p>
+      <p id="stepWhy" class="muted small"></p>
+      <p id="stepCheck" class="check"></p>
+      <div id="checkResult" class="hidden"></div>
+      <div class="row nav">
+        <button id="prevBtn" class="btn" type="button">◀</button>
+        <button id="playBtn" class="btn" type="button">🔊 <span data-t="listen">Dengarkan</span></button>
+        <button id="nextBtn" class="btn primary" type="button"><span data-t="next">Lanjut</span> ▶</button>
+      </div>
+      <label class="small"><input type="checkbox" id="handsFree"> <span data-t="handsFree">Mode tangan bebas (bacakan otomatis)</span></label>
+    </div>
+
+    <div class="card">
+      <p><b data-t="done">Selesai kalau:</b> <span id="gDone"></span></p>
+      <p class="muted" id="gPro"></p>
+      <p id="verifiedCount" class="small"></p>
+    </div>
+
+    <div class="row">
+      <button id="shareBtn" class="btn" type="button" data-t="share">Bagikan panduan</button>
+      <a class="btn primary" href="/" data-t="again">Perbaiki barang lain</a>
+    </div>
+    <p class="muted small" id="models"></p>
+  </section>
+</main>
+<p class="muted small center" id="disclaimer"></p>
+<footer class="muted small" data-t="footer">Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.</footer>
+<audio id="player"></audio>
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+:root{--o:#ff7a00;--ink:#1d232b;--mut:#6b7480;--bg:#f6f3ee;--card:#fff;--ok:#1f9d55;--bad:#c0392b}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+.top{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--ink);color:#fff;position:sticky;top:0;z-index:5}
+.top select{border-radius:8px;padding:4px 6px}
+main{max-width:640px;margin:0 auto;padding:12px}
+.card{background:var(--card);border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+h1{font-size:1.6rem;margin:.2em 0}h2{font-size:1.25rem;margin:.2em 0}h3{margin:0;font-size:1.1rem}
+.muted{color:var(--mut)}.small{font-size:.85rem}.hidden{display:none!important}
+.err{color:var(--bad);min-height:1em}
+.badge{max-width:640px;margin:8px auto 0;padding:6px 12px;border-radius:999px;background:#fff3e6;color:#8a4500;font-size:.85rem;text-align:center}
+.photoBox{display:flex;align-items:center;justify-content:center;min-height:200px;border:2px dashed #d5cfc5;border-radius:14px;margin:12px 0;cursor:pointer;overflow:hidden;background:#faf8f4;font-size:1.1rem}
+.photoBox img{width:100%;max-height:360px;object-fit:contain}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.btn{border:0;border-radius:12px;padding:10px 14px;background:#ece7df;color:var(--ink);font-size:1rem;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.btn.big{padding:14px 18px;font-size:1.05rem}
+.btn.primary{background:var(--o);color:#fff;font-weight:600}
+.btn.link{background:none;color:var(--o);text-decoration:underline;padding:6px 0}
+.btn.rec{background:var(--bad);color:#fff}
+#goBtn{width:100%;margin-top:8px;justify-content:center}
+textarea,input[type=text],#answerText{width:100%;border:1px solid #d5cfc5;border-radius:12px;padding:10px;font:inherit}
+.stages{list-style:none;padding:0}.stages li{padding:6px 0;border-bottom:1px solid #f0ece6}
+.stages li::before{content:"○ ";color:var(--mut)}.stages li.running::before{content:"◐ ";color:var(--o)}
+.stages li.done::before{content:"● ";color:var(--ok)}.stages li.skipped::before{content:"– ";color:var(--mut)}
+.stages li.stopped::before{content:"■ ";color:var(--bad)}
+.stages .note{color:var(--mut);font-size:.85rem;margin-left:6px}
+.q{font-weight:600}.stop{background:#fdecea;color:#8a1f12;padding:12px;border-radius:12px}
+.causes{padding-left:18px}.causes .pct{font-weight:700;color:var(--o)}
+.partsImg{width:100%;border-radius:12px;margin-top:8px}
+.legend{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.legend li{background:#f3efe8;border-radius:999px;padding:2px 10px;font-size:.9rem}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{background:#f3efe8;border-radius:999px;padding:2px 10px;font-size:.9rem}
+.safety{background:#fff6e5;border-radius:12px;padding:10px 12px;margin:10px 0}.safety ul{margin:4px 0;padding-left:18px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}.cols ul{padding-left:18px;margin:4px 0}
+.stepHead{display:flex;gap:10px;align-items:center}
+.stepNo{background:var(--o);color:#fff;border-radius:999px;min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.stepImg{width:100%;border-radius:12px;margin:10px 0;background:#faf8f4}
+.stepText{font-size:1.15rem}
+.caution{background:#fdecea;color:#8a1f12;padding:8px 10px;border-radius:10px}
+.check{color:var(--ok)}.check::before{content:"✓ "}
+.nav{justify-content:space-between}
+.fix-yes{color:var(--ok);font-weight:700}.fix-no{color:var(--bad);font-weight:700}.fix-partly,.fix-unclear{color:#8a4500;font-weight:700}
+footer{text-align:center;padding:24px 16px}
+@media (max-width:420px){.cols{grid-template-columns:1fr}}
+.chip{border:0;cursor:pointer}.chip.on{background:var(--o);color:#fff}
+#cats{margin:8px 0}
+.level{border-radius:999px;padding:1px 10px;font-weight:700;font-size:.8rem;color:#fff}
+.level.green{background:var(--ok)}.level.amber{background:#e69500}.level.red{background:var(--bad)}
+.pass{color:var(--ok);font-weight:700}.fail{color:var(--bad);font-weight:700}
+.center{text-align:center}
