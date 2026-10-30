@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 02:30 WIB (v1.10.0)
+- **New:** `scripts/eval_fixtures.py` + `docs/EVAL_REPORT.md` (mock run: 10/10 photos and 3/3 camera checks meet expectations). Live use: `python scripts/eval_fixtures.py https://<app> --out docs/EVAL_REPORT.md`; for real photos put them with a `manifest.json` (same shape as api/tests/fixtures) in a folder and pass `--dir`. Edge case note: in mock mode the unknown-object photo "passes" because the motorbike mock asks a follow-up; the live run is the real test of that.
+- **Checks (real runs, 02:25 WIB):** ruff clean, `mypy api` strict no issues in 49 files, pytest **196 passed, 7 skipped** (Playwright/jsdom, no Chromium downloadable here), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (196/203).
+- **Next up (Malik):** after first live key run: run eval_fixtures live, tune prompts, record numbers in SUBMISSION; re-take screenshots/video with hood panel + tyre when a Chromium exists; Render preview smoke once deployed.
+
 ## State on 2026-10-31 02:05 WIB (v1.9.1)
 - **New:** four more labelled stand-in fixtures for the tyre scenario (14 total) and `api/tests/test_tire_fixture.py` (flow, follow-up answer, camera check, PDF).
 - **Checks (real runs, 02:00 WIB):** ruff clean, `mypy api` strict no issues in 48 files, pytest **195 passed, 6 skipped** (Playwright only; jsdom UI test runs after `npm install --prefix /tmp/jd jsdom`), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (195/201).

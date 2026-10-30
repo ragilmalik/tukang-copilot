@@ -34,4 +34,5 @@ Owner: **M** = Malik, **H** = Malik.
 - [x] Workshop mode: large-print one-step-per-page PDF (v1.6.0)
 - [x] jsdom headless UI test of web/app.js (v1.7.1)
 - [x] "Under the hood" stage-to-model panel + PDF section (v1.7.0)
+- [x] Fixture evaluation script with markdown report, usable on real photos (v1.10.0)
 - [x] Fifth demo scenario: flat scooter tyre (v1.9.0)
