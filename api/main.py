@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import re
+import shutil
 import tempfile
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -19,7 +20,7 @@ from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import __version__
-from .pipeline import engine, mock
+from .pipeline import engine, media, mock
 from .settings import ROOT, settings
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -40,7 +41,8 @@ SAMPLE_TEXT = {
 CATEGORIES = {"", "motor", "pump", "appliance", "plumbing", "other"}
 IMAGE_TYPES = {".jpg", ".jpeg", ".png", ".webp"}
 AUDIO_TYPES = {".webm", ".ogg", ".wav", ".mp3", ".m4a", ".mp4", ".aac", ".opus"}
-MAX_PHOTO, MAX_AUDIO = 15 * 1024 * 1024, 20 * 1024 * 1024
+VIDEO_TYPES = {".mp4", ".mov", ".webm", ".3gp", ".mkv", ".m4v"}
+MAX_PHOTO, MAX_AUDIO, MAX_VIDEO = 15 * 1024 * 1024, 20 * 1024 * 1024, 40 * 1024 * 1024
 FILE_RE = re.compile(r"^(photo\d|parts|part_[A-Za-z0-9_-]+|check_\d+_\d+_\d+|diagram_\d+|voice_\d+_\d+)\.(jpg|png|mp3)$")
 
 
@@ -123,6 +125,7 @@ def health() -> dict[str, Any]:
 
 @app.post("/api/sessions")
 async def create_session(photos: list[UploadFile] | None = File(default=None), audio: UploadFile | None = File(default=None),
+                         video: UploadFile | None = File(default=None),
                          text: str = Form(default=""), language: str = Form(default="id"), category: str = Form(default=""),
                          sample: str = Form(default="")) -> dict[str, Any]:
     if language not in {"id", "jv", "en"}:
@@ -132,6 +135,8 @@ async def create_session(photos: list[UploadFile] | None = File(default=None), a
     if len(text) > 2000:
         raise HTTPException(400, "Description is too long (max 2000 characters)")
     tmp: list[Path] = []
+    tmp_dirs: list[Path] = []
+    video_sound: Path | None = None
     try:
         if sample:
             if sample not in SAMPLE_TEXT:
@@ -140,15 +145,31 @@ async def create_session(photos: list[UploadFile] | None = File(default=None), a
             text = text or SAMPLE_TEXT[sample][language]
         else:
             ups = [p for p in (photos or []) if p.filename][:3]
-            if not ups:
+            has_video = video is not None and bool(video.filename)
+            if not ups and not has_video:
                 raise HTTPException(400, "Take or upload a photo of the broken thing")
             for up in ups:
                 tmp.append(await _save_upload(up, IMAGE_TYPES, MAX_PHOTO, ".jpg"))
             photo_paths = list(tmp)
+            if has_video and video is not None and len(photo_paths) < 3:
+                # 5-10 s clip -> sharpest frame from each third, appended after any photos (max 3 in total)
+                vid = await _save_upload(video, VIDEO_TYPES, MAX_VIDEO, ".mp4")
+                tmp.append(vid)
+                frames_dir = Path(tempfile.mkdtemp(prefix="tc-frames-"))
+                try:
+                    frames = media.extract_frames(vid, frames_dir)
+                except RuntimeError as e:
+                    raise HTTPException(400, str(e))
+                tmp.extend(frames)
+                photo_paths += frames[:3 - len(photo_paths)]
+                tmp_dirs.append(frames_dir)
+                video_sound = vid  # used as the voice description if nothing else was given
         audio_path = None
         if audio is not None and audio.filename:
             audio_path = await _save_upload(audio, AUDIO_TYPES, MAX_AUDIO, ".webm")
             tmp.append(audio_path)
+        if audio_path is None and not text.strip() and video_sound is not None:
+            audio_path = video_sound
         if not text.strip() and audio_path is None:
             raise HTTPException(400, "Describe the problem by voice or text")
         try:
@@ -160,6 +181,8 @@ async def create_session(photos: list[UploadFile] | None = File(default=None), a
     finally:
         for p in tmp:
             p.unlink(missing_ok=True)
+        for d in tmp_dirs:
+            shutil.rmtree(d, ignore_errors=True)
     engine.start(s["id"])
     return {"id": s["id"]}
 

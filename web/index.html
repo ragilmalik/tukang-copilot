@@ -32,6 +32,11 @@
       <img id="photoPreview" alt="" class="hidden">
       <span id="photoHint">📷 <span data-t="takePhoto">Ambil foto</span></span>
     </label>
+    <label class="btn link videoBtn" id="videoBox">
+      <input id="video" type="file" accept="video/*" capture="environment" hidden>
+      <span data-t="videoBtn">🎥 Atau rekam video 5–10 detik</span>
+    </label>
+    <p class="small muted" id="videoHint" aria-live="polite"></p>
 
     <div class="chips" id="cats">
       <button type="button" class="chip" data-cat="motor" data-t="catMotor">Motor</button>

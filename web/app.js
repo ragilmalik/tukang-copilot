@@ -16,7 +16,7 @@ const T = {
         diff: "Kesulitan", min: "menit", est: "perkiraan", copied: "Tautan disalin", openW: "Penalaran: Muse Spark Open (open weights)", demo: "Mode demo: jawaban contoh, tanpa biaya API.",
         green: "AMAN", amber: "HATI-HATI", red: "STOP", pass: "✅ Langkah ini beres", fail: "⚠️ Belum pas", checking: "Memeriksa foto…",
         verified: "langkah terverifikasi kamera", recording: "Merekam…", recorded: "Suara terekam ✓", micErr: "Mikrofon tidak bisa dipakai. Ketik saja masalahnya.",
-        exhausted: "Sudah semua", newPlan: "Rencana baru siap.", photos: "foto" },
+        exhausted: "Sudah semua", newPlan: "Rencana baru siap.", photos: "foto", videoBtn: "🎥 Atau rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar terbaik diambil otomatis)", videoBig: "Videonya terlalu besar. Rekam 5–10 detik saja." },
   en: { hero: "What's broken?", heroSub: "Snap it, say what's wrong, get a step-by-step repair guide.", takePhoto: "Take photos (1–3)",
         catMotor: "Motorbike", catPump: "Water pump", catAppliance: "Home appliance", catPlumbing: "Pipes/taps", catOther: "Other",
         record: "Tap to talk", stop: "Tap to stop", typeHere: "…or type the problem here", go: "Check it now",
@@ -32,7 +32,7 @@ const T = {
         diff: "Difficulty", min: "min", est: "est.", copied: "Link copied", openW: "Reasoning: Muse Spark Open (open weights)", demo: "Demo mode: sample answers, no API cost.",
         green: "SAFE", amber: "CAUTION", red: "STOP", pass: "✅ Step looks right", fail: "⚠️ Not quite", checking: "Checking photo…",
         verified: "steps verified by camera", recording: "Recording…", recorded: "Voice recorded ✓", micErr: "Microphone unavailable. Please type the problem.",
-        exhausted: "All tried", newPlan: "New plan ready.", photos: "photos" },
+        exhausted: "All tried", newPlan: "New plan ready.", photos: "photos", videoBtn: "🎥 Or record a 5–10 s video", videoOk: "Video ready ✓ (the 3 sharpest frames are picked for you)", videoBig: "That video is too big. Record 5–10 seconds." },
 };
 // Basa Jawa (ngoko, as spoken around Semarang). Falls back to Bahasa Indonesia for any key not listed.
 T.jv = Object.assign({}, T.id, {
@@ -53,10 +53,11 @@ T.jv = Object.assign({}, T.id, {
   demo: "Mode demo: wangsulan conto, tanpa biaya API.",
   green: "AMAN", amber: "ATI-ATI", red: "MANDHEG", pass: "✅ Langkah iki wis bener", fail: "⚠️ Durung pas", checking: "Mriksa foto…",
   verified: "langkah wis dicek kamera", recording: "Ngrekam…", recorded: "Swara kerekam ✓", micErr: "Mikrofon ora bisa dienggo. Ketik wae masalahe.",
-  exhausted: "Wis kabeh dijajal", newPlan: "Rencana anyar wis siap.", photos: "foto",
+  exhausted: "Wis kabeh dijajal", newPlan: "Rencana anyar wis siap.", photos: "foto", videoBtn: "🎥 Utawa rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar paling cetha dijupuk otomatis)", videoBig: "Videone kegedhen. Rekam 5–10 detik wae.",
 });
 
 let lang = localStorage.getItem("tc_lang") || "id";
+let videoFile = null;
 let photoFiles = [], audioBlob = null, rec = null, chunks = [], S = null, stepIdx = 0, category = "", es = null;
 const t = (k) => (T[lang] && T[lang][k] !== undefined ? T[lang][k] : T.id[k] !== undefined ? T.id[k] : k);
 const rupiah = (n) => "Rp" + Number(n || 0).toLocaleString("id-ID");
@@ -91,6 +92,11 @@ async function health() {
 /* ---------------- capture ---------------- */
 function setupCapture() {
   on("lang", "change", (e) => { lang = e.target.value; localStorage.setItem("tc_lang", lang); applyLang(); });
+  on("video", "change", (e) => {
+    videoFile = e.target.files[0] || null;
+    if (videoFile && videoFile.size > 40 * 1024 * 1024) { videoFile = null; $("formErr").textContent = t("videoBig"); return; }
+    $("videoHint").textContent = videoFile ? t("videoOk") : "";
+  });
   on("photo", "change", (e) => {
     photoFiles = [...e.target.files].slice(0, 3);
     if (photoFiles.length) {
@@ -127,12 +133,13 @@ async function toggleRec() {
 async function submit(sample) {
   $("formErr").textContent = "";
   const text = $("text").value.trim();
-  if (!sample && !photoFiles.length) return ($("formErr").textContent = t("needPhoto"));
-  if (!sample && !text && !audioBlob) return ($("formErr").textContent = t("needDesc"));
+  if (!sample && !photoFiles.length && !videoFile) return ($("formErr").textContent = t("needPhoto"));
+  if (!sample && !text && !audioBlob && !videoFile) return ($("formErr").textContent = t("needDesc"));
   const fd = new FormData();
   fd.append("language", lang); fd.append("text", sample ? "" : text); fd.append("category", category);
   if (sample) fd.append("sample", sample);
   else photoFiles.forEach((f, i) => fd.append("photos", f, f.name || `photo${i + 1}.jpg`));
+  if (videoFile && !sample) fd.append("video", videoFile, videoFile.name || "clip.mp4");  // server keeps the 3 sharpest frames
   if (audioBlob && !sample) {
     const ext = audioBlob.type.includes("mp4") ? "m4a" : audioBlob.type.includes("ogg") ? "ogg" : "webm";
     fd.append("audio", audioBlob, "voice." + ext);

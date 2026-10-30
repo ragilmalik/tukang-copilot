@@ -15,7 +15,8 @@ curl localhost:8000/health
 ## `POST /api/sessions` (multipart)
 | Field | Required | Notes |
 |---|---|---|
-| `photos` | yes (1–3) | jpg/png/webp ≤ 15 MB each |
+| `photos` | yes (1–3), unless `video` is sent | jpg/png/webp ≤ 15 MB each |
+| `video` | no | mp4/mov/webm/3gp/mkv/m4v ≤ 40 MB, ≤ 30 s. The server keeps the sharpest frame from each third of the clip (3 frames; photos first, max 3 in total). If there is no `audio` and no `text`, the clip's own sound is used as the voice description. |
 | `audio` | text or audio | webm/ogg/wav/mp3/m4a/mp4/aac/opus ≤ 20 MB |
 | `text` | text or audio | ≤ 2000 chars |
 | `language` | no | `id` (default), `jv`, `en` |
@@ -23,6 +24,7 @@ curl localhost:8000/health
 | `sample` | no | `motor` / `pump` / `faucet` / `rice`: uses a built-in photo + description |
 ```bash
 curl -F photos=@bike.jpg -F text="Motor susah hidup" -F language=id -F category=motor localhost:8000/api/sessions
+curl -F video=@pump.mp4 -F language=id -F category=pump localhost:8000/api/sessions   # video only: frames + its sound
 # {"id":"d2b5d598d8c6"}
 ```
 Errors: 400 (missing photo/description, bad type, bad language/category, unreadable image), 413 (too large).

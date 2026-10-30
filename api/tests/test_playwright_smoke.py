@@ -108,3 +108,15 @@ def test_open_weights_badge(page, monkeypatch):
     assert "Muse Spark Open" in page.text_content("#owBadge")
     page.select_option("#lang", "en")
     assert "Reasoning" in page.text_content("#owBadge")       # follows the language switch
+
+
+def test_video_capture_flow(page, tmp_path):
+    from api.tests.test_video import _clip
+
+    clip = _clip(tmp_path / "pump.mp4")
+    page.goto(page.base + "/")
+    page.set_input_files("#video", str(clip))
+    assert page.text_content("#videoHint").strip()               # "Video siap ✓ ..."
+    page.click('#cats [data-cat="pump"]')
+    page.click("#goBtn")                                          # no photo, no text: the clip is enough
+    page.wait_for_selector("#result:not(.hidden), #question:not(.hidden)", timeout=30000)
