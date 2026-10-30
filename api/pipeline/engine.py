@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import logging
+import shutil
 import threading
 import time
 import traceback
@@ -27,6 +28,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, TypeVar, cast
 
+from PIL import Image
 from pydantic import BaseModel, ValidationError
 
 from .. import cost, prompts
@@ -85,12 +87,19 @@ def create(photos: list[Path], lang: str, text: str = "", audio: Path | None = N
     d = session_dir(sid)
     d.mkdir(parents=True, exist_ok=True)
     names = []
-    for i, p in enumerate(photos[:3]):
-        name = f"photo{i + 1}.jpg"
-        overlay.normalize_photo(p, d / name, settings.max_image_side)
-        names.append(name)
-    if audio is not None:
-        media.to_wav(audio, d / "voice.wav")
+    try:
+        for i, p in enumerate(photos[:3]):
+            name = f"photo{i + 1}.jpg"
+            try:
+                overlay.normalize_photo(p, d / name, settings.max_image_side)
+            except (OSError, ValueError, Image.DecompressionBombError) as e:
+                raise RuntimeError("Could not read that photo. Try a JPG or PNG.") from e
+            names.append(name)
+        if audio is not None:
+            media.to_wav(audio, d / "voice.wav")
+    except BaseException:
+        shutil.rmtree(d, ignore_errors=True)  # no half-made session left behind
+        raise
     s = {"id": sid, "created": time.time(), "lang": lang, "category": category, "status": "created", "mode": settings.mode,
          "text": text.strip(), "has_audio": audio is not None, "transcript": "", "answer": "", "question": None,
          "photos": names, "stages": {k: {"status": "waiting", "note": ""} for k in STAGES},
@@ -560,7 +569,6 @@ def report(sid: str) -> dict[str, Any]:
 
 def cleanup(max_age_hours: float | None = None) -> int:
     """Delete sessions older than RETENTION_HOURS (privacy, SPEC §7). Returns how many were removed."""
-    import shutil
 
     root = settings.data_dir / "sessions"
     if not root.exists():

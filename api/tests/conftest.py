@@ -19,6 +19,14 @@ def _tmp_data(tmp_path, monkeypatch):
     monkeypatch.setattr(settings, "mock", True)
     monkeypatch.setattr(settings, "narration_voice", False)
     yield
+    # a pipeline thread started by this test must not outlive its temp data folder (it would write into the next test's)
+    import threading
+    import time
+
+    deadline = time.time() + 20
+    for t in threading.enumerate():
+        if t.name.startswith("session-"):
+            t.join(max(0.0, deadline - time.time()))
 
 
 @pytest.fixture

@@ -74,14 +74,20 @@ async def _save_upload(up: UploadFile, allowed: set[str], limit: int, default_ex
     ext = (Path(up.filename or "").suffix or default_ext).lower()
     if ext not in allowed:
         raise HTTPException(400, f"Unsupported file type {ext}")
-    data = await up.read()
-    if not data:
-        raise HTTPException(400, "Empty file")
-    if len(data) > limit:
-        raise HTTPException(413, "File too large")
     fd, name = tempfile.mkstemp(suffix=ext)
-    with os.fdopen(fd, "wb") as f:
-        f.write(data)
+    size = 0
+    try:
+        with os.fdopen(fd, "wb") as f:
+            while chunk := await up.read(1024 * 1024):  # stream to disk, stop early on oversize uploads
+                size += len(chunk)
+                if size > limit:
+                    raise HTTPException(413, "File too large")
+                f.write(chunk)
+        if size == 0:
+            raise HTTPException(400, "Empty file")
+    except BaseException:
+        Path(name).unlink(missing_ok=True)
+        raise
     return Path(name)
 
 
