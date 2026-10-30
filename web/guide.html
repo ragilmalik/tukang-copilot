@@ -6,6 +6,8 @@
   <title>{{TITLE}} · Tukang Copilot</title>
   <meta name="description" content="Foto barang rusak, ceritakan masalahnya, dapat panduan perbaikan langkah demi langkah.">
   <link rel="stylesheet" href="/static/style.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ff7a00">
 </head>
 <body data-sid="{{SID}}">
 <header class="top">
@@ -109,6 +111,7 @@
 
     <div class="row">
       <button id="shareBtn" class="btn" type="button" data-t="share">Bagikan panduan</button>
+      <a id="pdfBtn" class="btn" href="#" download data-t="pdf">Unduh laporan PDF</a>
       <a class="btn primary" href="/" data-t="again">Perbaiki barang lain</a>
     </div>
     <p class="muted small" id="models"></p>

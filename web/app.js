@@ -4,10 +4,10 @@ const T = {
   id: { hero: "Apa yang rusak?", heroSub: "Foto barangnya, ceritakan masalahnya, dapat panduan perbaikan langkah demi langkah.", takePhoto: "Ambil foto (1–3)",
         catMotor: "Motor", catPump: "Pompa air", catAppliance: "Elektronik rumah", catPlumbing: "Pipa/keran", catOther: "Lainnya",
         record: "Ketuk untuk bicara", stop: "Ketuk untuk berhenti", typeHere: "…atau ketik masalahnya di sini", go: "Periksa sekarang",
-        samples: "Coba contoh:", sMotor: "motor mogok", sFaucet: "kran menetes", sRice: "rice cooker mati",
+        samples: "Coba contoh:", sMotor: "motor mogok", sPump: "pompa tidak keluar air", sFaucet: "kran menetes", sRice: "rice cooker mati",
         working: "Sedang memeriksa…", answerHere: "Jawaban kamu", send: "Kirim", diagnosis: "Diagnosa", safetyFirst: "Keselamatan dulu",
         tools: "Alat", materials: "Suku cadang", listen: "Dengarkan", next: "Lanjut", handsFree: "Mode tangan bebas (bacakan otomatis)",
-        done: "Selesai kalau:", checkStep: "Cek langkah ini", share: "Bagikan laporan", again: "Perbaiki barang lain",
+        done: "Selesai kalau:", checkStep: "Cek langkah ini", share: "Bagikan laporan", pdf: "Unduh laporan PDF", garage: "Garasi saya", garageNote: "Riwayat perbaikan hanya disimpan di HP ini. Panduan bisa dibuka 24 jam.", garageClear: "Hapus riwayat", again: "Perbaiki barang lain",
         stuck: "Masih rusak, coba rencana lain", stuckHere: "Apa yang terjadi? (mis. sudah dicoba, tetap mati)",
         needPhoto: "Ambil atau unggah foto dulu.", needDesc: "Ceritakan masalahnya (suara atau ketik).",
         footer: "Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.",
@@ -20,10 +20,10 @@ const T = {
   en: { hero: "What's broken?", heroSub: "Snap it, say what's wrong, get a step-by-step repair guide.", takePhoto: "Take photos (1–3)",
         catMotor: "Motorbike", catPump: "Water pump", catAppliance: "Home appliance", catPlumbing: "Pipes/taps", catOther: "Other",
         record: "Tap to talk", stop: "Tap to stop", typeHere: "…or type the problem here", go: "Check it now",
-        samples: "Try a sample:", sMotor: "bike won't start", sFaucet: "dripping tap", sRice: "dead rice cooker",
+        samples: "Try a sample:", sMotor: "bike won't start", sPump: "pump gives no water", sFaucet: "dripping tap", sRice: "dead rice cooker",
         working: "Checking…", answerHere: "Your answer", send: "Send", diagnosis: "Diagnosis", safetyFirst: "Safety first",
         tools: "Tools", materials: "Parts", listen: "Listen", next: "Next", handsFree: "Hands-free mode (read steps aloud)",
-        done: "Done when:", checkStep: "Check this step", share: "Share report", again: "Fix something else",
+        done: "Done when:", checkStep: "Check this step", share: "Share report", pdf: "Download PDF report", garage: "My garage", garageNote: "Your repair history stays on this phone only. Guides open for 24 hours.", garageClear: "Clear history", again: "Fix something else",
         stuck: "Still broken, try another plan", stuckHere: "What happened? (e.g. tried it, still dead)",
         needPhoto: "Take or upload a photo first.", needDesc: "Describe the problem (voice or text).",
         footer: "Light repairs only. For gas, house wiring, or high voltage, call a professional.",
@@ -34,7 +34,7 @@ const T = {
         verified: "steps verified by camera", recording: "Recording…", recorded: "Voice recorded ✓", micErr: "Microphone unavailable. Please type the problem.",
         exhausted: "All tried", newPlan: "New plan ready.", photos: "photos" },
 };
-T.jv = Object.assign({}, T.id, { hero: "Apa sing rusak?", heroSub: "Foto barange, critakna masalahe, entuk pandhuan ndandani.", go: "Priksa saiki",
+T.jv = Object.assign({}, T.id, { pdf: "Unduh laporan PDF", garage: "Garasiku", garageNote: "Riwayat ndandani mung disimpen ing HP iki. Pandhuan bisa dibukak 24 jam.", garageClear: "Busak riwayat", sPump: "pompa ora metu banyu", hero: "Apa sing rusak?", heroSub: "Foto barange, critakna masalahe, entuk pandhuan ndandani.", go: "Priksa saiki",
   record: "Tutul kanggo ngomong", next: "Terus", stuck: "Isih rusak, jajal rencana liya", checkStep: "Priksa langkah iki" });
 
 let lang = localStorage.getItem("tc_lang") || "id";
@@ -50,6 +50,7 @@ function applyLang() {
   document.querySelectorAll("[data-tp]").forEach((el) => (el.placeholder = t(el.dataset.tp)));
   if ($("lang")) $("lang").value = lang;
   if (S) { renderProgress(S); if (S.plan) render(S); }
+  if ($("garage") && !$("capture").classList.contains("hidden")) renderGarage();
 }
 
 async function health() {
@@ -119,7 +120,10 @@ async function submit(sample) {
   finally { $("goBtn").disabled = false; }
 }
 
-function show(which) { ["capture", "progress", "result"].forEach((s) => $(s) && $(s).classList.toggle("hidden", s !== which)); }
+function show(which) {
+  ["capture", "progress", "result"].forEach((s) => $(s) && $(s).classList.toggle("hidden", s !== which));
+  if ($("garage")) $("garage").classList.toggle("hidden", which !== "capture" || !loadGarage().length);
+}
 
 /* ---------------- progress (SSE, falls back to polling) ---------------- */
 async function fetchSession(id) { const r = await fetch("/api/sessions/" + id); if (!r.ok) throw new Error("not found"); return r.json(); }
@@ -156,7 +160,7 @@ function renderProgress(s) {
   if (s.status === "needs_answer") $("questionText").textContent = s.question;
   const stopped = ["stopped", "exhausted"].includes(s.status);
   $("stopBox").classList.toggle("hidden", !stopped);
-  if (stopped) $("stopBox").textContent = "⛔ " + (s.stop_reason || "");
+  if (stopped) { $("stopBox").textContent = "⛔ " + (s.stop_reason || ""); saveGarage(s); }
   $("jobErr").textContent = s.status === "error" ? s.error : "";
 }
 
@@ -171,6 +175,8 @@ async function sendAnswer() {
 function render(s) {
   if (!s || !s.plan) return;
   const rep = s.object_report || {}, dx = s.diagnosis || {}, plan = s.plan, base = s.files_base;
+  if ($("pdfBtn")) $("pdfBtn").href = `/api/sessions/${s.id}/report.pdf`;
+  saveGarage(s);
   $("dxObject").textContent = rep.object || ""; $("dxSummary").textContent = dx.problem_summary || "";
   const lvl = (s.safety || {}).level || dx.safety_level;
   $("safetyBadge").className = "level " + lvl; $("safetyBadge").textContent = t(lvl);
@@ -273,6 +279,32 @@ window.SAFETY_BASE = {
   en: ["Unplug it / switch the engine off and let it cool before you start.", "Wear gloves and eye protection around shards, fuel or liquids."],
 };
 
+/* ---------------- My garage (localStorage only, no account, SPEC v2) ---------------- */
+const GARAGE_KEY = "tc_garage", GARAGE_MAX = 20;
+function loadGarage() { try { const g = JSON.parse(localStorage.getItem(GARAGE_KEY) || "[]"); return Array.isArray(g) ? g : []; } catch (_) { return []; } }
+function saveGarage(s) {
+  if (!s || !s.id || document.body.dataset.sid) return; // never store someone else's shared guide
+  const steps = ((s.plan || {}).steps || []), checks = s.checks || {};
+  const entry = { id: s.id, object: (s.object_report || {}).object || "", fix: (s.plan || {}).cause_title || "",
+    level: (s.safety || {}).level || (s.diagnosis || {}).safety_level || "", status: s.status,
+    verified: steps.filter((st) => (checks[String(st.n)] || {}).passed).length, total: steps.length, at: Math.round((s.created || Date.now() / 1000) * 1000) };
+  const g = [entry].concat(loadGarage().filter((e) => e && e.id !== s.id)).slice(0, GARAGE_MAX);
+  try { localStorage.setItem(GARAGE_KEY, JSON.stringify(g)); } catch (_) {}
+  renderGarage();
+}
+function renderGarage() {
+  if (!$("garage")) return;
+  const g = loadGarage();
+  $("garage").classList.toggle("hidden", !g.length || ($("capture") && $("capture").classList.contains("hidden")));
+  $("garageList").innerHTML = g.map((e) => {
+    const day = new Date(e.at).toLocaleDateString(lang === "en" ? "en-GB" : "id-ID", { day: "numeric", month: "short" });
+    const lvl = ["green", "amber", "red"].includes(e.level) ? e.level : "";
+    return `<li><a href="/guide/${encodeURIComponent(e.id)}">${esc(e.object || e.id)}</a> ` +
+      (lvl ? `<span class="level ${lvl}">${esc(t(lvl))}</span> ` : "") +
+      `<span class="muted small">${esc(day)}${e.total ? ` · ${e.verified}/${e.total} ✓` : ""}${e.fix ? " · " + esc(e.fix) : ""}</span></li>`;
+  }).join("");
+}
+
 /* ---------------- boot ---------------- */
 document.addEventListener("DOMContentLoaded", () => {
   applyLang(); health(); setupResult();
@@ -282,6 +314,12 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchSession(shared).then((s) => { S = s; lang = s.lang; applyLang(); render(s); });
     return;
   }
-  setupCapture();
+  setupCapture(); renderGarage();
+  on("garageClear", "click", () => { localStorage.removeItem(GARAGE_KEY); renderGarage(); });
   if (location.hash.length > 1) { show("progress"); follow(location.hash.slice(1)); }
 });
+
+// PWA: install to home screen. The worker only caches the app shell; it fails quietly when sw.js is absent.
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));
+}

@@ -6,7 +6,7 @@ from api.pipeline import engine
 
 
 def _new(samples, sc, lang="id", text=None):
-    texts = {"motor": "Motor Honda Beat saya susah hidup", "faucet": "Kran wastafel menetes terus", "rice": "Rice cooker tidak panas"}
+    texts = {"motor": "Motor Honda Beat saya susah hidup", "pump": "Pompa air Shimizu bunyi tapi air tidak keluar", "faucet": "Kran wastafel menetes terus", "rice": "Rice cooker tidak panas"}
     return engine.create([samples[sc]], lang, text or texts[sc])
 
 
@@ -122,3 +122,24 @@ def test_budget_guard(samples, monkeypatch):
     m.charge("x", 0.009)
     with pytest.raises(cost.BudgetExceeded):
         m.check(0.01)
+
+
+def test_pump_amber_full_run_and_replan_to_foot_valve(samples):
+    s = engine.run(_new(samples, "pump")["id"])
+    assert s["status"] == "ready" and s["safety"]["level"] == "amber"
+    assert s["object_report"]["category"] == "pump" and all(p["found"] for p in s["parts"].values())
+    assert "pancingan" in s["plan"]["cause_title"].lower()
+    assert s["plan"]["steps"][0]["component_id"] == "c3"  # unplug first, always
+    assert s["diagrams"]["2"]["file"] == "diagram_2.png"
+    s = engine.replan(s["id"], "sudah dipancing, airnya habis lagi")
+    assert s["status"] == "ready" and "foot valve" in s["plan"]["cause_title"].lower()
+
+
+@pytest.mark.parametrize("text,cat,want", [
+    ("Pompa air nggak keluar airnya", "", "pump"), ("my water pump runs dry", "", "pump"), ("airnya mati", "pump", "pump"),
+    ("filter udara kotor, air filter", "", "motor"), ("kran netes", "", "faucet"), ("magic com mati", "", "rice"),
+])
+def test_scenario_routing(text, cat, want):
+    from api.pipeline import mock
+
+    assert mock.scenario(text, cat) == want

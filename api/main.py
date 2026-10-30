@@ -8,8 +8,10 @@ import logging
 import os
 import re
 import tempfile
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Any
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,10 +25,13 @@ from .settings import ROOT, settings
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 WEB = ROOT / "web"
 SAMPLES = ROOT / "samples"
-if not all((SAMPLES / f"{k}.jpg").exists() for k in ("motor", "faucet", "rice")):
+if not all((SAMPLES / f"{k}.jpg").exists() for k in ("motor", "pump", "faucet", "rice")):
     mock.make_sample_photos(SAMPLES)
 SAMPLE_TEXT = {
     "motor": mock.TRANSCRIPTS,
+    "pump": {"id": "Pompa air Shimizu saya bunyi dan muter, tapi airnya nggak keluar sama sekali.",
+             "jv": "Pompa banyu Shimizuku muni lan muter, nanging banyune ora metu babar pisan.",
+             "en": "My Shimizu water pump hums and spins, but no water comes out at all."},
     "faucet": {"id": "Kran wastafel dapur netes terus walaupun sudah ditutup kencang.", "jv": "Kran wastafel pawon netes terus senajan wis ditutup kenceng.",
                "en": "The kitchen faucet keeps dripping even when closed tight."},
     "rice": {"id": "Rice cooker saya nggak panas, lampunya mati padahal sudah dicolok.", "jv": "Rice cookerku ora panas, lampune mati senajan wis dicolok.",
@@ -40,7 +45,7 @@ FILE_RE = re.compile(r"^(photo\d|parts|part_[A-Za-z0-9_-]+|check_\d+_\d+_\d+|dia
 
 
 @asynccontextmanager
-async def lifespan(_app):
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     n = engine.cleanup()  # privacy: drop sessions older than RETENTION_HOURS
     if n:
         logging.getLogger("tukang").info("deleted %d sessions older than %sh", n, settings.retention_hours)
@@ -67,14 +72,14 @@ async def _save_upload(up: UploadFile, allowed: set[str], limit: int, default_ex
     return Path(name)
 
 
-def _load(sid: str) -> dict:
+def _load(sid: str) -> dict[str, Any]:
     try:
         return engine.load(sid)
     except (FileNotFoundError, ValueError):
         raise HTTPException(404, "Session not found")
 
 
-def public(s: dict) -> dict:
+def public(s: dict[str, Any]) -> dict[str, Any]:
     out = {k: v for k, v in s.items() if k not in {"text", "history"}}
     out["files_base"] = f"/files/{s['id']}/"
     return out
@@ -83,6 +88,23 @@ def public(s: dict) -> dict:
 @app.get("/", response_class=HTMLResponse)
 def index() -> str:
     return (WEB / "index.html").read_text(encoding="utf-8")
+
+
+@app.get("/manifest.webmanifest")
+def manifest() -> FileResponse:
+    """PWA manifest (install to home screen). Served from the root so its scope covers the whole app."""
+    p = WEB / "manifest.webmanifest"
+    if not p.exists():
+        raise HTTPException(404)
+    return FileResponse(p, media_type="application/manifest+json")
+
+
+@app.get("/sw.js")
+def service_worker() -> FileResponse:
+    p = WEB / "sw.js"
+    if not p.exists():
+        raise HTTPException(404)
+    return FileResponse(p, media_type="text/javascript", headers={"Service-Worker-Allowed": "/", "Cache-Control": "no-cache"})
 
 
 @app.get("/guide/{sid}", response_class=HTMLResponse)
@@ -94,7 +116,7 @@ def guide_page(sid: str) -> str:
 
 @app.get("/health")
 @app.get("/api/health")
-def health() -> dict:
+def health() -> dict[str, Any]:
     return {"ok": True, "version": __version__, "mode": settings.mode, "meta_api_key": bool(settings.meta_api_key),
             "open_weights": settings.open_weights_active, "models": engine.models_used()}
 
@@ -102,7 +124,7 @@ def health() -> dict:
 @app.post("/api/sessions")
 async def create_session(photos: list[UploadFile] | None = File(default=None), audio: UploadFile | None = File(default=None),
                          text: str = Form(default=""), language: str = Form(default="id"), category: str = Form(default=""),
-                         sample: str = Form(default="")) -> dict:
+                         sample: str = Form(default="")) -> dict[str, Any]:
     if language not in {"id", "jv", "en"}:
         raise HTTPException(400, "language must be id, jv or en")
     if category not in CATEGORIES:
@@ -143,16 +165,16 @@ async def create_session(photos: list[UploadFile] | None = File(default=None), a
 
 
 @app.get("/api/sessions/{sid}")
-def get_session(sid: str) -> dict:
+def get_session(sid: str) -> dict[str, Any]:
     return public(_load(sid))
 
 
 @app.get("/api/sessions/{sid}/events")
-async def events(sid: str):
+async def events(sid: str) -> StreamingResponse:
     """Server-Sent Events: one `data:` line per change until the session settles."""
     _load(sid)
 
-    async def gen():
+    async def gen() -> AsyncIterator[str]:
         last = None
         for _ in range(900):  # ~7.5 min max
             s = engine.load(sid)
@@ -168,7 +190,7 @@ async def events(sid: str):
 
 
 @app.post("/api/sessions/{sid}/answer")
-def post_answer(sid: str, text: str = Form(...)) -> dict:
+def post_answer(sid: str, text: str = Form(...)) -> dict[str, Any]:
     _load(sid)
     try:
         engine.answer(sid, text)
@@ -179,7 +201,7 @@ def post_answer(sid: str, text: str = Form(...)) -> dict:
 
 
 @app.post("/api/sessions/{sid}/steps/{n}/check")
-async def post_check(sid: str, n: int, photo: UploadFile = File(...)) -> dict:
+async def post_check(sid: str, n: int, photo: UploadFile = File(...)) -> dict[str, Any]:
     _load(sid)
     p = await _save_upload(photo, IMAGE_TYPES, MAX_PHOTO, ".jpg")
     try:
@@ -191,7 +213,7 @@ async def post_check(sid: str, n: int, photo: UploadFile = File(...)) -> dict:
 
 
 @app.post("/api/sessions/{sid}/replan")
-def post_replan(sid: str, report: str = Form(default="")) -> dict:
+def post_replan(sid: str, report: str = Form(default="")) -> dict[str, Any]:
     _load(sid)
     try:
         return public(engine.replan(sid, report))
@@ -200,13 +222,25 @@ def post_replan(sid: str, report: str = Form(default="")) -> dict:
 
 
 @app.get("/api/sessions/{sid}/report")
-def get_report(sid: str) -> dict:
+def get_report(sid: str) -> dict[str, Any]:
     _load(sid)
     return engine.report(sid)
 
 
+@app.get("/api/sessions/{sid}/report.pdf")
+def get_report_pdf(sid: str) -> FileResponse:
+    """Printable repair report (A4 PDF): safety level, marked photo, steps with camera checks, tools, cost."""
+    s = _load(sid)
+    if not s.get("diagnosis"):
+        raise HTTPException(409, "The diagnosis is not ready yet")
+    from .render import report_pdf
+
+    out = report_pdf.build(engine.report(sid), s, engine.session_dir(sid), engine.session_dir(sid) / "report.pdf")
+    return FileResponse(out, media_type="application/pdf", filename=f"tukang-copilot-{sid}.pdf")
+
+
 @app.get("/files/{sid}/{name}")
-def files(sid: str, name: str):
+def files(sid: str, name: str) -> FileResponse:
     if not FILE_RE.match(name):
         raise HTTPException(404)
     try:

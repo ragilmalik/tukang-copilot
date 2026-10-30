@@ -1,7 +1,8 @@
 """Offline stand-ins for every Meta call (MOCK=1 or no MODEL_API_KEY). The app, the tests and the demo
-fallback all run on these for free. Three scenarios from SPEC §8, picked by keywords:
+fallback all run on these for free. Four scenarios from SPEC §8, picked by keywords:
 
   * motor  - Honda Beat won't start: loose / fouled spark plug cap        (green)
+  * pump   - Shimizu water pump runs but no water: lost prime / foot valve   (amber)
   * faucet - dripping kitchen tap: worn washer                               (green)
   * rice   - rice cooker not heating: opening mains internals -> RED stop    (red)
 """
@@ -25,6 +26,8 @@ def scenario(text: str, category: str = "") -> str:
     t = (text or "").lower() + " " + (category or "")
     if re.search(r"\b(rice cooker|magic ?com|penanak|nasi|appliance)\b", t):
         return "rice"
+    if re.search(r"\b(pompa|pump|shimizu|sanyo|panasonic pump|sumur|jet pump|foot valve|klep)\b", t):
+        return "pump"
     if re.search(r"\b(kran|keran|faucet|tap|wastafel|netes|menetes|plumbing|pipa)\b", t):
         return "faucet"
     return "motor"
@@ -43,6 +46,12 @@ def object_report(sc: str, lang: str) -> dict[str, Any]:
 
 
 def _object_report(sc: str, lang: str) -> dict[str, Any]:
+    if sc == "pump":
+        return {"object": _L(lang, "Pompa air sumur dangkal (Shimizu)", "Shallow-well water pump (Shimizu)"), "brand_model_guess": "Shimizu PS-128", "category": "pump",
+                "components": [{"id": "c1", "name": _L(lang, "Baut pancingan", "Priming plug"), "sam_phrase": "priming plug", "condition": ""},
+                               {"id": "c2", "name": _L(lang, "Pipa hisap", "Suction pipe"), "sam_phrase": "suction pipe", "condition": _L(lang, "sambungan agak basah", "joint looks damp")},
+                               {"id": "c3", "name": _L(lang, "Steker pompa", "Pump power plug"), "sam_phrase": "power plug", "condition": ""}],
+                "visible_issues": [_L(lang, "Motor berputar tapi pipa keluar kering", "Motor spins but the outlet pipe is dry")]}
     if sc == "faucet":
         return {"object": _L(lang, "Kran air wastafel dapur", "Kitchen sink faucet"), "brand_model_guess": "", "category": "plumbing",
                 "components": [{"id": "c1", "name": _L(lang, "Tuas kran", "Faucet handle"), "sam_phrase": "faucet handle", "condition": ""},
@@ -63,6 +72,15 @@ def _object_report(sc: str, lang: str) -> dict[str, Any]:
 
 # ------------------------------------------------------------------ Diagnose
 def diagnosis(sc: str, lang: str) -> dict[str, Any]:
+    if sc == "pump":
+        return {"problem_summary": _L(lang, "Pompa menyala dan berputar, tapi air tidak keluar: pompa kehilangan pancingan.", "The pump runs but no water comes out: it has lost its prime."),
+                "causes": [{"title": _L(lang, "Pompa kehilangan air pancingan", "Pump lost its prime"), "confidence": 60, "evidence": [_L(lang, "Motor berputar, pipa keluar kering", "Motor spins, outlet dry")], "component_ids": ["c1"]},
+                           {"title": _L(lang, "Foot valve (klep kaki) tersumbat atau bocor", "Clogged or leaking foot valve"), "confidence": 30, "evidence": [_L(lang, "Pancingan cepat habis", "Prime keeps draining")], "component_ids": ["c2"]},
+                           {"title": _L(lang, "Sambungan pipa hisap bocor udara", "Air leak in the suction pipe joint"), "confidence": 10, "evidence": [_L(lang, "Sambungan terlihat basah", "Joint looks damp")], "component_ids": ["c2"]}],
+                "safety_level": "amber", "safety_reason": _L(lang, "Pompa listrik 220V dekat air: selalu cabut steker dulu dan kerjakan dengan tangan kering.", "A 220V pump near water: always unplug first and work with dry hands."),
+                "tools": [{"name": _L(lang, "Kunci ring 17 mm", "17 mm ring spanner"), "est_price_idr": 20000}, {"name": _L(lang, "Ember atau gayung", "Bucket or water scoop"), "est_price_idr": 10000}],
+                "parts": [{"name": "Seal tape", "est_price_idr": 5000}, {"name": _L(lang, "Foot valve 1\" (cadangan)", "1\" foot valve (spare)"), "est_price_idr": 35000}],
+                "difficulty": 2, "minutes_estimate": 25, "follow_up_question": ""}
     if sc == "faucet":
         return {"problem_summary": _L(lang, "Kran menetes dari mulut kran saat ditutup.", "The faucet drips from the spout when closed."),
                 "causes": [{"title": _L(lang, "Seal karet di dalam kran aus", "Worn rubber washer"), "confidence": 75, "evidence": [_L(lang, "Tetes dari mulut kran saat tertutup", "Drip from spout when closed")], "component_ids": ["c1", "c2"]},
@@ -90,7 +108,23 @@ def diagnosis(sc: str, lang: str) -> dict[str, Any]:
 
 # ------------------------------------------------------------------ Plan
 def plan(sc: str, lang: str, cause_index: int = 0) -> dict[str, Any]:
-    if sc == "faucet" and cause_index >= 1:
+    if sc == "pump" and cause_index >= 1:
+        s = [("c3", "Cabut steker pompa dari stop kontak dan pastikan tangan kering.", "Unplug the pump at the socket and make sure your hands are dry.", "Steker tercabut, pompa diam.", "The plug is out and the pump is silent.", False),
+             ("c2", "Angkat pipa hisap dari sumur sampai foot valve di ujungnya terlihat.", "Pull the suction pipe up out of the well until the foot valve at its end shows.", "Foot valve di ujung pipa terlihat jelas.", "The foot valve at the pipe end is clearly visible.", False),
+             ("c2", "Bersihkan saringan foot valve dari lumpur dan daun, lalu tekan kleppnya: harus membuka dan menutup lancar.", "Clean mud and leaves off the foot valve strainer, then press the flap: it must open and close freely.", "Saringan bersih dan klep bergerak lancar.", "The strainer is clean and the flap moves freely.", True),
+             ("c1", "Turunkan lagi pipanya, isi air pancingan sampai meluap, pasang baut, lalu colok steker.", "Lower the pipe back, fill priming water until it overflows, refit the plug, then plug in.", "Air keluar deras dari kran.", "Water flows strongly from the tap.", False)]
+        done, pro, cause = (_L(lang, "Air mengalir deras dalam 1 menit dan pancingan tidak habis lagi.", "Water flows within 1 minute and the prime holds."),
+                            _L(lang, "Bila motor mendengung tapi tidak berputar, panas, atau berbau hangus, panggil teknisi pompa.", "If the motor hums without spinning, runs hot, or smells burnt, call a pump technician."),
+                            _L(lang, "Foot valve (klep kaki) tersumbat atau bocor", "Clogged or leaking foot valve"))
+    elif sc == "pump":
+        s = [("c3", "Cabut steker pompa dari stop kontak dan pastikan tangan kering.", "Unplug the pump at the socket and make sure your hands are dry.", "Steker tercabut, pompa diam.", "The plug is out and the pump is silent.", False),
+             ("c1", "Buka baut pancingan di atas pompa dengan kunci ring 17 mm, putar berlawanan jarum jam.", "Undo the priming plug on top of the pump with the 17 mm spanner, anticlockwise.", "Lubang pancingan di atas pompa terbuka.", "The priming hole on top of the pump is open.", True),
+             ("c1", "Tuang air bersih pelan-pelan ke lubang pancingan sampai penuh dan meluap.", "Pour clean water slowly into the priming hole until it is full and overflowing.", "Air terlihat penuh sampai bibir lubang.", "Water is full to the rim of the hole.", False),
+             ("c1", "Lilit baut dengan seal tape, pasang lagi sampai kencang, colok steker, lalu buka kran.", "Wrap the plug in seal tape, screw it back tight, plug in, then open a tap.", "Air keluar deras dari kran.", "Water flows strongly from the tap.", False)]
+        done, pro, cause = (_L(lang, "Air mengalir deras dalam 1 menit.", "Water flows strongly within 1 minute."),
+                            _L(lang, "Bila pancingan cepat habis lagi, cek foot valve; bila motor panas atau berbau hangus, panggil teknisi pompa.", "If the prime drains again, check the foot valve; if the motor runs hot or smells burnt, call a pump technician."),
+                            _L(lang, "Pompa kehilangan air pancingan", "Pump lost its prime"))
+    elif sc == "faucet" and cause_index >= 1:
         s = [("c3", "Tutup lagi kran stop di bawah wastafel.", "Close the shut-off valve again.", "Air tidak keluar saat kran dibuka.", "No water when the faucet is opened.", False),
              ("c1", "Lepas tuas dan kepala kran seperti sebelumnya.", "Remove the handle and headgear as before.", "Lubang dudukan katup terlihat.", "The valve seat is visible.", True),
              ("c1", "Haluskan dudukan katup dengan alat pengasah dudukan (reseating tool), putar 3-4 kali.", "Smooth the valve seat with a reseating tool, 3-4 turns.", "Permukaan dudukan rata dan mengkilap.", "The seat looks even and shiny.", False),
@@ -134,6 +168,7 @@ def plan(sc: str, lang: str, cause_index: int = 0) -> dict[str, Any]:
 # ------------------------------------------------------------------ SAM, verify, image
 _BOXES = {"spark plug cap": (0.40, 0.35, 0.62, 0.58), "ignition cable": (0.55, 0.20, 0.85, 0.40), "air filter box": (0.10, 0.55, 0.40, 0.85),
           "faucet handle": (0.38, 0.12, 0.62, 0.24), "faucet spout": (0.55, 0.30, 0.85, 0.42), "shut-off valve": (0.42, 0.70, 0.58, 0.88),
+          "priming plug": (0.44, 0.18, 0.58, 0.32), "suction pipe": (0.02, 0.50, 0.30, 0.66), "power plug": (0.72, 0.72, 0.94, 0.94),
           "cook switch": (0.40, 0.60, 0.60, 0.72), "power cord": (0.70, 0.70, 0.95, 0.95)}
 
 
@@ -194,4 +229,11 @@ def make_sample_photos(folder: Path) -> dict[str, Path]:
     d.ellipse([200, 200, 800, 420], fill=(250, 250, 250), outline=(160, 160, 160), width=6); d.rectangle([200, 300, 800, 800], fill=(250, 250, 250), outline=(160, 160, 160), width=6)
     d.rectangle([420, 600, 580, 700], fill=(220, 60, 50)); d.line([800, 760, 980, 980], fill=(30, 30, 30), width=14)
     out["rice"] = folder / "rice.jpg"; im.save(out["rice"], quality=90)
+    # water pump (blue motor + pump head, suction pipe left, power cord bottom right)
+    im = Image.new("RGB", (1100, 900), (180, 175, 165)); d = ImageDraw.Draw(im)
+    d.rectangle([0, 700, 1100, 900], fill=(120, 115, 105)); d.rounded_rectangle([300, 300, 760, 640], radius=40, fill=(30, 90, 170), outline=(15, 40, 90), width=6)
+    d.ellipse([460, 160, 660, 320], fill=(200, 200, 205), outline=(90, 90, 95), width=6); d.rectangle([510, 180, 600, 260], fill=(110, 110, 115))
+    d.rectangle([20, 470, 320, 570], fill=(235, 235, 235), outline=(150, 150, 150), width=4); d.rectangle([760, 400, 1080, 480], fill=(235, 235, 235), outline=(150, 150, 150), width=4)
+    d.line([700, 640, 900, 760, 1000, 820], fill=(20, 20, 20), width=14); d.rectangle([960, 790, 1030, 850], fill=(40, 40, 40))
+    out["pump"] = folder / "pump.jpg"; im.save(out["pump"], quality=90)
     return out

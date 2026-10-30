@@ -17,15 +17,15 @@ Owner: **M** = Malik, **H** = Malik.
 - [ ] **M** Submit on Cerebral Valley (account ragilmalika) before Nov 5 09:00 WIB
 
 ## Should (scores better)
-- [ ] **H** Water pump mock scenario + fixtures (spec §8 case 2)
+- [x] **H** Water pump mock scenario + fixtures (spec §8 case 2)
 - [ ] **H** Video capture (5–10 s → 3 frames)
-- [ ] **H** PDF export of the report + local "My garage" history (localStorage)
+- [x] **H** PDF export of the report + local "My garage" history (localStorage)
 - [ ] **H** Open-weights run on Baseten for the Open Weight prize; show it in the demo
 - [ ] **M** Post the X clip (drafts in SUBMISSION.md); engagement counts until Nov 8
 - [ ] **H** Demo GIF + screenshots for README
 
 ## Could
-- [ ] PWA manifest (install to home screen)
+- [x] PWA manifest (install to home screen)
 - [ ] Javanese strings for every UI label (main ones done)
-- [ ] mypy on api/pipeline, Playwright smoke in CI
+- [x] mypy strict on all of api/ (Playwright smoke in CI: in progress)
 - [ ] Workshop mode (illustrated guide from a session)

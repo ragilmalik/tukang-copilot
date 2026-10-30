@@ -25,13 +25,13 @@ import traceback
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeVar, cast
 
 from pydantic import BaseModel, ValidationError
 
 from .. import cost, prompts
 from ..render import overlay
-from ..schemas import Diagnosis, DiagramReview, ObjectReport, RepairPlan, StepCheck, json_schema
+from ..schemas import Diagnosis, DiagramReview, ObjectReport, RepairPlan, Step, StepCheck, json_schema
 from ..settings import settings
 from . import media, mock, safety
 
@@ -52,7 +52,7 @@ def load(sid: str) -> dict[str, Any]:
     p = session_dir(sid) / "session.json"
     if not p.exists():
         raise FileNotFoundError(sid)
-    return json.loads(p.read_text(encoding="utf-8"))
+    return cast(dict[str, Any], json.loads(p.read_text(encoding="utf-8")))
 
 
 def save(s: dict[str, Any]) -> None:
@@ -110,8 +110,11 @@ def _photo_part(path: Path) -> dict[str, Any]:
     return meta_client.image_part(path)
 
 
-def _chat_json(cls: type[BaseModel], system: str, content: list[dict[str, Any]], name: str, mock_value: dict, *,
-               model: str | None = None, effort: str = "medium", allow_open: bool = False) -> Any:
+ModelT = TypeVar("ModelT", bound=BaseModel)
+
+
+def _chat_json(cls: type[ModelT], system: str, content: list[dict[str, Any]], name: str, mock_value: dict[str, Any], *,
+               model: str | None = None, effort: str = "medium", allow_open: bool = False) -> ModelT:
     """Structured call + pydantic validation; on invalid output, one retry with the error fed back."""
     if settings.offline:
         return cls.model_validate(mock_value)
@@ -202,7 +205,7 @@ def stage_segment(s: dict[str, Any], rep: ObjectReport) -> None:
 
     by_box = segment_boxes(photo, rep) if not settings.offline else {}
 
-    def one(c):
+    def one(c: Any) -> list[dict[str, Any]]:
         cost.use(meter)
         if by_box.get(c.id):
             return by_box[c.id]
@@ -227,7 +230,7 @@ def stage_segment(s: dict[str, Any], rep: ObjectReport) -> None:
     s["parts_image"] = "parts.jpg"
     for f in found:  # one image per part for the guided steps
         if f["segs"]:
-            overlay.draw_parts(photo, found, d / f"part_{f['id']}.jpg", only=f["id"])
+            overlay.draw_parts(photo, found, d / f"part_{f['id']}.jpg", only=str(f["id"]))
             s["parts"][f["id"]]["image"] = f"part_{f['id']}.jpg"
     hit = sum(1 for v in s["parts"].values() if v["found"])
     _stage(s, "segment", "done", f"{hit}/{len(found)}", int((time.time() - t0) * 1000))
@@ -321,13 +324,13 @@ def stage_safety(s: dict[str, Any], dx: Diagnosis, plan: RepairPlan) -> bool:
     return True
 
 
-def _review(img: Path, step) -> DiagramReview:
+def _review(img: Path, step: Step) -> DiagramReview:
     return _chat_json(DiagramReview, prompts.get("diagram_review"),
                       [_photo_part(img), {"type": "text", "text": f"Step: {step.instruction}"}], "diagram_review", {"ok": True},
                       model=settings.vision_model, effort="low")
 
 
-def make_diagram(s: dict[str, Any], step) -> dict[str, Any]:
+def make_diagram(s: dict[str, Any], step: Step) -> dict[str, Any]:
     d = session_dir(s["id"])
     out = d / f"diagram_{step.n}.png"
     photo = d / s["photos"][0]
@@ -360,7 +363,7 @@ def stage_illustrate(s: dict[str, Any], plan: RepairPlan) -> None:
     _stage(s, "illustrate", "running")
     meter = cost.current()
 
-    def one(st):
+    def one(st: Step) -> tuple[int, dict[str, Any]]:
         cost.use(meter)
         try:
             return st.n, make_diagram(s, st)

@@ -20,7 +20,7 @@ curl localhost:8000/health
 | `text` | text or audio | ≤ 2000 chars |
 | `language` | no | `id` (default), `jv`, `en` |
 | `category` | no | `motor`, `pump`, `appliance`, `plumbing`, `other` |
-| `sample` | no | `motor` / `faucet` / `rice`: uses a built-in photo + description |
+| `sample` | no | `motor` / `pump` / `faucet` / `rice`: uses a built-in photo + description |
 ```bash
 curl -F photos=@bike.jpg -F text="Motor susah hidup" -F language=id -F category=motor localhost:8000/api/sessions
 # {"id":"d2b5d598d8c6"}
@@ -49,6 +49,15 @@ After `MAX_CHECK_FAILS` fails: `"escalate":true` + `escalate_hint`. 409 for an u
 
 ## `POST /api/sessions/{id}/replan` (form: `report`)
 Moves to the next likely cause and returns the updated session (`status` `ready`), or `exhausted` with `stop_reason`, or `stopped` if the report trips the safety gate.
+
+## `GET /api/sessions/{id}/report.pdf`
+Printable A4 repair report in the session's language: safety level, the photo with the SAM-marked parts, each step with its camera check ([OK] or [  ]), tools and parts with estimated prices, attempts, disclaimer. `409` while the diagnosis is not ready, `404` for an unknown session.
+```bash
+curl -o report.pdf http://localhost:8000/api/sessions/$ID/report.pdf
+```
+
+## `GET /manifest.webmanifest`, `GET /sw.js`
+PWA manifest and the app-shell service worker, served from the root so the app can be installed to the home screen. `404` if the file is missing.
 
 ## `GET /api/sessions/{id}/report`
 ```json

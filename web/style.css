@@ -48,3 +48,4 @@ footer{text-align:center;padding:24px 16px}
 .level.green{background:var(--ok)}.level.amber{background:#e69500}.level.red{background:var(--bad)}
 .pass{color:var(--ok);font-weight:700}.fail{color:var(--bad);font-weight:700}
 .center{text-align:center}
+.garage{list-style:none;padding:0;margin:6px 0}.garage li{padding:6px 0;border-bottom:1px solid #eee}

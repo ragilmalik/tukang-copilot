@@ -6,6 +6,8 @@
   <title>Tukang Copilot</title>
   <meta name="description" content="Foto barang rusak, ceritakan masalahnya, dapat panduan perbaikan langkah demi langkah.">
   <link rel="stylesheet" href="/static/style.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ff7a00">
 </head>
 <body>
 <header class="top">
@@ -46,9 +48,18 @@
     <button id="goBtn" class="btn primary big" type="button" data-t="go">Diagnosa sekarang</button>
     <p class="small muted"><span data-t="samples">Coba contoh:</span>
       <button class="btn link sample" type="button" data-sample="motor" data-t="sMotor">motor mogok</button> ·
+      <button class="btn link sample" type="button" data-sample="pump" data-t="sPump">pompa tidak keluar air</button> ·
       <button class="btn link sample" type="button" data-sample="faucet" data-t="sFaucet">kran menetes</button> ·
       <button class="btn link sample" type="button" data-sample="rice" data-t="sRice">rice cooker mati</button></p>
     <p id="formErr" class="err"></p>
+  </section>
+
+  <!-- 1b. My garage: past repairs, kept only on this phone (localStorage) -->
+  <section id="garage" class="card hidden">
+    <h2 data-t="garage">Garasi saya</h2>
+    <p class="small muted" data-t="garageNote">Riwayat perbaikan hanya disimpan di HP ini.</p>
+    <ul id="garageList" class="garage"></ul>
+    <button id="garageClear" class="btn link" type="button" data-t="garageClear">Hapus riwayat</button>
   </section>
 
   <!-- 2. Progress -->
@@ -114,6 +125,7 @@
 
     <div class="row">
       <button id="shareBtn" class="btn" type="button" data-t="share">Bagikan panduan</button>
+      <a id="pdfBtn" class="btn" href="#" download data-t="pdf">Unduh laporan PDF</a>
       <button id="againBtn" class="btn" type="button" data-t="again">Perbaiki barang lain</button>
     </div>
     <p class="muted small" id="models"></p>
