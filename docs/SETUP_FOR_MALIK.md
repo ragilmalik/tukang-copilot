@@ -45,13 +45,14 @@ To stop: close the black window (or press Ctrl+C).
    Paste the key when asked (nothing shows while you paste, that's normal), press Enter. Press Enter again to skip the Baseten key for now.
    It saves the key in a file called `.env`, switches demo mode off, and runs a check. You want to see **ALL GOOD** with five green PASS lines. A tiny real call costs under $0.02.
 4. Start the app again (start.bat / start.sh). The orange *Demo mode* line is gone: you're live.
+5. Want to re-check later (e.g. after topping up credits)? Run `set_keys.py --check-only`. It uses the saved key and prints PASS/FAIL again. Typing a wrong key never breaks anything: `.env` is only written when you paste a key.
 
 **Cost per repair:** about $0.01–0.05 (a few Spark calls, one SAM call, 0–3 diagrams at $0.01). The app stops any single repair that would pass `MAX_COST_PER_SESSION_USD` (default $0.50).
 
-### Optional: open-weights mode (for the $10K Open Weight prize)
+### Optional: open-weights mode (for an open-weights bonus prize; check the exact prize list on the Cerebral Valley page)
 1. https://www.baseten.co → sign up → **API keys** → create → copy.
 2. Run `set_keys.py` again, paste the Meta key, then the Baseten key when asked. It sets `USE_OPEN_WEIGHTS=1`.
-3. Diagnosis and planning now run on **Muse Spark Open** (`meta-models/muse-spark-open`). The bottom of the result screen shows "open weights via Baseten".
+3. Diagnosis and planning now run on **Muse Spark Open** (`meta-models/muse-spark-open`). A blue **🔓 Muse Spark Open (open weights)** badge appears at the top of the app, and the bottom of the result screen shows "open weights via Baseten". Show this badge in the video.
 If Baseten's model page shows a different model id, open `.env` in Notepad and add `OPEN_MODEL=<that id>`.
 
 ---
