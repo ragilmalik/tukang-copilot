@@ -42,7 +42,8 @@ def main() -> int:
         print(f"{BASE}  mode={h['mode']}  version={h['version']}")
         ok(h["ok"] is True, "/health")
         ok(c.get("/").status_code == 200 and "Tukang" in c.get("/").text, "home page loads")
-        for sample, expect in (("motor", "ready"), ("faucet", "ready"), ("rice", "stopped")):
+        ok(c.get("/manifest.webmanifest").status_code == 200 and c.get("/sw.js").status_code == 200, "PWA manifest + service worker")
+        for sample, expect in (("motor", "ready"), ("pump", "ready"), ("faucet", "ready"), ("rice", "stopped")):
             print(f"[{sample}]")
             t0 = time.time()
             sid = c.post("/api/sessions", data={"sample": sample, "language": "id"}).json()["id"]
@@ -56,6 +57,8 @@ def main() -> int:
                 ok(c.get(f"/files/{sid}/{s['parts_image']}").status_code == 200, "highlighted-parts image")
             if expect != "ready":
                 ok(s["safety"]["level"] == "red", "red safety stop shown")
+                r = c.get(f"/api/sessions/{sid}/report.pdf")
+                ok(r.status_code == 200 and r.content[:4] == b"%PDF", "PDF report for the technician")
                 continue
             for d in s["diagrams"].values():
                 if d.get("file"):
@@ -68,6 +71,8 @@ def main() -> int:
             rep = c.get(f"/api/sessions/{sid}/report").json()
             ok(bool(rep.get("problem")), "report")
             ok(c.get(f"/guide/{sid}").status_code == 200, "shareable guide page")
+            r = c.get(f"/api/sessions/{sid}/report.pdf")
+            ok(r.status_code == 200 and r.content[:4] == b"%PDF", f"PDF report ({len(r.content) // 1024} KB)")
     print("\nALL PASSED" if not fails else f"\n{len(fails)} FAILED: {fails}")
     return 0 if not fails else 1
 
