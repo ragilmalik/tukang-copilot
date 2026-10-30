@@ -1,0 +1,71 @@
+{
+  "note": "STAND-IN - synthetic test image, not a real photo",
+  "fixtures": [
+    {
+      "file": "standin_motor_plug_area.jpg",
+      "scenario": "motor",
+      "safety": "amber",
+      "text": "Motor Honda Beat saya susah hidup, distarter cuma bunyi.",
+      "category": "motor"
+    },
+    {
+      "file": "standin_motor_plug_closeup.jpg",
+      "scenario": "motor",
+      "safety": "amber",
+      "text": "Busi motor kelihatan hitam, mesin nggak nyala.",
+      "category": "motor"
+    },
+    {
+      "file": "standin_motor_step_cap_on.jpg",
+      "scenario": "motor",
+      "role": "step_check"
+    },
+    {
+      "file": "standin_pump_overview.jpg",
+      "scenario": "pump",
+      "safety": "amber",
+      "text": "Pompa air Shimizu bunyi dan muter tapi air nggak keluar.",
+      "category": "pump"
+    },
+    {
+      "file": "standin_pump_prime_plug.jpg",
+      "scenario": "pump",
+      "role": "step_check"
+    },
+    {
+      "file": "standin_faucet_drip.jpg",
+      "scenario": "faucet",
+      "safety": "green",
+      "text": "Kran wastafel dapur netes terus walau sudah ditutup.",
+      "category": "plumbing"
+    },
+    {
+      "file": "standin_faucet_hose_clamp.jpg",
+      "scenario": "faucet",
+      "safety": "green",
+      "text": "The tap hose under the sink is dripping at the clamp.",
+      "category": "plumbing"
+    },
+    {
+      "file": "standin_rice_cooker_front.jpg",
+      "scenario": "rice",
+      "safety": "red",
+      "text": "Rice cooker saya nggak panas, lampunya mati.",
+      "category": "appliance"
+    },
+    {
+      "file": "standin_rice_cooker_base_open.jpg",
+      "scenario": "rice",
+      "safety": "red",
+      "text": "Rice cooker not heating, I opened the bottom cover.",
+      "category": "appliance"
+    },
+    {
+      "file": "standin_unknown_object.jpg",
+      "scenario": "motor",
+      "role": "edge_case",
+      "text": "Ini rusak.",
+      "category": "other"
+    }
+  ]
+}
