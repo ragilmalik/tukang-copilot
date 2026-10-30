@@ -70,3 +70,6 @@ See docs/DECISIONS.md. Most important: single FastAPI process + plain JS (no Nex
 
 ## Known gaps
 Video capture, PDF report, garage history, water-pump fixture, Playwright/mypy, real performance numbers. All in TODO.md.
+
+## 2026-10-30 19:50 WIB check
+check_all: ruff clean, mypy 33 files OK, 115 passed, 6 skipped (Playwright, no Chromium in this sandbox, skip cleanly). No code changes; Malik-side steps unchanged.
