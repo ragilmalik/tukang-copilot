@@ -16,7 +16,9 @@ jobs:
           node-version: "22"
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: pip install -r requirements-dev.txt
-      - run: ruff check api scripts
+      - run: ruff check .
+      - run: python -m mypy api
+      - run: python -m playwright install --with-deps chromium
       - run: python -m pytest api/tests -q
         env:
           MOCK: "1"
