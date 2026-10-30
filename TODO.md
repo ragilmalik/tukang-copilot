@@ -29,4 +29,5 @@ Owner: **M** = Malik, **H** = Malik.
 - [x] PWA manifest (install to home screen)
 - [x] Javanese strings for every UI label
 - [x] mypy strict on all of api/, Playwright smoke in CI (6 browser tests)
+- [x] Shopping links (Tokopedia/Shopee) + WhatsApp share of the parts list (v1.4.0)
 - [ ] Workshop mode (illustrated guide from a session)

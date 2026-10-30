@@ -66,6 +66,8 @@ def test_main_flow_faucet_check_step(page):
     page.wait_for_selector("#result:not(.hidden)", timeout=20000)
     assert page.is_visible("#partsImg") and page.is_visible("#stepCard")
     assert page.locator("#dxCauses li, #dxCauses > *").count() >= 1
+    assert page.locator("#gMats a.buy, #gTools a.buy").count() >= 1       # marketplace price links
+    assert page.is_visible("#waBtn") and page.get_attribute("#waBtn", "href").startswith("https://wa.me/")
     page.set_input_files("#stepPhoto", str(FIX / "standin_faucet_hose_clamp.jpg"))
     page.wait_for_selector("#checkResult:not(.hidden)")
     page.wait_for_function("!document.querySelector('#checkResult').textContent.includes('…')", timeout=15000)

@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-30 22:05 WIB (v1.4.0)
+- **New:** shopping links per tool/part (Tokopedia + Shopee search, links only) and a WhatsApp share button for the parts list (`api/shop.py`, fields `shop_url`, `shop_alt_url`, `whatsapp_url` in the session JSON; UI in result + guide pages, id/jv/en strings).
+- **Checks (real runs, 22:00 WIB):** ruff clean, `mypy api` strict no issues in 39 files, pytest **138 passed, 6 skipped** (Playwright, no Chromium here; its new assertions for the links are unverified in a browser), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED on a local mock server, `make_test_report.py` ALL PASSED (138/144).
+- **Next up (Malik):** Workshop mode (illustrated guide from a session); re-take demo screenshots/video if the result page change matters; Render preview smoke once deployed; prompt tuning when real photos arrive.
+
 ## State on 2026-10-30 21:35 WIB (v1.3.1)
 - **New:** upload hardening (chunked size-limited writes, corrupt/disguised/huge images give 400 and no leftover session folder), conftest joins pipeline threads between tests. 8 tests in `api/tests/test_hardening.py`.
 - **Checks (real runs, 21:35 WIB):** ruff clean, `mypy api` strict no issues in 37 files, pytest **134 passed, 6 skipped** (Playwright, no Chromium), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED on a local mock server, `make_test_report.py` ALL PASSED (134/140).

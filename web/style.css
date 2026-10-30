@@ -57,3 +57,5 @@ footer{text-align:center;padding:24px 16px}
 .stop ul{margin:4px 0 8px;padding-left:20px}
 .stopBtns{display:flex;gap:8px;flex-wrap:wrap}
 .stop .btn{text-decoration:none}
+
+.buy{margin-left:.35rem;color:var(--o);text-decoration:underline;white-space:nowrap}

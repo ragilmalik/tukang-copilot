@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 2026-10-30 22:00 · v1.4.0
+- Shopping help: every tool and part in the result and guide gets "Compare prices" links to Tokopedia and Shopee search pages (links only, Tukang Copilot never buys), plus a "Send shopping list to WhatsApp" button (wa.me share of tools, parts and rough prices in the session language). New `api/shop.py`; the session JSON carries `shop_url`, `shop_alt_url` and `whatsapp_url`. Front end only accepts those three https hosts. 4 new tests, one Playwright assertion.
+
 ## 2026-10-30 21:30 · v1.3.1
 - Upload hardening: files stream to disk in 1 MB chunks and stop at the size limit (no whole file in memory); a corrupt, disguised or decompression-bomb image now gives a friendly 400 and leaves no half-made session folder behind. 8 new tests (`test_hardening.py`).
 - Test isolation: conftest waits for pipeline threads at teardown, so a late worker can no longer write into the next test's folder or the repo `data/` folder.
