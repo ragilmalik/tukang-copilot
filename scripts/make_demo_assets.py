@@ -176,7 +176,7 @@ def shots() -> None:
         go_sample("pump"); pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
         pg.evaluate("window.scrollTo(0,0)"); snap("10_pump")
         go_sample("rice"); pg.wait_for_selector("#stopBox:not(.hidden)", timeout=30000)
-        pg.evaluate("window.scrollTo(0,0)"); snap("11_rice_stop")
+        pg.locator("#stopBox").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,140)"); snap("11_rice_stop")
         go_sample("faucet", "en"); pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
         pg.evaluate("window.scrollTo(0,0)"); snap("13_english")
         pg.goto(base + "/"); pg.select_option("#lang", "jv"); pg.wait_for_timeout(300); snap("14_garage_jv", full=True)
