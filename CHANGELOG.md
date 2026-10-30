@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.17.1 (2026-10-31 06:40 WIB)
+- Price sanity for live mode (`api/coerce.py` `_price`): shop and part prices now accept "75k", "75rb", "1,5 juta", "Rp 75.000"; negative values and anything above Rp15 million (a unit misread) become unknown (0) instead of a wild saving chip; a red-stop diagnosis never keeps a shop price. 13 new tests in `test_shop_cost.py`.
+
 ## 1.17.0 (2026-10-31 06:10 WIB)
 - "Bengkel vs DIY" price line. Diagnosis has a new `shop_cost_estimate_idr` (typical bengkel/servis price, parts plus labour; 0 when unknown or red stop) and a computed `diy_saving_idr` (shop price minus parts, never negative; tools left out because they are reusable). Prompt `diagnose.md` asks for it, `coerce.py` repairs "Rp 75.000" style values, all four non-red mock scenarios carry one. Phone UI shows a chip ("bengkel Rp150.000 · hemat Rp110.000", id/jv/en), the PDF report prints both lines. Also fixed the PDF total, which was labelled "tools + parts" but showed parts only; it is now labelled "parts". Tests: `test_shop_cost.py` (9) and a jsdom check per language and scenario.
 

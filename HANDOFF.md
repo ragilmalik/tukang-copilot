@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 06:40 WIB (v1.17.1)
+- **New:** price sanity in `coerce.py` (k/rb/juta units, implausible values become unknown, no shop price on red stops). See CHANGELOG 1.17.1.
+- **Checks (real runs, 06:35 WIB):** ruff clean, `mypy api` strict no issues in 54 files, pytest **247 passed, 7 skipped** (Playwright only; no Chromium downloadable on this arm64 sandbox), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` run.
+- **Next up (Malik):** after first live key run: eval_fixtures live, tune prompts; re-take screenshots/video when a Chromium exists; Render preview smoke once deployed.
+
 ## State on 2026-10-31 06:10 WIB (v1.17.0)
 - **New:** bengkel price vs DIY saving chip and PDF lines (`shop_cost_estimate_idr`, `diy_saving_idr`), PDF total label fixed (parts only). See CHANGELOG 1.17.0. The shop prices in mock mode are illustrative; in live mode they are the model's estimate, so judge them on real runs.
 - **Checks (real runs, 06:08 WIB):** ruff clean, `mypy api` strict no issues in 54 files, pytest **236 passed, 6 skipped** (Playwright only), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (236/242). PDF page inspected visually.

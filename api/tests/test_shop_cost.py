@@ -52,3 +52,28 @@ def test_session_and_report_carry_the_numbers(samples):
     assert s["diagnosis"]["diy_saving_idr"] == 150000 - s["diagnosis"]["cost_estimate_idr"] > 0
     r = engine.report(sid)
     assert r["shop_cost_estimate_idr"] == 150000 and r["diy_saving_idr"] == s["diagnosis"]["diy_saving_idr"]
+
+
+@pytest.mark.parametrize("raw,want", [
+    ("75k", 75000), ("75 rb", 75000), ("Rp 75 ribu", 75000), ("1,5 juta", 1500000),
+    ("2jt", 2000000), (90000, 90000), ("Rp 25.000", 25000), (-5, 0), ("900000000", 0), ("gratis", 0),
+])
+def test_price_units_and_implausible_values(raw, want):
+    d = mock.diagnosis("faucet", "id")
+    d["shop_cost_estimate_idr"] = raw
+    assert coerce(Diagnosis, d)["shop_cost_estimate_idr"] == want
+
+
+def test_red_stop_never_keeps_a_shop_price():
+    d = mock.diagnosis("faucet", "id")
+    d["safety_level"] = "red"
+    d["shop_cost_estimate_idr"] = 300000
+    out = coerce(Diagnosis, d)
+    assert out["shop_cost_estimate_idr"] == 0
+    assert Diagnosis.model_validate(out).diy_saving_idr == 0
+
+
+def test_part_prices_accept_k_suffix():
+    d = mock.diagnosis("faucet", "id")
+    d["parts"] = [{"name": "seal", "est_price_idr": "12k"}]
+    assert coerce(Diagnosis, d)["parts"][0]["est_price_idr"] == 12000

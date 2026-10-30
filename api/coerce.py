@@ -64,6 +64,28 @@ def _num(v: Any) -> float | None:
         return None
 
 
+_PRICE_UNITS = {"k": 1_000, "rb": 1_000, "ribu": 1_000, "jt": 1_000_000, "juta": 1_000_000}
+MAX_PLAUSIBLE_REPAIR_IDR = 15_000_000   # a home repair above this is the model misreading units; treat as unknown
+
+
+def _price(v: Any) -> int | None:
+    """Rupiah from '75k', '75rb', '1,5 juta', 'Rp 75.000' or a plain number; None when unreadable.
+
+    Anything negative or above MAX_PLAUSIBLE_REPAIR_IDR is treated as unknown (0 upstream).
+    """
+    if isinstance(v, str):
+        m = re.fullmatch(r"(?i)\s*(?:rp\.?\s*)?(\d+(?:[.,]\d+)?)\s*(k|rb|ribu|jt|juta)\s*", v)
+        if m:
+            n: float | None = float(m.group(1).replace(",", ".")) * _PRICE_UNITS[m.group(2).lower()]
+        else:
+            n = _num(v)
+    else:
+        n = _num(v)
+    if n is None or n < 0 or n > MAX_PLAUSIBLE_REPAIR_IDR:
+        return None
+    return int(round(n))
+
+
 def _int(v: Any, lo: int, hi: int) -> Any:
     n = _num(v)
     return v if n is None else max(lo, min(hi, int(round(n))))
@@ -129,8 +151,8 @@ def _items(v: Any) -> Any:
         if isinstance(it, str):
             out.append({"name": it, "est_price_idr": 0})
         elif isinstance(it, dict):
-            p = _num(it.get("est_price_idr"))
-            it["est_price_idr"] = 0 if p is None else max(0, int(p))
+            p = _price(it.get("est_price_idr"))
+            it["est_price_idr"] = 0 if p is None else p
             out.append(it)
     return out
 
@@ -140,8 +162,8 @@ def _diagnosis(d: dict[str, Any]) -> dict[str, Any]:
                               {"yellow": "amber", "orange": "amber", "safe": "green", "danger": "red", "stop": "red"})
     d["difficulty"] = _int(d.get("difficulty"), 1, 5)
     d["minutes_estimate"] = _int(d.get("minutes_estimate"), 1, 600)
-    shop = _num(d.get("shop_cost_estimate_idr"))
-    d["shop_cost_estimate_idr"] = 0 if shop is None else max(0, int(shop))
+    shop = _price(d.get("shop_cost_estimate_idr"))
+    d["shop_cost_estimate_idr"] = 0 if shop is None or d["safety_level"] == "red" else shop
     d["tools"], d["parts"] = _items(d.get("tools")), _items(d.get("parts"))
     causes = d.get("causes")
     if isinstance(causes, list):
