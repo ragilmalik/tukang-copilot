@@ -2,6 +2,17 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 2026-10-30 evening · v1.2.0
+- Video capture: record a 5–10 s clip instead of photos. One ffmpeg pass samples 12 frames, the sharpest (Laplacian variance) of each third is kept as a photo; with no voice note or text, the clip's own sound is transcribed. Max 30 s / 40 MB, clean 400s.
+- Basa Jawa: every UI string translated (ngoko); a test fails if any string is missing in jv or en.
+- Open-weights badge in the header when diagnosis + planning really run on Muse Spark Open (flag + Baseten key), in id/jv/en.
+- Safety escalation card for red stops and "all safe causes tried": why, what to do now, nearby service-centre search, technician PDF, 112 emergency line.
+- PWA: manifest, generated icons (scripts/make_icons.py), shell-only service worker (never caches API or photos).
+- Tests: 10 clearly labelled stand-in photo fixtures run end to end; Playwright browser smoke (6 tests, skip without Chromium); mypy strict config (mypy.ini) + CI step; scripts/check_all.sh. 121 tests.
+- Demo assets from the real app in demo mode: 2:37 1080p video with captions + edge-tts voice-over, .srt, 36 s vertical X clip, 14 phone screenshots, architecture diagram.
+- `set_keys.py` one-step key swap: `--stdin` (non-interactive), `--check-only`, `--help`; never creates .env without a key.
+- Docs: SPEC §17 (verified judging criteria → features), docs/WINNING_PLAN.md, docs/SUBMISSION_CHECKLIST.md, README screenshots/diagram, judge 60-second tour.
+
 ## 2026-10-30 evening · v1.1.0
 - Water pump scenario (SPEC §8 case 2): Shimizu pump runs but gives no water. Amber safety (220V near water, unplug first). Plan 1 re-primes the pump; "still broken" re-plans to the clogged foot valve. New sample photo and "Try a sample" button.
 - Printable PDF repair report: `GET /api/sessions/{id}/report.pdf` (A4, id/jv/en): safety badge, marked SAM photo, every step with its camera check, tools and parts with prices, attempts, disclaimer. Pure Pillow, no new dependency. "Download PDF report" button on the result and shared guide pages.

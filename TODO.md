@@ -12,20 +12,20 @@ Owner: **M** = Malik, **H** = Malik.
 - [ ] **H** Tune prompts on real photos; record results in TEST_REPORT manual QA table
 - [ ] **H/M** Deploy on Render (render.yaml), redeem a Render credit, `smoke_e2e.py <url>` passes
 - [ ] **M** Phone test over 4G (camera + mic need https)
-- [ ] **M** Record the 3-min video (DEMO_SCRIPT.md), upload to YouTube
+- [ ] **M** Record the 3-min video (DEMO_SCRIPT.md), upload to YouTube (backup cut ready: docs/demo/tukang-copilot-demo.mp4)
 - [ ] **H** Fill links in README + SUBMISSION, regenerate TEST_REPORT
 - [ ] **M** Submit on Cerebral Valley (account ragilmalika) before Nov 5 09:00 WIB
 
 ## Should (scores better)
 - [x] **H** Water pump mock scenario + fixtures (spec §8 case 2)
-- [ ] **H** Video capture (5–10 s → 3 frames)
+- [x] **H** Video capture (5–10 s → 3 sharpest frames)
 - [x] **H** PDF export of the report + local "My garage" history (localStorage)
-- [ ] **H** Open-weights run on Baseten for the Open Weight prize; show it in the demo
+- [ ] **H** Open-weights run on Baseten (needs BASETEN_API_KEY); badge is built and shows when active
 - [ ] **M** Post the X clip (drafts in SUBMISSION.md); engagement counts until Nov 8
-- [ ] **H** Demo GIF + screenshots for README
+- [x] **H** Screenshots + demo video + vertical clip (docs/demo/)
 
 ## Could
 - [x] PWA manifest (install to home screen)
-- [ ] Javanese strings for every UI label (main ones done)
-- [x] mypy strict on all of api/ (Playwright smoke in CI: in progress)
+- [x] Javanese strings for every UI label
+- [x] mypy strict on all of api/, Playwright smoke in CI (6 browser tests)
 - [ ] Workshop mode (illustrated guide from a session)
