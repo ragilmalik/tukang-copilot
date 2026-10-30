@@ -93,3 +93,18 @@ def test_pwa_manifest_linked(page):
     page.goto(page.base + "/")
     href = page.get_attribute('link[rel="manifest"]', "href")
     assert href and page.request.get(page.base + href).ok
+
+
+def test_open_weights_badge(page, monkeypatch):
+    from api.settings import settings
+
+    page.goto(page.base + "/")
+    page.wait_for_selector("#modeBadge:not(.hidden)")
+    assert not page.is_visible("#owBadge")                      # off by default
+    monkeypatch.setattr(settings, "use_open_weights", True)
+    monkeypatch.setattr(settings, "baseten_api_key", "test-baseten-key")
+    page.goto(page.base + "/")
+    page.wait_for_selector("#owBadge:not(.hidden)")
+    assert "Muse Spark Open" in page.text_content("#owBadge")
+    page.select_option("#lang", "en")
+    assert "Reasoning" in page.text_content("#owBadge")       # follows the language switch

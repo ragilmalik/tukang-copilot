@@ -13,7 +13,7 @@ const T = {
         footer: "Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.",
         stages: { listen: "Mendengarkan", gate: "Cek keselamatan awal", look: "Melihat foto", segment: "Menandai bagian (SAM 3.1)", diagnose: "Mendiagnosa",
                   plan: "Menyusun langkah", safety: "Cek keselamatan rencana", illustrate: "Menggambar diagram", narrate: "Menyiapkan suara" },
-        diff: "Kesulitan", min: "menit", est: "perkiraan", copied: "Tautan disalin", demo: "Mode demo: jawaban contoh, tanpa biaya API.",
+        diff: "Kesulitan", min: "menit", est: "perkiraan", copied: "Tautan disalin", openW: "Penalaran: Muse Spark Open (open weights)", demo: "Mode demo: jawaban contoh, tanpa biaya API.",
         green: "AMAN", amber: "HATI-HATI", red: "STOP", pass: "✅ Langkah ini beres", fail: "⚠️ Belum pas", checking: "Memeriksa foto…",
         verified: "langkah terverifikasi kamera", recording: "Merekam…", recorded: "Suara terekam ✓", micErr: "Mikrofon tidak bisa dipakai. Ketik saja masalahnya.",
         exhausted: "Sudah semua", newPlan: "Rencana baru siap.", photos: "foto" },
@@ -29,7 +29,7 @@ const T = {
         footer: "Light repairs only. For gas, house wiring, or high voltage, call a professional.",
         stages: { listen: "Listening", gate: "First safety check", look: "Looking at the photo", segment: "Finding the parts (SAM 3.1)", diagnose: "Diagnosing",
                   plan: "Planning steps", safety: "Plan safety check", illustrate: "Drawing diagrams", narrate: "Preparing voice" },
-        diff: "Difficulty", min: "min", est: "est.", copied: "Link copied", demo: "Demo mode: sample answers, no API cost.",
+        diff: "Difficulty", min: "min", est: "est.", copied: "Link copied", openW: "Reasoning: Muse Spark Open (open weights)", demo: "Demo mode: sample answers, no API cost.",
         green: "SAFE", amber: "CAUTION", red: "STOP", pass: "✅ Step looks right", fail: "⚠️ Not quite", checking: "Checking photo…",
         verified: "steps verified by camera", recording: "Recording…", recorded: "Voice recorded ✓", micErr: "Microphone unavailable. Please type the problem.",
         exhausted: "All tried", newPlan: "New plan ready.", photos: "photos" },
@@ -51,12 +51,21 @@ function applyLang() {
   if ($("lang")) $("lang").value = lang;
   if (S) { renderProgress(S); if (S.plan) render(S); }
   if ($("garage") && !$("capture").classList.contains("hidden")) renderGarage();
+  badges();
+}
+
+let HEALTH = null;
+// Header badges: demo mode, and the open-weights brain (Muse Spark Open on Baseten) when it is really in use.
+function badges() {
+  if (!HEALTH) return;
+  if (HEALTH.mode === "mock") { $("modeBadge").textContent = t("demo"); $("modeBadge").classList.remove("hidden"); }
+  if (HEALTH.open_weights && $("owBadge")) { $("owBadge").textContent = "🔓 " + t("openW"); $("owBadge").classList.remove("hidden"); }
 }
 
 async function health() {
   try {
     const h = await (await fetch("/api/health")).json();
-    if (h.mode === "mock") { $("modeBadge").textContent = t("demo"); $("modeBadge").classList.remove("hidden"); }
+    HEALTH = h; badges();
   } catch (_) {}
 }
 

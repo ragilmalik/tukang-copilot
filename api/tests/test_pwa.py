@@ -24,3 +24,14 @@ def test_service_worker_served_and_never_caches_api():
     r = c.get("/sw.js")
     assert r.status_code == 200 and "javascript" in r.headers["content-type"]
     assert "/api/" not in r.text.split("const SHELL")[1].split(";")[0]
+
+
+def test_health_reports_open_weights_only_when_really_active(monkeypatch):
+    from api.settings import settings
+
+    monkeypatch.setattr(settings, "use_open_weights", True)
+    monkeypatch.setattr(settings, "baseten_api_key", "")
+    assert c.get("/api/health").json()["open_weights"] is False   # asked for, but no Baseten key: no badge
+    monkeypatch.setattr(settings, "baseten_api_key", "k")
+    h = c.get("/api/health").json()
+    assert h["open_weights"] is True and "open weights" in h["models"]["diagnose"]
