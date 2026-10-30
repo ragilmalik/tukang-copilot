@@ -16,7 +16,7 @@ CI (`.github/workflows/ci.yml`) runs the same on every push. Browser tests also 
 | `test_engine.py` | Full pipeline per scenario: green faucet, amber motor with follow-up/resume, red rice cooker, gate stop, 3 languages, step check pass/fail/escalate, re-plan → exhaust, audio deleted, path-safe ids, 24 h cleanup, budget guard |
 | `test_api.py` | HTTP: health, pages, multi-photo upload, files, guide, report, answer, check, replan, SSE stream, 7 bad-request cases, 404s and path traversal |
 | `test_live_path.py` | The **real `meta_client`** (HTTP, multipart ASR, structured output, SAM SSE + mask parsing, image edits, Baseten) against `api/testing/fake_meta.py`; wrong key → clean 401 |
-| `test_fixtures.py` | All 10 stand-in fixtures are labelled (red banner + EXIF) and each runs end to end with the expected safety level; step-check photos accepted |
+| `test_fixtures.py` | All 14 stand-in fixtures are labelled (red banner + EXIF) and each runs end to end with the expected safety level; step-check photos accepted |
 | `test_video.py` | Video → 3 frames from different moments; sharper frame wins; >30 s and garbage rejected with 400; video-only session uses the clip's sound; photos + video capped at 3 |
 | `test_playwright_smoke.py` | Real Chromium, phone viewport: faucet flow + check-my-step, motor follow-up question, rice STOP card (3 actions, maps link, PDF works, 112), PWA manifest, open-weights badge (+ language switch), video capture; fails on any JS error |
 | `test_pwa.py` | Manifest valid with 192/512/maskable icons served; service worker never caches the API; health reports open weights only when really active |

@@ -61,6 +61,30 @@
       "category": "appliance"
     },
     {
+      "file": "standin_tire_flat_nail.jpg",
+      "scenario": "tire",
+      "safety": "amber",
+      "text": "Ban belakang motor skutik kempes pelan-pelan, kayaknya kena paku.",
+      "category": "motor"
+    },
+    {
+      "file": "standin_tire_flat_nail_en.jpg",
+      "scenario": "tire",
+      "safety": "amber",
+      "text": "My scooter rear tyre keeps going flat, I see a nail in the tread.",
+      "category": "motor"
+    },
+    {
+      "file": "standin_tire_valve_check.jpg",
+      "scenario": "tire",
+      "role": "step_check"
+    },
+    {
+      "file": "standin_tire_pressure_sticker.jpg",
+      "scenario": "tire",
+      "role": "reference"
+    },
+    {
       "file": "standin_unknown_object.jpg",
       "scenario": "motor",
       "role": "edge_case",

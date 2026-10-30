@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.9.1 (2026-10-31 02:00 WIB)
+- Four more labelled stand-in fixtures for the tyre scenario (flat tyre with nail in id and en, valve check photo, pressure sticker close-up), now 14 in total; `api/tests/test_tire_fixture.py` runs them end to end (diagnosis, optional follow-up answer, camera check, PDF report).
+
 ## 1.9.0 (2026-10-31 01:40 WIB)
 - Fifth demo scenario: flat scooter tyre with a nail (tubeless plug repair, amber). Cause 1 nail in tread, cause 2 leaking valve stem (re-plan tightens the valve core), SAM phrases `tyre tread` / `valve stem` / `wheel rim`, id/jv/en text, new sample photo `samples/tire.jpg`, "flat tyre" sample button in the 3 languages, routing for kempes/gembos/tambal ban/tubeless/puncture/tyre. Tests: 2 engine tests, 4 routing cases, jsdom flow (Javanese), smoke_e2e.
 

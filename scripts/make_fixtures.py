@@ -72,6 +72,23 @@ def rice_cooker_base_open(d: D) -> None:
         d.line([x, 420, 512, 420], fill=(220, 40, 40), width=8)
 
 
+def tire_flat(d: D) -> None:
+    d.rectangle([0, 600, 1024, 768], fill=(95, 92, 88)); d.ellipse([250, 190, 790, 640], fill=(25, 25, 27)); d.ellipse([380, 320, 660, 520], fill=(170, 172, 178))
+    d.ellipse([500, 400, 540, 440], fill=(60, 60, 64)); d.line([512, 215, 512, 262], fill=(190, 190, 195), width=9); d.ellipse([505, 205, 520, 220], fill=(210, 210, 215))
+
+
+def tire_valve_check(d: D) -> None:
+    d.rectangle([0, 600, 1024, 768], fill=(95, 92, 88)); d.ellipse([200, 140, 820, 700], fill=(30, 30, 33)); d.ellipse([360, 300, 660, 540], fill=(170, 172, 178))
+    d.rectangle([700, 330, 740, 400], fill=(190, 190, 195)); d.ellipse([690, 322, 750, 345], fill=(60, 60, 64))
+
+
+def tire_sticker_closeup(d: D) -> None:
+    d.rectangle([180, 160, 840, 620], fill=(235, 235, 225), outline=(60, 60, 60), width=6)
+    for i in range(5):
+        d.line([240, 230 + i * 70, 780, 230 + i * 70], fill=(70, 70, 70), width=10)
+    d.ellipse([700, 450, 800, 550], fill=(220, 190, 40))
+
+
 def unknown_object(d: D) -> None:
     d.rectangle([300, 200, 724, 600], fill=(120, 140, 110)); d.ellipse([440, 330, 584, 470], fill=(40, 40, 40))
 
@@ -93,6 +110,12 @@ FIXTURES: list[dict[str, object]] = [
      "text": "Rice cooker saya nggak panas, lampunya mati.", "category": "appliance"},
     {"file": "standin_rice_cooker_base_open.jpg", "draw": rice_cooker_base_open, "bg": (230, 225, 215), "scenario": "rice", "safety": "red",
      "text": "Rice cooker not heating, I opened the bottom cover.", "category": "appliance"},
+    {"file": "standin_tire_flat_nail.jpg", "draw": tire_flat, "bg": (150, 148, 142), "scenario": "tire", "safety": "amber",
+     "text": "Ban belakang motor skutik kempes pelan-pelan, kayaknya kena paku.", "category": "motor"},
+    {"file": "standin_tire_flat_nail_en.jpg", "draw": tire_flat, "bg": (140, 140, 138), "scenario": "tire", "safety": "amber",
+     "text": "My scooter rear tyre keeps going flat, I see a nail in the tread.", "category": "motor"},
+    {"file": "standin_tire_valve_check.jpg", "draw": tire_valve_check, "bg": (150, 148, 142), "scenario": "tire", "role": "step_check"},
+    {"file": "standin_tire_pressure_sticker.jpg", "draw": tire_sticker_closeup, "bg": (120, 120, 118), "scenario": "tire", "role": "reference"},
     {"file": "standin_unknown_object.jpg", "draw": unknown_object, "bg": (200, 200, 200), "scenario": "motor", "role": "edge_case",
      "text": "Ini rusak.", "category": "other"},
 ]

@@ -26,7 +26,7 @@ Prizes: Indie $150K/$100K/$75K/$50K/$25K. Bonus prizes up to $50K total (example
 | Indonesian / Javanese strings | ✅ every UI string in jv (ngoko); test enforces coverage | web/app.js, api/tests/test_i18n.py |
 | PWA | ✅ manifest, icons, shell-only service worker | web/manifest.webmanifest, web/sw.js |
 | Safety escalation polish | ✅ STOP card: why, do-this-now, service-centre search, PDF, 112 | web/app.js `renderStop` |
-| ~10 labelled stand-in photo fixtures | ✅ 10, red "STAND-IN" banner + EXIF note | api/tests/fixtures, scripts/make_fixtures.py |
+| ~10 labelled stand-in photo fixtures | ✅ 14 (10 + 4 tyre), red "STAND-IN" banner + EXIF note | api/tests/fixtures, scripts/make_fixtures.py |
 | Playwright smoke | ✅ 6 browser tests; skip cleanly without Chromium | api/tests/test_playwright_smoke.py |
 | Demo video, screenshots, diagram | ✅ demo-mode backup | docs/demo/, docs/img/architecture.png |
 | Real-key run, real photos, deploy, real video, submit | ⏳ needs Malik | docs/SUBMISSION_CHECKLIST.md |

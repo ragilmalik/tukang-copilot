@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 02:05 WIB (v1.9.1)
+- **New:** four more labelled stand-in fixtures for the tyre scenario (14 total) and `api/tests/test_tire_fixture.py` (flow, follow-up answer, camera check, PDF).
+- **Checks (real runs, 02:00 WIB):** ruff clean, `mypy api` strict no issues in 48 files, pytest **195 passed, 6 skipped** (Playwright only; jsdom UI test runs after `npm install --prefix /tmp/jd jsdom`), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (195/201).
+- **Next up (Malik):** re-take demo screenshots/video with the Under the hood panel and tyre sample when a Chromium exists; Render preview smoke once deployed; prompt tuning on real photos / first live key run. Malik-side steps unchanged.
+
 ## State on 2026-10-31 01:45 WIB (v1.9.0)
 - **New:** fifth demo scenario, flat scooter tyre with a nail (amber): tubeless plug repair plan, re-plan to a leaking valve stem, SAM masks on tread/valve/rim, id/jv/en text, `samples/tire.jpg`, sample button "ban kempes" / "flat tyre". Marked-parts image inspected visually.
 - **Checks (real runs, 01:40 WIB):** ruff clean, `mypy api` strict no issues in 47 files, pytest **190 passed, 6 skipped** (Playwright only; the jsdom UI test now RUNS here after `npm install --prefix /tmp/jd jsdom`, tip: plain `npm install` in /tmp/jd fails with EACCES on `/node_modules`), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED (5 scenarios), `make_test_report.py` ALL PASSED (190/196).
@@ -84,7 +89,7 @@ python scripts/make_test_report.py   # regenerate docs/TEST_REPORT.md from real 
 | `api/pipeline/safety.py` | Text gate, plan gate, messages in id/jv/en |
 | `api/pipeline/mock.py` | Demo answers + sample photos (motor, pump, faucet, rice) |
 | `api/pipeline/media.py` | ffmpeg WAV, video → sharpest frames, edge-tts |
-| `api/tests/fixtures/` | 10 labelled STAND-IN photos (scripts/make_fixtures.py) |
+| `api/tests/fixtures/` | 14 labelled STAND-IN photos (4 tyre ones added in v1.9.1) (scripts/make_fixtures.py) |
 | `docs/demo/` | Demo video, X clip, screenshots (scripts/make_demo_assets.py) |
 | `api/render/overlay.py` | SAM masks → numbered overlay |
 | `api/pipeline/media.py` | ffmpeg WAV conversion, edge-tts |
