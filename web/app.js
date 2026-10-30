@@ -147,22 +147,41 @@ async function toggleRec() {
   } catch (_) { $("formErr").textContent = t("micErr"); }
 }
 
+// Phone photos are 3-10 MB: shrink on the phone before upload so 4G is fast and cheap. Any failure sends the original.
+async function shrinkImage(file, maxSide = 1600, quality = 0.85) {
+  try {
+    if (!file || !/^image\/(jpeg|png|webp)$/.test(file.type) || file.size < 400 * 1024) return file;
+    if (typeof createImageBitmap !== "function" || typeof document === "undefined") return file;
+    const bmp = await createImageBitmap(file);
+    const k = Math.min(1, maxSide / Math.max(bmp.width, bmp.height));
+    const c = document.createElement("canvas");
+    c.width = Math.max(1, Math.round(bmp.width * k)); c.height = Math.max(1, Math.round(bmp.height * k));
+    const ctx = c.getContext && c.getContext("2d");
+    if (!ctx) return file;
+    ctx.drawImage(bmp, 0, 0, c.width, c.height);
+    if (bmp.close) bmp.close();
+    const blob = await new Promise((res) => c.toBlob(res, "image/jpeg", quality));
+    if (!blob || blob.size >= file.size) return file;
+    return new File([blob], (file.name || "photo").replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
+  } catch (_) { return file; }
+}
+
 async function submit(sample) {
   $("formErr").textContent = "";
   const text = $("text").value.trim();
   if (!sample && !photoFiles.length && !videoFile) return ($("formErr").textContent = t("needPhoto"));
   if (!sample && !text && !audioBlob && !videoFile) return ($("formErr").textContent = t("needDesc"));
-  const fd = new FormData();
-  fd.append("language", lang); fd.append("text", sample ? "" : text); fd.append("category", category);
-  if (sample) fd.append("sample", sample);
-  else photoFiles.forEach((f, i) => fd.append("photos", f, f.name || `photo${i + 1}.jpg`));
-  if (videoFile && !sample) fd.append("video", videoFile, videoFile.name || "clip.mp4");  // server keeps the 3 sharpest frames
-  if (audioBlob && !sample) {
-    const ext = audioBlob.type.includes("mp4") ? "m4a" : audioBlob.type.includes("ogg") ? "ogg" : "webm";
-    fd.append("audio", audioBlob, "voice." + ext);
-  }
   $("goBtn").disabled = true;
   try {
+    const fd = new FormData();
+    fd.append("language", lang); fd.append("text", sample ? "" : text); fd.append("category", category);
+    if (sample) fd.append("sample", sample);
+    else (await Promise.all(photoFiles.map((f) => shrinkImage(f)))).forEach((f, i) => fd.append("photos", f, f.name || `photo${i + 1}.jpg`));
+    if (videoFile && !sample) fd.append("video", videoFile, videoFile.name || "clip.mp4");  // server keeps the 3 sharpest frames
+    if (audioBlob && !sample) {
+      const ext = audioBlob.type.includes("mp4") ? "m4a" : audioBlob.type.includes("ogg") ? "ogg" : "webm";
+      fd.append("audio", audioBlob, "voice." + ext);
+    }
     const r = await fetch("/api/sessions", { method: "POST", body: fd });
     const j = await r.json();
     if (!r.ok) throw new Error(j.detail || r.statusText);
@@ -332,7 +351,8 @@ function setupResult() {
   on("nextBtn", "click", () => { if (stepIdx < S.plan.steps.length - 1) { stepIdx++; renderStep(); } });
   on("playBtn", "click", play);
   on("stepPhoto", "change", async (e) => {
-    const f = e.target.files[0]; if (!f) return;
+    const f0 = e.target.files[0]; if (!f0) return;
+    const f = await shrinkImage(f0);
     const st = S.plan.steps[stepIdx], fd = new FormData(); fd.append("photo", f, f.name || "check.jpg");
     $("checkResult").classList.remove("hidden"); $("checkResult").textContent = t("checking");
     const r = await fetch(`/api/sessions/${S.id}/steps/${st.n}/check`, { method: "POST", body: fd });

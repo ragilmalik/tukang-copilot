@@ -70,7 +70,43 @@ async function run(lang, sample) {
   w.close();
 }
 
+// shrinkImage: runs in the page with a stubbed canvas (jsdom has none): resizes, falls back to the original on any failure.
+async function shrinkChecks() {
+  const dom = await JSDOM.fromURL(base + "/", { runScripts: "dangerously", resources: "usable", pretendToBeVisual: true,
+    beforeParse(w) { w.fetch = nodeFetch; w.scrollTo = () => {}; } });
+  const w = dom.window, d = w.document;
+  await until(() => d.readyState === "complete");
+  await sleep(300);
+  check("shrink: function exists", typeof w.shrinkImage === "function");
+  const big = (n, type = "image/jpeg", name = "IMG_1.jpeg") => new w.File([new Uint8Array(n)], name, { type });
+  const small = big(1000);
+  check("shrink: small file untouched", (await w.shrinkImage(small)) === small);
+  const notImg = big(900000, "application/pdf", "a.pdf");
+  check("shrink: non-image untouched", (await w.shrinkImage(notImg)) === notImg);
+  const orig = d.createElement.bind(d);
+  let drawn = null;
+  w.createImageBitmap = async () => ({ width: 4000, height: 3000, close() {} });
+  d.createElement = (tag) => tag === "canvas" ? {
+    width: 0, height: 0,
+    getContext: () => ({ drawImage(_b, _x, _y, cw, ch) { drawn = [cw, ch]; } }),
+    toBlob(cb, type) { cb(new w.Blob([new Uint8Array(200000)], { type })); },
+  } : orig(tag);
+  const f1 = big(3000000);
+  const r1 = await w.shrinkImage(f1);
+  check("shrink: resized to max side 1600", drawn && drawn[0] === 1600 && drawn[1] === 1200, JSON.stringify(drawn));
+  check("shrink: smaller jpeg returned", r1 !== f1 && r1.size === 200000 && r1.type === "image/jpeg" && r1.name === "IMG_1.jpg", `${r1.size} ${r1.type} ${r1.name}`);
+  d.createElement = (tag) => tag === "canvas" ? { width: 0, height: 0, getContext: () => ({ drawImage() {} }), toBlob(cb) { cb(new w.Blob([new Uint8Array(5000000)])); } } : orig(tag);
+  const f2 = big(3000000);
+  check("shrink: keeps original when result is not smaller", (await w.shrinkImage(f2)) === f2);
+  d.createElement = (tag) => tag === "canvas" ? { getContext: () => null } : orig(tag);
+  check("shrink: no 2d context falls back", (await w.shrinkImage(f2)) === f2);
+  w.createImageBitmap = async () => { throw new Error("cannot decode HEIC"); };
+  check("shrink: decode error falls back", (await w.shrinkImage(f2)) === f2);
+  w.close();
+}
+
 try {
+  await shrinkChecks();
   await run("id", "faucet");
   await run("jv", "pump");
   await run("en", "motor");

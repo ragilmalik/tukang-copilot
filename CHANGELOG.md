@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.12.0 (2026-10-31 03:30 WIB)
+- Phone photos are shrunk on the phone before upload (`shrinkImage` in web/app.js: longest side 1600 px, JPEG 85 percent, only for jpeg/png/webp over 400 KB, original kept if the result is not smaller or anything fails, e.g. an undecodable HEIC). A 6 MB photo becomes roughly 300 KB, so three photos and the step check photos go over 4G in seconds. The Start button is disabled while shrinking so a double tap cannot create two repairs. jsdom test with a stubbed canvas covers resize, fallbacks and untouched small and non-image files.
+
 ## 1.11.0 (2026-10-31 03:00 WIB)
 - Privacy controls. `DELETE /api/sessions/{id}` and a "Delete my photos now" button (id/jv/en) erase a repair from the server immediately; "Clear history" in My garage now erases the saved repairs on the server too. A background janitor purges sessions older than `RETENTION_HOURS` every hour (before, only at startup, so a deploy running for days would have kept photos past the 24 h promise). A worker still running cannot resurrect an erased folder. `api/tests/test_erase.py` (6 tests), jsdom check for the button, smoke_e2e step.
 

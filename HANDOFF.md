@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 03:35 WIB (v1.12.0)
+- **New:** client-side photo shrinking before upload (`shrinkImage` in web/app.js; 1600 px, JPEG 85 percent, falls back to the original on any problem) for the repair photos and the step check photo; Start button disabled during shrinking. Real canvas behaviour is only tested with a stub in jsdom (no Chromium here), so check one real phone upload on 4G.
+- **Checks (real runs, 03:33 WIB):** ruff clean, `mypy api` strict no issues in 50 files, pytest **203 passed, 6 skipped** (Playwright only), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (203/209).
+- **Next up (Malik):** after first live key run: eval_fixtures live, tune prompts; re-take screenshots/video with hood panel, tyre, erase button when a Chromium exists; Render preview smoke once deployed.
+
 ## State on 2026-10-31 03:00 WIB (v1.11.0)
 - **New:** privacy controls. `DELETE /api/sessions/{id}` + "Delete my photos now" button (id/jv/en); My garage "Clear history" also erases on the server; hourly janitor purges sessions past `RETENTION_HOURS` (before, only at startup, so a long-running Render deploy would have broken the 24 h promise); erased sessions cannot be resurrected by a running worker.
 - **Checks (real runs, 02:58 WIB):** ruff clean, `mypy api` strict no issues in 50 files, pytest **203 passed, 6 skipped** (Playwright only; jsdom runs after `npm install --prefix /tmp/jd jsdom`), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED (incl. erase step), `make_test_report.py` ALL PASSED (203/209). The erase button's confirm/alert flow is not browser-tested (no Chromium here); jsdom checks that it exists and is translated.
