@@ -10,7 +10,7 @@
 
 *Problem.* Indonesia runs on ~130 million motorbikes, water pumps, rice cookers and household plumbing. A small fault costs a day's wage at a repair shop or days without water. Repair videos are rarely for your model, rarely in your language, and can't see your problem.
 
-*Solution.* Tukang Copilot is a phone web app. Snap 1–3 photos and describe the problem by voice in Bahasa Indonesia, Javanese or English. It identifies the object, highlights the exact parts on your own photo, diagnoses the likely causes with confidence and evidence, rates safety (green / amber / red), and walks you through the repair one step at a time with voice. After each step you snap a photo and it verifies the result or tells you exactly what to correct. If the fix doesn't work, it re-plans for the next cause. When a job is dangerous (gas, house wiring, 220 V internals, brake hydraulics) it refuses and tells you who to call.
+*Solution.* Tukang Copilot is an installable phone web app (PWA). Snap 1–3 photos or a 5–10 s video and describe the problem by voice in Bahasa Indonesia, Javanese or English. It identifies the object, highlights the exact parts on your own photo, diagnoses the likely causes with confidence and evidence, rates safety (green / amber / red), and walks you through the repair one step at a time with voice. After each step you snap a photo and it verifies the result or tells you exactly what to correct. If the fix doesn't work, it re-plans for the next cause. When a job is dangerous (gas, house wiring, 220 V internals, brake hydraulics) it refuses and tells you who to call. At the end you get a PDF repair report to keep or show a mechanic, saved to "My garage" on the phone (no account, uploads deleted after 24 h).
 
 *How it works (Meta models).*
 - **Muse Voice Transcribe**: voice notes in Indonesian/English, keyword-biased to repair vocabulary; **Muse Spark 1.2** audio for Javanese.
@@ -23,6 +23,8 @@
 *Impact.* Saves a shop visit for common faults, teaches people to fix things themselves, and works in local languages including Javanese. Every claim about savings in the demo is labelled as an estimate.
 
 *What's next.* Offline mode on Muse Glimmer, more object types (fans, washing machines, bicycles), a bengkel handoff that sends the report to a nearby mechanic, and a WhatsApp version.
+
+**Try it in 60 seconds (judges):** open the live link on a phone → tap "pompa tidak keluar air" or "motor mogok" under *Coba contoh* → answer the one question → tap *Cek langkah ini* and snap anything → tap "rice cooker mati" to see the red safety stop. Without a key the app runs in labelled demo mode; the repo also has a 2:37 demo-mode video in docs/demo/.
 
 **Built during the hackathon:** all code, prompts and docs, from scratch, Oct 26 – Nov 4, 2026 (see CHANGELOG.md and commit history).
 

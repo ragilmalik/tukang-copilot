@@ -7,11 +7,15 @@ Meta Global AI Developer Hackathon 2026 (Meta × Cerebral Valley) · Indie Devel
 | | |
 |---|---|
 | Live app | _add your Render URL here after deploy_ |
-| 3-minute demo video | _add YouTube link_ |
+| 3-minute demo video | _add YouTube link_ · backup cut in the repo: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:37, demo mode, captions + voice-over) |
 | X post | _add link_ |
 | License | MIT |
 
-![Parts highlighted by SAM 3.1 on the user's own photo (demo-mode sample)](docs/img/sample-motor-parts.jpg)
+| Snap + speak | Parts found (SAM 3.1) | Check my step | Safety stop |
+|---|---|---|---|
+| ![home](docs/demo/screenshots/01_home.png) | ![parts](docs/demo/screenshots/05_parts.png) | ![check](docs/demo/screenshots/07_check_fail.png) | ![stop](docs/demo/screenshots/11_rice_stop.png) |
+
+<sub>Demo-mode screenshots with clearly labelled stand-in photos (no real API calls). All 14 in [docs/demo/screenshots](docs/demo/screenshots).</sub>
 
 ---
 
@@ -23,14 +27,16 @@ Tukang Copilot looks at the actual object, marks the actual parts on your own ph
 
 ## What it does
 
-1. **Snap + speak.** 1–3 photos and a voice note (≤60 s) or typed text. Pick a category chip (Motor, Pompa air, Elektronik rumah, Pipa/keran, Lainnya).
+1. **Snap + speak.** 1–3 photos **or a 5–10 s video** (the server keeps the sharpest frame from each third, and the clip's sound can be the voice note) and a voice note (≤60 s) or typed text. Pick a category chip (Motor, Pompa air, Elektronik rumah, Pipa/keran, Lainnya).
 2. **Sees the parts.** SAM 3.1 segments each relevant part; they're tinted and numbered on your photo.
 3. **Diagnoses.** Top causes with confidence and evidence, tools and parts with estimated rupiah prices, difficulty 1–5, time estimate, and a **safety level**: 🟢 safe / 🟠 caution / 🔴 stop.
 4. **Asks when unsure.** If the top cause is below 60% it asks one sharp follow-up question before planning (agentic).
 5. **Guided repair.** One step per screen: the right picture (your photo with that part highlighted, or a Muse Image diagram for hidden steps), short instruction, why it matters, warnings, and voice readout (hands-free mode).
 6. **Check my step.** Snap a photo after each step; Muse Spark compares it to the expected state: ✅ next, or ⚠️ a specific correction. Repeated fails escalate.
 7. **Still broken?** Say what happened and it re-plans for the next likely cause. When every safe cause is used up, it tells you to see a mechanic and gives you the report to show them.
-8. **Report + share.** A shareable read-only guide link with steps verified by camera.
+8. **Report + share.** A shareable read-only guide link and a **PDF repair report** (problem, fix, parts, steps verified by camera), plus **My garage**: past repairs kept on the phone only, no account.
+9. **Installable (PWA)** in Bahasa Indonesia, **Basa Jawa** (every UI string) and English. When reasoning runs on **Muse Spark Open** (open weights, `USE_OPEN_WEIGHTS=true` + Baseten key) the app shows a visible badge.
+10. **Safety escalation.** A red STOP card says why, what to do right now, finds a service centre nearby, gives the technician the PDF, and shows the 112 emergency line.
 
 Hard safety stops (gas, house wiring, opening 220 V internals, high voltage, brake hydraulics, fuel leaks, airbags, anything medical) are enforced in code, not just in prompts. See [docs/SAFETY.md](docs/SAFETY.md).
 
@@ -64,11 +70,13 @@ flowchart LR
   API -->|SSE progress, JSON, images| Phone
 ```
 
+![Architecture: one agent loop, five Meta models](docs/img/architecture.png)
+
 Full diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Quick start
 
-**No key needed to try it.** Without `MODEL_API_KEY` the app runs in free **demo mode** with recorded answers for three scenarios.
+**No key needed to try it.** Without `MODEL_API_KEY` the app runs in free **demo mode** with recorded answers for four scenarios (motorbike, water pump, faucet, rice cooker).
 
 ```bash
 # Mac / Linux
@@ -80,12 +88,14 @@ Then open http://localhost:8000 and tap a "Try a sample" link.
 Go live with real Meta models (one step):
 ```bash
 python scripts/set_keys.py      # paste your key (hidden), writes .env, then checks every model
+python scripts/set_keys.py --check-only   # re-check later; check_keys.py --fake = dry run, no key, no cost
 ```
 
-Run the tests:
+Run every check (same as CI: ruff, mypy strict, all tests incl. Playwright browser smoke):
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest api/tests -q
+python -m playwright install chromium   # optional; browser tests skip cleanly without it
+scripts/check_all.sh
 ```
 
 Step-by-step for non-developers (accounts, keys, deploy to Render, phone testing): **[docs/SETUP_FOR_MALIK.md](docs/SETUP_FOR_MALIK.md)**. End-user guide: **[docs/HOW_TO_USE.md](docs/HOW_TO_USE.md)**.
@@ -113,11 +123,15 @@ Step-by-step for non-developers (accounts, keys, deploy to Render, phone testing
 | [docs/ROADMAP.md](docs/ROADMAP.md) | After the hackathon |
 | [docs/ATTRIBUTIONS.md](docs/ATTRIBUTIONS.md) | Third-party libraries and assets |
 | [docs/DECISIONS.md](docs/DECISIONS.md) | Why things are built the way they are |
+| [docs/WINNING_PLAN.md](docs/WINNING_PLAN.md) | Official judging criteria → features, with status |
+| [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md) | Every step to submit, who does it, how to check it |
+| [docs/demo/README.md](docs/demo/README.md) | Demo video, vertical X clip, screenshots, how to regenerate |
 
 ## Built during the hackathon
 
 Everything in this repository was written from scratch during the event window (Oct 26 – Nov 4, 2026). Dated list in [CHANGELOG.md](CHANGELOG.md); the git history shows the commit dates.
 
+- 2026-10-30 (evening): water pump scenario, PDF report, My garage, PWA, video capture (sharpest frames), full Basa Jawa strings, open-weights badge, safety escalation card, mypy strict, 10 labelled stand-in fixtures, Playwright browser smoke tests, generated demo video/screenshots/architecture diagram, one-step key swap (`set_keys.py --stdin`).
 - 2026-10-30: spec, Meta API verification, backend pipeline (listen → look → SAM → diagnose → plan → safety → illustrate → narrate → verify → re-plan), phone web app, fake Meta server, 77 automated tests, CI, Docker/Render deploy files, full docs.
 
 ## Team
