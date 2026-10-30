@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 01:45 WIB (v1.9.0)
+- **New:** fifth demo scenario, flat scooter tyre with a nail (amber): tubeless plug repair plan, re-plan to a leaking valve stem, SAM masks on tread/valve/rim, id/jv/en text, `samples/tire.jpg`, sample button "ban kempes" / "flat tyre". Marked-parts image inspected visually.
+- **Checks (real runs, 01:40 WIB):** ruff clean, `mypy api` strict no issues in 47 files, pytest **190 passed, 6 skipped** (Playwright only; the jsdom UI test now RUNS here after `npm install --prefix /tmp/jd jsdom`, tip: plain `npm install` in /tmp/jd fails with EACCES on `/node_modules`), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED (5 scenarios), `make_test_report.py` ALL PASSED (190/196).
+- **Next up (Malik):** re-take demo screenshots/video with Under the hood panel and the tyre sample when a Chromium exists; Render preview smoke once deployed; prompt tuning on real photos / first live key run; more stand-in fixtures for the tyre case (`scripts/make_fixtures.py`). Malik-side steps unchanged.
+
 ## State on 2026-10-31 01:30 WIB (v1.8.1)
 - **New:** wider text safety gate: electric shock (kesetrum, tersengat), fire/smoke/swollen battery (fire service 113), short circuit variants (konslet, korslet), refrigerant (freon, AC compressor). New `shock` and `fire` stop messages in id/jv/en. 14 new tests (gate + engine stop before any model call). Everyday phrases ("api kompor kecil", "knalpot putih") still pass.
 - **Checks (real runs, 01:25 WIB):** ruff clean, `mypy api` strict no issues in 47 files, pytest **183 passed, 7 skipped** (Playwright/jsdom, no Chromium installable here as non-root arm64), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (183/190).

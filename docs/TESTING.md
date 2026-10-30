@@ -33,7 +33,7 @@ META_API_BASE=http://127.0.0.1:8765/v1 MODEL_API_KEY=test-key NO_PROXY=127.0.0.1
 
 ## Scripts
 - `python scripts/check_keys.py` — real key: PASS/FAIL per Meta model (< $0.02). `--no-cost` = key + model list only. `--fake` = dry run.
-- `python scripts/smoke_e2e.py <url>` — drives a running server like a phone: 4 scenarios, follow-up, check, re-plan, report, PDF, guide, images, PWA files. Use on localhost and on the Render URL.
+- `python scripts/smoke_e2e.py <url>` — drives a running server like a phone: 5 scenarios, follow-up, check, re-plan, report, PDF, guide, images, PWA files. Use on localhost and on the Render URL.
 
 ## Manual QA checklist (phone, real photos, live mode)
 

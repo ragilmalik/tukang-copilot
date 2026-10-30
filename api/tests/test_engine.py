@@ -6,7 +6,7 @@ from api.pipeline import engine
 
 
 def _new(samples, sc, lang="id", text=None):
-    texts = {"motor": "Motor Honda Beat saya susah hidup", "pump": "Pompa air Shimizu bunyi tapi air tidak keluar", "faucet": "Kran wastafel menetes terus", "rice": "Rice cooker tidak panas"}
+    texts = {"motor": "Motor Honda Beat saya susah hidup", "pump": "Pompa air Shimizu bunyi tapi air tidak keluar", "faucet": "Kran wastafel menetes terus", "rice": "Rice cooker tidak panas", "tire": "Ban belakang motor kempes, ada paku"}
     return engine.create([samples[sc]], lang, text or texts[sc])
 
 
@@ -149,8 +149,26 @@ def test_pump_amber_full_run_and_replan_to_foot_valve(samples):
 @pytest.mark.parametrize("text,cat,want", [
     ("Pompa air nggak keluar airnya", "", "pump"), ("my water pump runs dry", "", "pump"), ("airnya mati", "pump", "pump"),
     ("filter udara kotor, air filter", "", "motor"), ("kran netes", "", "faucet"), ("magic com mati", "", "rice"),
+    ("ban belakang kempes", "motor", "tire"), ("my tyre has a puncture", "", "tire"), ("tambal ban tubeless", "", "tire"), ("motor mogok busi", "motor", "motor"),
 ])
 def test_scenario_routing(text, cat, want):
     from api.pipeline import mock
 
     assert mock.scenario(text, cat) == want
+
+
+def test_tire_amber_full_run_and_replan(samples):
+    s = engine.run(_new(samples, "tire")["id"])
+    assert s["status"] == "ready" and s["safety"]["level"] == "amber"
+    assert len(s["plan"]["steps"]) == 4 and "paku" in s["plan"]["cause_title"].lower()
+    assert [c["name"] for c in s["object_report"]["components"]][0].lower().startswith("tapak")
+    assert all(p["found"] for p in s["parts"].values())  # every tyre part gets a SAM mask in the demo
+    s = engine.replan(s["id"], "sudah ditambal tapi masih kempes pelan")
+    assert s["status"] == "ready" and "pentil" in s["plan"]["cause_title"].lower()
+    assert len(s["plan"]["steps"]) == 4
+
+
+def test_tire_english_plan_is_english(samples):
+    s = engine.run(engine.create([samples["tire"]], "en", "Flat tyre with a nail")["id"])
+    assert s["plan"]["steps"][0]["instruction"].startswith("Put the bike")
+    assert s["plan"]["when_to_call_pro"].startswith("A plug is temporary")

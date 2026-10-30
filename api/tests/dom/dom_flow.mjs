@@ -74,6 +74,7 @@ try {
   await run("jv", "pump");
   await run("en", "motor");
   await run("en", "rice");
+  await run("jv", "tire");
 } catch (e) { check("script error", false, e.stack || e); }
 const ok = checks.every((c) => c.ok);
 console.log(JSON.stringify({ ok, checks }));

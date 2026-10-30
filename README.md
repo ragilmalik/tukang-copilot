@@ -76,7 +76,7 @@ Full diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Quick start
 
-**No key needed to try it.** Without `MODEL_API_KEY` the app runs in free **demo mode** with recorded answers for four scenarios (motorbike, water pump, faucet, rice cooker).
+**No key needed to try it.** Without `MODEL_API_KEY` the app runs in free **demo mode** with recorded answers for five scenarios (motorbike, water pump, faucet, rice cooker, flat scooter tyre).
 
 ```bash
 # Mac / Linux

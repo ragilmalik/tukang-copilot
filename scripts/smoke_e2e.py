@@ -43,7 +43,7 @@ def main() -> int:
         ok(h["ok"] is True, "/health")
         ok(c.get("/").status_code == 200 and "Tukang" in c.get("/").text, "home page loads")
         ok(c.get("/manifest.webmanifest").status_code == 200 and c.get("/sw.js").status_code == 200, "PWA manifest + service worker")
-        for sample, expect in (("motor", "ready"), ("pump", "ready"), ("faucet", "ready"), ("rice", "stopped")):
+        for sample, expect in (("motor", "ready"), ("pump", "ready"), ("faucet", "ready"), ("rice", "stopped"), ("tire", "ready")):
             print(f"[{sample}]")
             t0 = time.time()
             sid = c.post("/api/sessions", data={"sample": sample, "language": "id"}).json()["id"]

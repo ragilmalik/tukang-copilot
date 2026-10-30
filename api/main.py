@@ -27,13 +27,16 @@ from .settings import ROOT, settings
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 WEB = ROOT / "web"
 SAMPLES = ROOT / "samples"
-if not all((SAMPLES / f"{k}.jpg").exists() for k in ("motor", "pump", "faucet", "rice")):
+if not all((SAMPLES / f"{k}.jpg").exists() for k in ("motor", "pump", "faucet", "rice", "tire")):
     mock.make_sample_photos(SAMPLES)
 SAMPLE_TEXT = {
     "motor": mock.TRANSCRIPTS,
     "pump": {"id": "Pompa air Shimizu saya bunyi dan muter, tapi airnya nggak keluar sama sekali.",
              "jv": "Pompa banyu Shimizuku muni lan muter, nanging banyune ora metu babar pisan.",
              "en": "My Shimizu water pump hums and spins, but no water comes out at all."},
+    "tire": {"id": "Ban belakang motor saya kempes pelan-pelan dan sepertinya ada paku di tapaknya.",
+             "jv": "Ban mburi motorku kempes alon-alon lan kayane ana paku ing tapake.",
+             "en": "My scooter's rear tyre is slowly going flat and there seems to be a nail in the tread."},
     "faucet": {"id": "Kran wastafel dapur netes terus walaupun sudah ditutup kencang.", "jv": "Kran wastafel pawon netes terus senajan wis ditutup kenceng.",
                "en": "The kitchen faucet keeps dripping even when closed tight."},
     "rice": {"id": "Rice cooker saya nggak panas, lampunya mati padahal sudah dicolok.", "jv": "Rice cookerku ora panas, lampune mati senajan wis dicolok.",
