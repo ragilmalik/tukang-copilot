@@ -37,3 +37,4 @@ Owner: **M** = Malik, **H** = Malik.
 - [x] Fixture evaluation script with markdown report, usable on real photos (v1.10.0)
 - [x] Privacy: erase-now button + endpoint, hourly retention janitor (v1.11.0)
 - [x] Fifth demo scenario: flat scooter tyre (v1.9.0)
+- [x] Bengkel price vs DIY saving chip + PDF lines (v1.17.0)

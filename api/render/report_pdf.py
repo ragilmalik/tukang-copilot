@@ -17,7 +17,8 @@ SAFETY_COLOR = {"green": (34, 150, 80), "amber": (215, 140, 0), "red": (205, 40,
 
 LABELS: dict[str, dict[str, str]] = {
     "id": {"title": "Laporan Perbaikan", "object": "Barang", "problem": "Masalah", "fix": "Penyebab yang diperbaiki", "safety": "Keselamatan",
-           "steps": "Langkah", "verified": "terverifikasi kamera", "tools": "Alat", "parts": "Suku cadang", "total": "Perkiraan biaya alat + suku cadang",
+           "steps": "Langkah", "verified": "terverifikasi kamera", "tools": "Alat", "parts": "Suku cadang", "total": "Perkiraan biaya suku cadang",
+           "shop": "Harga bengkel biasanya (jasa + suku cadang)", "save": "Hemat sendiri (hanya suku cadang)",
            "attempts": "Percobaan", "minutes": "menit", "status": "Status", "ok": "[OK]", "todo": "[  ]", "photo": "Foto dengan bagian yang ditandai (SAM 3.1)",
            "disclaimer": "Panduan ini hanya untuk perbaikan ringan. Harga adalah perkiraan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.",
            "made": "Dibuat dengan Tukang Copilot (Meta Muse Spark + SAM 3.1)", "page": "Hal.", "demo": "Mode demo: jawaban contoh",
@@ -27,7 +28,8 @@ LABELS: dict[str, dict[str, str]] = {
            "st_diagnose": "Diagnosa", "st_plan": "Susun langkah", "st_safety": "Cek keselamatan rencana", "st_illustrate": "Gambar bantu",
            "st_narrate": "Suara pemandu"},
     "en": {"title": "Repair Report", "object": "Item", "problem": "Problem", "fix": "Cause fixed", "safety": "Safety",
-           "steps": "Steps", "verified": "verified by camera", "tools": "Tools", "parts": "Parts", "total": "Estimated tools + parts cost",
+           "steps": "Steps", "verified": "verified by camera", "tools": "Tools", "parts": "Parts", "total": "Estimated parts cost",
+           "shop": "Typical shop price (labour + parts)", "save": "Saved by doing it yourself (parts only)",
            "attempts": "Attempts", "minutes": "min", "status": "Status", "ok": "[OK]", "todo": "[  ]", "photo": "Photo with the parts marked (SAM 3.1)",
            "disclaimer": "Light repairs only. Prices are estimates. For gas, house wiring, or high voltage, call a professional.",
            "made": "Made with Tukang Copilot (Meta Muse Spark + SAM 3.1)", "page": "Page", "demo": "Demo mode: sample answers",
@@ -189,9 +191,15 @@ def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: 
                 total += price
                 doc.text(f"- {r.get('name', '')}   {rupiah(price) if price else ''}", 24, indent=10)
             doc.space(6)
-        shown = rep.get("cost_estimate_idr") or total
+        parts_total = sum(int(r.get("est_price_idr") or 0) for r in items[1][1]) if len(items) > 1 else total
+        shown = rep.get("cost_estimate_idr") or parts_total
         mins = rep.get("minutes_estimate")
         doc.text(f"{L['total']}: {rupiah(shown)}" + (f"   ~{mins} {L['minutes']}" if mins else ""), 26, bold=True)
+        shop, saving = int(rep.get("shop_cost_estimate_idr") or 0), int(rep.get("diy_saving_idr") or 0)
+        if shop:
+            doc.text(f"{L['shop']}: {rupiah(shop)}", 24)
+            if saving:
+                doc.text(f"{L['save']}: {rupiah(saving)}", 24)
 
     if rep.get("attempts"):
         doc.rule()

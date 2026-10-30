@@ -76,7 +76,7 @@ PWA manifest and the app-shell service worker, served from the root so the app c
 ## `GET /api/sessions/{id}/report`
 ```json
 {"object":"Honda Beat, area busi","problem":"…","fix":"Busi kotor / berkerak","steps_total":4,"steps_verified":1,
- "tools":[…],"parts":[…],"cost_estimate_idr":25000,"minutes_estimate":20,"safety_level":"amber","attempts":["Tried 'Cop busi longgar', result: …"],"status":"ready"}
+ "tools":[…],"parts":[…],"cost_estimate_idr":25000,"shop_cost_estimate_idr":60000,"diy_saving_idr":35000,"minutes_estimate":20,"safety_level":"amber","attempts":["Tried 'Cop busi longgar', result: …"],"status":"ready"}
 ```
 
 ## `GET /files/{id}/{name}`

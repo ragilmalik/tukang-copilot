@@ -63,6 +63,8 @@ class Diagnosis(BaseModel):
     difficulty: int = Field(ge=1, le=5)
     minutes_estimate: int = Field(ge=1, le=600)
     follow_up_question: str = ""   # asked when the top cause is below 60% confidence
+    # Typical price at a bengkel/servis for this same repair (parts + labour), rupiah; 0 = unknown or red stop.
+    shop_cost_estimate_idr: int = Field(default=0, ge=0)
 
     @field_validator("causes")
     @classmethod
@@ -72,6 +74,11 @@ class Diagnosis(BaseModel):
     @property
     def cost_estimate_idr(self) -> int:
         return sum(i.est_price_idr for i in self.parts)
+
+    @property
+    def diy_saving_idr(self) -> int:
+        """What the owner keeps by doing it themselves, counting parts only (tools are reusable)."""
+        return max(0, self.shop_cost_estimate_idr - self.cost_estimate_idr) if self.shop_cost_estimate_idr else 0
 
 
 class Step(BaseModel):

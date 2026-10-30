@@ -305,7 +305,7 @@ def stage_diagnose(s: dict[str, Any], rep: ObjectReport) -> Diagnosis:
                {"type": "text", "text": "Object report:\n" + json.dumps(rep.model_dump(), ensure_ascii=False) + f"\n\nOwner's description:\n{description(s)}"}]
     dx = _chat_json(Diagnosis, prompts.get("diagnose", lang_name=prompts.LANG_NAME[s["lang"]]), content, "diagnosis",
                     mock.diagnosis(_scenario(s), s["lang"]), model=settings.reason_model, effort="high", allow_open=True)
-    s["diagnosis"] = dx.model_dump() | {"cost_estimate_idr": dx.cost_estimate_idr}
+    s["diagnosis"] = dx.model_dump() | {"cost_estimate_idr": dx.cost_estimate_idr, "diy_saving_idr": dx.diy_saving_idr}
     s["safety"]["level"], s["safety"]["reason"] = dx.safety_level, dx.safety_reason
     _stage(s, "diagnose", "done", dx.causes[0].title[:90], int((time.time() - t0) * 1000))
     return dx
@@ -544,7 +544,7 @@ def replan(sid: str, report: str) -> dict[str, Any]:
     s = load(sid)
     if not s.get("diagnosis"):
         raise ValueError("no diagnosis yet")
-    dx = Diagnosis.model_validate({k: v for k, v in s["diagnosis"].items() if k != "cost_estimate_idr"})
+    dx = Diagnosis.model_validate({k: v for k, v in s["diagnosis"].items() if k not in ("cost_estimate_idr", "diy_saving_idr")})
     rep = ObjectReport.model_validate(s["object_report"])
     report = (report or "").strip()[:500]
     gate = safety.check_text(report, s["lang"])
@@ -593,6 +593,7 @@ def report(sid: str) -> dict[str, Any]:
     return {"id": sid, "object": (s.get("object_report") or {}).get("object", ""), "problem": dx.get("problem_summary", ""),
             "fix": plan.get("cause_title", ""), "steps_total": len(steps), "steps_verified": verified,
             "tools": dx.get("tools", []), "parts": dx.get("parts", []), "cost_estimate_idr": dx.get("cost_estimate_idr", 0),
+            "shop_cost_estimate_idr": dx.get("shop_cost_estimate_idr", 0), "diy_saving_idr": dx.get("diy_saving_idr", 0),
             "minutes_estimate": dx.get("minutes_estimate"), "safety_level": s["safety"]["level"], "attempts": s.get("history", []),
             "status": s["status"], "created": s["created"], "lang": s["lang"]}
 

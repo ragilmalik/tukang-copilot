@@ -66,6 +66,8 @@ async function run(lang, sample) {
     check(`${lang}/${sample}: hood rows >= 5`, rows >= 5, rows);
     check(`${lang}/${sample}: hood names SAM`, /sam-3\.1/i.test(d.getElementById("hoodList").textContent));
     check(`${lang}/${sample}: no raw i18n keys in hood`, !/hs_/.test(d.getElementById("hoodList").textContent));
+    const saveChip = d.getElementById("gSave");
+    check(`${lang}/${sample}: shop price chip shown with rupiah`, saveChip && !saveChip.classList.contains("hidden") && /Rp\d/.test(saveChip.textContent) && !/undefined|shopCost/.test(saveChip.textContent), saveChip && saveChip.textContent);
     check(`${lang}/${sample}: PDF + workshop links`, (d.getElementById("workshopBtn") || {}).href !== undefined);
     check(`${lang}/${sample}: erase button has a translated label`, !!d.getElementById("eraseBtn") && !/^erase$/.test(d.getElementById("eraseBtn").textContent) && d.getElementById("eraseBtn").textContent.length > 8);
     check(`${lang}/${sample}: focus moved to result heading`, d.activeElement && d.activeElement.tagName === "H2", d.activeElement && d.activeElement.tagName);

@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.17.0 (2026-10-31 06:10 WIB)
+- "Bengkel vs DIY" price line. Diagnosis has a new `shop_cost_estimate_idr` (typical bengkel/servis price, parts plus labour; 0 when unknown or red stop) and a computed `diy_saving_idr` (shop price minus parts, never negative; tools left out because they are reusable). Prompt `diagnose.md` asks for it, `coerce.py` repairs "Rp 75.000" style values, all four non-red mock scenarios carry one. Phone UI shows a chip ("bengkel Rp150.000 · hemat Rp110.000", id/jv/en), the PDF report prints both lines. Also fixed the PDF total, which was labelled "tools + parts" but showed parts only; it is now labelled "parts". Tests: `test_shop_cost.py` (9) and a jsdom check per language and scenario.
+
 ## 1.16.0 (2026-10-31 05:30 WIB)
 - Real-phone photo formats. New `api/pipeline/photos.py`: iPhone HEIC/HEIF uploads (repair photos and the step check photo) are converted to JPEG on the server with the optional `pillow-heif` package (added to requirements.txt); without it HEIC gets a clear 400 message ("set the camera to JPG") instead of a crash. `.jfif` and upper-case extensions accepted. 7 new tests in `test_photo_formats.py` (HEIC round trip incl. check photo, EXIF-rotated JPEG, corrupt file gives 400, unsupported types, decoder-missing message).
 

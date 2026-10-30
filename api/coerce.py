@@ -140,6 +140,8 @@ def _diagnosis(d: dict[str, Any]) -> dict[str, Any]:
                               {"yellow": "amber", "orange": "amber", "safe": "green", "danger": "red", "stop": "red"})
     d["difficulty"] = _int(d.get("difficulty"), 1, 5)
     d["minutes_estimate"] = _int(d.get("minutes_estimate"), 1, 600)
+    shop = _num(d.get("shop_cost_estimate_idr"))
+    d["shop_cost_estimate_idr"] = 0 if shop is None else max(0, int(shop))
     d["tools"], d["parts"] = _items(d.get("tools")), _items(d.get("parts"))
     causes = d.get("causes")
     if isinstance(causes, list):

@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 06:10 WIB (v1.17.0)
+- **New:** bengkel price vs DIY saving chip and PDF lines (`shop_cost_estimate_idr`, `diy_saving_idr`), PDF total label fixed (parts only). See CHANGELOG 1.17.0. The shop prices in mock mode are illustrative; in live mode they are the model's estimate, so judge them on real runs.
+- **Checks (real runs, 06:08 WIB):** ruff clean, `mypy api` strict no issues in 54 files, pytest **236 passed, 6 skipped** (Playwright only), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (236/242). PDF page inspected visually.
+- **Next up (Malik):** after first live key run: eval_fixtures live, tune prompts (check shop price sanity); re-take screenshots/video when a Chromium exists (new chip not in current assets); Render preview smoke once deployed.
+
 ## State on 2026-10-31 05:30 WIB (v1.16.0)
 - **New:** HEIC/HEIF (iPhone) upload support via optional `pillow-heif` (`api/pipeline/photos.py`), friendly refusal when the decoder is missing, `.jfif` accepted, 7 tests (`test_photo_formats.py`). See CHANGELOG 1.16.0.
 - **Checks (real runs, 05:28 WIB):** ruff clean, `mypy api` strict no issues in 53 files, pytest **226 passed, 7 skipped**, `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (226/233). pillow-heif must be in the Render build (it is in requirements.txt; wheels exist for linux x86_64/arm64).
