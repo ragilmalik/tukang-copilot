@@ -189,11 +189,12 @@ def plan(sc: str, lang: str, cause_index: int = 0) -> dict[str, Any]:
         done, pro, cause = (_L(lang, "Mesin hidup dan stasioner stabil.", "The engine starts and idles steadily."),
                             _L(lang, "Bawa ke bengkel bila tercium bau bensin kuat.", "See a mechanic if there's a strong fuel smell."),
                             _L(lang, "Cop busi longgar", "Loose spark plug cap"))
+    waits = {1: 10} if sc == "motor" and cause_index == 0 else {}   # first motor step: let the engine cool 10 minutes
     steps = []
     for i, (cid, ins_id, ins_en, exp_id, exp_en, diag) in enumerate(s, 1):
         ins = ins_en if lang == "en" else ins_id
         steps.append({"n": i, "component_id": cid, "instruction": ins, "why": "", "expected_state": exp_en if lang == "en" else exp_id,
-                      "warnings": [], "voice_text": ins, "needs_diagram": diag,
+                      "warnings": [], "voice_text": ins, "needs_diagram": diag, "wait_minutes": waits.get(i, 0),
                       "diagram_prompt": "cutaway of the part being serviced, orange arrow showing the motion" if diag else ""})
     return {"cause_title": cause, "steps": steps, "done_check": done, "when_to_call_pro": pro}
 

@@ -89,6 +89,7 @@ class Step(BaseModel):
     expected_state: str           # what the camera should see when this step is done
     warnings: list[str] = Field(default_factory=list)
     voice_text: str = ""
+    wait_minutes: int = Field(default=0, ge=0, le=120)  # a real waiting time in this step (cool down, dry); 0 = none
     needs_diagram: bool = False   # True: the photo can't show it, so Muse Image draws a diagram
     diagram_prompt: str = ""      # English brief for Muse Image
 

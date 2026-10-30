@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.18.0 (2026-10-31 07:15 WIB)
+- Waiting-time steps. A plan step can now carry `wait_minutes` (0 to 120; "let the engine cool 10 minutes", glue or sealant drying). The guide shows a countdown with Start/Stop, then vibrates and reads "waiting time is over" aloud (id/jv/en); the workshop sheet prints a tick-box line ("Wait 10 minutes"). `coerce.py` `_wait` repairs "about 15 min" style values and drops silly ones; `prompts/plan.md` asks for it; the motor mock plan's first step waits 10 minutes. Tests: `test_wait_timer.py` (9), a coerce test, and 7 jsdom checks (timer shown, 10:00, counts down, stops, absent on other scenarios). Timer ticks use wall-clock time so it stays right if the phone throttles the tab; if the screen locks the vibrate/voice alert may not fire (not testable without a real phone).
+
 ## 1.17.1 (2026-10-31 06:40 WIB)
 - Price sanity for live mode (`api/coerce.py` `_price`): shop and part prices now accept "75k", "75rb", "1,5 juta", "Rp 75.000"; negative values and anything above Rp15 million (a unit misread) become unknown (0) instead of a wild saving chip; a red-stop diagnosis never keeps a shop price. 13 new tests in `test_shop_cost.py`.
 

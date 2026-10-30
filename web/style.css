@@ -71,3 +71,6 @@ h1:focus,h2:focus{outline:none}
 #gDiff,#gTime,#gCost{min-height:0}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+.timer{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#eef6ff;color:#12385f;padding:8px 10px;border-radius:10px;margin:8px 0}
+.timer .clock{font-variant-numeric:tabular-nums;font-size:1.3em;font-weight:700}

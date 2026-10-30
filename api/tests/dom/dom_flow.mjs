@@ -60,6 +60,18 @@ async function run(lang, sample) {
   if (ready) {
     check(`${lang}/${sample}: diagnosis text`, d.getElementById("dxObject").textContent.trim().length > 2);
     check(`${lang}/${sample}: steps rendered`, d.getElementById("stepText").textContent.trim().length > 5);
+    const tm = d.getElementById("stepTimer");
+    if (sample === "motor") {  // step 1 asks the owner to wait 10 minutes: countdown visible, starts and stops
+      check(`${lang}/${sample}: wait timer shown`, tm && !tm.classList.contains("hidden") && /10/.test(d.getElementById("timerLabel").textContent), tm && tm.textContent);
+      check(`${lang}/${sample}: timer clock 10:00`, d.getElementById("timerClock").textContent === "10:00", d.getElementById("timerClock").textContent);
+      check(`${lang}/${sample}: timer label translated`, !/waitFor|timerStart/.test(tm.textContent), tm.textContent);
+      d.getElementById("timerBtn").click(); await sleep(700);
+      check(`${lang}/${sample}: timer counts down`, d.getElementById("timerBtn").dataset.state === "running" && d.getElementById("timerClock").textContent !== "10:00", d.getElementById("timerClock").textContent);
+      d.getElementById("timerBtn").click();
+      check(`${lang}/${sample}: timer stops and resets`, d.getElementById("timerBtn").dataset.state === "idle" && d.getElementById("timerClock").textContent === "10:00");
+    } else {
+      check(`${lang}/${sample}: no timer when no wait`, !tm || tm.classList.contains("hidden"));
+    }
     const hood = d.getElementById("hood");
     check(`${lang}/${sample}: hood panel visible`, hood && !hood.classList.contains("hidden"));
     const rows = d.querySelectorAll("#hoodList li").length;

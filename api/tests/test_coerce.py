@@ -123,3 +123,10 @@ def test_engine_accepts_drifty_reply_without_retry(live):
     live.setattr(meta_client, "chat_json", fake)
     out = engine._chat_json(Diagnosis, "sys", [], "diagnosis", {})
     assert out.safety_level == "green" and out.causes[0].confidence == 90 and len(calls) == 1
+
+
+def test_wait_minutes_repair():
+    from api.coerce import _wait
+    assert _wait(10) == 10 and _wait("about 15 min") == 15 and _wait("7,5") == 8
+    assert _wait(0) == 0 and _wait(-3) == 0 and _wait(500) == 0 and _wait(True) == 0 and _wait(None) == 0 and _wait("none") == 0
+    assert _wait(float("nan")) == 0

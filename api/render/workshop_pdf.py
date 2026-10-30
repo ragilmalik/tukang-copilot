@@ -13,11 +13,11 @@ from .report_pdf import INK, LABELS, M, MUTED, ORANGE, SAFETY_COLOR, W, _Doc, _f
 
 TXT: dict[str, dict[str, str]] = {
     "id": {"title": "Lembar Bengkel", "step": "LANGKAH", "of": "dari", "look": "Kalau sudah benar, kamera melihat:", "warn": "HATI-HATI",
-           "gather": "Siapkan dulu", "done": "Selesai kalau:", "tick": "Centang setelah selesai", "empty": "Tidak ada langkah"},
+           "wait": "Tunggu {n} menit", "gather": "Siapkan dulu", "done": "Selesai kalau:", "tick": "Centang setelah selesai", "empty": "Tidak ada langkah"},
     "en": {"title": "Workshop Sheet", "step": "STEP", "of": "of", "look": "When it is right, the camera sees:", "warn": "CAREFUL",
-           "gather": "Get these ready", "done": "Done when:", "tick": "Tick when finished", "empty": "No steps"},
+           "wait": "Wait {n} minutes", "gather": "Get these ready", "done": "Done when:", "tick": "Tick when finished", "empty": "No steps"},
     "jv": {"title": "Lembar Bengkel", "step": "LANGKAH", "of": "saka", "look": "Yen wis bener, kamera ndeleng:", "warn": "ATI-ATI",
-           "gather": "Cepakna dhisik", "done": "Rampung yen:", "tick": "Centhang yen wis rampung", "empty": "Ora ana langkah"},
+           "wait": "Antosna {n} menit", "gather": "Cepakna dhisik", "done": "Rampung yen:", "tick": "Centhang yen wis rampung", "empty": "Ora ana langkah"},
 }
 
 
@@ -75,6 +75,10 @@ def _step_page(doc: _Doc, st: dict[str, Any], total: int, session: dict[str, Any
     if st.get("why"):
         doc.space(6)
         doc.text(str(st["why"]), 30, color=MUTED, gap=10)
+    wait = int(st.get("wait_minutes") or 0)
+    if wait > 0:
+        doc.space(10)
+        doc.text("[ ] " + T["wait"].replace("{n}", str(wait)), 40, bold=True, color=ORANGE, gap=8)
     warns = [str(w) for w in st.get("warnings") or [] if w]
     if warns:
         doc.space(14)

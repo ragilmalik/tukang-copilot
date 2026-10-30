@@ -179,6 +179,20 @@ def _diagnosis(d: dict[str, Any]) -> dict[str, Any]:
     return d
 
 
+def _wait(v: Any) -> int:
+    """Waiting time in whole minutes, 0..120; anything unreadable or silly means no timer."""
+    if isinstance(v, bool):
+        return 0
+    if isinstance(v, str):
+        m = re.search(r"\d+(?:[.,]\d+)?", v)
+        if not m:
+            return 0
+        v = float(m.group(0).replace(",", "."))
+    if isinstance(v, (int, float)) and v == v and 0 < v <= 120:
+        return max(1, round(v))
+    return 0
+
+
 def _plan(d: dict[str, Any]) -> dict[str, Any]:
     steps = d.get("steps")
     if isinstance(steps, list):
@@ -187,6 +201,7 @@ def _plan(d: dict[str, Any]) -> dict[str, Any]:
             s["n"] = i
             s["warnings"] = _strs(s.get("warnings"))
             s["needs_diagram"] = _bool(s.get("needs_diagram", False))
+            s["wait_minutes"] = _wait(s.get("wait_minutes"))
             if s.get("component_id") is not None:
                 s["component_id"] = str(s["component_id"])
         d["steps"] = steps

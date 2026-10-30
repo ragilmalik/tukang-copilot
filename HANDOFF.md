@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 07:15 WIB (v1.18.0)
+- **New:** waiting-time steps (`wait_minutes` on Step; guide countdown timer with vibrate and spoken alert; workshop sheet tick line; coerce `_wait`; prompt line). See CHANGELOG 1.18.0.
+- **Checks (real runs, 07:12 WIB):** ruff clean, `mypy api` strict no issues in 55 files, pytest **258 passed, 7 skipped** (Playwright only; jsdom runs with /tmp/jd, incl. 7 new timer checks), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED. Timer alert on a locked phone screen not testable here.
+- **Next up (Malik):** after first live key run: eval_fixtures live, tune prompts (check the model uses wait_minutes sensibly, not on every step); re-take screenshots/video when a Chromium exists (timer and saving chip not in current assets); Render preview smoke once deployed.
+
 ## State on 2026-10-31 06:40 WIB (v1.17.1)
 - **New:** price sanity in `coerce.py` (k/rb/juta units, implausible values become unknown, no shop price on red stops). See CHANGELOG 1.17.1.
 - **Checks (real runs, 06:35 WIB):** ruff clean, `mypy api` strict no issues in 54 files, pytest **247 passed, 7 skipped** (Playwright only; no Chromium downloadable on this arm64 sandbox), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` run.

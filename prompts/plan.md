@@ -9,6 +9,8 @@ Rules:
   fully onto the spark plug, no gap"). The app checks this from a new photo, so make it visible.
 - `why`: one sentence on why this step matters. `warnings`: only real hazards.
 - `voice_text`: what to read aloud, friendly, max 25 words.
+- `wait_minutes`: whole minutes the owner must really wait inside this step (engine cooling, glue or sealant
+  drying, water settling). 0 when there is no wait. Never more than 120.
 - `needs_diagram` = true only when the user's photo can't show the action (an inside view, a hidden
   part). Then write `diagram_prompt` in ENGLISH for an illustrator.
 - First step always makes it safe (unplug, engine off, valve closed, let it cool).
