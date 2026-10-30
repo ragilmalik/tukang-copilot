@@ -61,6 +61,9 @@ Printable A4 repair report in the session's language: safety level, the photo wi
 curl -o report.pdf http://localhost:8000/api/sessions/$ID/report.pdf
 ```
 
+## `GET /api/sessions/{id}/workshop.pdf`
+Large-print workshop sheets (A4) to pin up next to the job: a cover with the safety banner, the marked photo and a tick list of tools and parts, then one page per step (giant step number, instruction, warnings in a red box, what the camera should see, the step diagram or marked photo, a tick box) and a final "Done when" page. Session language. `409` while there is no plan (including a red safety stop), `404` for an unknown session.
+
 ## `GET /manifest.webmanifest`, `GET /sw.js`
 PWA manifest and the app-shell service worker, served from the root so the app can be installed to the home screen. `404` if the file is missing.
 

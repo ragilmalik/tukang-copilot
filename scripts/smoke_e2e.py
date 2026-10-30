@@ -60,6 +60,8 @@ def main() -> int:
                 r = c.get(f"/api/sessions/{sid}/report.pdf")
                 ok(r.status_code == 200 and r.content[:4] == b"%PDF", "PDF report for the technician")
                 continue
+            r = c.get(f"/api/sessions/{sid}/workshop.pdf")
+            ok(r.status_code == 200 and r.content[:4] == b"%PDF", "workshop sheets PDF")
             for d in s["diagrams"].values():
                 if d.get("file"):
                     ok(c.get(f"/files/{sid}/{d['file']}").status_code == 200, f"diagram {d['file']}")

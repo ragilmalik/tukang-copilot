@@ -58,3 +58,34 @@ def test_pdf_endpoint_red_stop_still_works():
     sid = client.post("/api/sessions", data={"sample": "rice"}).json()["id"]
     assert _wait(sid)["status"] == "stopped"
     assert client.get(f"/api/sessions/{sid}/report.pdf").status_code in {200, 409}
+
+
+def _pages(data: bytes) -> int:
+    return data.count(b"/Type /Page") - data.count(b"/Type /Pages")
+
+
+@pytest.mark.parametrize("lang", ["id", "jv", "en"])
+def test_workshop_sheets_one_page_per_step(samples, tmp_path, lang):
+    from api.render import workshop_pdf
+
+    sid = engine.create([samples["pump"]], lang, "Pompa air tidak mau menyedot")["id"]
+    s = engine.run(sid)
+    steps = len(s["plan"]["steps"])
+    out = workshop_pdf.build(engine.report(sid), engine.load(sid), engine.session_dir(sid), tmp_path / "w.pdf")
+    data = out.read_bytes()
+    assert data.startswith(b"%PDF")
+    assert _pages(data) >= steps + 1  # cover + one page per step (+ final page)
+
+
+def test_workshop_endpoint():
+    sid = client.post("/api/sessions", data={"sample": "faucet", "language": "id"}).json()["id"]
+    assert _wait(sid)["status"] == "ready"
+    r = client.get(f"/api/sessions/{sid}/workshop.pdf")
+    assert r.status_code == 200 and r.headers["content-type"] == "application/pdf" and r.content.startswith(b"%PDF")
+    assert client.get("/api/sessions/nope123/workshop.pdf").status_code == 404
+
+
+def test_workshop_endpoint_red_stop_has_no_plan():
+    sid = client.post("/api/sessions", data={"sample": "rice"}).json()["id"]
+    assert _wait(sid)["status"] == "stopped"
+    assert client.get(f"/api/sessions/{sid}/workshop.pdf").status_code == 409

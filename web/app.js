@@ -7,7 +7,7 @@ const T = {
         samples: "Coba contoh:", sMotor: "motor mogok", sPump: "pompa tidak keluar air", sFaucet: "kran menetes", sRice: "rice cooker mati",
         working: "Sedang memeriksa…", retry: "Coba lagi", answerHere: "Jawaban kamu", send: "Kirim", diagnosis: "Diagnosa", safetyFirst: "Keselamatan dulu",
         tools: "Alat", materials: "Suku cadang", listen: "Dengarkan", next: "Lanjut", handsFree: "Mode tangan bebas (bacakan otomatis)",
-        done: "Selesai kalau:", checkStep: "Cek langkah ini", share: "Bagikan laporan", pdf: "Unduh laporan PDF", wa: "Kirim daftar belanja ke WhatsApp", buy: "Cari harga", garage: "Garasi saya", garageNote: "Riwayat perbaikan hanya disimpan di HP ini. Panduan bisa dibuka 24 jam.", garageClear: "Hapus riwayat", again: "Perbaiki barang lain",
+        done: "Selesai kalau:", checkStep: "Cek langkah ini", share: "Bagikan laporan", pdf: "Unduh laporan PDF", workshop: "Lembar bengkel (cetak besar)", wa: "Kirim daftar belanja ke WhatsApp", buy: "Cari harga", garage: "Garasi saya", garageNote: "Riwayat perbaikan hanya disimpan di HP ini. Panduan bisa dibuka 24 jam.", garageClear: "Hapus riwayat", again: "Perbaiki barang lain",
         stuck: "Masih rusak, coba rencana lain", stuckHere: "Apa yang terjadi? (mis. sudah dicoba, tetap mati)",
         needPhoto: "Ambil atau unggah foto dulu.", needDesc: "Ceritakan masalahnya (suara atau ketik).",
         footer: "Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.",
@@ -26,7 +26,7 @@ const T = {
         samples: "Try a sample:", sMotor: "bike won't start", sPump: "pump gives no water", sFaucet: "dripping tap", sRice: "dead rice cooker",
         working: "Checking…", retry: "Try again", answerHere: "Your answer", send: "Send", diagnosis: "Diagnosis", safetyFirst: "Safety first",
         tools: "Tools", materials: "Parts", listen: "Listen", next: "Next", handsFree: "Hands-free mode (read steps aloud)",
-        done: "Done when:", checkStep: "Check this step", share: "Share report", pdf: "Download PDF report", wa: "Send shopping list to WhatsApp", buy: "Compare prices", garage: "My garage", garageNote: "Your repair history stays on this phone only. Guides open for 24 hours.", garageClear: "Clear history", again: "Fix something else",
+        done: "Done when:", checkStep: "Check this step", share: "Share report", pdf: "Download PDF report", workshop: "Workshop sheets (large print)", wa: "Send shopping list to WhatsApp", buy: "Compare prices", garage: "My garage", garageNote: "Your repair history stays on this phone only. Guides open for 24 hours.", garageClear: "Clear history", again: "Fix something else",
         stuck: "Still broken, try another plan", stuckHere: "What happened? (e.g. tried it, still dead)",
         needPhoto: "Take or upload a photo first.", needDesc: "Describe the problem (voice or text).",
         footer: "Light repairs only. For gas, house wiring, or high voltage, call a professional.",
@@ -48,7 +48,7 @@ T.jv = Object.assign({}, T.id, {
   samples: "Jajal conto:", sMotor: "motor mogok", sPump: "pompa ora metu banyu", sFaucet: "kran netes", sRice: "rice cooker mati",
   working: "Lagi dipriksa…", retry: "Jajal maneh", answerHere: "Wangsulanmu", send: "Kirim", diagnosis: "Diagnosa", safetyFirst: "Slamet dhisik",
   tools: "Piranti", materials: "Suku cadang", listen: "Rungokna", next: "Terus", handsFree: "Mode tanpa tangan (diwacakake otomatis)",
-  done: "Rampung yen:", checkStep: "Priksa langkah iki", share: "Bagekna laporan", pdf: "Undhuh laporan PDF", wa: "Kirim dhaptar blanja menyang WhatsApp", buy: "Golek rega", garage: "Garasiku",
+  done: "Rampung yen:", checkStep: "Priksa langkah iki", share: "Bagekna laporan", pdf: "Undhuh laporan PDF", workshop: "Lembar bengkel (cetak gedhe)", wa: "Kirim dhaptar blanja menyang WhatsApp", buy: "Golek rega", garage: "Garasiku",
   garageNote: "Riwayat ndandani mung disimpen ing HP iki. Pandhuan bisa dibukak 24 jam.", garageClear: "Busak riwayat", again: "Ndandani barang liya",
   stuck: "Isih rusak, jajal rencana liya", stuckHere: "Kepiye kedadeyane? (umpamane wis dijajal, tetep mati)",
   needPhoto: "Jupuk utawa unggah foto dhisik.", needDesc: "Critakna masalahe (swara utawa ketik).",
@@ -245,6 +245,7 @@ function render(s) {
   if (!s || !s.plan) return;
   const rep = s.object_report || {}, dx = s.diagnosis || {}, plan = s.plan, base = s.files_base;
   if ($("pdfBtn")) $("pdfBtn").href = `/api/sessions/${s.id}/report.pdf`;
+  if ($("workshopBtn")) $("workshopBtn").href = `/api/sessions/${s.id}/workshop.pdf`;
   saveGarage(s);
   $("dxObject").textContent = rep.object || ""; $("dxSummary").textContent = dx.problem_summary || "";
   const lvl = (s.safety || {}).level || dx.safety_level;

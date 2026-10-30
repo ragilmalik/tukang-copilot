@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-30 23:15 WIB (v1.6.0)
+- **New:** Workshop mode. `GET /api/sessions/{id}/workshop.pdf` (+ "Workshop sheets (large print)" button on result and guide pages, id/jv/en): A4 cover with safety banner, marked photo and tick list, then one big-type page per step (warnings in a red box, what the camera should see, diagram or marked photo, tick box), final "Done when" page. `api/render/workshop_pdf.py`, 5 tests; pages inspected visually.
+- **Checks (real runs, 23:10 WIB):** ruff clean, `mypy api` strict no issues in 42 files, pytest **153 passed, 6 skipped** (Playwright, no Chromium here), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED (incl. workshop PDF for every sample), `make_test_report.py` ALL PASSED (153/159). The new button is not browser-tested.
+- **Next up (Malik):** Playwright assertions for Try again + workshop button when a browser exists; re-take demo screenshots/video if wanted; Render preview smoke once deployed; prompt tuning when real photos arrive. Malik-side steps unchanged.
+
 ## State on 2026-10-30 22:45 WIB (v1.5.0)
 - **New:** live-mode resilience. `api/errors.py` maps failures to friendly id/jv/en sentences; `POST /api/sessions/{id}/retry` + a "Try again" button resume a failed session; check/replan outages give 503 + Retry-After; failed re-plan rolls back the cause index. Fake Meta server has `FAULTS` injection; `api/tests/test_resilience.py` (10 tests).
 - **Checks (real runs, 22:40 WIB):** ruff clean, `mypy api` strict no issues in 41 files, pytest **148 passed, 6 skipped** (Playwright, no Chromium downloadable here), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED on a local mock server, `make_test_report.py` ALL PASSED (148/154). The new Try again button is not browser-tested (no Chromium here).

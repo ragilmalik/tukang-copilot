@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 2026-10-30 23:10 · v1.6.0
+- Workshop mode: "Workshop sheets (large print)" button on the result and guide pages and `GET /api/sessions/{id}/workshop.pdf`, an A4 one-step-per-page PDF to pin up next to the bike or pump (id/jv/en). New `api/render/workshop_pdf.py`; 5 new tests; smoke script checks it.
+
 ## 2026-10-30 22:40 · v1.5.0
 - Resilience for live mode: pipeline failures now show one calm sentence in the person's language (busy, dropped signal, wrong key, cost limit, unusable AI answer) instead of raw HTTP text; technical detail stays on the server (`error_detail`, keys scrubbed). New `api/errors.py`.
 - "Try again" button and `POST /api/sessions/{id}/retry`: a failed session resumes from the failed stage and keeps what was already done and spent.

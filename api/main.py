@@ -309,6 +309,18 @@ def get_report_pdf(sid: str) -> FileResponse:
     return FileResponse(out, media_type="application/pdf", filename=f"tukang-copilot-{sid}.pdf")
 
 
+@app.get("/api/sessions/{sid}/workshop.pdf")
+def get_workshop_pdf(sid: str) -> FileResponse:
+    """Large-print workshop sheets (A4, one step per page) to pin up next to the job."""
+    s = _load(sid)
+    if not s.get("plan"):
+        raise HTTPException(409, "The plan is not ready yet")
+    from .render import workshop_pdf
+
+    out = workshop_pdf.build(engine.report(sid), s, engine.session_dir(sid), engine.session_dir(sid) / "workshop.pdf")
+    return FileResponse(out, media_type="application/pdf", filename=f"tukang-copilot-workshop-{sid}.pdf")
+
+
 @app.get("/files/{sid}/{name}")
 def files(sid: str, name: str) -> FileResponse:
     if not FILE_RE.match(name):
