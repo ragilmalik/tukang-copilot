@@ -86,7 +86,13 @@ def test_rice_cooker_red_stop(page):
     page.goto(page.base + "/")
     page.click('button.sample[data-sample="rice"]')
     page.wait_for_selector("#stopBox:not(.hidden)", timeout=20000)
-    assert "⛔" in page.text_content("#stopBox")
+    box = page.text_content("#stopBox")
+    assert "⛔" in box and "112" in box                                   # stop title + emergency line
+    assert page.locator("#stopBox li").count() == 3                       # what to do right now
+    maps = page.get_attribute("#stopBox a[href*='google.com/maps']", "href")
+    assert maps and "query=" in maps
+    pdf = page.get_attribute("#stopBox a[href$='report.pdf']", "href")
+    assert page.request.get(page.base + pdf).ok                           # technician report works for a stopped job
 
 
 def test_pwa_manifest_linked(page):

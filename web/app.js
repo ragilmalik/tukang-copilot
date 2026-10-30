@@ -13,7 +13,10 @@ const T = {
         footer: "Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.",
         stages: { listen: "Mendengarkan", gate: "Cek keselamatan awal", look: "Melihat foto", segment: "Menandai bagian (SAM 3.1)", diagnose: "Mendiagnosa",
                   plan: "Menyusun langkah", safety: "Cek keselamatan rencana", illustrate: "Menggambar diagram", narrate: "Menyiapkan suara" },
-        diff: "Kesulitan", min: "menit", est: "perkiraan", copied: "Tautan disalin", openW: "Penalaran: Muse Spark Open (open weights)", demo: "Mode demo: jawaban contoh, tanpa biaya API.",
+        diff: "Kesulitan", min: "menit", est: "perkiraan",  stopTitle: "STOP: jangan lanjutkan sendiri", triedTitle: "Saatnya ke bengkel/servis", stopNow: "Lakukan sekarang:",
+        stopNowRed: ["Matikan dan cabut dari listrik / tutup gas / matikan mesin.", "Jangan buka casing atau bagian dalamnya.", "Bawa ke servis resmi atau panggil teknisi, tunjukkan laporan ini."],
+        stopNowTried: ["Biarkan dalam keadaan mati dan aman.", "Unduh laporan PDF: berisi apa saja yang sudah dicoba.", "Tunjukkan ke bengkel/servis supaya tidak mengulang dari nol."],
+        findService: "Cari servis terdekat", emergency: "Darurat (api, asap, bau gas kuat): telepon 112.", copied: "Tautan disalin", openW: "Penalaran: Muse Spark Open (open weights)", demo: "Mode demo: jawaban contoh, tanpa biaya API.",
         green: "AMAN", amber: "HATI-HATI", red: "STOP", pass: "✅ Langkah ini beres", fail: "⚠️ Belum pas", checking: "Memeriksa foto…",
         verified: "langkah terverifikasi kamera", recording: "Merekam…", recorded: "Suara terekam ✓", micErr: "Mikrofon tidak bisa dipakai. Ketik saja masalahnya.",
         exhausted: "Sudah semua", newPlan: "Rencana baru siap.", photos: "foto", videoBtn: "🎥 Atau rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar terbaik diambil otomatis)", videoBig: "Videonya terlalu besar. Rekam 5–10 detik saja." },
@@ -29,7 +32,10 @@ const T = {
         footer: "Light repairs only. For gas, house wiring, or high voltage, call a professional.",
         stages: { listen: "Listening", gate: "First safety check", look: "Looking at the photo", segment: "Finding the parts (SAM 3.1)", diagnose: "Diagnosing",
                   plan: "Planning steps", safety: "Plan safety check", illustrate: "Drawing diagrams", narrate: "Preparing voice" },
-        diff: "Difficulty", min: "min", est: "est.", copied: "Link copied", openW: "Reasoning: Muse Spark Open (open weights)", demo: "Demo mode: sample answers, no API cost.",
+        diff: "Difficulty", min: "min", est: "est.",  stopTitle: "STOP: don't continue on your own", triedTitle: "Time for a repair shop", stopNow: "Do this now:",
+        stopNowRed: ["Switch it off and unplug it / close the gas / stop the engine.", "Don't open the casing or the inside.", "Take it to a service centre or call a technician, and show them this report."],
+        stopNowTried: ["Leave it switched off and safe.", "Download the PDF report: it lists everything already tried.", "Show it to the shop so they don't start from zero."],
+        findService: "Find a service centre nearby", emergency: "Emergency (fire, smoke, strong gas smell): call 112.", copied: "Link copied", openW: "Reasoning: Muse Spark Open (open weights)", demo: "Demo mode: sample answers, no API cost.",
         green: "SAFE", amber: "CAUTION", red: "STOP", pass: "✅ Step looks right", fail: "⚠️ Not quite", checking: "Checking photo…",
         verified: "steps verified by camera", recording: "Recording…", recorded: "Voice recorded ✓", micErr: "Microphone unavailable. Please type the problem.",
         exhausted: "All tried", newPlan: "New plan ready.", photos: "photos", videoBtn: "🎥 Or record a 5–10 s video", videoOk: "Video ready ✓ (the 3 sharpest frames are picked for you)", videoBig: "That video is too big. Record 5–10 seconds." },
@@ -49,7 +55,10 @@ T.jv = Object.assign({}, T.id, {
   footer: "Mung kanggo ndandani sing entheng. Yen gas, listrik omah, utawa tegangan dhuwur, celuk teknisi.",
   stages: { listen: "Ngrungokake", gate: "Priksa keamanan wiwitan", look: "Ndeleng foto", segment: "Nandhani perangan (SAM 3.1)", diagnose: "Nggoleki sebabe",
             plan: "Nyusun langkah", safety: "Priksa keamanan rencana", illustrate: "Nggambar diagram", narrate: "Nyiapake swara" },
-  diff: "Angel", min: "menit", est: "kira-kira", copied: "Tautan wis disalin", openW: "Nalar: Muse Spark Open (open weights)",
+  diff: "Angel", min: "menit", est: "kira-kira",  stopTitle: "MANDHEG: aja diterusake dhewe", triedTitle: "Wayahe menyang bengkel/servis", stopNow: "Tindakake saiki:",
+  stopNowRed: ["Pateni lan copot saka listrik / tutup gas / pateni mesin.", "Aja mbukak casing utawa jerone.", "Gawanen menyang servis resmi utawa celuk teknisi, tuduhna laporan iki."],
+  stopNowTried: ["Jarna tetep mati lan aman.", "Undhuh laporan PDF: isine apa wae sing wis dijajal.", "Tuduhna menyang bengkel/servis supaya ora mbaleni saka nol."],
+  findService: "Golek servis paling cedhak", emergency: "Darurat (geni, kebul, ambu gas banget): telpon 112.", copied: "Tautan wis disalin", openW: "Nalar: Muse Spark Open (open weights)",
   demo: "Mode demo: wangsulan conto, tanpa biaya API.",
   green: "AMAN", amber: "ATI-ATI", red: "MANDHEG", pass: "✅ Langkah iki wis bener", fail: "⚠️ Durung pas", checking: "Mriksa foto…",
   verified: "langkah wis dicek kamera", recording: "Ngrekam…", recorded: "Swara kerekam ✓", micErr: "Mikrofon ora bisa dienggo. Ketik wae masalahe.",
@@ -195,7 +204,7 @@ function renderProgress(s) {
   if (s.status === "needs_answer") $("questionText").textContent = s.question;
   const stopped = ["stopped", "exhausted"].includes(s.status);
   $("stopBox").classList.toggle("hidden", !stopped);
-  if (stopped) { $("stopBox").textContent = "⛔ " + (s.stop_reason || ""); saveGarage(s); }
+  if (stopped) { renderStop(s); saveGarage(s); }
   $("jobErr").textContent = s.status === "error" ? s.error : "";
 }
 
@@ -204,6 +213,22 @@ async function sendAnswer() {
   const fd = new FormData(); fd.append("text", v);
   await fetch(`/api/sessions/${S.id}/answer`, { method: "POST", body: fd });
   $("answerText").value = ""; follow(S.id);
+}
+
+/* ---------------- safety stop / escalation card ---------------- */
+// Red stop (safety gate) or "all safe causes tried": say why, what to do right now, and where to get help.
+function renderStop(s) {
+  const red = s.status === "stopped";
+  const obj = ((s.object_report || {}).object || "").trim();
+  const q = encodeURIComponent((lang === "en" ? "repair service " : "servis ") + (obj || ""));
+  const actions = (red ? t("stopNowRed") : t("stopNowTried")).map((a) => `<li>${esc(a)}</li>`).join("");
+  $("stopBox").innerHTML =
+    `<p class="stopTitle">${red ? "⛔ " + esc(t("stopTitle")) : "🧰 " + esc(t("triedTitle"))}</p>`
+    + `<p>${esc(s.stop_reason || "")}</p>`
+    + `<p class="small"><b>${esc(t("stopNow"))}</b></p><ul class="small">${actions}</ul>`
+    + `<p class="stopBtns"><a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${q}">📍 ${esc(t("findService"))}</a>`
+    + ` <a class="btn link" href="/api/sessions/${esc(s.id)}/report.pdf">📄 ${esc(t("pdf"))}</a></p>`
+    + `<p class="small">${esc(t("emergency"))}</p>`;
 }
 
 /* ---------------- result + guided repair ---------------- */

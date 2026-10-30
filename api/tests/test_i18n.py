@@ -6,7 +6,7 @@ JS = (Path(__file__).resolve().parents[2] / "web" / "app.js").read_text(encoding
 
 
 def _keys(block: str) -> set[str]:
-    return set(re.findall(r"(\w+): [\"{]", block))
+    return set(re.findall(r"(\w+): [\"{\[]", block))
 
 
 def test_javanese_and_english_cover_every_indonesian_string():
