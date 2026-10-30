@@ -49,6 +49,9 @@ Answers the follow-up question and resumes. 409 if the session isn't waiting.
 ```
 After `MAX_CHECK_FAILS` fails: `"escalate":true` + `escalate_hint`. 409 for an unknown step or no plan.
 
+## `DELETE /api/sessions/{id}`
+Erases the repair (photos, voice leftovers, diagrams, PDFs, session JSON) from the server right now: `{"id":"…","deleted":true}`, `404` if it does not exist. A worker still running for that session cannot write it back. The "Delete my photos now" button calls it; "Clear history" in My garage calls it for every saved repair, best effort. The server also purges anything older than `RETENTION_HOURS` at startup and then every hour.
+
 ## `POST /api/sessions/{id}/retry`
 Re-runs a session whose `status` is `error` (busy AI service, dropped signal). Finished stages and the cost so far are kept. `{"ok":true}`; `409` if the session did not fail. Failed sessions carry a friendly `error` in the session language and an `error_kind` (`busy`, `network`, `auth`, `budget`, `invalid`, `generic`); the technical detail is never sent to the browser. Step-check and replan outages answer `503` with the same friendly text and `Retry-After`.
 

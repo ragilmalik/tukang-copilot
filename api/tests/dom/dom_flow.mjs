@@ -58,6 +58,7 @@ async function run(lang, sample) {
     check(`${lang}/${sample}: hood names SAM`, /sam-3\.1/i.test(d.getElementById("hoodList").textContent));
     check(`${lang}/${sample}: no raw i18n keys in hood`, !/hs_/.test(d.getElementById("hoodList").textContent));
     check(`${lang}/${sample}: PDF + workshop links`, (d.getElementById("workshopBtn") || {}).href !== undefined);
+    check(`${lang}/${sample}: erase button has a translated label`, !!d.getElementById("eraseBtn") && !/^erase$/.test(d.getElementById("eraseBtn").textContent) && d.getElementById("eraseBtn").textContent.length > 8);
     check(`${lang}/${sample}: safety badge`, d.getElementById("safetyBadge").textContent.trim().length > 0);
     // next step button moves on
     const before = d.getElementById("stepNo").textContent;

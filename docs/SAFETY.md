@@ -30,7 +30,7 @@ Tukang Copilot does not give medical advice, does not handle cars' high-voltage 
 ## Privacy
 - **No accounts, no names, no phone numbers** collected.
 - The **voice recording is deleted** right after transcription.
-- Photos and sessions live only on the server disk and are **deleted after 24 h** (`RETENTION_HOURS`).
+- Photos and sessions live only on the server disk and are **deleted after 24 h** (`RETENTION_HOURS`), purged at startup and then hourly while the server runs. A **Delete my photos now** button (`DELETE /api/sessions/{id}`) erases a repair at once.
 - `GET /api/sessions/{id}` never returns the raw typed description; `session.json` itself is never served.
 - Session ids are random 12-hex strings; shared links are read-only.
 - Meta Standard-mode model ids are used, so content is not used to train Meta models (per Meta's docs). Contributor-mode ids are deliberately avoided.

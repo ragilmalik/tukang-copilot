@@ -7,7 +7,7 @@ const T = {
         samples: "Coba contoh:", sMotor: "motor mogok", sPump: "pompa tidak keluar air", sFaucet: "kran menetes", sRice: "rice cooker mati", sTire: "ban kempes", sTire: "ban kempes",
         working: "Sedang memeriksa…", retry: "Coba lagi", answerHere: "Jawaban kamu", send: "Kirim", diagnosis: "Diagnosa", safetyFirst: "Keselamatan dulu",
         tools: "Alat", materials: "Suku cadang", listen: "Dengarkan", next: "Lanjut", handsFree: "Mode tangan bebas (bacakan otomatis)",
-        done: "Selesai kalau:", checkStep: "Cek langkah ini", share: "Bagikan laporan", pdf: "Unduh laporan PDF", workshop: "Lembar bengkel (cetak besar)", hood: "Di balik layar: model yang dipakai", hs_listen: "Dengar suara", hs_gate: "Cek keselamatan teks", hs_look: "Lihat foto", hs_segment: "Tandai bagian", hs_diagnose: "Diagnosa", hs_plan: "Susun langkah", hs_safety: "Cek keselamatan rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Suara pemandu", wa: "Kirim daftar belanja ke WhatsApp", buy: "Cari harga", garage: "Garasi saya", garageNote: "Riwayat perbaikan hanya disimpan di HP ini. Panduan bisa dibuka 24 jam.", garageClear: "Hapus riwayat", again: "Perbaiki barang lain",
+        done: "Selesai kalau:", checkStep: "Cek langkah ini", share: "Bagikan laporan", pdf: "Unduh laporan PDF", workshop: "Lembar bengkel (cetak besar)", hood: "Di balik layar: model yang dipakai", hs_listen: "Dengar suara", hs_gate: "Cek keselamatan teks", hs_look: "Lihat foto", hs_segment: "Tandai bagian", hs_diagnose: "Diagnosa", hs_plan: "Susun langkah", hs_safety: "Cek keselamatan rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Suara pemandu", wa: "Kirim daftar belanja ke WhatsApp", buy: "Cari harga", garage: "Garasi saya", garageNote: "Riwayat perbaikan hanya disimpan di HP ini. Panduan bisa dibuka 24 jam.", garageClear: "Hapus riwayat", again: "Perbaiki barang lain", erase: "Hapus foto saya sekarang", eraseAsk: "Hapus foto, suara, dan panduan ini dari server sekarang?", erased: "Sudah dihapus dari server.",
         stuck: "Masih rusak, coba rencana lain", stuckHere: "Apa yang terjadi? (mis. sudah dicoba, tetap mati)",
         needPhoto: "Ambil atau unggah foto dulu.", needDesc: "Ceritakan masalahnya (suara atau ketik).",
         footer: "Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.",
@@ -26,7 +26,7 @@ const T = {
         samples: "Try a sample:", sMotor: "bike won't start", sPump: "pump gives no water", sFaucet: "dripping tap", sRice: "dead rice cooker", sTire: "flat tyre",
         working: "Checking…", retry: "Try again", answerHere: "Your answer", send: "Send", diagnosis: "Diagnosis", safetyFirst: "Safety first",
         tools: "Tools", materials: "Parts", listen: "Listen", next: "Next", handsFree: "Hands-free mode (read steps aloud)",
-        done: "Done when:", checkStep: "Check this step", share: "Share report", pdf: "Download PDF report", workshop: "Workshop sheets (large print)", hood: "Under the hood: models used", hs_listen: "Listen", hs_gate: "Text safety gate", hs_look: "Look at photo", hs_segment: "Mark parts", hs_diagnose: "Diagnose", hs_plan: "Plan steps", hs_safety: "Plan safety gate", hs_illustrate: "Helper diagram", hs_narrate: "Voice guide", wa: "Send shopping list to WhatsApp", buy: "Compare prices", garage: "My garage", garageNote: "Your repair history stays on this phone only. Guides open for 24 hours.", garageClear: "Clear history", again: "Fix something else",
+        done: "Done when:", checkStep: "Check this step", share: "Share report", pdf: "Download PDF report", workshop: "Workshop sheets (large print)", hood: "Under the hood: models used", hs_listen: "Listen", hs_gate: "Text safety gate", hs_look: "Look at photo", hs_segment: "Mark parts", hs_diagnose: "Diagnose", hs_plan: "Plan steps", hs_safety: "Plan safety gate", hs_illustrate: "Helper diagram", hs_narrate: "Voice guide", wa: "Send shopping list to WhatsApp", buy: "Compare prices", garage: "My garage", garageNote: "Your repair history stays on this phone only. Guides open for 24 hours.", garageClear: "Clear history", again: "Fix something else", erase: "Delete my photos now", eraseAsk: "Delete the photos, voice and guide of this repair from the server now?", erased: "Deleted from the server.",
         stuck: "Still broken, try another plan", stuckHere: "What happened? (e.g. tried it, still dead)",
         needPhoto: "Take or upload a photo first.", needDesc: "Describe the problem (voice or text).",
         footer: "Light repairs only. For gas, house wiring, or high voltage, call a professional.",
@@ -49,7 +49,7 @@ T.jv = Object.assign({}, T.id, {
   working: "Lagi dipriksa…", retry: "Jajal maneh", answerHere: "Wangsulanmu", send: "Kirim", diagnosis: "Diagnosa", safetyFirst: "Slamet dhisik",
   tools: "Piranti", materials: "Suku cadang", listen: "Rungokna", next: "Terus", handsFree: "Mode tanpa tangan (diwacakake otomatis)",
   done: "Rampung yen:", checkStep: "Priksa langkah iki", share: "Bagekna laporan", pdf: "Undhuh laporan PDF", workshop: "Lembar bengkel (cetak gedhe)", hood: "Ing mburi layar: model sing dipakai", hs_listen: "Rungokake swara", hs_gate: "Priksa slamet teks", hs_look: "Delok foto", hs_segment: "Tandhani bagean", hs_diagnose: "Diagnosa", hs_plan: "Nyusun langkah", hs_safety: "Priksa slamet rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Swara panuntun", wa: "Kirim dhaptar blanja menyang WhatsApp", buy: "Golek rega", garage: "Garasiku",
-  garageNote: "Riwayat ndandani mung disimpen ing HP iki. Pandhuan bisa dibukak 24 jam.", garageClear: "Busak riwayat", again: "Ndandani barang liya",
+  garageNote: "Riwayat ndandani mung disimpen ing HP iki. Pandhuan bisa dibukak 24 jam.", garageClear: "Busak riwayat", again: "Ndandani barang liya", erase: "Busak fotoku saiki", eraseAsk: "Busak foto, swara, lan pandhuan iki saka server saiki?", erased: "Wis dibusak saka server.",
   stuck: "Isih rusak, jajal rencana liya", stuckHere: "Kepiye kedadeyane? (umpamane wis dijajal, tetep mati)",
   needPhoto: "Jupuk utawa unggah foto dhisik.", needDesc: "Critakna masalahe (swara utawa ketik).",
   footer: "Mung kanggo ndandani sing entheng. Yen gas, listrik omah, utawa tegangan dhuwur, celuk teknisi.",
@@ -358,6 +358,14 @@ function setupResult() {
     if (navigator.share) { try { await navigator.share({ title: "Tukang Copilot", url }); return; } catch (_) {} }
     try { await navigator.clipboard.writeText(url); alert(t("copied")); } catch (_) { prompt("Link", url); }
   });
+  on("eraseBtn", "click", () => {
+    if (!S || !S.id || !confirm(t("eraseAsk"))) return;
+    const id = S.id;
+    fetch(`/api/sessions/${encodeURIComponent(id)}`, { method: "DELETE" }).catch(() => null).then(() => {
+      try { localStorage.setItem(GARAGE_KEY, JSON.stringify(loadGarage().filter((e) => e && e.id !== id))); } catch (_) {}
+      alert(t("erased")); history.replaceState(null, "", "/"); location.reload();
+    });
+  });
   on("againBtn", "click", () => { history.replaceState(null, "", "/"); location.reload(); });
 }
 
@@ -403,7 +411,10 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
   setupCapture(); renderGarage();
-  on("garageClear", "click", () => { localStorage.removeItem(GARAGE_KEY); renderGarage(); });
+  on("garageClear", "click", () => {
+    loadGarage().forEach((e) => { if (e && e.id) fetch(`/api/sessions/${encodeURIComponent(e.id)}`, { method: "DELETE" }).catch(() => null); }); // best effort: erase on the server too
+    localStorage.removeItem(GARAGE_KEY); renderGarage();
+  });
   if (location.hash.length > 1) { show("progress"); follow(location.hash.slice(1)); }
 });
 

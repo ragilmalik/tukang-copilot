@@ -75,6 +75,7 @@ def main() -> int:
             ok(c.get(f"/guide/{sid}").status_code == 200, "shareable guide page")
             r = c.get(f"/api/sessions/{sid}/report.pdf")
             ok(r.status_code == 200 and r.content[:4] == b"%PDF", f"PDF report ({len(r.content) // 1024} KB)")
+            ok(c.delete(f"/api/sessions/{sid}").json().get("deleted") is True and c.get(f"/api/sessions/{sid}").status_code == 404, "erase my photos now")
     print("\nALL PASSED" if not fails else f"\n{len(fails)} FAILED: {fails}")
     return 0 if not fails else 1
 

@@ -42,6 +42,7 @@ log = logging.getLogger("tukang.engine")
 STAGES = ["listen", "gate", "look", "segment", "diagnose", "plan", "safety", "illustrate", "narrate"]
 _locks: dict[str, threading.Lock] = {}
 _save_lock = threading.Lock()
+_deleted: set[str] = set()  # sessions the user erased; a still-running worker must not write them back
 
 
 # =========================================================================== storage
@@ -60,9 +61,11 @@ def load(sid: str) -> dict[str, Any]:
 
 def save(s: dict[str, Any]) -> None:
     d = session_dir(s["id"])
-    d.mkdir(parents=True, exist_ok=True)
     s["updated"] = time.time()
     with _save_lock:
+        if s["id"] in _deleted:
+            return  # erased by the user while a worker was still running
+        d.mkdir(parents=True, exist_ok=True)
         tmp = d / f"session.{threading.get_ident()}.tmp"
         tmp.write_text(json.dumps(s, ensure_ascii=False, indent=2), encoding="utf-8")
         tmp.replace(d / "session.json")
@@ -592,6 +595,18 @@ def report(sid: str) -> dict[str, Any]:
             "tools": dx.get("tools", []), "parts": dx.get("parts", []), "cost_estimate_idr": dx.get("cost_estimate_idr", 0),
             "minutes_estimate": dx.get("minutes_estimate"), "safety_level": s["safety"]["level"], "attempts": s.get("history", []),
             "status": s["status"], "created": s["created"], "lang": s["lang"]}
+
+
+def delete(sid: str) -> bool:
+    """Erase one session (photos, audio, PDFs) right now, at the user's request. True when something was removed."""
+
+    d = session_dir(sid)
+    if not (d / "session.json").exists():
+        return False
+    with _save_lock:
+        _deleted.add(sid)
+        shutil.rmtree(d, ignore_errors=True)
+    return True
 
 
 def cleanup(max_age_hours: float | None = None) -> int:

@@ -50,12 +50,28 @@ MAX_PHOTO, MAX_AUDIO, MAX_VIDEO = 15 * 1024 * 1024, 20 * 1024 * 1024, 40 * 1024 
 FILE_RE = re.compile(r"^(photo\d|parts|part_[A-Za-z0-9_-]+|check_\d+_\d+_\d+|diagram_\d+|voice_\d+_\d+)\.(jpg|png|mp3)$")
 
 
+CLEANUP_EVERY_S = 3600.0
+
+
+async def _janitor(interval: float) -> None:
+    """Keep the privacy promise on a server that stays up for days: purge expired sessions every `interval` seconds."""
+    while True:
+        try:
+            n = await asyncio.to_thread(engine.cleanup)
+            if n:
+                logging.getLogger("tukang").info("deleted %d sessions older than %sh", n, settings.retention_hours)
+        except Exception:  # never let the janitor die
+            logging.getLogger("tukang").exception("cleanup failed")
+        await asyncio.sleep(interval)
+
+
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
-    n = engine.cleanup()  # privacy: drop sessions older than RETENTION_HOURS
-    if n:
-        logging.getLogger("tukang").info("deleted %d sessions older than %sh", n, settings.retention_hours)
-    yield
+    task = asyncio.create_task(_janitor(CLEANUP_EVERY_S))  # first pass runs at startup, then hourly
+    try:
+        yield
+    finally:
+        task.cancel()
 
 
 app = FastAPI(title="Tukang Copilot", version=__version__, lifespan=lifespan)
@@ -223,6 +239,13 @@ async def create_session(request: Request, photos: list[UploadFile] | None = Fil
 @app.get("/api/sessions/{sid}")
 def get_session(sid: str) -> dict[str, Any]:
     return public(_load(sid))
+
+
+@app.delete("/api/sessions/{sid}")
+def delete_session(sid: str) -> dict[str, Any]:
+    """Erase this repair (photos, voice, PDFs) from the server now, instead of waiting for RETENTION_HOURS."""
+    _load(sid)
+    return {"id": sid, "deleted": engine.delete(sid)}
 
 
 @app.get("/api/sessions/{sid}/events")

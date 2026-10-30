@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.11.0 (2026-10-31 03:00 WIB)
+- Privacy controls. `DELETE /api/sessions/{id}` and a "Delete my photos now" button (id/jv/en) erase a repair from the server immediately; "Clear history" in My garage now erases the saved repairs on the server too. A background janitor purges sessions older than `RETENTION_HOURS` every hour (before, only at startup, so a deploy running for days would have kept photos past the 24 h promise). A worker still running cannot resurrect an erased folder. `api/tests/test_erase.py` (6 tests), jsdom check for the button, smoke_e2e step.
+
 ## 1.10.0 (2026-10-31 02:30 WIB)
 - `scripts/eval_fixtures.py`: scores every photo fixture against its manifest expectation (safety level, red stop vs plan, object category, share of parts found by SAM, step count, seconds, cost) plus the camera step checks, against any running server, mock or live, and can point at a folder of real photos with the same `manifest.json` shape (`--dir`). Writes `docs/EVAL_REPORT.md`. For the first live run this gives honest accuracy numbers. `api/tests/test_eval_script.py` (2 tests, incl. a deliberate mismatch that must FAIL).
 

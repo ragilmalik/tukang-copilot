@@ -35,4 +35,5 @@ Owner: **M** = Malik, **H** = Malik.
 - [x] jsdom headless UI test of web/app.js (v1.7.1)
 - [x] "Under the hood" stage-to-model panel + PDF section (v1.7.0)
 - [x] Fixture evaluation script with markdown report, usable on real photos (v1.10.0)
+- [x] Privacy: erase-now button + endpoint, hourly retention janitor (v1.11.0)
 - [x] Fifth demo scenario: flat scooter tyre (v1.9.0)
