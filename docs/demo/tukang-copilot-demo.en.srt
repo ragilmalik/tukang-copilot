@@ -1,0 +1,63 @@
+1
+00:00:00,000 --> 00:00:12,604
+In Indonesia, a small fault on a motorbike or a water pump can cost a day's wage, or days without water. The repair videos online are not for your model, not in your language, and they can't see your problem.
+
+2
+00:00:12,604 --> 00:00:27,608
+Tukang Copilot turns any phone into a mechanic's apprentice. Take a photo, say what's wrong, in Bahasa Indonesia, Javanese or English, and pick a category. This recording runs in demo mode, with labelled stand-in photos.
+
+3
+00:00:27,608 --> 00:00:36,732
+Behind the progress bar, Muse Voice Transcribe hears the problem, Muse Spark looks at the photo, and SAM 3.1 segments the exact parts.
+
+4
+00:00:36,732 --> 00:00:44,536
+When the evidence is ambiguous, the agent asks one short question instead of guessing. Do you smell fuel? No.
+
+5
+00:00:44,536 --> 00:00:55,172
+Then the diagnosis card: the most likely causes with confidence and evidence, a safety level, the tools you need, the time, and an estimated parts cost in rupiah.
+
+6
+00:00:55,172 --> 00:01:02,712
+The parts are highlighted and numbered on your own photo, using SAM 3.1 masks, not a generic diagram.
+
+7
+00:01:02,712 --> 00:01:10,540
+The repair is guided one step at a time, with the target part marked, a voice readout, the reason why, and warnings.
+
+8
+00:01:10,540 --> 00:01:21,368
+After each step you tap Check my step and snap a photo. Muse Spark compares it with the expected state. Here the photo is too dark, so it asks for the torch instead of guessing.
+
+9
+00:01:21,368 --> 00:01:27,708
+Retake it, and the step is verified. Every step is checked by the camera before you move on.
+
+10
+00:01:27,708 --> 00:01:36,952
+If it still doesn't work, you say what happened, and the agent re-plans to the next most likely cause. Plan, act, verify, re-plan.
+
+11
+00:01:36,952 --> 00:01:44,612
+Same loop for a water pump that hums but gives no water: unplug first, then re-prime it, step by step.
+
+12
+00:01:44,612 --> 00:01:55,200
+And it knows when to say no. A rice cooker that won't heat would need opening its 220 volt internals, so the safety gate stops the guidance and recommends a service centre.
+
+13
+00:01:55,200 --> 00:02:03,460
+When you finish, you get a repair report as a PDF to share, and the job is saved to My garage on your phone. No account needed.
+
+14
+00:02:03,460 --> 00:02:09,152
+The app also runs in English, and in Javanese, with Javanese voice input.
+
+15
+00:02:09,152 --> 00:02:30,708
+Under the hood: Muse Voice Transcribe, Muse Spark for vision, diagnosis, planning and verification, SAM 3.1 for masks, and Muse Image for diagrams when your photo can't show the action. One switch runs the reasoning on Muse Spark Open, Meta's open-weights model, on Baseten. The safety gate is enforced in code, in three layers.
+
+16
+00:02:30,708 --> 00:02:36,708
+Tukang Copilot. Every phone becomes a mechanic's apprentice.
