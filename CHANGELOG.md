@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.8.0 (2026-10-31 00:50 WIB)
+- Model-drift tolerance for live mode (`api/coerce.py`): JSON is pulled out of think tags, code fences and surrounding prose; harmless quirks are repaired before validation (capitalised or synonym enums such as "Amber"/"danger", confidence as 0.85 or "85%", "Rp 25.000" prices, a string where a list belongs, a sixth cause or twelfth step, percent boxes). A reply with no JSON at all now gets one retry instead of failing. 11 tests (`test_coerce.py`).
+
 ## 1.7.1
 - jsdom headless UI test (41 checks, id/jv/en, 4 scenarios) for the real web/app.js; CI installs jsdom.
 

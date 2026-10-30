@@ -32,6 +32,7 @@ from PIL import Image
 from pydantic import BaseModel, ValidationError
 
 from .. import cost, errors, prompts
+from ..coerce import coerce
 from ..render import overlay
 from ..schemas import Diagnosis, DiagramReview, ObjectReport, RepairPlan, Step, StepCheck, json_schema
 from ..settings import settings
@@ -133,9 +134,14 @@ def _chat_json(cls: type[ModelT], system: str, content: list[dict[str, Any]], na
     messages: list[dict[str, Any]] = [{"role": "system", "content": system}, {"role": "user", "content": content}]
     last: Exception | None = None
     for _ in range(2):
-        raw = meta_client.chat_json(messages, json_schema(cls), name, model=model, reasoning_effort=effort, open_weights=use_open)
         try:
-            return cls.model_validate(raw)
+            raw = meta_client.chat_json(messages, json_schema(cls), name, model=model, reasoning_effort=effort, open_weights=use_open)
+        except ValueError as e:   # no parseable JSON in the reply (json.JSONDecodeError is a ValueError)
+            last = e
+            messages += [{"role": "user", "content": "Your reply had no valid JSON. Return the JSON object only, no prose."}]
+            continue
+        try:
+            return cls.model_validate(coerce(cls, raw))
         except ValidationError as e:
             last = e
             messages += [{"role": "assistant", "content": json.dumps(raw, ensure_ascii=False)[:6000]},

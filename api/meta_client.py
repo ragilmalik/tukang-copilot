@@ -120,13 +120,8 @@ def transcribe_with_spark_audio(wav_path: Path, language_name: str) -> str:
 
 # --------------------------------------------------------------------------- 2. Text models, structured output
 def _extract_json(text: str) -> Any:
-    text = (text or "").strip()
-    if text.startswith("```"):
-        text = text.split("\n", 1)[1] if "\n" in text else text.strip("`")
-    starts = [i for i in (text.find("{"), text.find("[")) if i >= 0]
-    start = min(starts) if starts else 0
-    end = max(text.rfind("}"), text.rfind("]"))
-    return json.loads(text[start: end + 1])
+    from .coerce import extract_json
+    return extract_json(text)
 
 
 def chat_json(messages: list[dict[str, Any]], schema: dict[str, Any], schema_name: str, *,
