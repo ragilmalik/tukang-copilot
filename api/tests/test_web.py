@@ -39,5 +39,7 @@ def test_guide_page_is_read_only():
 
 
 def test_no_inline_secrets():
-    for f in WEB.iterdir():
-        assert "MODEL_API_KEY" not in f.read_text(encoding="utf-8")
+    texts = [f for f in WEB.rglob("*") if f.is_file() and f.suffix in {".js", ".html", ".css", ".webmanifest"}]
+    assert texts
+    for f in texts:
+        assert "MODEL_API_KEY" not in f.read_text(encoding="utf-8"), f
