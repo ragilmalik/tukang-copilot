@@ -105,8 +105,41 @@ async function shrinkChecks() {
   w.close();
 }
 
+
+// Hostile model output: every free-text string in a real session gets an HTML payload appended; the page must never run it.
+async function xssChecks() {
+  const fd = new FormData(); fd.append("language", "en"); fd.append("text", ""); fd.append("category", "other"); fd.append("sample", "pump");
+  const id = (await (await fetch(base + "/api/sessions", { method: "POST", body: fd })).json()).id;
+  let sess = null;
+  for (let i = 0; i < 100 && !(sess && ["ready"].includes(sess.status)); i++) { sess = await (await fetch(`${base}/api/sessions/${id}`)).json(); await sleep(150); }
+  const PAY = '<img src=x onerror="window.__pwn=1"><script>window.__pwn=2</script>';
+  const poison = (v, key = "") => {
+    if (typeof v === "string") return (v.includes(" ") || (v.length > 14 && !/^(\/|https?:)/.test(v))) && !/^(id|status|level|kind|stage|file|image)/.test(key) ? v + PAY : v;
+    if (Array.isArray(v)) return v.map((x) => poison(x, key));
+    if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, poison(x, k)]));
+    return v;
+  };
+  const bad = poison(sess);
+  const errors = [];
+  const vc = new VirtualConsole(); vc.on("jsdomError", (e) => errors.push(String(e.message || e)));
+  const dom = await JSDOM.fromURL(`${base}/guide/${id}`, { runScripts: "dangerously", resources: "usable", pretendToBeVisual: true, virtualConsole: vc,
+    beforeParse(w) {
+      w.scrollTo = () => {};
+      w.fetch = (url, o) => (String(url).endsWith(`/api/sessions/${id}`) && !(o && o.method) ? Promise.resolve(new Response(JSON.stringify(bad), { headers: { "content-type": "application/json" } })) : nodeFetch(url, o));
+    } });
+  const w = dom.window, d = w.document;
+  await until(() => d.readyState === "complete");
+  const shown = await until(() => d.getElementById("stepText").textContent.length > 5, 8000);
+  check("xss: guide page rendered hostile session", shown);
+  check("xss: no injected script ran", w.__pwn === undefined, w.__pwn);
+  check("xss: no injected img/script elements", d.querySelectorAll("img[src='x'], script:not([src])").length === 0, d.querySelectorAll("img[src='x']").length);
+  check("xss: payload shown as text", d.body.textContent.includes("<img src=x"));
+  w.close();
+}
+
 try {
   await shrinkChecks();
+  await xssChecks();
   await run("id", "faucet");
   await run("jv", "pump");
   await run("en", "motor");

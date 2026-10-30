@@ -4,7 +4,7 @@ const T = {
   id: { hero: "Apa yang rusak?", heroSub: "Foto barangnya, ceritakan masalahnya, dapat panduan perbaikan langkah demi langkah.", takePhoto: "Ambil foto (1–3)",
         catMotor: "Motor", catPump: "Pompa air", catAppliance: "Elektronik rumah", catPlumbing: "Pipa/keran", catOther: "Lainnya",
         record: "Ketuk untuk bicara", stop: "Ketuk untuk berhenti", typeHere: "…atau ketik masalahnya di sini", go: "Periksa sekarang",
-        samples: "Coba contoh:", sMotor: "motor mogok", sPump: "pompa tidak keluar air", sFaucet: "kran menetes", sRice: "rice cooker mati", sTire: "ban kempes", sTire: "ban kempes",
+        samples: "Coba contoh:", sMotor: "motor mogok", sPump: "pompa tidak keluar air", sFaucet: "kran menetes", sRice: "rice cooker mati", sTire: "ban kempes",
         working: "Sedang memeriksa…", retry: "Coba lagi", answerHere: "Jawaban kamu", send: "Kirim", diagnosis: "Diagnosa", safetyFirst: "Keselamatan dulu",
         tools: "Alat", materials: "Suku cadang", listen: "Dengarkan", next: "Lanjut", handsFree: "Mode tangan bebas (bacakan otomatis)",
         done: "Selesai kalau:", checkStep: "Cek langkah ini", share: "Bagikan laporan", pdf: "Unduh laporan PDF", workshop: "Lembar bengkel (cetak besar)", hood: "Di balik layar: model yang dipakai", hs_listen: "Dengar suara", hs_gate: "Cek keselamatan teks", hs_look: "Lihat foto", hs_segment: "Tandai bagian", hs_diagnose: "Diagnosa", hs_plan: "Susun langkah", hs_safety: "Cek keselamatan rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Suara pemandu", wa: "Kirim daftar belanja ke WhatsApp", buy: "Cari harga", garage: "Garasi saya", garageNote: "Riwayat perbaikan hanya disimpan di HP ini. Panduan bisa dibuka 24 jam.", garageClear: "Hapus riwayat", again: "Perbaiki barang lain", erase: "Hapus foto saya sekarang", eraseAsk: "Hapus foto, suara, dan panduan ini dari server sekarang?", erased: "Sudah dihapus dari server.",
@@ -273,7 +273,7 @@ function render(s) {
   $("dxCauses").innerHTML = (dx.causes || []).map((c, i) => `<li${i === s.cause_index ? ' class="on"' : ""}><span class="pct">${c.confidence}%</span> ${esc(c.title)}<br><span class="muted small">${esc((c.evidence || []).join("; "))}</span></li>`).join("");
   if (s.parts_image) {
     $("partsWrap").classList.remove("hidden"); $("partsImg").src = base + s.parts_image;
-    $("partsList").innerHTML = Object.values(s.parts || {}).map((p) => `<li>${p.label}. ${esc(p.name)}${p.found ? "" : " (?)"}</li>`).join("");
+    $("partsList").innerHTML = Object.values(s.parts || {}).map((p) => `<li>${esc(p.label)}. ${esc(p.name)}${p.found ? "" : " (?)"}</li>`).join("");
   }
   $("gTitle").textContent = plan.cause_title;
   $("gDiff").textContent = `${t("diff")} ${dx.difficulty}/5`; $("gTime").textContent = `⏱ ${dx.minutes_estimate} ${t("min")}`;

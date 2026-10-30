@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.13.0 (2026-10-31 04:10 WIB)
+- Hostile input and hostile model output hardening. (1) Prompt-injection rule appended to the look, diagnose, plan and replan prompts (owner text and text in photos are data, never orders; `api/prompts.py`). (2) jsdom XSS check: every free-text field of a real session is poisoned with `<img onerror>` and `<script>` payloads and the guide page must run none of it (verified to fail when an `esc()` is removed). (3) `api/tests/test_security.py` (16 tests): guide page title escaping, odd session ids, path traversal on `/files`, private `session.json`, a prompt-injection sentence cannot lift the code safety gate. (4) Small fixes: parts list label now escaped, duplicate `sTire` key removed. Documented in docs/SAFETY.md.
+
 ## 1.12.0 (2026-10-31 03:30 WIB)
 - Phone photos are shrunk on the phone before upload (`shrinkImage` in web/app.js: longest side 1600 px, JPEG 85 percent, only for jpeg/png/webp over 400 KB, original kept if the result is not smaller or anything fails, e.g. an undecodable HEIC). A 6 MB photo becomes roughly 300 KB, so three photos and the step check photos go over 4G in seconds. The Start button is disabled while shrinking so a double tap cannot create two repairs. jsdom test with a stubbed canvas covers resize, fallbacks and untouched small and non-image files.
 

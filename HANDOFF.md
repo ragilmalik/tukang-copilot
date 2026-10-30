@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 04:10 WIB (v1.13.0)
+- **New:** hostile input hardening: untrusted-input rule in the four owner-text prompts, jsdom XSS test (poisons all free text of a real session; confirmed it fails when `esc()` is removed), `api/tests/test_security.py` (16 tests: escaping, odd ids, traversal, injection vs code gate). docs/SAFETY.md section added.
+- **Checks (real runs, 04:05 WIB):** ruff clean, `mypy api` strict no issues in 51 files, pytest **219 passed, 6 skipped** (Playwright only; jsdom runs after `npm install --prefix /tmp/jd jsdom`), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (219/225). No Chromium downloadable here, so screenshots and video are unchanged.
+- **Next up (Malik):** after first live key run: eval_fixtures live, check the untrusted-input rule did not change live outputs, tune prompts; re-take screenshots/video with hood panel, tyre, erase button when a Chromium exists; Render preview smoke once deployed.
+
 ## State on 2026-10-31 03:35 WIB (v1.12.0)
 - **New:** client-side photo shrinking before upload (`shrinkImage` in web/app.js; 1600 px, JPEG 85 percent, falls back to the original on any problem) for the repair photos and the step check photo; Start button disabled during shrinking. Real canvas behaviour is only tested with a stub in jsdom (no Chromium here), so check one real phone upload on 4G.
 - **Checks (real runs, 03:33 WIB):** ruff clean, `mypy api` strict no issues in 50 files, pytest **203 passed, 6 skipped** (Playwright only), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (203/209).
