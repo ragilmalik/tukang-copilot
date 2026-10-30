@@ -60,3 +60,5 @@ footer{text-align:center;padding:24px 16px}
 .stop .btn{text-decoration:none}
 
 .buy{margin-left:.35rem;color:var(--o);text-decoration:underline;white-space:nowrap}
+
+.hood{margin:12px 0;padding:8px 12px;border:1px solid #e3e3e8;border-radius:12px}.hood summary{cursor:pointer;font-weight:600}.hood ul{margin:8px 0 0;padding-left:18px;line-height:1.7}

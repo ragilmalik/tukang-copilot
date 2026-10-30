@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-30 23:50 WIB (v1.7.0)
+- **New:** "Under the hood" panel (`api/trace.py`, `trace` in session JSON, collapsible list on result + guide pages in id/jv/en, section in the PDF report). Shows which Meta model ran each stage and where code gates / edge-tts are used. Report PDF page inspected visually.
+- **Checks (real runs, 23:45 WIB):** ruff clean, `mypy api` strict no issues in 44 files, pytest **158 passed, 6 skipped** (Playwright, no Chromium here; new hood assertions unverified in a browser), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED.
+- **Next up (Malik):** re-take demo screenshots/video to include the Under the hood panel; Playwright assertions when a browser exists; Render preview smoke once deployed; prompt tuning when real photos arrive. Malik-side steps unchanged.
+
 ## State on 2026-10-30 23:15 WIB (v1.6.0)
 - **New:** Workshop mode. `GET /api/sessions/{id}/workshop.pdf` (+ "Workshop sheets (large print)" button on result and guide pages, id/jv/en): A4 cover with safety banner, marked photo and tick list, then one big-type page per step (warnings in a red box, what the camera should see, diagram or marked photo, tick box), final "Done when" page. `api/render/workshop_pdf.py`, 5 tests; pages inspected visually.
 - **Checks (real runs, 23:10 WIB):** ruff clean, `mypy api` strict no issues in 42 files, pytest **153 passed, 6 skipped** (Playwright, no Chromium here), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED (incl. workshop PDF for every sample), `make_test_report.py` ALL PASSED (153/159). The new button is not browser-tested.

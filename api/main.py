@@ -20,6 +20,7 @@ from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingRes
 from fastapi.staticfiles import StaticFiles
 
 from . import __version__, errors, guard, shop
+from .trace import build_trace
 from .pipeline import engine, media, mock
 from .settings import ROOT, settings
 
@@ -101,6 +102,7 @@ def _load(sid: str) -> dict[str, Any]:
 def public(s: dict[str, Any]) -> dict[str, Any]:
     out = {k: v for k, v in s.items() if k not in {"text", "history", "error_detail"}}
     out["files_base"] = f"/files/{s['id']}/"
+    out["trace"] = build_trace(s)
     dx = out.get("diagnosis")
     if isinstance(dx, dict):
         out["diagnosis"] = {**dx, "tools": shop.with_links(dx.get("tools") or []), "parts": shop.with_links(dx.get("parts") or [])}

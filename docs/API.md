@@ -55,6 +55,9 @@ Re-runs a session whose `status` is `error` (busy AI service, dropped signal). F
 ## `POST /api/sessions/{id}/replan` (form: `report`)
 Moves to the next likely cause and returns the updated session (`status` `ready`), or `exhausted` with `stop_reason`, or `stopped` if the report trips the safety gate.
 
+## Session JSON: `trace`
+Every session object carries `trace`: nine rows in pipeline order, each `{stage, tool, kind, status, ms}`. `kind` is `meta` (a Meta model), `open` (Muse Spark Open on Baseten), `tts` (edge-tts) or `code` (rule-based safety gates). Used by the "Under the hood" panel and the PDF report.
+
 ## `GET /api/sessions/{id}/report.pdf`
 Printable A4 repair report in the session's language: safety level, the photo with the SAM-marked parts, each step with its camera check ([OK] or [  ]), tools and parts with estimated prices, attempts, disclaimer. `409` while the diagnosis is not ready, `404` for an unknown session.
 ```bash

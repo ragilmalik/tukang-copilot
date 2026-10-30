@@ -68,6 +68,9 @@ def test_main_flow_faucet_check_step(page):
     assert page.locator("#dxCauses li, #dxCauses > *").count() >= 1
     assert page.locator("#gMats a.buy, #gTools a.buy").count() >= 1       # marketplace price links
     assert page.is_visible("#waBtn") and page.get_attribute("#waBtn", "href").startswith("https://wa.me/")
+    assert page.get_attribute("#workshopBtn", "href").endswith("/workshop.pdf")
+    page.click("#hoodTitle")
+    assert "sam-3.1" in page.inner_text("#hoodList") and page.locator("#hoodList li").count() >= 5
     page.set_input_files("#stepPhoto", str(FIX / "standin_faucet_hose_clamp.jpg"))
     page.wait_for_selector("#checkResult:not(.hidden)")
     page.wait_for_function("!document.querySelector('#checkResult').textContent.includes('…')", timeout=15000)

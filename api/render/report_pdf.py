@@ -8,6 +8,8 @@ from typing import Any
 
 from PIL import Image, ImageDraw, ImageFont
 
+from ..trace import build_trace
+
 W, H = 1240, 1754  # A4 at 150 dpi
 M = 90  # margin
 INK, MUTED, ORANGE = (28, 28, 30), (110, 110, 118), (255, 122, 0)
@@ -19,13 +21,21 @@ LABELS: dict[str, dict[str, str]] = {
            "attempts": "Percobaan", "minutes": "menit", "status": "Status", "ok": "[OK]", "todo": "[  ]", "photo": "Foto dengan bagian yang ditandai (SAM 3.1)",
            "disclaimer": "Panduan ini hanya untuk perbaikan ringan. Harga adalah perkiraan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.",
            "made": "Dibuat dengan Tukang Copilot (Meta Muse Spark + SAM 3.1)", "page": "Hal.", "demo": "Mode demo: jawaban contoh",
-           "green": "AMAN", "amber": "HATI-HATI", "red": "STOP"},
+           "green": "AMAN", "amber": "HATI-HATI", "red": "STOP",
+           "hood": "Di balik layar: model yang dipakai",
+           "st_listen": "Dengar suara", "st_gate": "Cek keselamatan teks", "st_look": "Lihat foto", "st_segment": "Tandai bagian",
+           "st_diagnose": "Diagnosa", "st_plan": "Susun langkah", "st_safety": "Cek keselamatan rencana", "st_illustrate": "Gambar bantu",
+           "st_narrate": "Suara pemandu"},
     "en": {"title": "Repair Report", "object": "Item", "problem": "Problem", "fix": "Cause fixed", "safety": "Safety",
            "steps": "Steps", "verified": "verified by camera", "tools": "Tools", "parts": "Parts", "total": "Estimated tools + parts cost",
            "attempts": "Attempts", "minutes": "min", "status": "Status", "ok": "[OK]", "todo": "[  ]", "photo": "Photo with the parts marked (SAM 3.1)",
            "disclaimer": "Light repairs only. Prices are estimates. For gas, house wiring, or high voltage, call a professional.",
            "made": "Made with Tukang Copilot (Meta Muse Spark + SAM 3.1)", "page": "Page", "demo": "Demo mode: sample answers",
-           "green": "SAFE", "amber": "CAUTION", "red": "STOP"},
+           "green": "SAFE", "amber": "CAUTION", "red": "STOP",
+           "hood": "Under the hood: models used",
+           "st_listen": "Listen", "st_gate": "Text safety gate", "st_look": "Look at photo", "st_segment": "Mark parts",
+           "st_diagnose": "Diagnose", "st_plan": "Plan steps", "st_safety": "Plan safety gate", "st_illustrate": "Helper diagram",
+           "st_narrate": "Voice guide"},
 }
 LABELS["jv"] = dict(LABELS["id"], title="Laporan Ndandani", object="Barang", problem="Masalah", fix="Sing didandani", safety="Keslametan",
                     steps="Langkah", tools="Piranti", made="Digawe nganggo Tukang Copilot (Meta Muse Spark + SAM 3.1)")
@@ -189,6 +199,13 @@ def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: 
         for a in rep["attempts"]:
             doc.text(f"- {a}", 23, indent=10)
 
+    rows = [r for r in build_trace(session) if r["status"] == "done"]
+    if rows:
+        doc.rule()
+        doc.text(L["hood"], 26, bold=True)
+        for r in rows:
+            secs = f"  {r['ms'] / 1000:.1f}s" if (r.get("ms") or 0) >= 100 else ""
+            doc.text(f"- {L.get('st_' + r['stage'], r['stage'])}: {r['tool']}{secs}", 20, color=MUTED, indent=10)
     doc.rule()
     doc.text(L["disclaimer"], 22, color=MUTED)
     pages = doc.finish()
