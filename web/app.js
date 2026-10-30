@@ -34,8 +34,27 @@ const T = {
         verified: "steps verified by camera", recording: "Recording…", recorded: "Voice recorded ✓", micErr: "Microphone unavailable. Please type the problem.",
         exhausted: "All tried", newPlan: "New plan ready.", photos: "photos" },
 };
-T.jv = Object.assign({}, T.id, { pdf: "Unduh laporan PDF", garage: "Garasiku", garageNote: "Riwayat ndandani mung disimpen ing HP iki. Pandhuan bisa dibukak 24 jam.", garageClear: "Busak riwayat", sPump: "pompa ora metu banyu", hero: "Apa sing rusak?", heroSub: "Foto barange, critakna masalahe, entuk pandhuan ndandani.", go: "Priksa saiki",
-  record: "Tutul kanggo ngomong", next: "Terus", stuck: "Isih rusak, jajal rencana liya", checkStep: "Priksa langkah iki" });
+// Basa Jawa (ngoko, as spoken around Semarang). Falls back to Bahasa Indonesia for any key not listed.
+T.jv = Object.assign({}, T.id, {
+  hero: "Apa sing rusak?", heroSub: "Foto barange, critakna masalahe, entuk pandhuan ndandani langkah demi langkah.", takePhoto: "Jupuk foto (1–3)",
+  catMotor: "Motor", catPump: "Pompa banyu", catAppliance: "Elektronik omah", catPlumbing: "Pipa/kran", catOther: "Liyane",
+  record: "Tutul kanggo ngomong", stop: "Tutul kanggo mandheg", typeHere: "…utawa ketik masalahe ing kene", go: "Priksa saiki",
+  samples: "Jajal conto:", sMotor: "motor mogok", sPump: "pompa ora metu banyu", sFaucet: "kran netes", sRice: "rice cooker mati",
+  working: "Lagi dipriksa…", answerHere: "Wangsulanmu", send: "Kirim", diagnosis: "Diagnosa", safetyFirst: "Slamet dhisik",
+  tools: "Piranti", materials: "Suku cadang", listen: "Rungokna", next: "Terus", handsFree: "Mode tanpa tangan (diwacakake otomatis)",
+  done: "Rampung yen:", checkStep: "Priksa langkah iki", share: "Bagekna laporan", pdf: "Undhuh laporan PDF", garage: "Garasiku",
+  garageNote: "Riwayat ndandani mung disimpen ing HP iki. Pandhuan bisa dibukak 24 jam.", garageClear: "Busak riwayat", again: "Ndandani barang liya",
+  stuck: "Isih rusak, jajal rencana liya", stuckHere: "Kepiye kedadeyane? (umpamane wis dijajal, tetep mati)",
+  needPhoto: "Jupuk utawa unggah foto dhisik.", needDesc: "Critakna masalahe (swara utawa ketik).",
+  footer: "Mung kanggo ndandani sing entheng. Yen gas, listrik omah, utawa tegangan dhuwur, celuk teknisi.",
+  stages: { listen: "Ngrungokake", gate: "Priksa keamanan wiwitan", look: "Ndeleng foto", segment: "Nandhani perangan (SAM 3.1)", diagnose: "Nggoleki sebabe",
+            plan: "Nyusun langkah", safety: "Priksa keamanan rencana", illustrate: "Nggambar diagram", narrate: "Nyiapake swara" },
+  diff: "Angel", min: "menit", est: "kira-kira", copied: "Tautan wis disalin", openW: "Nalar: Muse Spark Open (open weights)",
+  demo: "Mode demo: wangsulan conto, tanpa biaya API.",
+  green: "AMAN", amber: "ATI-ATI", red: "MANDHEG", pass: "✅ Langkah iki wis bener", fail: "⚠️ Durung pas", checking: "Mriksa foto…",
+  verified: "langkah wis dicek kamera", recording: "Ngrekam…", recorded: "Swara kerekam ✓", micErr: "Mikrofon ora bisa dienggo. Ketik wae masalahe.",
+  exhausted: "Wis kabeh dijajal", newPlan: "Rencana anyar wis siap.", photos: "foto",
+});
 
 let lang = localStorage.getItem("tc_lang") || "id";
 let photoFiles = [], audioBlob = null, rec = null, chunks = [], S = null, stepIdx = 0, category = "", es = null;
