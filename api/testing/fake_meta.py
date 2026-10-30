@@ -31,6 +31,19 @@ MODELS = ["muse-wonder-1.0", "muse-spark-1.3", "muse-spark-1.2", "muse-spark-1.1
           "muse-voice-transcribe-1.0", "sam-3.1"]
 app = FastAPI(title="Fake Meta Model API (tests only)")
 CALLS: list[dict[str, Any]] = []  # tests inspect what the client sent
+# Fault injection for robustness tests: path suffix -> {"status": int, "times": int | None (None = always)}
+FAULTS: dict[str, dict[str, Any]] = {}
+
+
+@app.middleware("http")
+async def _inject_faults(req: Request, call_next: Any) -> Any:
+    for suffix, f in FAULTS.items():
+        if req.url.path.endswith(suffix) and (f.get("times") is None or f["times"] > 0):
+            if f.get("times") is not None:
+                f["times"] -= 1
+            CALLS.append({"endpoint": "fault", "path": req.url.path, "status": f["status"]})
+            return _err(int(f["status"]), "injected", "injected fault for tests")
+    return await call_next(req)
 
 
 def _err(status: int, code: str, msg: str) -> JSONResponse:

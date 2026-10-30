@@ -49,6 +49,9 @@ Answers the follow-up question and resumes. 409 if the session isn't waiting.
 ```
 After `MAX_CHECK_FAILS` fails: `"escalate":true` + `escalate_hint`. 409 for an unknown step or no plan.
 
+## `POST /api/sessions/{id}/retry`
+Re-runs a session whose `status` is `error` (busy AI service, dropped signal). Finished stages and the cost so far are kept. `{"ok":true}`; `409` if the session did not fail. Failed sessions carry a friendly `error` in the session language and an `error_kind` (`busy`, `network`, `auth`, `budget`, `invalid`, `generic`); the technical detail is never sent to the browser. Step-check and replan outages answer `503` with the same friendly text and `Retry-After`.
+
 ## `POST /api/sessions/{id}/replan` (form: `report`)
 Moves to the next likely cause and returns the updated session (`status` `ready`), or `exhausted` with `stop_reason`, or `stopped` if the report trips the safety gate.
 

@@ -23,6 +23,7 @@ textarea,input[type=text],#answerText{width:100%;border:1px solid #d5cfc5;border
 .stages li::before{content:"○ ";color:var(--mut)}.stages li.running::before{content:"◐ ";color:var(--o)}
 .stages li.done::before{content:"● ";color:var(--ok)}.stages li.skipped::before{content:"– ";color:var(--mut)}
 .stages li.stopped::before{content:"■ ";color:var(--bad)}
+.stages li.error::before{content:"✕ ";color:var(--bad)}
 .stages .note{color:var(--mut);font-size:.85rem;margin-left:6px}
 .q{font-weight:600}.stop{background:#fdecea;color:#8a1f12;padding:12px;border-radius:12px}
 .causes{padding-left:18px}.causes .pct{font-weight:700;color:var(--o)}

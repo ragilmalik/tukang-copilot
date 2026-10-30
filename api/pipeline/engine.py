@@ -31,7 +31,7 @@ from typing import Any, TypeVar, cast
 from PIL import Image
 from pydantic import BaseModel, ValidationError
 
-from .. import cost, prompts
+from .. import cost, errors, prompts
 from ..render import overlay
 from ..schemas import Diagnosis, DiagramReview, ObjectReport, RepairPlan, Step, StepCheck, json_schema
 from ..settings import settings
@@ -447,16 +447,32 @@ def run(sid: str) -> dict[str, Any]:
             stage_illustrate(s, plan)
             stage_narrate(s, plan)
             s["status"] = "ready"
-        except cost.BudgetExceeded as e:
-            s["status"], s["error"] = "error", str(e)
-        except Exception as e:
+        except Exception as e:  # BudgetExceeded, Meta API errors, invalid model output ...
             log.error("session %s failed: %s", sid, traceback.format_exc())
-            s["status"], s["error"] = "error", str(e)[:400]
+            s["status"], s["error"], s["error_detail"] = "error", errors.friendly(e, s["lang"]), errors.detail(e)
+            s["error_kind"] = errors.classify(e)
+            for k, v in s["stages"].items():
+                if v["status"] == "running":
+                    s["stages"][k] = {"status": "error", "note": ""}
         finally:
             s["cost"] = meter.summary()
             save(s)
             cost.use(None)
         return s
+
+
+def retry(sid: str) -> dict[str, Any]:
+    """Re-run a session that stopped on an error. Finished stages are kept; failed ones start again."""
+    s = load(sid)
+    if s["status"] != "error":
+        raise ValueError("this session did not fail")
+    for k, v in s["stages"].items():
+        if v["status"] == "error":
+            s["stages"][k] = {"status": "waiting", "note": ""}
+    s["status"], s["error"], s["error_detail"], s["error_kind"] = "running", None, None, None
+    s["retries"] = int(s.get("retries", 0)) + 1
+    save(s)
+    return s
 
 
 def start(sid: str) -> None:
@@ -534,6 +550,7 @@ def replan(sid: str, report: str) -> dict[str, Any]:
             "en": "All safe causes have been tried. Take it to a repair shop and show them this report."}[s["lang"]]
         save(s)
         return s
+    before_hist = list(s["history"][:-1])
     s["cause_index"] += 1
     meter = cost.Meter(settings.max_cost_usd)
     cost.use(meter)
@@ -543,6 +560,10 @@ def replan(sid: str, report: str) -> dict[str, Any]:
             stage_illustrate(s, plan)
             stage_narrate(s, plan)
             s["status"] = "ready"
+    except Exception:
+        s["cause_index"] -= 1  # the new plan never arrived: the person can press "Still broken" again
+        s["history"] = before_hist
+        raise
     finally:
         prev = s.get("cost") or {}
         by_model = dict(prev.get("by_model", {}))

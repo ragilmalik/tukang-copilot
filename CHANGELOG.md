@@ -2,6 +2,12 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 2026-10-30 22:40 · v1.5.0
+- Resilience for live mode: pipeline failures now show one calm sentence in the person's language (busy, dropped signal, wrong key, cost limit, unusable AI answer) instead of raw HTTP text; technical detail stays on the server (`error_detail`, keys scrubbed). New `api/errors.py`.
+- "Try again" button and `POST /api/sessions/{id}/retry`: a failed session resumes from the failed stage and keeps what was already done and spent.
+- Step check and re-plan outages answer 503 with a friendly message and `Retry-After`; a failed re-plan no longer skips a cause (cause index and history are rolled back).
+- Fake Meta server got fault injection (`FAULTS`); 10 new tests in `test_resilience.py` (outage then recovery, flaky 429s absorbed, SAM and image-edit outages degrade gracefully, bad key in Javanese).
+
 ## 2026-10-30 22:00 · v1.4.0
 - Shopping help: every tool and part in the result and guide gets "Compare prices" links to Tokopedia and Shopee search pages (links only, Tukang Copilot never buys), plus a "Send shopping list to WhatsApp" button (wa.me share of tools, parts and rough prices in the session language). New `api/shop.py`; the session JSON carries `shop_url`, `shop_alt_url` and `whatsapp_url`. Front end only accepts those three https hosts. 4 new tests, one Playwright assertion.
 

@@ -19,7 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import __version__, guard, shop
+from . import __version__, errors, guard, shop
 from .pipeline import engine, media, mock
 from .settings import ROOT, settings
 
@@ -99,7 +99,7 @@ def _load(sid: str) -> dict[str, Any]:
 
 
 def public(s: dict[str, Any]) -> dict[str, Any]:
-    out = {k: v for k, v in s.items() if k not in {"text", "history"}}
+    out = {k: v for k, v in s.items() if k not in {"text", "history", "error_detail"}}
     out["files_base"] = f"/files/{s['id']}/"
     dx = out.get("diagnosis")
     if isinstance(dx, dict):
@@ -229,7 +229,8 @@ async def events(sid: str) -> StreamingResponse:
         last = None
         for _ in range(900):  # ~7.5 min max
             s = engine.load(sid)
-            snap = json.dumps({"status": s["status"], "stages": s["stages"], "question": s.get("question")}, ensure_ascii=False)
+            keys = ("status", "stages", "question", "error", "error_kind")
+            snap = json.dumps({k: s.get(k) for k in keys}, ensure_ascii=False)
             if snap != last:
                 yield f"data: {snap}\n\n"
                 last = snap
@@ -251,6 +252,18 @@ def post_answer(sid: str, text: str = Form(...)) -> dict[str, Any]:
     return {"ok": True}
 
 
+@app.post("/api/sessions/{sid}/retry")
+def post_retry(sid: str) -> dict[str, Any]:
+    """Run again a session that stopped on an error (busy AI service, dropped signal ...)."""
+    _load(sid)
+    try:
+        engine.retry(sid)
+    except ValueError as e:
+        raise HTTPException(409, str(e))
+    engine.start(sid)
+    return {"ok": True}
+
+
 @app.post("/api/sessions/{sid}/steps/{n}/check")
 async def post_check(sid: str, n: int, photo: UploadFile = File(...)) -> dict[str, Any]:
     _load(sid)
@@ -259,6 +272,9 @@ async def post_check(sid: str, n: int, photo: UploadFile = File(...)) -> dict[st
         return engine.check_step(sid, n, p)
     except ValueError as e:
         raise HTTPException(409, str(e))
+    except Exception as e:  # Meta API busy or offline: the photo is not lost, the person can simply retake it
+        logging.getLogger("tukang").error("step check failed: %s", errors.detail(e))
+        raise HTTPException(503, errors.friendly(e, _load(sid)["lang"]), headers={"Retry-After": "10"})
     finally:
         p.unlink(missing_ok=True)
 
@@ -270,6 +286,9 @@ def post_replan(sid: str, report: str = Form(default="")) -> dict[str, Any]:
         return public(engine.replan(sid, report))
     except ValueError as e:
         raise HTTPException(409, str(e))
+    except Exception as e:
+        logging.getLogger("tukang").error("replan failed: %s", errors.detail(e))
+        raise HTTPException(503, errors.friendly(e, _load(sid)["lang"]), headers={"Retry-After": "10"})
 
 
 @app.get("/api/sessions/{sid}/report")

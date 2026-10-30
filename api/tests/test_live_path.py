@@ -101,4 +101,5 @@ def test_wrong_key_fails_cleanly(live, monkeypatch):
     monkeypatch.setattr(settings, "meta_api_key", "wrong")
     sid = live.post("/api/sessions", data={"sample": "faucet", "language": "id"}).json()["id"]
     s = _wait(live, sid)
-    assert s["status"] == "error" and "401" in s["error"]
+    assert s["status"] == "error" and s["error_kind"] == "auth"
+    assert "401" not in s["error"] and "401" in engine.load(sid)["error_detail"]  # friendly outside, detail kept on the server
