@@ -10,10 +10,16 @@ ROOT = Path(__file__).resolve().parents[2]
 def _load(monkeypatch, env_file):
     monkeypatch.setenv("TC_ENV_FILE", str(env_file))
     spec = importlib.util.spec_from_file_location("set_keys", ROOT / "scripts" / "set_keys.py")
+    assert spec and spec.loader
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    calls = []
-    monkeypatch.setattr(mod.subprocess, "call", lambda cmd, cwd=None: calls.append(cmd) or 0)
+    calls: list[list[str]] = []
+
+    def fake_call(cmd, cwd=None):
+        calls.append(cmd)
+        return 0
+
+    monkeypatch.setattr(mod.subprocess, "call", fake_call)
     return mod, calls
 
 
