@@ -147,7 +147,38 @@ async function xssChecks() {
   w.close();
 }
 
+async function offlineChecks() {
+  for (const lang of ["id", "jv", "en"]) {
+    const vc = new VirtualConsole(); vc.on("jsdomError", () => {});
+    const dom = await JSDOM.fromURL(base + "/", {
+      runScripts: "dangerously", resources: "usable", pretendToBeVisual: true, virtualConsole: vc,
+      beforeParse(w) {
+        w.fetch = (url, o) => (String(url).includes("/api/health") ? nodeFetch(url, o) : Promise.reject(new TypeError("Failed to fetch")));
+        w.localStorage.setItem("tc_lang", lang); w.scrollTo = () => {};
+      },
+    });
+    const w = dom.window, d = w.document;
+    await until(() => d.readyState === "complete");
+    await sleep(300);
+    const bar = d.getElementById("offlineBar");
+    check(`${lang}: offline bar exists and starts hidden`, bar && bar.classList.contains("hidden"));
+    Object.defineProperty(w.navigator, "onLine", { value: false, configurable: true });
+    w.dispatchEvent(new w.Event("offline"));
+    check(`${lang}: offline bar shows when phone goes offline`, !bar.classList.contains("hidden") && bar.textContent.length > 20, bar.textContent);
+    Object.defineProperty(w.navigator, "onLine", { value: true, configurable: true });
+    w.dispatchEvent(new w.Event("online"));
+    check(`${lang}: offline bar hides again`, bar.classList.contains("hidden"));
+    d.querySelector('button.sample[data-sample="faucet"]').click();
+    await until(() => d.getElementById("formErr").textContent.length > 0, 4000);
+    const msg = d.getElementById("formErr").textContent;
+    check(`${lang}: network failure gives friendly text`, msg.length > 20 && !/failed to fetch/i.test(msg), msg);
+    check(`${lang}: start button usable again`, d.getElementById("goBtn").disabled === false);
+    w.close();
+  }
+}
+
 try {
+  await offlineChecks();
   await shrinkChecks();
   await xssChecks();
   await run("id", "faucet");

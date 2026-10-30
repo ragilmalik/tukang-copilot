@@ -19,6 +19,7 @@ const T = {
         findService: "Cari servis terdekat", emergency: "Darurat (api, asap, bau gas kuat): telepon 112.", copied: "Tautan disalin", openW: "Penalaran: Muse Spark Open (open weights)", demo: "Mode demo: jawaban contoh, tanpa biaya API.",
         green: "AMAN", amber: "HATI-HATI", red: "STOP", pass: "✅ Langkah ini beres", fail: "⚠️ Belum pas", checking: "Memeriksa foto…",
         verified: "langkah terverifikasi kamera", recording: "Merekam…", recorded: "Suara terekam ✓", micErr: "Mikrofon tidak bisa dipakai. Ketik saja masalahnya.",
+        netErr: "Koneksi terputus. Cek sinyal lalu coba lagi.", offline: "Tidak ada internet. Diagnosis butuh sinyal; foto kamu tetap aman di HP.",
         exhausted: "Sudah semua", newPlan: "Rencana baru siap.", photos: "foto", videoBtn: "🎥 Atau rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar terbaik diambil otomatis)", videoBig: "Videonya terlalu besar. Rekam 5–10 detik saja." },
   en: { hero: "What's broken?", heroSub: "Snap it, say what's wrong, get a step-by-step repair guide.", takePhoto: "Take photos (1–3)",
         catMotor: "Motorbike", catPump: "Water pump", catAppliance: "Home appliance", catPlumbing: "Pipes/taps", catOther: "Other",
@@ -38,6 +39,7 @@ const T = {
         findService: "Find a service centre nearby", emergency: "Emergency (fire, smoke, strong gas smell): call 112.", copied: "Link copied", openW: "Reasoning: Muse Spark Open (open weights)", demo: "Demo mode: sample answers, no API cost.",
         green: "SAFE", amber: "CAUTION", red: "STOP", pass: "✅ Step looks right", fail: "⚠️ Not quite", checking: "Checking photo…",
         verified: "steps verified by camera", recording: "Recording…", recorded: "Voice recorded ✓", micErr: "Microphone unavailable. Please type the problem.",
+        netErr: "Connection lost. Check your signal and try again.", offline: "You are offline. Diagnosis needs a signal; your photos stay on your phone.",
         exhausted: "All tried", newPlan: "New plan ready.", photos: "photos", videoBtn: "🎥 Or record a 5–10 s video", videoOk: "Video ready ✓ (the 3 sharpest frames are picked for you)", videoBig: "That video is too big. Record 5–10 seconds." },
 };
 // Basa Jawa (ngoko, as spoken around Semarang). Falls back to Bahasa Indonesia for any key not listed.
@@ -62,6 +64,7 @@ T.jv = Object.assign({}, T.id, {
   demo: "Mode demo: wangsulan conto, tanpa biaya API.",
   green: "AMAN", amber: "ATI-ATI", red: "MANDHEG", pass: "✅ Langkah iki wis bener", fail: "⚠️ Durung pas", checking: "Mriksa foto…",
   verified: "langkah wis dicek kamera", recording: "Ngrekam…", recorded: "Swara kerekam ✓", micErr: "Mikrofon ora bisa dienggo. Ketik wae masalahe.",
+  netErr: "Sambungan megat. Priksa sinyal banjur coba maneh.", offline: "Ora ana internet. Diagnosis butuh sinyal; foto sampeyan tetep aman ing HP.",
   exhausted: "Wis kabeh dijajal", newPlan: "Rencana anyar wis siap.", photos: "foto", videoBtn: "🎥 Utawa rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar paling cetha dijupuk otomatis)", videoBig: "Videone kegedhen. Rekam 5–10 detik wae.",
 });
 
@@ -81,6 +84,7 @@ function applyLang() {
   if (S) { renderProgress(S); if (S.plan) render(S); }
   if ($("garage") && !$("capture").classList.contains("hidden")) renderGarage();
   badges();
+  if (window.__offlineRefresh) window.__offlineRefresh();
 }
 
 let HEALTH = null;
@@ -96,6 +100,18 @@ async function health() {
     const h = await (await fetch("/api/health")).json();
     HEALTH = h; badges();
   } catch (_) {}
+}
+
+/* Network trouble: friendly text instead of "Failed to fetch", plus a banner while the phone is offline. */
+function netMsg(e) {
+  const m = e && e.message ? String(e.message) : "";
+  return (!e || e.name === "TypeError" || /failed to fetch|load failed|networkerror|network request/i.test(m) || (typeof navigator !== "undefined" && navigator.onLine === false)) ? t("netErr") : (m || t("netErr"));
+}
+function setupOffline() {
+  const bar = $("offlineBar"); if (!bar) return;
+  const upd = () => { bar.textContent = "📡 " + t("offline"); bar.classList.toggle("hidden", navigator.onLine !== false); };
+  window.addEventListener("online", upd); window.addEventListener("offline", upd);
+  window.__offlineRefresh = upd; upd();
 }
 
 /* ---------------- capture ---------------- */
@@ -129,6 +145,7 @@ function setupCapture() {
       const r = await fetch(`/api/sessions/${S.id}/retry`, { method: "POST" });
       if (r.ok) { $("jobErr").textContent = ""; $("retryBtn").classList.add("hidden"); follow(S.id); }
       else $("jobErr").textContent = (await r.json()).detail || "";
+    } catch (e) { $("jobErr").textContent = netMsg(e);
     } finally { $("retryBtn").disabled = false; }
   });
 }
@@ -189,7 +206,7 @@ async function submit(sample) {
     if (!r.ok) throw new Error(j.detail || r.statusText);
     history.replaceState(null, "", "#" + j.id);
     show("progress"); follow(j.id);
-  } catch (e) { $("formErr").textContent = e.message; }
+  } catch (e) { $("formErr").textContent = netMsg(e); }
   finally { $("goBtn").disabled = false; }
 }
 
@@ -264,8 +281,11 @@ function renderProgress(s) {
 async function sendAnswer() {
   const v = $("answerText").value.trim(); if (!v) return;
   const fd = new FormData(); fd.append("text", v);
-  await fetch(`/api/sessions/${S.id}/answer`, { method: "POST", body: fd });
-  $("answerText").value = ""; follow(S.id);
+  try {
+    const r = await fetch(`/api/sessions/${S.id}/answer`, { method: "POST", body: fd });
+    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || t("netErr"));
+  } catch (e) { $("jobErr").textContent = netMsg(e); return; }
+  $("jobErr").textContent = ""; $("answerText").value = ""; follow(S.id);
 }
 
 /* ---------------- safety stop / escalation card ---------------- */
@@ -380,11 +400,13 @@ function setupResult() {
     const f = await shrinkImage(f0);
     const st = S.plan.steps[stepIdx], fd = new FormData(); fd.append("photo", f, f.name || "check.jpg");
     $("checkResult").classList.remove("hidden"); $("checkResult").textContent = t("checking");
-    const r = await fetch(`/api/sessions/${S.id}/steps/${st.n}/check`, { method: "POST", body: fd });
-    const j = await r.json(); e.target.value = "";
-    if (!r.ok) { $("checkResult").textContent = j.detail; return; }
-    S = await fetchSession(S.id); showCheck(j); renderVerified();
-    if (j.passed && stepIdx < S.plan.steps.length - 1) setTimeout(() => { stepIdx++; renderStep(); }, 1500);
+    try {
+      const r = await fetch(`/api/sessions/${S.id}/steps/${st.n}/check`, { method: "POST", body: fd });
+      const j = await r.json(); e.target.value = "";
+      if (!r.ok) { $("checkResult").textContent = j.detail; return; }
+      S = await fetchSession(S.id); showCheck(j); renderVerified();
+      if (j.passed && stepIdx < S.plan.steps.length - 1) setTimeout(() => { stepIdx++; renderStep(); }, 1500);
+    } catch (err) { e.target.value = ""; $("checkResult").textContent = "⚠️ " + netMsg(err); }
   });
   on("stuckBtn", "click", async () => {
     const fd = new FormData(); fd.append("report", $("stuckText").value.trim());
@@ -396,6 +418,7 @@ function setupResult() {
       S = j;
       if (S.status === "ready") { stepIdx = 0; render(S); $("stuckMsg").textContent = t("newPlan"); $("stuckText").value = ""; window.scrollTo(0, 0); }
       else $("stuckMsg").textContent = "⛔ " + (S.stop_reason || S.error || "");
+    } catch (err) { $("stuckMsg").textContent = "⚠️ " + netMsg(err);
     } finally { $("stuckBtn").disabled = false; }
   });
   on("shareBtn", "click", async () => {
@@ -448,7 +471,7 @@ function renderGarage() {
 
 /* ---------------- boot ---------------- */
 document.addEventListener("DOMContentLoaded", () => {
-  applyLang(); health(); setupResult();
+  setupOffline(); applyLang(); health(); setupResult();
   const shared = document.body.dataset.sid;
   if (shared && !shared.startsWith("{{")) { // read-only /guide/<id> page
     on("lang", "change", (e) => { lang = e.target.value; applyLang(); });

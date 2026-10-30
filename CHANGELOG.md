@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.15.0 (2026-10-31 05:05 WIB)
+- Weak-signal handling in the phone UI. Network failures (start, answer, step photo check, re-plan, Try again) now show a friendly id/jv/en sentence instead of "Failed to fetch" or a stuck "Checking photo..."; an offline banner appears on the home and guide pages while the phone has no connection and disappears when it returns. Step photo check and answer no longer end in an unhandled promise rejection. 18 new jsdom checks (3 languages: banner shows and hides, fetch rejection gives friendly text, Start button usable again). Not verified in a real browser with airplane mode (no Chromium here).
+
 ## 1.14.0 (2026-10-31 04:35 WIB)
 - Accessibility pass on the phone UI. Page language is now tagged `jv` for Basa Jawa (was `id`, so screen readers mispronounced it); photo, video and step-check pickers are reachable by keyboard (tab + Enter/Space); category chips and the mic button expose `aria-pressed`; progress has a short screen-reader status line instead of re-reading the whole list; check results, errors and recording state are live regions; focus moves to the new section heading on each screen change; visible focus ring, 44 px touch targets, reduced-motion support. 8 new jsdom checks per language run plus a static test. Not verified with a real screen reader or in Chromium (none available here).
 

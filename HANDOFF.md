@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 05:05 WIB (v1.15.0)
+- **New:** weak-signal handling. Friendly id/jv/en network error text on every fetch path (start, answer, check, re-plan, retry), offline banner on home and guide pages, no more stuck "Checking photo..." when the signal drops. jsdom checks added (offline bar show/hide, rejected fetch gives friendly message). See CHANGELOG 1.15.0.
+- **Checks (real runs, 05:00 WIB):** ruff clean, `mypy api` strict no issues in 51 files, pytest **220 passed, 6 skipped** (Playwright only; jsdom test now has 108 checks), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` run. Offline behaviour only jsdom-verified (no Chromium here).
+- **Next up (Malik):** after first live key run: eval_fixtures live, tune prompts; re-take screenshots/video when a Chromium exists; Render preview smoke once deployed; real phone test of airplane-mode behaviour and TalkBack (Malik).
+
 ## State on 2026-10-31 04:40 WIB (v1.14.0)
 - **New:** accessibility pass (html lang `jv`, keyboard-reachable pickers, aria-pressed on chips and mic, screen-reader progress status, live regions, focus to new section heading, focus ring, 44 px targets, reduced motion). See CHANGELOG 1.14.0.
 - **Checks (real runs, 04:38 WIB):** ruff clean, `mypy api` strict no issues in 51 files, pytest **220 passed, 6 skipped** (Playwright only), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (220/226). No Chromium downloadable here, so screenshots and video are unchanged and the a11y changes are only jsdom-verified.
