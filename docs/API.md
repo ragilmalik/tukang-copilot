@@ -27,7 +27,7 @@ curl -F photos=@bike.jpg -F text="Motor susah hidup" -F language=id -F category=
 curl -F video=@pump.mp4 -F language=id -F category=pump localhost:8000/api/sessions   # video only: frames + its sound
 # {"id":"d2b5d598d8c6"}
 ```
-Errors: 400 (missing photo/description, bad type, bad language/category, unreadable image), 413 (too large).
+Errors: 400 (missing photo/description, bad type, bad language/category, unreadable image), 413 (too large), 429 (too many new repairs from one visitor, live mode only, `Retry-After` set), 503 (rolling 24 h spend cap reached, live mode only).
 
 ## `GET /api/sessions/{id}`
 The whole session (see ARCHITECTURE.md for fields) plus `files_base` (`/files/{id}/`). Statuses: `created`, `running`, `needs_answer`, `ready`, `stopped`, `exhausted`, `error`.

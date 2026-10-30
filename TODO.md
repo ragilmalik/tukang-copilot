@@ -25,6 +25,7 @@ Owner: **M** = Malik, **H** = Malik.
 - [x] **H** Screenshots + demo video + vertical clip (docs/demo/)
 
 ## Could
+- [x] Abuse guard (rate limit + daily spend cap) and security headers for the public deploy
 - [x] PWA manifest (install to home screen)
 - [x] Javanese strings for every UI label
 - [x] mypy strict on all of api/, Playwright smoke in CI (6 browser tests)

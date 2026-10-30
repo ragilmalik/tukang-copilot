@@ -9,17 +9,17 @@ import os
 import re
 import shutil
 import tempfile
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
+from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import __version__
+from . import __version__, guard
 from .pipeline import engine, media, mock
 from .settings import ROOT, settings
 
@@ -56,6 +56,17 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(title="Tukang Copilot", version=__version__, lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in settings.cors_origins.split(",")], allow_methods=["*"], allow_headers=["*"])
+@app.middleware("http")
+async def security_headers(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
+    """Cheap hardening: no MIME sniffing, no framing, no referrer leaks, camera and mic only for this origin."""
+    resp = await call_next(request)
+    resp.headers.setdefault("X-Content-Type-Options", "nosniff")
+    resp.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
+    resp.headers.setdefault("Referrer-Policy", "no-referrer")
+    resp.headers.setdefault("Permissions-Policy", "camera=(self), microphone=(self), geolocation=(self)")
+    return resp
+
+
 app.mount("/static", StaticFiles(directory=WEB), name="static")
 
 
@@ -124,7 +135,7 @@ def health() -> dict[str, Any]:
 
 
 @app.post("/api/sessions")
-async def create_session(photos: list[UploadFile] | None = File(default=None), audio: UploadFile | None = File(default=None),
+async def create_session(request: Request, photos: list[UploadFile] | None = File(default=None), audio: UploadFile | None = File(default=None),
                          video: UploadFile | None = File(default=None),
                          text: str = Form(default=""), language: str = Form(default="id"), category: str = Form(default=""),
                          sample: str = Form(default="")) -> dict[str, Any]:
@@ -134,6 +145,12 @@ async def create_session(photos: list[UploadFile] | None = File(default=None), a
         raise HTTPException(400, "unknown category")
     if len(text) > 2000:
         raise HTTPException(400, "Description is too long (max 2000 characters)")
+    if guard.active():
+        try:
+            guard.check_budget()
+            guard.check_rate(guard.client_key(request.headers.get("x-forwarded-for"), request.client.host if request.client else None))
+        except guard.Blocked as b:
+            raise HTTPException(b.status, guard.message(b.kind, language), headers={"Retry-After": str(b.retry_after)})
     tmp: list[Path] = []
     tmp_dirs: list[Path] = []
     video_sound: Path | None = None

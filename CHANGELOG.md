@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 2026-10-30 night · v1.3.0
+- Abuse guard for a public deployment (`api/guard.py`): per-visitor rate limit (`RATE_LIMIT_PER_HOUR`, default 30) and a rolling 24 h spend cap across all repairs (`DAILY_BUDGET_USD`, default 10). Live mode only, so demo mode and judges using a mock site are never blocked. Friendly id/jv/en message, `Retry-After` header, 429 or 503. 8 tests.
+
 ## 2026-10-30 evening · v1.2.0
 - Video capture: record a 5–10 s clip instead of photos. One ffmpeg pass samples 12 frames, the sharpest (Laplacian variance) of each third is kept as a photo; with no voice note or text, the clip's own sound is transcribed. Max 30 s / 40 MB, clean 400s.
 - Basa Jawa: every UI string translated (ngoko); a test fails if any string is missing in jv or en.

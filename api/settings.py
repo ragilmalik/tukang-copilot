@@ -60,6 +60,8 @@ class Settings:
     illustrate: bool = field(default_factory=lambda: _flag("ILLUSTRATE", default="1"))
     max_diagrams: int = field(default_factory=lambda: int(_env("MAX_DIAGRAMS", default="2")))
     max_cost_usd: float = field(default_factory=lambda: float(_env("MAX_COST_PER_SESSION_USD", default="0.50")))
+    rate_limit_per_hour: int = field(default_factory=lambda: int(_env("RATE_LIMIT_PER_HOUR", default="30")))
+    daily_budget_usd: float = field(default_factory=lambda: float(_env("DAILY_BUDGET_USD", default="10")))
     max_image_side: int = field(default_factory=lambda: int(_env("MAX_IMAGE_SIDE", default="1536")))
     retention_hours: float = field(default_factory=lambda: float(_env("RETENTION_HOURS", default="24")))
     max_check_fails: int = field(default_factory=lambda: int(_env("MAX_CHECK_FAILS", default="2")))

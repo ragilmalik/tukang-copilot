@@ -92,6 +92,8 @@ If Baseten's model page shows a different model id, open `.env` in Notepad and a
 | `DIAGRAM_CHECKER` | 1 | Spark reviews each diagram, redraws once |
 | `NARRATION_VOICE` | 1 | Server voice files; 0 = browser voice only |
 | `MAX_COST_PER_SESSION_USD` | 0.50 | Hard stop per repair |
+| `RATE_LIMIT_PER_HOUR` | 30 | New repairs per visitor per hour on a live site (0 = off) |
+| `DAILY_BUDGET_USD` | 10 | Rolling 24 h spend cap for the whole site; new repairs get a friendly "try tomorrow" (0 = off) |
 | `MAX_CHECK_FAILS` | 2 | Failed step checks before suggesting re-plan / pro |
 | `RETENTION_HOURS` | 24 | Photos and sessions auto-delete after this |
 | `PORT` | 8000 | Web port |
