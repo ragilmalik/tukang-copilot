@@ -72,7 +72,10 @@ def test_live_voice_note_is_transcribed(live, tmp_path):
 
     wav = tmp_path / "v.wav"
     with wave.open(str(wav), "wb") as w:
-        w.setnchannels(1), w.setsampwidth(2), w.setframerate(16000), w.writeframes(b"\x00\x00" * 8000)
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(16000)
+        w.writeframes(b"\x00\x00" * 8000)
     from api.main import SAMPLES
 
     files = [("photos", ("p.jpg", open(SAMPLES / "motor.jpg", "rb"), "image/jpeg")),

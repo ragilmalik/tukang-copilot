@@ -26,7 +26,9 @@ def test_every_id_used_in_js_exists_in_index():
 def test_every_ui_string_key_exists_in_all_languages():
     keys = set(re.findall(r'data-tp?="([A-Za-z]+)"', INDEX))
     for lang in ("id", "en"):
-        block = re.search(lang + r": \{(.*?)\n  \},?\n", JS, re.S).group(1)
+        m = re.search(lang + r": \{(.*?)\n  \},?\n", JS, re.S)
+        assert m, lang
+        block = m.group(1)
         missing = [k for k in keys if not re.search(r"\b" + k + r":", block)]
         assert not missing, (lang, missing)
 

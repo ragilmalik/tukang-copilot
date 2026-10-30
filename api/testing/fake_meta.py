@@ -16,6 +16,7 @@ import io
 import json
 import re
 import time
+from collections.abc import Callable, Iterator
 from typing import Any
 
 import numpy as np
@@ -65,23 +66,23 @@ def _all_text(messages: list[dict[str, Any]]) -> str:
 
 
 @app.get("/v1/models")
-async def models(req: Request):
+async def models(req: Request) -> Any:
     if (e := _auth(req)):
         return e
     return {"object": "list", "data": [{"id": m, "object": "model", "created": 1793000000 - i, "owned_by": "meta"} for i, m in enumerate(MODELS)]}
 
 
 @app.post("/v1/asr/transcribe")
-async def transcribe(req: Request):
+async def transcribe(req: Request) -> Any:
     if (e := _auth(req)):
         return e
     form = await req.form()
     try:
-        spec = json.loads(form["request"])
+        spec = json.loads(str(form["request"]))
     except Exception:
         return _err(400, "invalid_request", "request part must be JSON")
     audio = form.get("audio")
-    if audio is None or spec.get("audioEncoding") != "WAV":
+    if audio is None or isinstance(audio, str) or spec.get("audioEncoding") != "WAV":
         return _err(400, "invalid_request", "The audio is not a supported WAV file")
     data = await audio.read()
     if not data.startswith(b"RIFF"):
@@ -92,7 +93,7 @@ async def transcribe(req: Request):
 
 
 @app.post("/v1/chat/completions")
-async def chat(req: Request):
+async def chat(req: Request) -> Any:
     if (e := _auth(req)):
         return e
     body = await req.json()
@@ -114,7 +115,7 @@ async def chat(req: Request):
         lang = "en" if "in English" in text else "id"
         sc = mock.scenario(_owner_text(msgs))
         idx = 1 if "Earlier attempt" in text else 0
-        fixtures = {"object_report": lambda: mock.object_report(sc, lang), "diagnosis": lambda: mock.diagnosis(sc, lang),
+        fixtures: dict[str, Callable[[], Any]] = {"object_report": lambda: mock.object_report(sc, lang), "diagnosis": lambda: mock.diagnosis(sc, lang),
                     "repair_plan": lambda: mock.plan(sc, lang, idx), "diagram_review": lambda: {"ok": True, "problems": [], "fix_prompt": ""},
                     "step_check": lambda: {"passed": True, "observation": "Looks right.", "correction": ""}}
         if name not in fixtures:
@@ -133,7 +134,7 @@ def _png(w: int = 512, h: int = 512) -> str:
 
 @app.post("/v1/images/generations")
 @app.post("/v1/images/edits")
-async def images(req: Request):
+async def images(req: Request) -> Any:
     if (e := _auth(req)):
         return e
     body = await req.json()
@@ -157,7 +158,7 @@ def _sam_record(oid: int, l: int, t: int, r: int, b: int, w: int, h: int) -> str
 
 
 @app.post("/v1/responses")
-async def responses(req: Request):
+async def responses(req: Request) -> Any:
     if (e := _auth(req)):
         return e
     body = await req.json()
@@ -186,10 +187,10 @@ async def responses(req: Request):
             if box:
                 recs.append(_sam_record(0, int(box[0] * w), int(box[1] * h), int(box[2] * w), int(box[3] * h), w, h))
     text = ("<0f>" + ",".join(recs)) if recs else ""
-    lane = {"item_id": "msg_fake", "output_index": 0, "content_index": 0}
+    lane: dict[str, Any] = {"item_id": "msg_fake", "output_index": 0, "content_index": 0}
 
-    def gen():
-        events = [{"type": "response.created", "response": {"id": "resp_fake", "status": "in_progress"}}]
+    def gen() -> Iterator[str]:
+        events: list[dict[str, Any]] = [{"type": "response.created", "response": {"id": "resp_fake", "status": "in_progress"}}]
         if text:
             half = len(text) // 2
             events += [{"type": "response.output_text.delta", "delta": text[:half], **lane},
@@ -207,7 +208,7 @@ async def responses(req: Request):
 
 # OpenAI-compatible Baseten stand-in for the open-weights path (same handler, different base URL)
 @app.post("/baseten/v1/chat/completions")
-async def baseten(req: Request):
+async def baseten(req: Request) -> Any:
     if req.headers.get("authorization") != "Bearer test-baseten-key":
         return _err(401, "unauthorized", "bad key")
     body = await req.json()
@@ -219,7 +220,7 @@ async def baseten(req: Request):
     rf = body.get("response_format") or {}
     text = _all_text(body.get("messages") or [])
     sc, lang = mock.scenario(_owner_text(body.get("messages") or [])), ("en" if "in English" in text else "id")
-    name = (rf.get("json_schema") or {}).get("name")
+    name = str((rf.get("json_schema") or {}).get("name"))
     data = {"diagnosis": mock.diagnosis(sc, lang), "repair_plan": mock.plan(sc, lang)}.get(name, {})
     return {"id": "x", "object": "chat.completion", "model": "meta-models/muse-spark-open",
             "choices": [{"index": 0, "message": {"role": "assistant", "content": json.dumps(data), "reasoning_content": "..."}, "finish_reason": "stop"}],

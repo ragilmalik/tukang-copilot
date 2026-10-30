@@ -10,7 +10,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 PALETTE = [(255, 122, 0), (0, 168, 255), (46, 204, 113), (231, 76, 60), (155, 89, 182)]
 
 
-def _font(size: int):
+def _font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
     for name in ("DejaVuSans-Bold.ttf", "arialbd.ttf", "Arial Bold.ttf"):
         try:
             return ImageFont.truetype(name, size)
@@ -32,7 +32,7 @@ def full_mask(seg: dict[str, Any], width: int, height: int) -> np.ndarray:
         return canvas
     m = raw.astype(np.uint8) if isinstance(raw, np.ndarray) else np.frombuffer(bytes(raw), dtype=np.uint8)
     m = (m.reshape(seg["mh"], seg["mw"]) > 0).astype(np.uint8) * 255
-    box = Image.fromarray(m, "L").resize((r - l, b - t), Image.NEAREST)
+    box = Image.fromarray(m, "L").resize((r - l, b - t), Image.Resampling.NEAREST)
     canvas[t:b, l:r] = np.array(box) > 127
     return canvas
 

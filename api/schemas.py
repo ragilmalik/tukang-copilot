@@ -2,7 +2,7 @@
 `response_format` (structured output, https://dev.meta.ai/docs/structured-output)."""
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -114,12 +114,12 @@ class DiagramReview(BaseModel):
     fix_prompt: str = ""
 
 
-def json_schema(model: type[BaseModel]) -> dict:
+def json_schema(model: type[BaseModel]) -> dict[str, Any]:
     """Pydantic -> plain JSON Schema with $defs inlined, so strict providers accept it."""
     schema = model.model_json_schema()
     defs = schema.pop("$defs", {})
 
-    def inline(node):
+    def inline(node: Any) -> Any:
         if isinstance(node, dict):
             if "$ref" in node:
                 return inline(dict(defs[node["$ref"].split("/")[-1]]))
@@ -128,4 +128,5 @@ def json_schema(model: type[BaseModel]) -> dict:
             return [inline(x) for x in node]
         return node
 
-    return inline(schema)
+    out: dict[str, Any] = inline(schema)
+    return out

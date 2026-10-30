@@ -21,7 +21,7 @@ import logging
 import time
 import uuid
 from pathlib import Path
-from typing import Any
+from typing import Any, AsyncIterator
 
 import httpx
 
@@ -260,11 +260,11 @@ def parse_sam_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Responses stream events -> masks, using Meta's meta-sam-parser."""
     from meta_sam_parser import decode_mask_to_raster, image_segmentation_format, parse_responses_stream
 
-    async def _source():
+    async def _source() -> AsyncIterator[dict[str, Any]]:
         for ev in events:
             yield ev
 
-    async def _parse():
+    async def _parse() -> Any:
         return await parse_responses_stream(_source(), image_segmentation_format()).final_result()
 
     result = asyncio.run(_parse())

@@ -170,3 +170,30 @@ Only show work built during the hackathon.
 - Never put API keys in code or chat; use .env and the platform's secret settings.
 - Keep Malik's instructions short, numbered, and in plain English (offer Bahasa if he prefers).
 - Report progress at the end of each build day with what's done, what's next, and anything he must do.
+
+---
+
+## 17. v2 Winning Improvements (added 2026-10-30 18:50 WIB, from official sources)
+
+### What the judges score (verified)
+Sources: official page https://dev.meta.ai/events/global-hackathon (fetched 2026-10-30) and the Official Rules as summarised by https://madrobot.blog/2026/10/03/meta-global-ai-developer-hackathon-1-million-prizes-muse-model-api/ (the waiver/rules page itself needs sign-in).
+- **Impact 30%**: real-world potential, who benefits, how much it matters, whether it could become a product.
+- **Creative use of Meta AI tools 25%** (Muse Spark series, Muse Image, SAM 3.1, Voice Transcribe, open weights / Muse Spark Open, Muse Code).
+- **Demo, including the video 25%**.
+- **Technical depth & execution 20%**.
+- Indie track lens (official page): "creativity, technical ambition, and **whether it works**".
+- Prizes: Indie $150K / $100K / $75K / $50K / $25K. **Bonus prizes up to $50K total** "for standout projects or community achievements, such as a public vote or the most viral project", announced ~Nov 10. ⚠️ The per-bonus amounts in §14 (Agentic $5K, Open Weight $10K, Viral $20K, Community $10K) are NOT confirmed by any source fetched today; treat them as unverified until seen on the Cerebral Valley page.
+- Timeline: submissions due Nov 4 9:00 PM ET (= Nov 5 09:00 WIB); judging Nov 4–8; live finals Nov 9.
+
+### Criterion → concrete features
+| Criterion | Feature (status) |
+|---|---|
+| Impact 30% | 4 Indonesian scenarios incl. **water pump no-flow** (spec §8 #2); **PDF repair report** + **"My garage" history** (proves real reuse); money-saved estimate vs bengkel visit; Bahasa/Jawa strings everywhere |
+| Meta tools 25% | Spark vision → SAM 3.1 masks → Spark plan → Muse Image diagram → Spark verify loop; **open-weights badge** (visible "Muse Spark Open" chip when `USE_OPEN_WEIGHTS=true`); per-stage model chips in the UI and report |
+| Demo 25% | **Flawless mock/demo mode** end to end (no key needed); scripted 2–3 min **video with captions + voiceover** generated from the real UI; screenshots; vertical 30–45 s clip for X |
+| Technical depth 20% | mypy strict clean, ruff, pytest, **Playwright smoke** of the main flow, CI, one-step real-key swap with `scripts/set_keys.py` + `scripts/check_keys.py`, safety gate in code (3 layers) |
+| "Whether it works" | Safety escalation polish (red stop screen with service-centre advice), PWA installable, **video capture → 3 frames**, ~10 clearly labelled stand-in photo fixtures for tests |
+
+### Build order (top items first)
+1. Checks green incl. mypy strict (CI enforces). 2. Water pump flow. 3. PDF report + garage. 4. Open-weights badge. 5. Fixtures + Playwright smoke. 6. Demo assets (video, captions, voiceover, screenshots, diagram), write-up, setup guide, submission checklist. 7. PWA, video capture, id/jv strings, safety polish.
+Details and status: tukang-copilot/docs/WINNING_PLAN.md.

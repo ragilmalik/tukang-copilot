@@ -26,7 +26,7 @@ def ffmpeg_exe() -> str:
         return exe
     import imageio_ffmpeg
 
-    return imageio_ffmpeg.get_ffmpeg_exe()
+    return str(imageio_ffmpeg.get_ffmpeg_exe())
 
 
 def to_wav(src: Path, dst: Path, sr: int = SR) -> Path:
@@ -50,7 +50,7 @@ def speak(text: str, lang: str, out: Path, timeout: float = 25) -> Path | None:
     except ImportError:
         return None
 
-    async def _run():
+    async def _run() -> None:
         await edge_tts.Communicate(text, VOICES.get(lang, VOICES["id"])).save(str(out))
 
     try:

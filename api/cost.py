@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import threading
+from typing import Any
 
 PRICES_PER_M = {  # USD per 1M tokens (input, output)
     "muse-wonder-1.0": (4.00, 20.00),
@@ -34,7 +35,7 @@ class Meter:
         if self.spent + upcoming > self.budget + 1e-9:
             raise BudgetExceeded(f"Job budget ${self.budget:.2f} reached (spent ${self.spent:.3f}).")
 
-    def summary(self) -> dict:
+    def summary(self) -> dict[str, Any]:
         return {"spent_usd": round(self.spent, 4), "budget_usd": self.budget,
                 "by_model": {k: round(v, 4) for k, v in self.items.items()}}
 
@@ -62,7 +63,7 @@ def check(upcoming: float = 0.0) -> None:
         m.check(upcoming)
 
 
-def tokens_usd(model: str, usage: dict | None) -> float:
+def tokens_usd(model: str | None, usage: dict[str, Any] | None) -> float:
     if not usage or model not in PRICES_PER_M:
         return 0.0
     pin, pout = PRICES_PER_M[model]
@@ -71,7 +72,7 @@ def tokens_usd(model: str, usage: dict | None) -> float:
     return tin / 1e6 * pin + tout / 1e6 * pout
 
 
-def charge_tokens(model: str, usage: dict | None) -> None:
+def charge_tokens(model: str | None, usage: dict[str, Any] | None) -> None:
     usd = tokens_usd(model, usage)
     if usd:
-        charge(model, usd)
+        charge(model or "unknown", usd)
