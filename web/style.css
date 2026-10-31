@@ -148,3 +148,6 @@ body.typing .tourBar{bottom:auto;top:calc(8px + env(safe-area-inset-top))}
 .agArrow{position:absolute;right:6px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:1.1rem}
 .flash{outline:3px solid #d97706;outline-offset:3px;border-radius:8px;background-color:#fff4e0}
 @media (prefers-reduced-motion:no-preference){.flash{animation:tcFlash 1.8s ease-out}@keyframes tcFlash{0%{background-color:#ffd9a0}100%{background-color:#fff4e0}}}
+/* v1.24 recorded demo: honest label while the replay plays, note while the server wakes */
+.badge.replay{background:#ede7ff;color:#3d2a8a;font-weight:600}
+.wakeNote{margin:4px 0;padding:6px 10px;border-radius:10px;background:#ede7ff;color:#3d2a8a}

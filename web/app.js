@@ -149,6 +149,24 @@ const T_EXTRA = {
 /* I18N_EXTRA:end */
 ["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_EXTRA[k]));
 
+/* I18N_REPLAY:start (v1.24: recorded demo when the server sleeps). api/tests/test_replay.py checks all three. */
+const T_REPLAY = {
+  id: { rpBadge: "▶ Demo rekaman: putaran mode demo yang disimpan, tanpa server", rpWake: "Server sedang bangun (hosting gratis, bisa sampai 1 menit). Tombol demo langsung memutar demo rekaman.",
+        rpOwnPhoto: "Demo rekaman hanya bisa memutar dua foto contoh. Foto kamu sendiri perlu server live: muat ulang halaman sebentar lagi.",
+        rpOnlyDemo: "Demo rekaman hanya berisi contoh motor. Untuk foto sendiri atau contoh lain, muat ulang saat server sudah bangun.",
+        rpNoLive: "Bagian ini perlu server live; demo rekaman tidak bisa melakukannya.", rpNoMore: "Demo rekaman hanya punya satu rencana ulang." },
+  jv: { rpBadge: "▶ Demo rekaman: puteran mode demo sing disimpen, tanpa server", rpWake: "Server lagi tangi (hosting gratis, bisa nganti 1 menit). Tombol demo langsung muter demo rekaman.",
+        rpOwnPhoto: "Demo rekaman mung bisa muter loro foto conto. Foto sampeyan dhewe butuh server live: muat maneh kaca iki sedhela engkas.",
+        rpOnlyDemo: "Demo rekaman mung isi conto motor. Kanggo foto dhewe utawa conto liya, muat maneh yen server wis tangi.",
+        rpNoLive: "Bagean iki butuh server live; demo rekaman ora bisa nindakake.", rpNoMore: "Demo rekaman mung duwe siji rencana anyar." },
+  en: { rpBadge: "▶ Recorded demo: a saved demo-mode run, no server", rpWake: "The server is waking up (free hosting, up to a minute). The demo button plays a recorded run right away.",
+        rpOwnPhoto: "The recorded demo can only play the two sample photos. Your own photo needs the live server: reload the page in a moment.",
+        rpOnlyDemo: "The recorded demo only has the motorbike sample. For your own photo or another sample, reload once the server is awake.",
+        rpNoLive: "This part needs the live server; the recorded demo can't do it.", rpNoMore: "The recorded demo has only one re-plan." },
+};
+/* I18N_REPLAY:end */
+["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_REPLAY[k]));
+
 let lang = localStorage.getItem("tc_lang") || "id";
 let videoFile = null;
 let photoFiles = [], audioBlob = null, rec = null, chunks = [], S = null, stepIdx = 0, category = "", es = null;
@@ -156,6 +174,9 @@ const t = (k) => (T[lang] && T[lang][k] !== undefined ? T[lang][k] : T.id[k] !==
 const rupiah = (n) => "Rp" + Number(n || 0).toLocaleString("id-ID");
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const on = (id, ev, fn) => $(id) && $(id).addEventListener(ev, fn);
+window.tcT = (k) => t(k);  // web/replay.js shows its messages in the chosen language
+const replayOn = () => !!(window.TCReplay && window.TCReplay.active());
+const apiHref = (p) => (replayOn() ? window.TCReplay.href(p) : p);  // PDF links point at the recorded copy in a replay
 
 function applyLang() {
   document.documentElement.lang = lang === "en" ? "en" : lang === "jv" ? "jv" : "id";
@@ -173,14 +194,38 @@ let HEALTH = null;
 function badges() {
   if (!HEALTH) return;
   if (HEALTH.mode === "mock") { $("modeBadge").textContent = t("demo"); $("modeBadge").classList.remove("hidden"); }
+  if (HEALTH.mode === "replay") { $("modeBadge").textContent = t("rpBadge"); $("modeBadge").classList.add("replay"); $("modeBadge").classList.remove("hidden"); }
   if (HEALTH.open_weights && $("owBadge")) { $("owBadge").textContent = "🔓 " + t("openW"); $("owBadge").classList.remove("hidden"); }
 }
 
-async function health() {
-  try {
-    const h = await (await fetch("/api/health")).json();
-    HEALTH = h; badges();
-  } catch (_) {}
+// A sleeping free-tier server can take ~50 s to answer. Wait WAKE_MS at most: after that the 1-tap demo plays the
+// recorded run (web/replay.js) instead, and a note says so. A late answer still fills in the badges.
+const WAKE_MS = 4000;
+let healthP = null, serverSlow = false;
+function wakeNote(v) {
+  serverSlow = v;
+  const n = $("wakeNote"); if (!n) return;
+  n.textContent = v ? "⏳ " + t("rpWake") : ""; n.classList.toggle("hidden", !v || replayOn());
+}
+function health() {
+  if (window.TCReplay && window.TCReplay.forced() && !replayOn()) {  // ?replay=1: always the recording (judges, tests)
+    healthP = window.TCReplay.start(lang).then((ok) => (ok ? fetch("/api/health") : Promise.reject(new Error("no replay"))))
+      .then((r) => r.json()).then((h) => { HEALTH = h; badges(); return false; }).catch(() => false);
+    return healthP;
+  }
+  const req = fetch("/api/health").then((r) => { if (!r.ok) throw new Error(r.statusText); return r.json(); });
+  req.then((h) => { if (!replayOn() || h.mode === "replay") { HEALTH = h; badges(); } wakeNote(false); }).catch(() => {});
+  healthP = Promise.race([req.then(() => true), new Promise((res) => setTimeout(() => res(false), WAKE_MS))])
+    .catch(() => false).then((ok) => { if (!ok && window.TCReplay) wakeNote(true); return ok; });
+  return healthP;
+}
+// true when the 1-tap demo should play the recording: offline, forced, or no server answer within WAKE_MS
+async function useReplay() {
+  if (!window.TCReplay) return false;
+  if (replayOn()) return true;
+  if (typeof navigator !== "undefined" && navigator.onLine === false) return true;
+  if (HEALTH && !serverSlow) return false;
+  return !(await (healthP || health()));
 }
 
 /* Network trouble: friendly text instead of "Failed to fetch", plus a banner while the phone is offline. */
@@ -387,7 +432,7 @@ function renderStop(s) {
     + `<p>${esc(s.stop_reason || "")}</p>`
     + `<p class="small"><b>${esc(t("stopNow"))}</b></p><ul class="small">${actions}</ul>`
     + `<p class="stopBtns"><a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${q}">📍 ${esc(t("findService"))}</a>`
-    + ` <a class="btn link" href="/api/sessions/${esc(s.id)}/report.pdf">📄 ${esc(t("pdf"))}</a></p>`
+    + ` <a class="btn link" href="${esc(apiHref(`/api/sessions/${s.id}/report.pdf`))}">📄 ${esc(t("pdf"))}</a></p>`
     + `<p class="small">${esc(t("emergency"))}</p><div id="stopHandoff" class="handoff hidden"></div>`;
   showHandoff("stopHandoff");
 }
@@ -403,7 +448,7 @@ async function showHandoff(boxId) {
     box.innerHTML = `<p class="hoTitle">🧑‍🔧 ${esc(h.title)}</p><p class="small">${esc(t("hoSub"))}</p>`
       + `<p class="hoBtns">${HO_SAFE.test(h.whatsapp_url || "") ? `<a class="btn wa" target="_blank" rel="noopener noreferrer" href="${esc(h.whatsapp_url)}">💬 ${esc(t("hoWa"))}</a>` : ""}`
       + `${HO_SAFE.test(h.maps_url || "") ? ` <a class="btn" target="_blank" rel="noopener noreferrer" href="${esc(h.maps_url)}">📍 ${esc(t("hoMaps"))}</a>` : ""}`
-      + `${h.pdf_url ? ` <a class="btn" href="/api/sessions/${esc(encodeURIComponent(S.id))}/report.pdf">📄 ${esc(t("hoPdf"))}</a>` : ""}</p>`
+      + `${h.pdf_url ? ` <a class="btn" href="${esc(apiHref(`/api/sessions/${encodeURIComponent(S.id)}/report.pdf`))}">📄 ${esc(t("hoPdf"))}</a>` : ""}</p>`
       + `<details class="small"><summary>${esc(t("hoMsg"))}</summary><pre class="hoText">${esc(h.text)}</pre></details>`;
     box.classList.remove("hidden");
     return h;
@@ -414,8 +459,8 @@ async function showHandoff(boxId) {
 function render(s) {
   if (!s || !s.plan) return;
   const rep = s.object_report || {}, dx = s.diagnosis || {}, plan = s.plan, base = s.files_base;
-  if ($("pdfBtn")) $("pdfBtn").href = `/api/sessions/${s.id}/report.pdf`;
-  if ($("workshopBtn")) $("workshopBtn").href = `/api/sessions/${s.id}/workshop.pdf`;
+  if ($("pdfBtn")) $("pdfBtn").href = apiHref(`/api/sessions/${s.id}/report.pdf`);
+  if ($("workshopBtn")) { $("workshopBtn").href = apiHref(`/api/sessions/${s.id}/workshop.pdf`); $("workshopBtn").classList.toggle("hidden", replayOn()); }
   saveGarage(s);
   $("dxObject").textContent = rep.object || ""; $("dxSummary").textContent = dx.problem_summary || "";
   const lvl = (s.safety || {}).level || dx.safety_level;
@@ -738,7 +783,7 @@ function setupResult() {
     } finally { $("stuckBtn").disabled = false; }
   });
   on("shareBtn", "click", async () => {
-    const url = location.origin + "/guide/" + S.id;
+    const url = replayOn() ? location.origin + "/?replay=1" : location.origin + "/guide/" + S.id;  // a recording has no shared guide page
     const dx = (S && S.diagnosis) || {}, c = (dx.causes || [])[S.cause_index || 0] || (dx.causes || [])[0];
     const text = [S.object_report && S.object_report.object, c && c.title].filter(Boolean).join(": ");  // the link preview card shows the rest
     if (navigator.share) {
@@ -1113,7 +1158,11 @@ async function sampleCheck(kind) {
   updateTour();
 }
 function setupDemo() {
-  on("demoBtn", "click", () => { setTour(true); submit("motor"); });
+  on("demoBtn", "click", async () => {
+    setTour(true);
+    if (await useReplay()) { await window.TCReplay.start(lang); wakeNote(false); await health(); }
+    submit("motor");
+  });
   on("tourClose", "click", () => setTour(false));
   on("tourToggle", "click", toggleTour);
   on("sampleBad", "click", () => sampleCheck("dark"));
@@ -1138,7 +1187,8 @@ document.addEventListener("DOMContentLoaded", () => {
     loadGarage().forEach((e) => { if (e && e.id) fetch(`/api/sessions/${encodeURIComponent(e.id)}`, { method: "DELETE" }).catch(() => null); }); // best effort: erase on the server too
     localStorage.removeItem(GARAGE_KEY); renderGarage();
   });
-  if (location.hash.length > 1) { show("progress"); startElapsed(); follow(location.hash.slice(1)); }
+  if (location.hash.startsWith("#replay-")) history.replaceState(null, "", location.pathname + location.search);  // a recording does not survive a reload
+  else if (location.hash.length > 1) { show("progress"); startElapsed(); follow(location.hash.slice(1)); }
 });
 
 // PWA: install to home screen. The worker only caches the app shell; it fails quietly when sw.js is absent.

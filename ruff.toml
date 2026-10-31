@@ -9,3 +9,4 @@ ignore = ["E701", "E702", "E741"]
 "api/testing/*" = ["E501"]
 "scripts/*" = ["E501", "E402"]
 "api/tests/*" = ["E501"]
+"api/tests/test_playwright_replay.py" = ["E501", "F811"]  # re-uses the smoke test fixtures by import

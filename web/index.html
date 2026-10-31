@@ -31,6 +31,7 @@
     <ol class="how" aria-label="How it works"><li data-t="how1">📷 Foto + cerita</li><li data-t="how2">🎯 AI tandai bagiannya</li><li data-t="how3">✅ Tiap langkah dicek kamera</li></ol>
     <button id="demoBtn" class="btn demo big" type="button" data-testid="demo-btn" data-t="demoBtn">▶ Coba demo 1 ketuk</button>
     <p class="small muted demoSub" data-t="demoSub">Tanpa foto, tanpa akun: lihat AI memperbaiki motor mogok dari awal sampai cek kamera.</p>
+    <p id="wakeNote" class="small wakeNote hidden" role="status"></p>
     <img class="demoThumb" src="/og.png" alt="" width="390" height="205" loading="lazy" style="width:100%;height:auto;border-radius:12px;margin-top:8px" data-testid="demo-thumb">
 
     <label class="photoBox" id="photoBox">
@@ -191,6 +192,7 @@
 <footer class="muted small" data-t="footer">Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.</footer>
 <div id="tourBar" class="tourBar hidden" data-testid="tour-bar"><button id="tourToggle" class="tourToggle" type="button" aria-expanded="true" aria-controls="tourText" aria-label="Kecilkan tip">💡</button><p id="tourText" role="status" aria-live="polite"></p><button id="tourClose" class="tourX" type="button" aria-label="Tutup">×</button></div>
 <audio id="player"></audio>
+<script src="/static/replay.js"></script>
 <script src="/static/app.js"></script>
 </body>
 </html>
