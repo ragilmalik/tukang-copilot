@@ -2,6 +2,12 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 09:30 WIB (v1.21.0) — feature-complete for submission
+- **New since 1.20 (win plan lanes A/B/C):** live camera guide (SAM 3.1 on camera frames, `POST /steps/{n}/track`), hands-free voice commands (`POST /command` push-to-talk fallback), bengkel hand-off (`GET /handoff`: WhatsApp + Maps + mechanic brief PDF), `DEMO_FALLBACK`, impact trial kit, Render free-plan deploy readiness, `scripts/deploy_check.py` (in LIVE mode it FAILs any session that silently used demo answers), regenerated demo kit (22 screenshots, 2:50 video, 45 s vertical clip, captions + voice-over), docs/WRITEUP.md, a field-by-field docs/SUBMISSION.md for the Cerebral Valley form. Details: CHANGELOG 1.21.0.
+- **Checks (real runs, 2026-10-31):** pytest **410 passed, 0 failed** (run in chunks under 110 s: `-m "not slow"` split over 3 file groups = 141 + 88 + 173, then `-m slow` = 8); `ruff check api scripts` clean; `mypy api` strict no issues in 67 files; `smoke_e2e.py` ALL PASSED on a local mock server (set `NO_PROXY=127.0.0.1,localhost`); `deploy_check.py` READY (mock), and in LIVE mode against the fake Meta server: wrong key → FAIL fallback flagged, right key → READY.
+- **Sandbox tips:** the full suite takes ~4 min, so split it (see above or `../work/run_tests.sh`). Demo assets: `python scripts/make_demo_assets.py shots|diagram|voice|video` (video takes ~3 min, so run it with nohup; segments are cached in `$TMPDIR/tukang-video`, delete that after changing screenshots). edge-tts needs the env proxy removed (the script does that unless `EDGE_TTS_PROXY` is set).
+- **Honest status:** no live Meta answer has been verified yet. Demo assets are demo mode (labelled stand-in photos, recorded answers, Chromium fake camera). Impact numbers are MOCK.
+
 ## State on 2026-10-31 08:20 WIB (v1.20.0)
 - **New:** "Before you start" safety gate. `Diagnosis.before_you_start` (max 4), tick list on result and shared guide pages, step card dimmed and `inert` until all ticked (ticks kept in localStorage per repair), no hands-free voice while locked, PDF prints the list, prompt asks for it, red stops carry none. Also made the jsdom timer check less timing-sensitive (it flaked once under load: the 500 ms tick can still show 10:00 at 700 ms).
 - **Checks (real runs, 08:15 WIB):** ruff clean, `mypy api` strict no issues in 57 files, pytest **289 passed, 6 skipped** (Playwright only; jsdom runs after `npm install --prefix /tmp/jd jsdom`), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (289/295). Lock/unlock only jsdom-verified (no Chromium here, so no real-browser check of `inert`); the Playwright smoke does not click inside the step card, so it should be unaffected.
@@ -172,19 +178,16 @@ See docs/DECISIONS.md. Most important: single FastAPI process + plain JS (no Nex
 - After any change: `python -m pytest api/tests -q`, then `python scripts/make_test_report.py`, then update CHANGELOG.md and TODO.md.
 - Check his shift schedule before asking him to do anything (he works nights).
 
-## Next up (Malik, no Malik needed)
-1. Video capture (5 to 10 s clip, 3 frames) in web/app.js + engine (owner of engine/web).
-2. Open-weights badge chip in the UI and the PDF when `USE_OPEN_WEIGHTS=true`; per-stage model chips.
-3. Safety escalation polish: red stop screen with service-centre advice and a PDF; Javanese strings for every remaining UI label.
-4. Parallel run (see ../work/COORDINATION.md) owns: Playwright smoke, fixtures, demo video assets, submission checklist, WINNING_PLAN.
+## Next up (Malik, once Malik's steps unblock it)
+1. After the key: `set_keys.py` ALL GOOD → `smoke_e2e.py` in LIVE mode with no FALLBACK lines → `eval_fixtures.py` live → tune prompts → update META_API_NOTES ⚠️ items and the "Honest status" lines in WRITEUP/SUBMISSION/VERIFICATION_REPORT.
+2. After real photos/trials: replace stand-in fixtures, `scripts/impact_report.py` (real rows), re-shoot screenshots with real photos.
+3. After deploy: `deploy_check.py <url> --live`, fill the live/video/X links in README + SUBMISSION, rebuild docs-out/.
+4. Resume the paused "Keep building Tukang Copilot" scheduled task only if Malik wants more polish.
 
-## Next 3 actions (need Malik)
-1. Get the repo approval → push → CI green.
-2. Real key → `check_keys.py` → live run of the three samples → fix differences.
-3. Real photos → prompt tuning → deploy → phone test → video.
-
-## Known gaps
-Video capture, PDF report, garage history, water-pump fixture, Playwright/mypy, real performance numbers. All in TODO.md.
-
-## 2026-10-30 19:50 WIB check
-check_all: ruff clean, mypy 33 files OK, 115 passed, 6 skipped (Playwright, no Chromium in this sandbox, skip cleanly). No code changes; Malik-side steps unchanged.
+## Malik-only (nothing else blocks the submission)
+1. Meta key: claim credits + set a spend limit on dev.meta.ai, create a key, run `python scripts/set_keys.py` (paste, Enter) → ALL GOOD.
+2. Optional: Baseten key for open weights (run `set_keys.py` again, set `USE_OPEN_WEIGHTS=1`).
+3. Real photos + 5 user trials (docs/USER_TRIAL_KIT.md).
+4. Approve the GitHub push (`ragilmalik/tukang-copilot`) and the Render deploy (docs/DEPLOY.md, free plan).
+5. Upload the video to YouTube (Unlisted is fine; the real recording or docs/demo/tukang-copilot-demo.mp4) and post the X clip (docs/demo/tukang-copilot-x-vertical.mp4, draft post in docs/SUBMISSION.md).
+6. Paste the docs/SUBMISSION.md fields into Cerebral Valley (account ragilmalika) and submit before **Thu Nov 5, 09:00 WIB**.

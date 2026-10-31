@@ -3,26 +3,24 @@
 Deadline: **Thu Nov 5, 2026, 09:00 WIB** (Nov 4, 9 PM ET). Internal target: feature-complete Nov 3, 23:59 WIB.
 Owner: **M** = Malik, **H** = Malik.
 
-## Must (to submit)
-- [ ] **M** Say yes to creating the public GitHub repo `tukang-copilot` → **H** pushes, CI goes green
-- [ ] **M** Claim $150 Meta credits, add card, set spend limit on dev.meta.ai
-- [ ] **M** Create Meta API key → run `python scripts/set_keys.py` → ALL GOOD
-- [ ] **H** First live run on the samples; fix any real-API differences; update META_API_NOTES ⚠️ items
-- [ ] **M** Send 8–10 real photos (bike plug area, water pump, tap/hose, rice cooker)
-- [ ] **H** Tune prompts on real photos; record results in TEST_REPORT manual QA table
-- [ ] **H/M** Deploy on Render (render.yaml), redeem a Render credit, `smoke_e2e.py <url>` passes
-- [ ] **M** Phone test over 4G (camera + mic need https)
-- [ ] **M** Record the 3-min video (DEMO_SCRIPT.md), upload to YouTube (backup cut ready: docs/demo/tukang-copilot-demo.mp4)
-- [ ] **H** Fill links in README + SUBMISSION, regenerate TEST_REPORT
-- [ ] **M** Submit on Cerebral Valley (account ragilmalika) before Nov 5 09:00 WIB
+## Must (to submit) — see HANDOFF.md "Malik-only" list
+- [ ] **M** Meta key → `python scripts/set_keys.py` → ALL GOOD (claim credits + set a spend limit on dev.meta.ai first)
+- [ ] **H** First live run on the 5 samples (no FALLBACK lines); fix real-API differences; update META_API_NOTES ⚠️ items and the "Honest status" lines in WRITEUP/SUBMISSION
+- [ ] **M** Real photos + 5 user trials (docs/USER_TRIAL_KIT.md) → **H** `scripts/impact_report.py`, replace MOCK impact numbers, tune prompts
+- [ ] **M** Approve GitHub push (`ragilmalik/tukang-copilot`) + Render deploy (docs/DEPLOY.md, free plan); set `PUBLIC_BASE_URL`
+- [ ] **H** `deploy_check.py <url> --live` → READY
+- [ ] **M** Phone test over 4G: camera, live guide, hands-free (Android Chrome jv-ID), WhatsApp hand-off, PDF
+- [ ] **M** Upload the video to YouTube (real recording per DEMO_SCRIPT.md, or the 2:50 backup cut), post the X clip
+- [ ] **H** Fill links in README + SUBMISSION
+- [ ] **M** Paste docs/SUBMISSION.md fields into Cerebral Valley (account ragilmalika) and submit before Nov 5 09:00 WIB
 
 ## Should (scores better)
 - [x] **H** Water pump mock scenario + fixtures (spec §8 case 2)
 - [x] **H** Video capture (5–10 s → 3 sharpest frames)
 - [x] **H** PDF export of the report + local "My garage" history (localStorage)
 - [ ] **H** Open-weights run on Baseten (needs BASETEN_API_KEY); badge is built and shows when active
-- [ ] **M** Post the X clip (drafts in SUBMISSION.md); engagement counts until Nov 8
-- [x] **H** Screenshots + demo video + vertical clip (docs/demo/)
+- [ ] **M** Post the X clip (draft in SUBMISSION.md, 45 s clip ready); engagement counts until Nov 8
+- [x] **H** Screenshots + demo video + vertical clip (docs/demo/), regenerated for v1.21.0
 
 ## Could
 - [x] Abuse guard (rate limit + daily spend cap) and security headers for the public deploy
@@ -41,3 +39,9 @@ Owner: **M** = Malik, **H** = Malik.
 - [x] Waiting-time steps with countdown timer (v1.18.0)
 - [x] Outcome buttons ("it works now"), PDF result line, garage total saved (v1.19.0)
 - [x] "Before you start" tick list that locks the steps until confirmed (v1.20.0)
+- [x] Live camera guide: SAM 3.1 on live frames with canvas overlay (v1.21.0)
+- [x] Hands-free voice commands + push-to-talk fallback (v1.21.0)
+- [x] Bengkel hand-off: WhatsApp summary, Maps search, mechanic brief PDF (v1.21.0)
+- [x] Demo fallback on live API failure + deploy_check flags it (v1.21.0)
+- [x] Impact trial kit (outcome log → impact report) (v1.21.0)
+- [x] Render free-plan deploy readiness + deploy_check.py (v1.21.0)
