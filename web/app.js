@@ -356,7 +356,7 @@ function renderProgress(s) {
   if (asking) $("questionText").textContent = s.question;
   if (asking && !wasAsking) {  // the question is the one thing to act on: bring it on screen (stage list + results push it down)
     const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setTimeout(() => $("question").scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }), 50);
+    setTimeout(() => { const q = $("question"); if (q.scrollIntoView) q.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }); }, 50);
   }
   const stopped = ["stopped", "exhausted"].includes(s.status);
   $("stopBox").classList.toggle("hidden", !stopped);
@@ -991,7 +991,7 @@ function agGo(e, boxId) {
   }
   const el = agTarget(e, boxId); if (!el) return;
   const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  el.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
+  if (el.scrollIntoView) el.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
   if (!el.hasAttribute("tabindex") && !/^(BUTTON|A|INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) el.setAttribute("tabindex", "-1");
   try { el.focus({ preventScroll: true }); } catch (_) { /* old browsers */ }
   flash(el);
