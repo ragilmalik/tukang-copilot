@@ -664,7 +664,7 @@ def voice_command(sid: str, text: str = "", audio: Path | None = None) -> dict[s
 OUTCOMES = ("fixed", "pro")
 
 
-def set_outcome(sid: str, result: str) -> dict[str, Any]:
+def set_outcome(sid: str, result: str, minutes: int | None = None, tester: str = "") -> dict[str, Any]:
     """Close the loop: the owner says it works now ("fixed") or that a professional took over ("pro").
     The saving is only counted for "fixed", and only when the diagnosis carried a shop price."""
     s = load(sid)
@@ -672,9 +672,15 @@ def set_outcome(sid: str, result: str) -> dict[str, Any]:
         raise ValueError("no plan yet")
     if result not in OUTCOMES:
         raise ValueError("unknown outcome")
+    if minutes is not None and not 0 <= minutes <= 600:
+        raise ValueError("minutes must be between 0 and 600")
+    from .. import impact
+
+    tester = impact.clean_tester(tester)
     saved = int((s.get("diagnosis") or {}).get("diy_saving_idr") or 0) if result == "fixed" else 0
-    s["outcome"] = {"result": result, "at": time.time(), "saved_idr": saved}
+    s["outcome"] = {"result": result, "at": time.time(), "saved_idr": saved, **({"minutes": minutes} if minutes is not None else {})}
     save(s)
+    impact.record(s, minutes, tester)  # append-only trial log for scripts/impact_report.py
     return s
 
 

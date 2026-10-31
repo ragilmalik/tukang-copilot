@@ -69,6 +69,8 @@ class Settings:
     narration_voice: bool = field(default_factory=lambda: _flag("NARRATION_VOICE", default="1"))
     # Live mode only: when a Meta call still fails after its retries, carry on with the demo answer for that stage
     # and label it in the UI and PDF ("demo answer, live API unavailable") instead of failing the repair.
+    # Download the impact trial log from a deployed server (GET /api/impact/outcomes.jsonl). Unset = endpoint off.
+    impact_token: str = field(default_factory=lambda: _env("IMPACT_TOKEN"))
     demo_fallback: bool = field(default_factory=lambda: _flag("DEMO_FALLBACK", default="1"))
     # Live guide (camera overlay): SAM 3.1 on ~1 frame per second, capped per repair to keep cost bounded.
     max_track_frames: int = field(default_factory=lambda: int(_env("MAX_TRACK_FRAMES", default="120")))

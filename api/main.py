@@ -19,7 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import __version__, errors, guard, handoff, shop
+from . import __version__, errors, guard, handoff, impact, shop
 from .trace import build_trace
 from .pipeline import engine, media, mock, photos, track
 from .settings import ROOT, settings
@@ -377,11 +377,13 @@ def post_replan(sid: str, report: str = Form(default="")) -> dict[str, Any]:
 
 
 @app.post("/api/sessions/{sid}/outcome")
-def post_outcome(sid: str, result: str = Form(...)) -> dict[str, Any]:
-    """The owner closes the loop: result is "fixed" (it works now) or "pro" (a mechanic took over)."""
+def post_outcome(sid: str, result: str = Form(...), minutes: int | None = Form(default=None),
+                 tester: str = Form(default="")) -> dict[str, Any]:
+    """The owner closes the loop: result is "fixed" (it works now) or "pro" (a mechanic took over).
+    Optional for trials: minutes the fix took, and a tester label (e.g. "T1"). Each call is appended to the impact log."""
     _load(sid)
     try:
-        return public(engine.set_outcome(sid, result.strip().lower()))
+        return public(engine.set_outcome(sid, result.strip().lower(), minutes, tester))
     except ValueError as e:
         raise HTTPException(409 if "plan" in str(e) else 422, str(e))
 
@@ -422,6 +424,19 @@ def get_workshop_pdf(sid: str) -> FileResponse:
 
     out = workshop_pdf.build(engine.report(sid), s, engine.session_dir(sid), engine.session_dir(sid) / "workshop.pdf")
     return FileResponse(out, media_type="application/pdf", filename=f"tukang-copilot-workshop-{sid}.pdf")
+
+
+@app.get("/api/impact/outcomes.jsonl")
+def impact_log(request: Request) -> Response:
+    """The trial outcome log (numbers only), for scripts/impact_report.py --data. Off unless IMPACT_TOKEN is set;
+    send it as the X-Impact-Token header. A server disk can be wiped on redeploy, so download after the trials."""
+    import hmac
+
+    tok = request.headers.get("x-impact-token", "")
+    if not settings.impact_token or not hmac.compare_digest(tok, settings.impact_token):
+        raise HTTPException(404)
+    p = impact.log_path()
+    return Response(p.read_bytes() if p.exists() else b"", media_type="application/x-ndjson")
 
 
 @app.get("/files/{sid}/{name}")
