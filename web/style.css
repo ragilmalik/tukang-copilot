@@ -133,3 +133,5 @@ details.agent{margin-top:10px}details.agent summary{cursor:pointer;font-weight:6
 .tourBar button:focus-visible{outline:3px solid #ffb366;outline-offset:1px}
 .tourBar.collapsed{border-radius:999px;padding:2px}.tourBar.collapsed p,.tourBar.collapsed .tourX{display:none}
 body:has(#tourBar:not(.hidden)){padding-bottom:96px}body:has(#tourBar.collapsed:not(.hidden)){padding-bottom:56px}
+/* While a text field has focus (keyboard open) the tip bar moves to the top so it never sits by Send. */
+body.typing .tourBar{bottom:auto;top:calc(8px + env(safe-area-inset-top))}

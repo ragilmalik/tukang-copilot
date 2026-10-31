@@ -1033,3 +1033,10 @@ document.addEventListener("DOMContentLoaded", () => {
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));
 }
+
+// Keyboard open (text field focused): move the tip bar to the top of the screen.
+document.addEventListener("focusin", (e) => {
+  const el = e.target;
+  if (el && (el.tagName === "TEXTAREA" || (el.tagName === "INPUT" && !["file", "checkbox", "radio", "button"].includes(el.type)))) document.body.classList.add("typing");
+});
+document.addEventListener("focusout", () => document.body.classList.remove("typing"));
