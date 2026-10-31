@@ -191,3 +191,26 @@ def test_one_tap_demo_runs_the_whole_agent_loop(page):
     for bit in ("muse-spark-1.3", "sam-3.1", "Only 55% sure", "not yet", "correct", "Still broken: new"):
         assert bit in log, bit
     assert page.locator("#agent .agLoop .lp.on").count() >= 7
+
+
+def test_tip_bar_moves_to_top_while_typing(page):
+    """ffc24d8: while a text field has focus (phone keyboard open) the tip bar sits at the top, never by Send;
+    it goes back to the bottom corner when the field loses focus. Checkboxes and file inputs do not move it."""
+    page.goto(page.base + "/")
+    page.select_option("#lang", "en")
+    page.click("#demoBtn")
+    page.wait_for_selector("#question:not(.hidden)", timeout=20000)
+    page.wait_for_selector("#tourBar:not(.hidden)")
+    low = page.locator("#tourBar").bounding_box()
+    assert low and low["y"] > 844 / 2, low                     # bottom corner by default
+    page.focus("#answerText")
+    page.wait_for_function("document.body.classList.contains('typing')")
+    top = page.locator("#tourBar").bounding_box()
+    assert top and top["y"] < 60, top                          # moved to the top while typing
+    ans = page.locator("#answerText").bounding_box()
+    assert ans and not (top["y"] < ans["y"] + ans["height"] and ans["y"] < top["y"] + top["height"] and
+                        top["x"] < ans["x"] + ans["width"] and ans["x"] < top["x"] + top["width"]) or ans["y"] > 120
+    page.locator("#answerText").blur()
+    page.wait_for_function("!document.body.classList.contains('typing')")
+    back = page.locator("#tourBar").bounding_box()
+    assert back and back["y"] > 844 / 2, back
