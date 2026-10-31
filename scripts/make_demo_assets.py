@@ -63,46 +63,52 @@ SCENES: list[Scene] = [
     Scene("hook", "title:Motor mogok. Bengkelnya tutup.|Bike won't start. The repair shop is closed.",
           "Indonesia runs on ~130 million motorbikes, water pumps and rice cookers.",
           "In Indonesia, a small fault on a motorbike or a water pump can cost a day's wage, or days without water. "
-          "The repair videos online are not for your model, not in your language, and they can't see your problem.", 9),
+          "Repair videos online are not for your model, not in your language, and they can't see your problem.", 8),
     Scene("intro", "01_home", "Tukang Copilot: photo + voice in Bahasa, Javanese or English.",
-          "Tukang Copilot turns any phone into a mechanic's apprentice. Take a photo, say what's wrong, in Bahasa Indonesia, "
-          "Javanese or English, and pick a category. This recording runs in demo mode, with labelled stand-in photos.", 8),
-    Scene("progress", "02_progress", "Live stages: Listening → Looking → Finding the parts → Diagnosing.",
-          "Behind the progress bar, Muse Voice Transcribe hears the problem, Muse Spark looks at the photo, "
-          "and SAM 3.1 segments the exact parts.", 7),
+          "Tukang Copilot turns any phone into a mechanic's apprentice. Take a photo and say what's wrong. "
+          "This recording runs in demo mode, with labelled stand-in photos.", 6),
+    Scene("progress", "02_progress", "Listening → Looking → Finding the parts → Diagnosing.",
+          "Muse Voice Transcribe hears the problem, Muse Spark looks at the photo, and SAM 3.1 finds the exact parts.", 5),
     Scene("question", "03_question", "Unsure? It asks ONE question instead of guessing.",
-          "When the evidence is ambiguous, the agent asks one short question instead of guessing. Do you smell fuel? No.", 6),
-    Scene("diagnosis", "04_diagnosis", "Diagnosis: likely causes with confidence, safety level, tools, time, cost estimate.",
-          "Then the diagnosis card: the most likely causes with confidence and evidence, a safety level, "
-          "the tools you need, the time, and an estimated parts cost in rupiah.", 8),
+          "When the evidence is ambiguous, it asks one short question instead of guessing.", 4),
+    Scene("diagnosis", "04_diagnosis", "Likely causes with confidence, safety level, tools, time, cost vs bengkel price.",
+          "Then the diagnosis: likely causes with confidence, a safety level, tools, time, and the parts cost against the repair-shop price.", 6),
     Scene("parts", "05_parts", "SAM 3.1 masks the real parts on YOUR photo, numbered.",
-          "The parts are highlighted and numbered on your own photo, using SAM 3.1 masks, not a generic diagram.", 6),
-    Scene("step", "06_step", "Guided repair: one step per screen, read aloud, with the why and the warnings.",
-          "The repair is guided one step at a time, with the target part marked, a voice readout, the reason why, and warnings.", 7),
-    Scene("check_fail", "07_check_fail", "Check my step: a new photo is verified. ⚠ Correction when it's wrong.",
-          "After each step you tap Check my step and snap a photo. Muse Spark compares it with the expected state. "
-          "Here the photo is too dark, so it asks for the torch instead of guessing.", 8),
+          "The parts are masked and numbered on your own photo by SAM 3.1, not a generic diagram.", 5),
+    Scene("preflight", "15_preflight", "Safety first: the steps stay locked until every check is ticked.",
+          "Before step one, a short safety checklist. The steps stay locked until you tick every item.", 5),
+    Scene("live", "16_live_guide", "Live camera guide: SAM 3.1 highlights the part to touch, on the live camera.",
+          "New: the live camera guide. Point the phone and SAM 3.1 outlines the exact part to touch, about once a second, "
+          "on the live picture. In this demo the camera is Chromium's fake camera playing a stand-in photo.", 9),
+    Scene("check_fail", "07_check_fail", "Check my step: the photo is verified. ⚠ Correction when it's wrong.",
+          "After each step, Check my step. Muse Spark compares the photo with the expected state. "
+          "Too dark here, so it asks for the torch instead of guessing.", 7),
     Scene("check_pass", "08_check_pass", "✓ Verified by the camera, then on to the next step.",
-          "Retake it, and the step is verified. Every step is checked by the camera before you move on.", 6),
+          "Retake it, and the step is verified before you move on.", 4),
+    Scene("handsfree", "17_hands_free", "Hands-free: steps read aloud, voice commands like “lanjut”, “ulang”, “cek”.",
+          "Your hands are dirty, so go hands-free. Each step is read aloud and the phone listens for lanjut, ulang, cek or berhenti. "
+          "Phones without continuous listening get push-to-talk through Voice Transcribe.", 9),
     Scene("replan", "09_replan", "Still broken? The agent re-plans to the next likely cause.",
-          "If it still doesn't work, you say what happened, and the agent re-plans to the next most likely cause. "
-          "Plan, act, verify, re-plan.", 7),
-    Scene("pump", "10_pump", "Water pump runs but no water: loss of prime, step by step.",
-          "Same loop for a water pump that hums but gives no water: unplug first, then re-prime it, step by step.", 7),
+          "Still broken? Say what happened, and the agent re-plans to the next most likely cause. Plan, act, verify, re-plan.", 6),
+    Scene("handoff", "18_handoff", "Hand-off to a bengkel: WhatsApp summary, nearest workshop, PDF with a mechanic brief.",
+          "And when it's a job for a pro, one tap hands it off: a WhatsApp summary of what was found and tried, "
+          "a search for the nearest bengkel, and a PDF with a brief for the mechanic.", 8),
     Scene("rice", "11_rice_stop", "RED STOP: opening 220 V internals → take it to a service centre.",
-          "And it knows when to say no. A rice cooker that won't heat would need opening its 220 volt internals, "
-          "so the safety gate stops the guidance and recommends a service centre.", 8),
-    Scene("report", "12_report", "Repair report as PDF + 'My garage' history on the phone. No account.",
-          "When you finish, you get a repair report as a PDF to share, and the job is saved to My garage on your phone. No account needed.", 7),
-    Scene("lang", "13_english", "English and Basa Jawa too (Javanese UI + Javanese voice input).",
-          "The app also runs in English, and in Javanese, with Javanese voice input.", 5),
+          "It also knows when to say no. A rice cooker that won't heat would mean opening 220 volt internals, "
+          "so the safety gate stops the guidance.", 7),
+    Scene("stop_pdf", "19_stop_pdf", "The stop comes with a report PDF and the same hand-off card.",
+          "The stop still gives you a PDF report and the hand-off card, so you're never left at a dead end.", 5),
+    Scene("lang", "20_javanese_result", "Basa Jawa UI and Javanese voice input, plus English.",
+          "The whole app runs in Bahasa Indonesia, Javanese and English, with Javanese voice input.", 5),
+    Scene("ow", "21_open_weights", "One switch: reasoning on Muse Spark Open (open weights) via Baseten.",
+          "And with one switch, diagnosis and planning run on Muse Spark Open, Meta's open-weights model, on Baseten. "
+          "The app shows a badge when it does.", 6),
     Scene("arch", "arch", "Meta models: Voice Transcribe · Muse Spark · SAM 3.1 · Muse Image · Muse Spark Open (open weights).",
-          "Under the hood: Muse Voice Transcribe, Muse Spark for vision, diagnosis, planning and verification, SAM 3.1 for masks, "
-          "and Muse Image for diagrams when your photo can't show the action. One switch runs the reasoning on Muse Spark Open, "
-          "Meta's open-weights model, on Baseten. The safety gate is enforced in code, in three layers.", 14),
+          "Under the hood: Voice Transcribe, Muse Spark for vision, diagnosis, planning and verification, SAM 3.1 for masks and live tracking, "
+          "and Muse Image for diagrams your photo can't show. The safety gate is enforced in code, in three layers.", 11),
     Scene("close", "title:Tukang Copilot|Every phone becomes a mechanic's apprentice.",
           "Open source, MIT licence, built during the Meta Global AI Developer Hackathon.",
-          "Tukang Copilot. Every phone becomes a mechanic's apprentice.", 6),
+          "Tukang Copilot. Every phone becomes a mechanic's apprentice.", 5),
 ]
 
 
@@ -132,24 +138,53 @@ def _chromium() -> str | None:
     return None
 
 
+SR_STUB = """(() => {  // headless Chromium has no working speech service: a silent stand-in so the hands-free UI can be shown
+  class SR { constructor() { this.lang = ''; this.continuous = true; this.interimResults = false; }
+    start() { setTimeout(() => this.onstart && this.onstart(), 30); } stop() {} abort() {} }
+  window.SpeechRecognition = SR; window.webkitSpeechRecognition = SR; })();"""
+
+
+def _fake_camera_y4m(photo: Path) -> Path:
+    """Chromium's fake camera plays a .y4m file: a few seconds of a labelled stand-in photo with a slow drift."""
+    out = Path(tempfile.mkdtemp()) / "cam.y4m"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-i", str(photo), "-t", "4", "-r", "10",
+                    "-vf", "scale=1024:768,crop=984:738:20+16*sin(t):15+12*cos(t),scale=640:480,format=yuv420p",
+                    "-f", "yuv4mpegpipe", str(out)], check=True)
+    return out
+
+
 def shots() -> None:
     from playwright.sync_api import sync_playwright
+
+    from api.settings import settings
 
     SHOTS.mkdir(parents=True, exist_ok=True)
     base, srv = _server()
     dark = Path(tempfile.mkdtemp()) / "dark.jpg"
     Image.new("RGB", (800, 600), (6, 6, 6)).save(dark)
+    cam = _fake_camera_y4m(FIX / "standin_pump_overview.jpg")
     with sync_playwright() as p:
-        b = p.chromium.launch(executable_path=_chromium(), args=["--no-proxy-server"])
-        pg = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True).new_page()
+        b = p.chromium.launch(executable_path=_chromium(), args=[
+            "--no-proxy-server", "--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream",
+            f"--use-file-for-fake-video-capture={cam}"])
+        ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True)
+        ctx.grant_permissions(["camera", "microphone"], origin=base)
+        ctx.add_init_script(SR_STUB)
+        pg = ctx.new_page()
 
         def snap(name: str, full: bool = False) -> None:
             pg.wait_for_timeout(350)
             pg.screenshot(path=str(SHOTS / f"{name}.png"), full_page=full)
+            print("shot", name, flush=True)
 
         def go_sample(sample: str, lang: str = "id") -> None:
             pg.goto(base + "/"); pg.select_option("#lang", lang); pg.wait_for_timeout(200)
             pg.click(f'button.sample[data-sample="{sample}"]')
+
+        def tick_preflight() -> None:
+            for box in pg.locator("#preList input").all():
+                box.check()
+            pg.wait_for_timeout(200)
 
         pg.goto(base + "/"); pg.wait_for_selector("#modeBadge:not(.hidden)")
         pg.set_input_files("#photo", str(FIX / "standin_motor_plug_area.jpg"))
@@ -162,6 +197,8 @@ def shots() -> None:
         pg.click("#answerBtn"); pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
         pg.evaluate("window.scrollTo(0,0)"); snap("04_diagnosis")
         pg.locator("#partsWrap").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,-120)"); snap("05_parts")
+        pg.locator("#preflight").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,-80)"); snap("15_preflight")
+        tick_preflight()
         pg.locator("#stepCard").scroll_into_view_if_needed(); snap("06_step")
         pg.set_input_files("#stepPhoto", str(dark))
         pg.wait_for_function("!document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
@@ -170,16 +207,43 @@ def shots() -> None:
         pg.wait_for_timeout(600)
         pg.wait_for_function("!document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
         pg.locator("#checkResult").scroll_into_view_if_needed(); snap("08_check_pass")
+        pg.check("#handsFree"); pg.wait_for_selector("#voiceBar:not(.hidden)", timeout=5000); pg.wait_for_timeout(600)
+        pg.locator("#voiceBar").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,180)"); snap("17_hands_free")
+        pg.uncheck("#handsFree")
         pg.fill("#stuckText", "Sudah dicoba, mesin tetap tidak nyala."); pg.click("#stuckBtn"); pg.wait_for_timeout(1500)
         pg.locator("#stepCard").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,-260)"); snap("09_replan")
+        pg.click("#mechBtn"); pg.wait_for_selector("#handoff:not(.hidden)", timeout=10000)
+        pg.evaluate("document.querySelector('#handoff details') && (document.querySelector('#handoff details').open = true)")
+        pg.evaluate("document.querySelector('#mechBtn').scrollIntoView({block: 'start'}); window.scrollBy(0, -90)"); snap("18_handoff")
         pg.locator("#pdfBtn").scroll_into_view_if_needed(); snap("12_report")
+        # live camera guide on the pump repair (Chromium fake camera playing a labelled stand-in photo)
         go_sample("pump"); pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
         pg.evaluate("window.scrollTo(0,0)"); snap("10_pump")
+        tick_preflight()
+        pg.click("#liveBtn"); pg.wait_for_selector("#live:not(.hidden)")
+        pg.wait_for_function("/^🎯/.test(document.querySelector('#liveState').textContent)", timeout=20000)
+        pg.wait_for_timeout(900)
+        pg.evaluate("document.querySelector('#liveBtn').scrollIntoView({block: 'start'}); window.scrollBy(0, -90)"); snap("16_live_guide")
+        pg.click("#liveClose")
+        # safety stop with PDF + hand-off
         go_sample("rice"); pg.wait_for_selector("#stopBox:not(.hidden)", timeout=30000)
-        pg.locator("#stopBox").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,140)"); snap("11_rice_stop")
+        pg.wait_for_selector("#stopHandoff:not(.hidden)", timeout=10000)
+        pg.evaluate("document.querySelector('#stopBox').scrollIntoView({block: 'start'}); window.scrollBy(0, -80)"); snap("11_rice_stop")
+        pg.evaluate("document.querySelector('#stopHandoff').scrollIntoView({block: 'end'}); window.scrollBy(0, 40)"); snap("22_stop_handoff")
+        sid = pg.evaluate("S && S.id")
+        pdf = Path(tempfile.mkdtemp()) / "stop.pdf"
+        pdf.write_bytes(pg.request.get(f"{base}/api/sessions/{sid}/report.pdf").body())
+        subprocess.run(["pdftoppm", "-png", "-r", "110", "-f", "1", "-l", "1", "-singlefile", str(pdf), str(SHOTS / "19_stop_pdf")], check=True)
+        print("shot 19_stop_pdf", flush=True)
         go_sample("faucet", "en"); pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
         pg.evaluate("window.scrollTo(0,0)"); snap("13_english")
+        go_sample("tire", "jv"); pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
+        pg.evaluate("window.scrollTo(0,0)"); snap("20_javanese_result")
         pg.goto(base + "/"); pg.select_option("#lang", "jv"); pg.wait_for_timeout(300); snap("14_garage_jv", full=True)
+        # open-weights badge: what the header shows when USE_OPEN_WEIGHTS=1 + a Baseten key (still demo answers here)
+        settings.use_open_weights, settings.baseten_api_key = True, "stand-in-not-a-key"
+        pg.goto(base + "/"); pg.select_option("#lang", "en"); pg.wait_for_selector("#owBadge:not(.hidden)", timeout=5000); snap("21_open_weights")
+        settings.use_open_weights, settings.baseten_api_key = False, ""
         b.close()
     srv.should_exit = True
     print("screenshots ->", SHOTS, sorted(p.name for p in SHOTS.glob("*.png")))
@@ -194,13 +258,13 @@ def diagram() -> None:
         ("Phone (PWA)", "photo · voice · text\nid / jv / en", (80, 230), (230, 230, 230)),
         ("Listen", "Muse Voice Transcribe\n(Jawa: Spark 1.2 audio)", (420, 230), (255, 228, 204)),
         ("Look", "Muse Spark 1.3 vision\n→ ObjectReport JSON", (760, 230), (255, 228, 204)),
-        ("Find parts", "SAM 3.1 masks\n→ numbered overlay", (1100, 230), (204, 230, 255)),
+        ("Find parts", "SAM 3.1 masks →\nphoto + live camera", (1100, 230), (204, 230, 255)),
         ("Diagnose", "Muse Spark 1.3\nor Muse Spark Open*", (1440, 230), (255, 228, 204)),
         ("Safety gate", "3 layers in code\nred = STOP + pro", (1440, 560), (255, 210, 205)),
         ("Plan", "Muse Spark → steps\nwith expected state", (1100, 560), (255, 228, 204)),
         ("Illustrate", "Muse Image edit\nof YOUR photo", (760, 560), (225, 214, 245)),
         ("Verify step", "new photo → Spark\n✓ pass / ⚠ correction", (420, 560), (210, 240, 220)),
-        ("Report", "PDF + My garage\n(no account)", (80, 560), (230, 230, 230)),
+        ("Report", "PDF · bengkel\nhand-off · garage", (80, 560), (230, 230, 230)),
     ]
     bw, bh = 300, 200
     for title, sub, (x, y), col in boxes:
@@ -236,6 +300,9 @@ def voice() -> None:
 
     VOICE.mkdir(parents=True, exist_ok=True)
     proxy = os.environ.get("EDGE_TTS_PROXY")
+    if not proxy:  # aiohttp chokes on some proxy URLs in the environment; edge-tts goes direct unless EDGE_TTS_PROXY is set
+        for k in ("HTTPS_PROXY", "HTTP_PROXY", "https_proxy", "http_proxy", "ALL_PROXY", "all_proxy"):
+            os.environ.pop(k, None)
 
     async def run() -> None:
         for sc in SCENES:
@@ -294,17 +361,21 @@ def _frame(sc: Scene, vertical: bool = False) -> Image.Image:
         y = 140 if vertical else 60
         d.rounded_rectangle([x - 14, y - 14, x + pw_ + 14, y + ph + 14], radius=36, fill=INK)
         im.paste(shot, (x, y))
+        if vertical:
+            d.text((80, 60), "demo mode · labelled stand-in photos", fill=MUTED, font=font(30, False))
         if not vertical:
             d.text((x + pw_ + 120, 120), "Tukang Copilot", fill=ORANGE, font=font(56))
             d.text((x + pw_ + 120, 195), "demo mode · labelled stand-in photos", fill=MUTED, font=font(28, False))
     if sc.image != "arch" or True:
         f = font(46 if not vertical else 44)
-        cw = (fw - 900) if (not vertical and not sc.image.startswith(("title:", "arch"))) else fw - 160
+        cw = (fw - 980) if (not vertical and not sc.image.startswith(("title:", "arch"))) else fw - 160
         cx = 900 if (not vertical and not sc.image.startswith(("title:", "arch"))) else 80
         lines = _wrap(d, sc.caption, f, cw)
         lh = 60
         if vertical:
             cy = fh - 380 if not sc.image.startswith("title:") else fh - 520
+            if sc.image == "arch":
+                d.rectangle([0, cy - 30, fw, cy + lh * len(lines) + 30], fill=INK)
         elif sc.image == "arch":
             cy = fh - 30 - lh * len(lines)
             d.rectangle([0, cy - 20, fw, fh], fill=INK)
@@ -356,19 +427,21 @@ def video() -> None:
 
 
 def vertical(work: Path, has_voice: bool) -> None:
-    """30-45 s 9:16 clip for X: hook, parts, check, rice stop, models, close."""
-    keys = ["hook", "parts", "check_pass", "rice", "arch", "close"]
+    """~45 s 9:16 clip for X: hook, parts, live camera, check, hands-free, hand-off, rice stop, models, close."""
+    keys = ["hook", "parts", "live", "check_pass", "handsfree", "handoff", "rice", "arch", "close"]
     short = {"hook": "Motor mogok, bengkel tutup? Foto + ngomong.", "parts": "SAM 3.1 menandai part di foto KAMU.",
-             "check_pass": "Tiap langkah dicek kamera ✓", "rice": "Bahaya? Dia bilang STOP.",
-             "arch": "Built with Meta Muse Spark + SAM 3.1 + Muse Image", "close": "Tukang Copilot · open source"}
+             "live": "Kamera langsung: part yang harus dipegang ditandai (demo).", "check_pass": "Tiap langkah dicek kamera ✓",
+             "handsfree": "Tangan kotor? Bilang “lanjut”.", "handoff": "Kerjaan ahli? Kirim ringkasan ke bengkel via WhatsApp.",
+             "rice": "Bahaya? Dia bilang STOP.",
+             "arch": "Built with Meta Muse Spark + SAM 3.1 + Muse Image", "close": "Tukang Copilot · open source · mode demo"}
     parts: list[Path] = []
     for k in keys:
         sc = next(s for s in SCENES if s.key == k)
         v = Scene(sc.key, sc.image, short[k], sc.say, 5.5)
         png = work / f"v_{k}.png"; _frame(v, vertical=True).save(png)
         seg = work / f"v_{k}.mp4"
-        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", "30", "-t", "6", "-i", str(png),
-                        "-f", "lavfi", "-t", "6", "-i", "anullsrc=r=44100:cl=stereo", "-t", "6",
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", "30", "-t", "5", "-i", str(png),
+                        "-f", "lavfi", "-t", "5", "-i", "anullsrc=r=44100:cl=stereo", "-t", "5",
                         "-c:v", "libx264", "-pix_fmt", "yuv420p", "-preset", "veryfast", "-crf", "23", "-c:a", "aac", "-ar", "44100", "-ac", "2", str(seg)], check=True)
         parts.append(seg)
     lst = work / "vlist.txt"; lst.write_text("".join(f"file '{p}'\n" for p in parts))
