@@ -16,6 +16,7 @@ from typing import Any
 
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -75,6 +76,7 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Tukang Copilot", version=__version__, lifespan=lifespan)
+app.add_middleware(GZipMiddleware, minimum_size=1024)  # app.js 90 KB → ~29 KB on 4G; SSE (text/event-stream) is never gzipped
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in settings.cors_origins.split(",")], allow_methods=["*"], allow_headers=["*"])
 @app.middleware("http")
 async def security_headers(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
@@ -181,8 +183,12 @@ def progress_view(s: dict[str, Any]) -> dict[str, Any]:
 
 
 @app.get("/", response_class=HTMLResponse)
-def index() -> str:
-    return (WEB / "index.html").read_text(encoding="utf-8")
+def index(request: Request) -> str:
+    base = _base(request)
+    og = _og("Tukang Copilot: foto barang rusak, dapat panduan perbaikan",
+             "Foto + cerita → AI menandai bagiannya dan memandu tiap langkah, dicek kamera. Bahasa Indonesia, Basa Jawa, English.",
+             f"{base}/og.png", base + "/")
+    return (WEB / "index.html").read_text(encoding="utf-8").replace("</head>", og + "\n</head>", 1)
 
 
 @app.get("/manifest.webmanifest")
@@ -202,11 +208,56 @@ def service_worker() -> FileResponse:
     return FileResponse(p, media_type="text/javascript", headers={"Service-Worker-Allowed": "/", "Cache-Control": "no-cache"})
 
 
+def _base(request: Request) -> str:
+    """Absolute site address for link previews (crawlers need absolute og:image URLs)."""
+    return settings.public_base_url or str(request.base_url).rstrip("/")
+
+
+def _og(title: str, desc: str, image: str, url: str) -> str:
+    e = html.escape
+    return (f'<meta property="og:type" content="website"><meta property="og:site_name" content="Tukang Copilot">'
+            f'<meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}">'
+            f'<meta property="og:image" content="{e(image)}"><meta property="og:image:width" content="1200">'
+            f'<meta property="og:image:height" content="630"><meta property="og:url" content="{e(url)}">'
+            f'<meta name="twitter:card" content="summary_large_image">')
+
+
 @app.get("/guide/{sid}", response_class=HTMLResponse)
-def guide_page(sid: str) -> str:
+def guide_page(sid: str, request: Request) -> str:
     s = _load(sid)
-    title = html.escape((s.get("object_report") or {}).get("object") or "Tukang Copilot")
-    return (WEB / "guide.html").read_text(encoding="utf-8").replace("{{TITLE}}", title).replace("{{SID}}", sid)
+    obj = (s.get("object_report") or {}).get("object") or "Tukang Copilot"
+    causes = (s.get("diagnosis") or {}).get("causes") or []
+    desc = (causes[0].get("title", "") + " · " if causes and isinstance(causes[0], dict) else "") + \
+        "Panduan perbaikan langkah demi langkah, tiap langkah dicek kamera."
+    base = _base(request)
+    og = _og(f"{obj} · Tukang Copilot", desc, f"{base}/api/sessions/{sid}/card.png", f"{base}/guide/{sid}")
+    page = (WEB / "guide.html").read_text(encoding="utf-8").replace("{{TITLE}}", html.escape(obj)).replace("{{SID}}", sid)
+    return page.replace("</head>", og + "\n</head>", 1)
+
+
+@app.get("/api/sessions/{sid}/card.png")
+def get_share_card(sid: str) -> FileResponse:
+    """Link-preview card (1200x630) for a shared guide: marked photo, object, top cause, safety level, plan line."""
+    s = _load(sid)
+    if not s.get("object_report"):
+        raise HTTPException(409, "Nothing to show yet")
+    from .render import share_card
+
+    out = share_card.build(s, engine.session_dir(sid), engine.session_dir(sid) / "card.png")
+    return FileResponse(out, media_type="image/png", headers={"Cache-Control": "public, max-age=300"})
+
+
+@app.get("/og.png")
+def home_card() -> FileResponse:
+    """Link preview for the front page (built once per process from the labelled stand-in motorbike photo)."""
+    from .render import share_card
+
+    if (WEB / "og.png").exists():
+        return FileResponse(WEB / "og.png", media_type="image/png", headers={"Cache-Control": "public, max-age=86400"})
+    out = settings.data_dir / "og-home.png"
+    if not out.exists():
+        share_card.build_home(ROOT / "samples" / "motor.jpg", out)
+    return FileResponse(out, media_type="image/png", headers={"Cache-Control": "public, max-age=86400"})
 
 
 @app.get("/health")

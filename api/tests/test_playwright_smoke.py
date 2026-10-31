@@ -269,3 +269,15 @@ def test_agent_log_lines_jump_to_what_they_describe(page):
     assert page.inner_text("#stepNo").strip() == "1" and _in_view(page, "#stepCard")
     assert page.get_attribute("#agent .agGo", "title") == "Show it on screen"
     assert page.evaluate("document.activeElement.id") == "stepCard"                    # focus follows for keyboards
+
+
+def test_follow_up_question_is_brought_on_screen(page, monkeypatch):
+    """v1.23 audit fix: the stage list plus streamed results push the question below the fold on a 390x844 phone,
+    so the page scrolls it into view when it appears (the owner must not have to hunt for it)."""
+    from api.settings import settings
+    monkeypatch.setattr(settings, "mock_pace_s", 0.3)
+    page.goto(page.base + "/")
+    page.select_option("#lang", "en")
+    page.click('button.sample[data-sample="motor"]')
+    page.wait_for_selector("#question:not(.hidden)", timeout=20000)
+    assert _in_view(page, "#quickAns")

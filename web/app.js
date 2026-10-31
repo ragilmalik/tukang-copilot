@@ -351,8 +351,13 @@ function renderProgress(s) {
     const nDone = Object.values(s.stages).filter((v) => v.status === "done").length;
     $("progressStatus").textContent = run ? `${nDone}/${Object.keys(s.stages).length}: ${t("stages")[run[0]] || run[0]}` : "";
   }
-  $("question").classList.toggle("hidden", s.status !== "needs_answer");
-  if (s.status === "needs_answer") $("questionText").textContent = s.question;
+  const asking = s.status === "needs_answer", wasAsking = !$("question").classList.contains("hidden");
+  $("question").classList.toggle("hidden", !asking);
+  if (asking) $("questionText").textContent = s.question;
+  if (asking && !wasAsking) {  // the question is the one thing to act on: bring it on screen (stage list + results push it down)
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setTimeout(() => $("question").scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }), 50);
+  }
   const stopped = ["stopped", "exhausted"].includes(s.status);
   $("stopBox").classList.toggle("hidden", !stopped);
   if (stopped) { renderStop(s); saveGarage(s); }
@@ -734,7 +739,9 @@ function setupResult() {
   });
   on("shareBtn", "click", async () => {
     const url = location.origin + "/guide/" + S.id;
-    if (navigator.share) { try { await navigator.share({ title: "Tukang Copilot", url }); return; } catch (_) {} }
+    const dx = (S && S.diagnosis) || {}, c = (dx.causes || [])[S.cause_index || 0] || (dx.causes || [])[0];
+    const text = [S.object_report && S.object_report.object, c && c.title].filter(Boolean).join(": ");  // the link preview card shows the rest
+    if (navigator.share) { try { await navigator.share({ title: "Tukang Copilot", text, url }); return; } catch (_) {} }
     try { await navigator.clipboard.writeText(url); alert(t("copied")); } catch (_) { prompt("Link", url); }
   });
   on("eraseBtn", "click", () => {

@@ -1,5 +1,6 @@
 """v1.23: partial results stream on the progress screen (SSE `progress_view`), with demo-mode pacing."""
 import json
+from typing import Any
 import time
 
 from fastapi.testclient import TestClient
@@ -57,7 +58,7 @@ def test_pacing_is_demo_only_and_not_counted_in_stage_time(monkeypatch):
     saved = []
     monkeypatch.setattr(engine, "save", lambda s: saved.append(1))
     monkeypatch.setattr(settings, "mock_pace_s", 0.4)
-    s = {"stages": {"look": {"status": "waiting", "note": ""}}}
+    s: dict[str, Any] = {"stages": {"look": {"status": "waiting", "note": ""}}}
     t0 = time.time(); engine._stage(s, "look", "done", "x", 5)
     assert time.time() - t0 >= 0.35 and s["stages"]["look"]["ms"] == 5        # demo: held on screen, real ms kept
     monkeypatch.setattr(settings, "mock", False)
