@@ -4,6 +4,8 @@
 
 ## English
 
+**Just looking?** Tap **▶ Try the 1-tap demo** on the home screen. No photo or account needed: it runs a whole bike repair with small tips in the corner (tap 💡 to open one again, × to close). Open **🤖 What the AI did** on the result to see every decision the AI made. The same list is in the PDF report.
+
 1. **Open the app** on your phone (the link from your friend, or the Render link). Pick your language at the top right: Bahasa Indonesia, Basa Jawa or English.
 2. **Take a photo** of the broken thing. Tap the big dashed box. You can pick up to 3 photos: one wide, one close-up of the problem area works best. Good light, hold still.
 3. **Tap a category** if you like (Motor, Water pump, Home appliance, Pipes/taps, Other). It helps a little.
@@ -24,6 +26,8 @@
 **Tips:** photograph the part, not the whole room. Use your phone torch in dark engine bays. If voice fails, type. Photos are deleted after 24 hours, and there's no account.
 
 ## Bahasa Indonesia
+
+**Cuma mau lihat?** Ketuk **▶ Coba demo 1 ketuk** di layar awal. Tanpa foto dan tanpa akun: aplikasi menjalankan satu perbaikan motor lengkap dengan tip kecil di pojok (ketuk 💡 untuk membuka lagi, × untuk menutup). Buka **🤖 Yang dilakukan AI** di hasil untuk melihat setiap keputusan AI. Daftar yang sama ada di laporan PDF.
 
 1. **Buka aplikasinya** di HP. Pilih bahasa di kanan atas.
 2. **Foto barang yang rusak.** Ketuk kotak putus-putus. Boleh sampai 3 foto: satu jauh, satu dekat ke bagian yang bermasalah. Cahaya terang, HP diam.
