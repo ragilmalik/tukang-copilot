@@ -58,7 +58,7 @@ def test_pacing_is_demo_only_and_not_counted_in_stage_time(monkeypatch):
     saved = []
     monkeypatch.setattr(engine, "save", lambda s: saved.append(1))
     monkeypatch.setattr(settings, "mock_pace_s", 0.4)
-    s: dict[str, Any] = {"stages": {"look": {"status": "waiting", "note": ""}}}
+    s: dict[str, Any] = {"status": "running", "stages": {"look": {"status": "waiting", "note": ""}}}
     t0 = time.time(); engine._stage(s, "look", "done", "x", 5)
     assert time.time() - t0 >= 0.35 and s["stages"]["look"]["ms"] == 5        # demo: held on screen, real ms kept
     monkeypatch.setattr(settings, "mock", False)
@@ -67,3 +67,6 @@ def test_pacing_is_demo_only_and_not_counted_in_stage_time(monkeypatch):
     assert time.time() - t0 < 0.1                                             # live: never slowed down
     t0 = time.time(); monkeypatch.setattr(settings, "mock", True); engine._stage(s, "look", "running")
     assert time.time() - t0 < 0.1                                             # only finished stages are held
+    s["status"] = "ready"
+    t0 = time.time(); engine._stage(s, "look", "done", "x", 5)
+    assert time.time() - t0 < 0.1                                             # a re-plan on the result page is not slowed

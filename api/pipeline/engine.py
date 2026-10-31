@@ -74,8 +74,8 @@ def save(s: dict[str, Any]) -> None:
 def _stage(s: dict[str, Any], name: str, status: str, note: str = "", ms: int | None = None) -> None:
     s["stages"][name] = {"status": status, "note": short(note), **({"ms": ms} if ms is not None else {})}
     save(s)
-    if status == "done" and settings.offline and settings.mock_pace_s > 0:
-        time.sleep(min(settings.mock_pace_s, 3.0))  # demo pacing (see settings.mock_pace_s); ms above is the real time
+    if status == "done" and s.get("status") == "running" and settings.offline and settings.mock_pace_s > 0:
+        time.sleep(min(settings.mock_pace_s, 3.0))  # demo pacing, first analysis only (not re-plans); ms above is the real time
 
 
 def short(text: str, n: int = 90) -> str:
@@ -634,7 +634,8 @@ def check_step(sid: str, n: int, photo: Path) -> dict[str, Any]:
         if not res.passed:
             rec["fails"] += 1
     escalate = rec["fails"] >= settings.max_check_fails
-    _event(s, "check", model=s["models"]["verify"], step=n, passed=res.passed, fallback=check_fallback, escalate=escalate)
+    _event(s, "check", model=s["models"]["verify"], step=n, passed=res.passed, fallback=check_fallback, escalate=escalate,
+           cause=int(s.get("cause_index") or 0))  # which plan the step belonged to (the UI links only current-plan checks)
     out = res.model_dump() | {"fails": rec["fails"], "escalate": escalate, "fallback": check_fallback}
     if escalate:
         out["escalate_hint"] = {"id": "Sudah dicoba beberapa kali. Ketuk 'Masih rusak' untuk rencana lain, atau panggil teknisi.",

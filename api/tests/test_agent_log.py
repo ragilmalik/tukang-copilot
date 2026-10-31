@@ -119,3 +119,26 @@ def test_agent_log_is_capped():
     for _ in range(engine.AGENT_LOG_MAX + 20):
         engine._event(s, "check", step=1, passed=False)
     assert len(s["agent_log"]) == engine.AGENT_LOG_MAX
+
+
+def test_check_event_records_which_plan_it_belonged_to():
+    """v1.23: the UI links a step-check log line to the step card only while that plan is current."""
+    from fastapi.testclient import TestClient
+
+    from api.main import app
+    import io
+    import time
+    from PIL import Image
+
+    c = TestClient(app)
+    sid = c.post("/api/sessions", data={"sample": "faucet"}).json()["id"]
+    for _ in range(100):
+        if c.get(f"/api/sessions/{sid}").json()["status"] == "ready":
+            break
+        time.sleep(0.05)
+    b = io.BytesIO(); Image.new("RGB", (400, 300), (5, 5, 5)).save(b, "JPEG"); b.seek(0)
+    c.post(f"/api/sessions/{sid}/steps/1/check", files={"photo": ("c.jpg", b, "image/jpeg")})
+    c.post(f"/api/sessions/{sid}/replan", data={"report": "still dripping"})
+    log = c.get(f"/api/sessions/{sid}").json()["agent_log"]
+    checks = [e for e in log if e["kind"] == "check"]
+    assert checks and checks[0]["cause"] == 0

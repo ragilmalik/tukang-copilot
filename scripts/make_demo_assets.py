@@ -62,13 +62,13 @@ class Scene:
 SCENES: list[Scene] = [
     Scene("hook", "title:Motor mogok. Bengkelnya tutup.|Bike won't start. The repair shop is closed.",
           "Indonesia runs on ~130 million motorbikes, water pumps and rice cookers.",
-          "In Indonesia, a small fault on a motorbike or a water pump can cost a day's wage, or days without water. "
-          "Repair videos online are not for your model, not in your language, and they can't see your problem.", 8),
+          "In Indonesia, a small fault on a motorbike or a water pump can cost a day's wage. "
+          "Repair videos can't see your problem, and they're not in your language.", 7),
     Scene("intro", "01_home", "Photo + voice in Bahasa, Javanese or English. No photo? ▶ 1-tap demo.",
-          "Tukang Copilot turns any phone into a mechanic's apprentice. Take a photo and say what's wrong. "
-          "This recording runs in demo mode, with labelled stand-in photos.", 6),
-    Scene("progress", "02_progress", "Each stage shows the Meta model doing it: Muse Spark, SAM 3.1, Muse Image.",
-          "Muse Voice Transcribe hears the problem, Muse Spark looks at the photo, and SAM 3.1 finds the exact parts.", 5),
+          "Take a photo and say what's wrong. This recording runs in demo mode, with labelled stand-in photos.", 5),
+    Scene("progress", "02_progress", "Results stream in as each Meta model finishes: what it saw, SAM 3.1's outlines, the likely cause.",
+          "You watch the agent work: as each stage finishes, its result appears. What Muse Spark saw, "
+          "the parts SAM 3.1 outlined, then the likely cause.", 6),
     Scene("question", "03_question", "Unsure? It asks ONE question instead of guessing.",
           "When the evidence is ambiguous, it asks one short question instead of guessing.", 4),
     Scene("diagnosis", "04_diagnosis", "Likely causes with confidence, safety level, tools, time, cost vs bengkel price.",
@@ -86,15 +86,20 @@ SCENES: list[Scene] = [
     Scene("check_pass", "08_check_pass", "✓ Verified by the camera, then on to the next step.",
           "Retake it, and the step is verified before you move on.", 4),
     Scene("handsfree", "17_hands_free", "Hands-free: steps read aloud, voice commands like “lanjut”, “ulang”, “cek”.",
-          "Your hands are dirty, so go hands-free. Each step is read aloud and the phone listens for lanjut, ulang, cek or berhenti. "
-          "Phones without continuous listening get push-to-talk through Voice Transcribe.", 9),
+          "Hands dirty? Go hands-free: each step is read aloud, and the phone listens for lanjut, ulang or cek.", 6),
     Scene("replan", "09_replan", "Still broken? The agent re-plans to the next likely cause.",
           "Still broken? Say what happened, and the agent re-plans to the next most likely cause. Plan, act, verify, re-plan.", 6),
     Scene("agent", "23_agent_log", "“What the AI did”: every decision, the model that made it, and why it asked.",
           "Every decision is on screen: what it saw, why it asked, each photo check, each re-plan, and which Meta model did it.", 6),
+    Scene("jump", "24_agent_jump", "Tap any log line: it jumps to the step it checked, highlighted.",
+          "Tap a line, and it jumps to the exact step that was checked.", 4),
     Scene("handoff", "18_handoff", "Hand-off to a bengkel: WhatsApp summary, nearest workshop, PDF with a mechanic brief.",
           "And when it's a job for a pro, one tap hands it off: a WhatsApp summary of what was found and tried, "
           "a search for the nearest bengkel, and a PDF with a brief for the mechanic.", 8),
+    Scene("pdf", "25_pdf_agent", "The PDF report carries the same agent log, for the mechanic or the judges.",
+          "The PDF report carries the same log, so a mechanic can see what was already tried.", 5),
+    Scene("share", "26_share_card", "Share a guide link: WhatsApp and X show this card (marked photo, cause, safety level).",
+          "Share the guide, and WhatsApp or X shows a card with your marked photo, the likely cause and the safety level.", 6),
     Scene("rice", "11_rice_stop", "RED STOP: opening 220 V internals → take it to a service centre.",
           "It also knows when to say no. A rice cooker that won't heat would mean opening 220 volt internals, "
           "so the safety gate stops the guidance.", 7),
@@ -105,8 +110,8 @@ SCENES: list[Scene] = [
           "And with one switch, diagnosis and planning run on Muse Spark Open, Meta's open-weights model, on Baseten. "
           "The app shows a badge when it does.", 6),
     Scene("arch", "arch", "Meta models: Voice Transcribe · Muse Spark · SAM 3.1 · Muse Image · Muse Spark Open (open weights).",
-          "Under the hood: Voice Transcribe, Muse Spark for vision, diagnosis, planning and verification, SAM 3.1 for masks and live tracking, "
-          "and Muse Image for diagrams your photo can't show. The safety gate is enforced in code, in three layers.", 11),
+          "Under the hood: Voice Transcribe, Muse Spark to see, reason and check, SAM 3.1 for masks and live tracking, "
+          "and Muse Image for diagrams. Safety is enforced in code.", 9),
     Scene("close", "title:Tukang Copilot|Every phone becomes a mechanic's apprentice.",
           "Open source, MIT licence, built during the Meta Global AI Developer Hackathon.",
           "Tukang Copilot. Every phone becomes a mechanic's apprentice.", 5),
@@ -192,7 +197,11 @@ def shots() -> None:
         pg.fill("#text", "Motor saya Honda Beat susah hidup, distarter cuma bunyi tapi mesin nggak nyala.")
         pg.evaluate("document.activeElement && document.activeElement.blur(); window.scrollTo(0, 0)")
         snap("01_home")
-        pg.click("#goBtn"); pg.wait_for_selector("#progress:not(.hidden)"); pg.wait_for_timeout(250)
+        pg.click("#goBtn"); pg.wait_for_selector("#progress:not(.hidden)")
+        # v1.23: partial results stream in (demo pacing MOCK_PACE holds each finished stage on screen)
+        pg.wait_for_selector("#lf-segment img", timeout=30000)
+        pg.wait_for_function("document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
+        pg.evaluate("document.querySelector('#stageList').scrollIntoView({block: 'start'}); window.scrollBy(0, -110)")
         snap("02_progress")
         pg.wait_for_selector("#question:not(.hidden)", timeout=30000); pg.fill("#answerText", "Tidak bau bensin")
         snap("03_question")
@@ -209,12 +218,29 @@ def shots() -> None:
         pg.wait_for_timeout(600)
         pg.wait_for_function("!document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
         pg.locator("#checkResult").scroll_into_view_if_needed(); snap("08_check_pass")
+        pg.wait_for_function("document.querySelector('#stepNo').textContent.trim() === '2'", timeout=10000)  # auto-advanced
+        pg.locator("#agent .agGo", has_text="Langkah 1 dicek").first.click()          # v1.23: tap a log line → back to that step
+        pg.wait_for_selector("#stepCard.flash"); pg.wait_for_timeout(900)
+        pg.evaluate("window.scrollBy(0, -40)"); snap("24_agent_jump")
         pg.check("#handsFree"); pg.wait_for_selector("#voiceBar:not(.hidden)", timeout=5000); pg.wait_for_timeout(600)
         pg.locator("#voiceBar").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,180)"); snap("17_hands_free")
         pg.uncheck("#handsFree")
-        pg.fill("#stuckText", "Sudah dicoba, mesin tetap tidak nyala."); pg.click("#stuckBtn"); pg.wait_for_timeout(1500)
+        pg.fill("#stuckText", "Sudah dicoba, mesin tetap tidak nyala."); pg.click("#stuckBtn")
+        pg.wait_for_function("document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled",
+                             timeout=20000); pg.wait_for_timeout(600)
         pg.locator("#stepCard").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,-260)"); snap("09_replan")
         pg.evaluate("document.querySelector('#agent').scrollIntoView({block: 'start'}); window.scrollBy(0, -70)"); snap("23_agent_log")
+        msid = pg.evaluate("S && S.id")
+        mpdf = Path(tempfile.mkdtemp()) / "motor.pdf"
+        mpdf.write_bytes(pg.request.get(f"{base}/api/sessions/{msid}/report.pdf").body())
+        # the PDF pages are drawn as images (no text layer); in this motorbike report the agent log is on page 2
+        info = subprocess.run(["pdfinfo", str(mpdf)], capture_output=True, text=True).stdout
+        page_no = 2 if any(ln.startswith("Pages:") and int(ln.split()[1]) >= 2 for ln in info.splitlines()) else 1
+        subprocess.run(["pdftoppm", "-png", "-r", "110", "-f", str(page_no), "-l", str(page_no), "-singlefile", str(mpdf),
+                        str(SHOTS / "25_pdf_agent")], check=True)
+        print("shot 25_pdf_agent (page", page_no, ")", flush=True)
+        (SHOTS / "26_share_card.png").write_bytes(pg.request.get(f"{base}/api/sessions/{msid}/card.png").body())
+        print("shot 26_share_card", flush=True)
         pg.click("#mechBtn"); pg.wait_for_selector("#handoff:not(.hidden)", timeout=10000)
         pg.evaluate("document.querySelector('#handoff details') && (document.querySelector('#handoff details').open = true)")
         pg.evaluate("document.querySelector('#mechBtn').scrollIntoView({block: 'start'}); window.scrollBy(0, -90)"); snap("18_handoff")
@@ -341,6 +367,7 @@ def _wrap(d: ImageDraw.ImageDraw, text: str, f: Any, width: int) -> list[str]:
 def _frame(sc: Scene, vertical: bool = False) -> Image.Image:
     fw, fh = (1080, 1920) if vertical else (W, H)
     im = Image.new("RGB", (fw, fh), BG); d = ImageDraw.Draw(im)
+    cap_x = 900  # caption column for screenshot scenes; moved right for the wide share card
     if sc.image.startswith("title:"):
         big, small = sc.image[6:].split("|")
         im.paste(ORANGE, [0, 0, fw, fh]); d = ImageDraw.Draw(im)
@@ -359,20 +386,26 @@ def _frame(sc: Scene, vertical: bool = False) -> Image.Image:
         shot = Image.open(SHOTS / f"{sc.image}.png").convert("RGB")
         ph = fh - (560 if vertical else 120)
         pw_ = int(shot.width * ph / shot.height)
+        wide = shot.width > shot.height
+        if wide:  # landscape picture (the share card): fit it to the left 1/2 (or full width in the vertical clip)
+            pw_ = fw - 160 if vertical else 780
+            ph = int(shot.height * pw_ / shot.width)
         shot = shot.resize((pw_, ph), Image.Resampling.LANCZOS)
         x = (fw - pw_) // 2 if vertical else 140
-        y = 140 if vertical else 60
+        y = (fh - ph) // 2 - 200 if (vertical and wide) else (140 if vertical else ((fh - ph) // 2 if wide else 60))
         d.rounded_rectangle([x - 14, y - 14, x + pw_ + 14, y + ph + 14], radius=36, fill=INK)
         im.paste(shot, (x, y))
+        cap_x = max(900, x + pw_ + 100)
         if vertical:
             d.text((80, 60), "demo mode · labelled stand-in photos", fill=MUTED, font=font(30, False))
         if not vertical:
-            d.text((x + pw_ + 120, 120), "Tukang Copilot", fill=ORANGE, font=font(56))
-            d.text((x + pw_ + 120, 195), "demo mode · labelled stand-in photos", fill=MUTED, font=font(28, False))
+            hx = cap_x if wide else x + pw_ + 120
+            d.text((hx, 120), "Tukang Copilot", fill=ORANGE, font=font(56))
+            d.text((hx, 195), "demo mode · labelled stand-in photos", fill=MUTED, font=font(28, False))
     if sc.image != "arch" or True:
         f = font(46 if not vertical else 44)
-        cw = (fw - 980) if (not vertical and not sc.image.startswith(("title:", "arch"))) else fw - 160
-        cx = 900 if (not vertical and not sc.image.startswith(("title:", "arch"))) else 80
+        cw = (fw - cap_x - 80) if (not vertical and not sc.image.startswith(("title:", "arch"))) else fw - 160
+        cx = cap_x if (not vertical and not sc.image.startswith(("title:", "arch"))) else 80
         lines = _wrap(d, sc.caption, f, cw)
         lh = 60
         if vertical:
@@ -430,12 +463,13 @@ def video() -> None:
 
 
 def vertical(work: Path, has_voice: bool) -> None:
-    """~45 s 9:16 clip for X: hook, parts, live camera, check, hands-free, hand-off, rice stop, models, close."""
-    keys = ["hook", "parts", "live", "check_pass", "handsfree", "handoff", "rice", "arch", "close"]
+    """~45 s 9:16 clip for X: hook, streaming progress, parts, live camera, check, share card, rice stop, models, close."""
+    keys = ["hook", "progress", "parts", "live", "check_pass", "share", "rice", "arch", "close"]
     short = {"hook": "Motor mogok, bengkel tutup? Foto + ngomong.", "parts": "SAM 3.1 menandai part di foto KAMU.",
              "live": "Kamera langsung: part yang harus dipegang ditandai (demo).", "check_pass": "Tiap langkah dicek kamera ✓",
              "handsfree": "Tangan kotor? Bilang “lanjut”.", "handoff": "Kerjaan ahli? Kirim ringkasan ke bengkel via WhatsApp.",
-             "rice": "Bahaya? Dia bilang STOP.",
+             "rice": "Bahaya? Dia bilang STOP.", "progress": "Lihat AI bekerja: hasil muncul tiap tahap.",
+             "share": "Bagikan: WhatsApp & X tampilkan kartu ini (demo).",
              "arch": "Built with Meta Muse Spark + SAM 3.1 + Muse Image", "close": "Tukang Copilot · open source · mode demo"}
     parts: list[Path] = []
     for k in keys:
@@ -453,7 +487,7 @@ def vertical(work: Path, has_voice: bool) -> None:
     print("vertical ->", out)
 
 
-GIF_SHOTS = ["01_home", "02_progress", "03_question", "05_parts", "23_agent_log", "15_preflight", "07_check_fail", "08_check_pass",
+GIF_SHOTS = ["01_home", "02_progress", "03_question", "05_parts", "23_agent_log", "24_agent_jump", "15_preflight", "07_check_fail", "08_check_pass",
              "16_live_guide", "09_replan", "11_rice_stop", "20_javanese_result"]
 
 

@@ -94,7 +94,7 @@ const T_EXTRA = {
         tourCheck: "Coba 'Cek langkah ini' dengan foto contoh: foto gelap ditolak, foto benar lolos.",
         tourStuck: "Lalu ketuk 'Masih rusak' di bawah untuk melihat AI menyusun ulang rencananya.", tourClose: "Tutup", tourTip: "Tampilkan tip", tourHide: "Kecilkan tip",
         sampleTry: "Belum punya foto? Coba foto contoh:", sampleBad: "📷 Foto gelap ✗", sampleGood: "📷 Foto benar ✓",
-        pv_title: "Temuan sejauh ini", pv_seen: "👁️ Terlihat: {object}", pv_parts: "🎯 SAM 3.1 menandai {found} dari {of} bagian", pv_cause: "🧠 Paling mungkin: {cause} ({conf}%)", pv_steps: "📋 {n} langkah siap", pv_img: "Foto dengan bagian yang ditandai SAM 3.1", ag_go: "Tunjukkan di layar" },
+        pv_title: "Temuan sejauh ini", pv_seen: "👁️ Terlihat: {object}", pv_parts: "🎯 SAM 3.1 menandai {found} dari {of} bagian", pv_cause: "🧠 Paling mungkin: {cause} ({conf}%)", pv_steps: "📋 {n} langkah siap", pv_img: "Foto dengan bagian yang ditandai SAM 3.1", agJump: "Tunjukkan di layar" },
   jv: { demoBtn: "▶ Jajal demo sak tutulan", demoSub: "Tanpa foto, tanpa akun: delengen AI ndandani motor mogok saka wiwitan nganti dicek kamera.",
         how1: "📷 Foto + crita", how2: "🎯 AI nandhani perangane", how3: "✅ Saben langkah dicek kamera",
         agentTitle: "🤖 Sing ditindakake AI", agentSub: "Saben keputusan agen, piranti sing dienggo, lan kapan mandheg.", agentLive: "Log agen",
@@ -119,7 +119,7 @@ const T_EXTRA = {
         tourCheck: "Jajal 'Priksa langkah iki' nganggo foto conto: foto peteng ditolak, foto bener lolos.",
         tourStuck: "Banjur tutul 'Isih rusak' ing ngisor kanggo ndeleng AI nyusun rencana anyar.", tourClose: "Tutup", tourTip: "Tampilake pitutur", tourHide: "Cilikna pitutur",
         sampleTry: "Durung duwe foto? Jajal foto conto:", sampleBad: "📷 Foto peteng ✗", sampleGood: "📷 Foto bener ✓",
-        pv_title: "Temuan nganti saiki", pv_seen: "👁️ Katon: {object}", pv_parts: "🎯 SAM 3.1 nandhani {found} saka {of} perangan", pv_cause: "🧠 Sing paling mungkin: {cause} ({conf}%)", pv_steps: "📋 {n} langkah wis siyap", pv_img: "Foto karo perangan sing ditandhani SAM 3.1", ag_go: "Tuduhna ing layar" },
+        pv_title: "Temuan nganti saiki", pv_seen: "👁️ Katon: {object}", pv_parts: "🎯 SAM 3.1 nandhani {found} saka {of} perangan", pv_cause: "🧠 Sing paling mungkin: {cause} ({conf}%)", pv_steps: "📋 {n} langkah wis siyap", pv_img: "Foto karo perangan sing ditandhani SAM 3.1", agJump: "Tuduhna ing layar" },
   en: { demoBtn: "▶ Try the 1-tap demo", demoSub: "No photo, no account: watch the AI fix a bike that won't start, right up to the camera check.",
         how1: "📷 Snap + say it", how2: "🎯 AI marks the part", how3: "✅ Every step camera-checked",
         agentTitle: "🤖 What the AI did", agentSub: "Every decision the agent made, the tool it used, and when it stopped.", agentLive: "Agent log",
@@ -144,7 +144,7 @@ const T_EXTRA = {
         tourCheck: "Try 'Check this step' with a sample photo: the dark one is rejected, the right one passes.",
         tourStuck: "Then tap 'Still broken' below to watch the AI re-plan.", tourClose: "Close", tourTip: "Show tip", tourHide: "Minimise tip",
         sampleTry: "No photo yet? Try a sample photo:", sampleBad: "📷 Dark photo ✗", sampleGood: "📷 Right photo ✓",
-        pv_title: "Found so far", pv_seen: "👁️ Seen: {object}", pv_parts: "🎯 SAM 3.1 outlined {found} of {of} parts", pv_cause: "🧠 Most likely: {cause} ({conf}%)", pv_steps: "📋 {n} steps ready", pv_img: "Your photo with the parts SAM 3.1 outlined", ag_go: "Show it on screen" },
+        pv_title: "Found so far", pv_seen: "👁️ Seen: {object}", pv_parts: "🎯 SAM 3.1 outlined {found} of {of} parts", pv_cause: "🧠 Most likely: {cause} ({conf}%)", pv_steps: "📋 {n} steps ready", pv_img: "Your photo with the parts SAM 3.1 outlined", agJump: "Show it on screen" },
 };
 /* I18N_EXTRA:end */
 ["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_EXTRA[k]));
@@ -936,7 +936,7 @@ function renderAgentLog(s, boxId) {
     const tool = e.model ? `<code class="tool">${esc(e.model)}</code>` : (["gate", "plan_guard", "input_guard"].includes(e.kind) ? `<code class="tool code">${esc(t("agCode"))}</code>` : "");
     const secs = e.ms >= 100 ? ` <span class="muted">${(e.ms / 1000).toFixed(1)}s</span>` : "";
     const line = `<span class="agT muted">${esc(Number(e.t || 0).toFixed(0))}s</span> <span aria-hidden="true">${AG_ICON[e.kind] || "•"}</span> ${agentLine(e)} ${tool}${secs}`;
-    return `<li class="ag ${esc(AG_PHASE[e.kind] || "")}">${agTarget(e, boxId) ? `<button type="button" class="agGo" data-i="${i}" title="${esc(t("ag_go"))}">${line}<span class="agArrow" aria-hidden="true">›</span></button>` : line}</li>`;
+    return `<li class="ag ${esc(AG_PHASE[e.kind] || "")}">${agTarget(e, boxId) ? `<button type="button" class="agGo" data-i="${i}" title="${esc(t("agJump"))}">${line}<span class="agArrow" aria-hidden="true">›</span></button>` : line}</li>`;
   }).join("");
   if (!box.dataset.go) {  // one delegated handler per log box: tap a line to see the stage, photo or step it is about
     box.dataset.go = "1";
@@ -965,6 +965,7 @@ function agTarget(e, boxId) {
     if (k === "question") return $("question");
     return document.getElementById("lf-" + k) || document.getElementById("st-" + k);
   }
+  if (e.kind === "check" && e.cause !== undefined && S && e.cause !== (S.cause_index || 0)) return null;  // a step of an earlier plan
   let id = AG_RESULT[e.kind];
   if (id === "preflight" && !visible($("preflight"))) id = "safetyBadge";
   if (id === "handoff" && !visible($("handoff"))) id = visible($("stopBox")) ? "stopBox" : "stuckBtn";
