@@ -21,6 +21,7 @@
 </header>
 <div id="offlineBar" class="badge hidden" role="status"></div>
 <div id="modeBadge" class="badge hidden"></div>
+<p id="deskNote" class="deskNote small" data-t="deskNote">Dibuat untuk HP: buka halaman ini di HP untuk kamera, suara, dan cek langkah.</p>
 <div id="owBadge" class="badge ow hidden" data-testid="open-weights-badge"></div>
 
 <main>
@@ -32,7 +33,7 @@
     <button id="demoBtn" class="btn demo big" type="button" data-testid="demo-btn" data-t="demoBtn">▶ Coba demo 1 ketuk</button>
     <p class="small muted demoSub" data-t="demoSub">Tanpa foto, tanpa akun: lihat AI memperbaiki motor mogok dari awal sampai cek kamera.</p>
     <p id="wakeNote" class="small wakeNote hidden" role="status"></p>
-    <img class="demoThumb" src="/og.png" alt="" width="390" height="205" loading="lazy" style="width:100%;height:auto;border-radius:12px;margin-top:8px" data-testid="demo-thumb">
+    <figure class="demoFig"><img class="demoThumb" src="/static/demo-thumb.jpg" alt="" width="640" height="320" data-testid="demo-thumb"><figcaption class="small muted" data-t="thumbCap">Foto contoh (pengganti) dengan bagian yang ditandai SAM 3.1</figcaption></figure>
 
     <label class="photoBox" id="photoBox">
       <input id="photo" type="file" accept="image/*" capture="environment" multiple hidden>
@@ -79,7 +80,8 @@
 
   <!-- 2. Progress -->
   <section id="progress" class="card hidden">
-    <h2 data-t="working">Sedang memeriksa…</h2>
+    <h2 id="progTitle" data-t="working">Sedang memeriksa…</h2>
+    <div id="stopBox" class="stop hidden" role="alert" aria-live="assertive"></div>
     <p id="elapsed" class="small muted" aria-live="off"></p>
     <p id="progressStatus" class="sr-only" aria-live="polite"></p>
     <ol id="stageList" class="stages"></ol>
@@ -90,7 +92,6 @@
       <button id="answerBtn" class="btn primary" type="button" data-t="send">Kirim</button>
     </div>
     <div id="liveFind" class="liveFind hidden" aria-live="polite" data-testid="live-find"><p class="small muted lfTitle" data-t="pv_title">Temuan sejauh ini</p><ul class="lfList"></ul></div>
-    <div id="stopBox" class="stop hidden" role="alert" aria-live="assertive"></div>
     <p id="jobErr" class="err" role="alert"></p>
     <button id="retryBtn" class="btn primary hidden" type="button" data-t="retry">Coba lagi</button>
     <details id="agentLive" class="agent hidden" open data-testid="agent-live"><summary data-t="agentLive">Log agen</summary><div class="agLoop"></div><ol class="agList small"></ol></details>
@@ -100,6 +101,7 @@
   <section id="result" class="hidden">
     <div class="card">
       <p id="fallbackNote" class="fbNote hidden" role="status" data-testid="fallback-note"></p>
+      <p id="planBanner" class="planBanner hidden" role="status" data-testid="plan-banner"></p>
       <p class="muted small"><span data-t="diagnosis">Diagnosa</span> <span id="safetyBadge" class="level"></span></p>
       <h2 id="dxObject"></h2>
       <p id="dxSummary"></p>

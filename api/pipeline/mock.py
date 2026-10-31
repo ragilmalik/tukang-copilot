@@ -244,8 +244,9 @@ def track(frame: Path, phrase: str, seed: int = 0) -> list[dict[str, Any]]:
     return [r]
 
 
-def step_check(photo: Path, lang: str) -> dict[str, Any]:
-    """Deterministic: a dark or nearly blank photo fails (asks for more light), anything else passes."""
+def step_check(photo: Path, lang: str, expected: str = "") -> dict[str, Any]:
+    """Deterministic: a dark or nearly blank photo fails (asks for more light), anything else passes. A pass names the
+    step's expected state (what a real check confirms) instead of a generic "it matches"."""
     stat = ImageStat.Stat(Image.open(photo).convert("L"))
     if stat.mean[0] < 45:
         return {"passed": False, "observation": _L(lang, "Foto terlalu gelap, bagiannya tidak terlihat.", "The photo is too dark to see the part."),
@@ -253,6 +254,9 @@ def step_check(photo: Path, lang: str) -> dict[str, Any]:
     if stat.stddev[0] < 6:
         return {"passed": False, "observation": _L(lang, "Foto kosong atau buram.", "The photo is blank or blurry."),
                 "correction": _L(lang, "Arahkan kamera ke bagian yang ditandai dan tahan HP tetap diam.", "Point at the marked part and hold the phone still.")}
+    if expected.strip():
+        prefix = {"id": "Terlihat benar: ", "jv": "Katon bener: ", "en": "Looks right: "}.get(lang, "Terlihat benar: ")
+        return {"passed": True, "observation": prefix + expected.strip()[:200], "correction": ""}
     return {"passed": True, "observation": _L(lang, "Terlihat sesuai dengan kondisi yang diharapkan.", "It matches the expected state."), "correction": ""}
 
 

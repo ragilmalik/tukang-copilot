@@ -5,7 +5,7 @@
 // and user photos must not linger on the device (24 h retention lives on the server).
 const CACHE = "tukang-shell-v4";  // v1.24: recorded demo + shell timeout
 const SHELL = ["/", "/static/style.css", "/static/app.js", "/static/replay.js", "/manifest.webmanifest",
-               "/static/icons/icon-192.png", "/static/icons/icon-512.png", "/static/replay/demo.json"];
+               "/static/icons/icon-192.png", "/static/icons/icon-512.png", "/static/demo-thumb.jpg", "/static/replay/demo.json"];
 const SHELL_WAIT_MS = 3500;  // a sleeping server: show the cached shell after this, keep refreshing it in the background
 
 self.addEventListener("install", (e) => {

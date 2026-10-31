@@ -18,7 +18,7 @@ INK, MUTED, ORANGE = (28, 28, 30), (110, 110, 118), (255, 122, 0)
 SAFETY_COLOR = {"green": (34, 150, 80), "amber": (215, 140, 0), "red": (205, 40, 40)}
 
 LABELS: dict[str, dict[str, str]] = {
-    "id": {"title": "Laporan Perbaikan", "object": "Barang", "problem": "Masalah", "fix": "Penyebab yang diperbaiki", "safety": "Keselamatan",
+    "id": {"title": "Laporan Perbaikan", "object": "Barang", "problem": "Masalah", "fix": "Penyebab yang ditangani", "safety": "Keselamatan",
            "steps": "Langkah", "verified": "terverifikasi kamera", "tools": "Alat", "parts": "Suku cadang", "total": "Perkiraan biaya suku cadang",
            "shop": "Harga bengkel biasanya (jasa + suku cadang)", "save": "Hemat sendiri (hanya suku cadang)",
            "attempts": "Percobaan", "minutes": "menit", "outcome": "Hasil", "o_fixed": "Beres: sudah jalan lagi (kata pemilik)",
@@ -31,7 +31,7 @@ LABELS: dict[str, dict[str, str]] = {
            "st_listen": "Dengar suara", "st_gate": "Cek keselamatan teks", "st_look": "Lihat foto", "st_segment": "Tandai bagian",
            "st_diagnose": "Diagnosa", "st_plan": "Susun langkah", "st_safety": "Cek keselamatan rencana", "st_illustrate": "Gambar bantu",
            "st_narrate": "Suara pemandu"},
-    "en": {"title": "Repair Report", "object": "Item", "problem": "Problem", "fix": "Cause fixed", "safety": "Safety",
+    "en": {"title": "Repair Report", "object": "Item", "problem": "Problem", "fix": "Cause worked on", "safety": "Safety",
            "steps": "Steps", "verified": "verified by camera", "tools": "Tools", "parts": "Parts", "total": "Estimated parts cost",
            "shop": "Typical shop price (labour + parts)", "save": "Saved by doing it yourself (parts only)",
            "attempts": "Attempts", "minutes": "min", "outcome": "Result", "o_fixed": "Fixed: it works again (owner's word)",
@@ -45,7 +45,7 @@ LABELS: dict[str, dict[str, str]] = {
            "st_diagnose": "Diagnose", "st_plan": "Plan steps", "st_safety": "Plan safety gate", "st_illustrate": "Helper diagram",
            "st_narrate": "Voice guide"},
 }
-LABELS["jv"] = dict(LABELS["id"], title="Laporan Ndandani", object="Barang", problem="Masalah", fix="Sing didandani", safety="Keslametan",
+LABELS["jv"] = dict(LABELS["id"], title="Laporan Ndandani", object="Barang", problem="Masalah", fix="Sabab sing ditangani", safety="Keslametan",
                     steps="Langkah", tools="Piranti", made="Digawe nganggo Tukang Copilot (Meta Muse Spark + SAM 3.1)",
                     outcome="Asil", o_fixed="Rampung: wis urip maneh (jarene sing duwe)", o_pro="Digawa menyang bengkel/teknisi")
 

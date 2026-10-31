@@ -154,15 +154,21 @@ const T_REPLAY = {
   id: { rpBadge: "▶ Demo rekaman: putaran mode demo yang disimpan, tanpa server", rpWake: "Server sedang bangun (hosting gratis, bisa sampai 1 menit). Tombol demo langsung memutar demo rekaman.",
         rpOwnPhoto: "Demo rekaman hanya bisa memutar dua foto contoh. Foto kamu sendiri perlu server live: muat ulang halaman sebentar lagi.",
         rpOnlyDemo: "Demo rekaman hanya berisi contoh motor. Untuk foto sendiri atau contoh lain, muat ulang saat server sudah bangun.",
-        rpNoLive: "Bagian ini perlu server live; demo rekaman tidak bisa melakukannya.", rpNoMore: "Demo rekaman hanya punya satu rencana ulang." },
+        rpNoLive: "Bagian ini perlu server live; demo rekaman tidak bisa melakukannya.", rpNoMore: "Demo rekaman hanya punya satu rencana ulang.",
+        planOf: "🔁 Rencana {n} dari {m}: {cause}", triedMark: "sudah dicoba", stopHead: "Dihentikan demi keselamatan", deskNote: "Dibuat untuk HP: buka halaman ini di HP untuk kamera, suara, dan cek langkah.",
+        thumbCap: "Foto contoh (pengganti) dengan bagian yang ditandai SAM 3.1" },
   jv: { rpBadge: "▶ Demo rekaman: puteran mode demo sing disimpen, tanpa server", rpWake: "Server lagi tangi (hosting gratis, bisa nganti 1 menit). Tombol demo langsung muter demo rekaman.",
         rpOwnPhoto: "Demo rekaman mung bisa muter loro foto conto. Foto sampeyan dhewe butuh server live: muat maneh kaca iki sedhela engkas.",
         rpOnlyDemo: "Demo rekaman mung isi conto motor. Kanggo foto dhewe utawa conto liya, muat maneh yen server wis tangi.",
-        rpNoLive: "Bagean iki butuh server live; demo rekaman ora bisa nindakake.", rpNoMore: "Demo rekaman mung duwe siji rencana anyar." },
+        rpNoLive: "Bagean iki butuh server live; demo rekaman ora bisa nindakake.", rpNoMore: "Demo rekaman mung duwe siji rencana anyar.",
+        planOf: "🔁 Rencana {n} saka {m}: {cause}", triedMark: "wis dijajal", stopHead: "Dimandhegake supaya slamet", deskNote: "Digawe kanggo HP: bukak kaca iki ing HP kanggo kamera, swara, lan cek langkah.",
+        thumbCap: "Foto conto (gantosan) kanthi bagean sing ditandhani SAM 3.1" },
   en: { rpBadge: "▶ Recorded demo: a saved demo-mode run, no server", rpWake: "The server is waking up (free hosting, up to a minute). The demo button plays a recorded run right away.",
         rpOwnPhoto: "The recorded demo can only play the two sample photos. Your own photo needs the live server: reload the page in a moment.",
         rpOnlyDemo: "The recorded demo only has the motorbike sample. For your own photo or another sample, reload once the server is awake.",
-        rpNoLive: "This part needs the live server; the recorded demo can't do it.", rpNoMore: "The recorded demo has only one re-plan." },
+        rpNoLive: "This part needs the live server; the recorded demo can't do it.", rpNoMore: "The recorded demo has only one re-plan.",
+        planOf: "🔁 Plan {n} of {m}: {cause}", triedMark: "tried", stopHead: "Stopped for your safety", deskNote: "Made for phones: open this page on your phone for the camera, voice and step checks.",
+        thumbCap: "Stand-in sample photo with the parts SAM 3.1 marked" },
 };
 /* I18N_REPLAY:end */
 ["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_REPLAY[k]));
@@ -355,6 +361,7 @@ function show(which) {
     const h = $(which) && $(which).querySelector("h1, h2");
     if (h) { h.tabIndex = -1; try { h.focus({ preventScroll: true }); } catch (_) { /* old browsers */ } }
   }
+  if (!firstShow && typeof window.scrollTo === "function") window.scrollTo(0, 0);  // a new screen starts at its top (the result opened half-way down)
   firstShow = false;
   if ($("garage")) $("garage").classList.toggle("hidden", which !== "capture" || !loadGarage().length);
 }
@@ -401,11 +408,20 @@ function renderProgress(s) {
   if (asking) $("questionText").textContent = s.question;
   if (asking && !wasAsking) {  // the question is the one thing to act on: bring it on screen (stage list + results push it down)
     const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setTimeout(() => { const q = $("question"); if (q.scrollIntoView) q.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }); }, 50);
+    setTimeout(() => {
+      const q = $("question"); if (q.scrollIntoView) q.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
+      const first = q.querySelector("#quickAns button");  // keyboard and screen-reader users land on the answers, not at the top
+      if (first && document.activeElement !== $("answerText")) { try { first.focus({ preventScroll: true }); } catch (_) { first.focus(); } }
+    }, 50);
   }
   const stopped = ["stopped", "exhausted"].includes(s.status);
+  if ($("progTitle")) $("progTitle").textContent = stopped ? (s.status === "stopped" ? "⛔ " + t("stopHead") : "🧰 " + t("triedTitle")) : t("working");
   $("stopBox").classList.toggle("hidden", !stopped);
-  if (stopped) { renderStop(s); saveGarage(s); }
+  if (stopped) {
+    const fresh = $("stopBox").classList.contains("hidden") || !$("stopBox").innerHTML;
+    renderStop(s); saveGarage(s);
+    if (fresh && typeof window.scrollTo === "function") window.scrollTo(0, 0);  // the STOP card sits right under the heading
+  }
   $("jobErr").textContent = s.status === "error" ? s.error : "";
   if ($("retryBtn")) $("retryBtn").classList.toggle("hidden", !(s.status === "error" && s.error_kind !== "budget"));
 }
@@ -448,7 +464,7 @@ async function showHandoff(boxId) {
     box.innerHTML = `<p class="hoTitle">🧑‍🔧 ${esc(h.title)}</p><p class="small">${esc(t("hoSub"))}</p>`
       + `<p class="hoBtns">${HO_SAFE.test(h.whatsapp_url || "") ? `<a class="btn wa" target="_blank" rel="noopener noreferrer" href="${esc(h.whatsapp_url)}">💬 ${esc(t("hoWa"))}</a>` : ""}`
       + `${HO_SAFE.test(h.maps_url || "") ? ` <a class="btn" target="_blank" rel="noopener noreferrer" href="${esc(h.maps_url)}">📍 ${esc(t("hoMaps"))}</a>` : ""}`
-      + `${h.pdf_url ? ` <a class="btn" href="${esc(apiHref(`/api/sessions/${encodeURIComponent(S.id)}/report.pdf`))}">📄 ${esc(t("hoPdf"))}</a>` : ""}</p>`
+      + `${h.pdf_url && boxId !== "stopHandoff" ? ` <a class="btn" href="${esc(apiHref(`/api/sessions/${encodeURIComponent(S.id)}/report.pdf`))}">📄 ${esc(t("hoPdf"))}</a>` : ""}</p>`
       + `<details class="small"><summary>${esc(t("hoMsg"))}</summary><pre class="hoText">${esc(h.text)}</pre></details>`;
     box.classList.remove("hidden");
     return h;
@@ -466,7 +482,13 @@ function render(s) {
   const lvl = (s.safety || {}).level || dx.safety_level;
   $("safetyBadge").className = "level " + lvl; $("safetyBadge").textContent = t(lvl);
   $("safetyReason").textContent = dx.safety_reason || "";
-  $("dxCauses").innerHTML = (dx.causes || []).map((c, i) => `<li${i === s.cause_index ? ' class="on"' : ""}><span class="pct">${c.confidence}%</span> ${esc(c.title)}<br><span class="muted small">${esc((c.evidence || []).join("; "))}</span></li>`).join("");
+  const ci = s.cause_index || 0, causes = dx.causes || [];
+  $("dxCauses").innerHTML = causes.map((c, i) => `<li${i === ci ? ' class="on"' : i < ci ? ' class="tried"' : ""}><span class="pct">${c.confidence}%</span> ${esc(c.title)}${i < ci ? ` <span class="triedTag">✗ ${esc(t("triedMark"))}</span>` : ""}<br><span class="muted small">${esc((c.evidence || []).join("; "))}</span></li>`).join("");
+  if ($("planBanner")) {  // after a re-plan the top of the screen must show that the plan changed, not the same first cause
+    const cur = causes[ci];
+    $("planBanner").textContent = ci > 0 && cur ? t("planOf").replace("{n}", String(ci + 1)).replace("{m}", String(causes.length)).replace("{cause}", cur.title) : "";
+    $("planBanner").classList.toggle("hidden", !(ci > 0 && cur));
+  }
   if (s.parts_image) {
     $("partsWrap").classList.remove("hidden"); $("partsImg").src = base + s.parts_image;
     $("partsList").innerHTML = Object.values(s.parts || {}).map((p) => `<li>${esc(p.label)}. ${esc(p.name)}${p.found ? "" : " (?)"}</li>`).join("");

@@ -610,11 +610,11 @@ def check_step(sid: str, n: int, photo: Path) -> dict[str, Any]:
             content += [{"type": "text", "text": "Highlighted part:"}, _photo_part(d / s["parts"][step.component_id]["image"])]
         content += [{"type": "text", "text": "NEW photo:"}, _photo_part(d / name)]
         if settings.offline:
-            res = StepCheck.model_validate(mock.step_check(d / name, s["lang"]))
+            res = StepCheck.model_validate(mock.step_check(d / name, s["lang"], step.expected_state))
         else:
             fb: dict[str, Any] = {}
             res = _chat_json(StepCheck, prompts.get("verify_step", lang_name=prompts.LANG_NAME[s["lang"]]), content, "step_check",
-                             mock.step_check(d / name, s["lang"]), model=settings.vision_model, effort="medium", fallback_into=fb)
+                             mock.step_check(d / name, s["lang"], step.expected_state), model=settings.vision_model, effort="medium", fallback_into=fb)
             check_fallback = bool(fb)
     finally:
         cost.use(None)
