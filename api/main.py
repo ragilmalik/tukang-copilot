@@ -327,6 +327,16 @@ def post_replan(sid: str, report: str = Form(default="")) -> dict[str, Any]:
         raise HTTPException(503, errors.friendly(e, _load(sid)["lang"]), headers={"Retry-After": "10"})
 
 
+@app.post("/api/sessions/{sid}/outcome")
+def post_outcome(sid: str, result: str = Form(...)) -> dict[str, Any]:
+    """The owner closes the loop: result is "fixed" (it works now) or "pro" (a mechanic took over)."""
+    _load(sid)
+    try:
+        return public(engine.set_outcome(sid, result.strip().lower()))
+    except ValueError as e:
+        raise HTTPException(409 if "plan" in str(e) else 422, str(e))
+
+
 @app.get("/api/sessions/{sid}/report")
 def get_report(sid: str) -> dict[str, Any]:
     _load(sid)

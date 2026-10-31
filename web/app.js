@@ -7,7 +7,7 @@ const T = {
         samples: "Coba contoh:", sMotor: "motor mogok", sPump: "pompa tidak keluar air", sFaucet: "kran menetes", sRice: "rice cooker mati", sTire: "ban kempes",
         working: "Sedang memeriksa…", retry: "Coba lagi", answerHere: "Jawaban kamu", send: "Kirim", diagnosis: "Diagnosa", safetyFirst: "Keselamatan dulu",
         tools: "Alat", materials: "Suku cadang", listen: "Dengarkan", next: "Lanjut", handsFree: "Mode tangan bebas (bacakan otomatis)",
-        done: "Selesai kalau:", waitFor: "Tunggu {n} menit", timerStart: "Mulai pengatur waktu", timerStop: "Hentikan", timerDone: "Waktu tunggu selesai. Lanjut ke langkah berikutnya.", checkStep: "Cek langkah ini", share: "Bagikan laporan", pdf: "Unduh laporan PDF", workshop: "Lembar bengkel (cetak besar)", hood: "Di balik layar: model yang dipakai", hs_listen: "Dengar suara", hs_gate: "Cek keselamatan teks", hs_look: "Lihat foto", hs_segment: "Tandai bagian", hs_diagnose: "Diagnosa", hs_plan: "Susun langkah", hs_safety: "Cek keselamatan rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Suara pemandu", wa: "Kirim daftar belanja ke WhatsApp", buy: "Cari harga", garage: "Garasi saya", garageNote: "Riwayat perbaikan hanya disimpan di HP ini. Panduan bisa dibuka 24 jam.", garageClear: "Hapus riwayat", again: "Perbaiki barang lain", erase: "Hapus foto saya sekarang", eraseAsk: "Hapus foto, suara, dan panduan ini dari server sekarang?", erased: "Sudah dihapus dari server.",
+        done: "Selesai kalau:", outcomeAsk: "Sudah jalan lagi?", fixedBtn: "Sudah beres 🎉", proBtn: "Dibawa ke bengkel", fixedThanks: "Mantap! Perbaikan selesai.", proThanks: "Tidak apa-apa, membawa ke ahli itu pilihan yang aman. Laporan PDF bisa ditunjukkan ke mekanik.", savedTotal: "Total hemat", savedFrom: "dari", savedUnit: "perbaikan", waitFor: "Tunggu {n} menit", timerStart: "Mulai pengatur waktu", timerStop: "Hentikan", timerDone: "Waktu tunggu selesai. Lanjut ke langkah berikutnya.", checkStep: "Cek langkah ini", share: "Bagikan laporan", pdf: "Unduh laporan PDF", workshop: "Lembar bengkel (cetak besar)", hood: "Di balik layar: model yang dipakai", hs_listen: "Dengar suara", hs_gate: "Cek keselamatan teks", hs_look: "Lihat foto", hs_segment: "Tandai bagian", hs_diagnose: "Diagnosa", hs_plan: "Susun langkah", hs_safety: "Cek keselamatan rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Suara pemandu", wa: "Kirim daftar belanja ke WhatsApp", buy: "Cari harga", garage: "Garasi saya", garageNote: "Riwayat perbaikan hanya disimpan di HP ini. Panduan bisa dibuka 24 jam.", garageClear: "Hapus riwayat", again: "Perbaiki barang lain", erase: "Hapus foto saya sekarang", eraseAsk: "Hapus foto, suara, dan panduan ini dari server sekarang?", erased: "Sudah dihapus dari server.",
         stuck: "Masih rusak, coba rencana lain", stuckHere: "Apa yang terjadi? (mis. sudah dicoba, tetap mati)",
         needPhoto: "Ambil atau unggah foto dulu.", needDesc: "Ceritakan masalahnya (suara atau ketik).",
         footer: "Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.",
@@ -27,7 +27,7 @@ const T = {
         samples: "Try a sample:", sMotor: "bike won't start", sPump: "pump gives no water", sFaucet: "dripping tap", sRice: "dead rice cooker", sTire: "flat tyre",
         working: "Checking…", retry: "Try again", answerHere: "Your answer", send: "Send", diagnosis: "Diagnosis", safetyFirst: "Safety first",
         tools: "Tools", materials: "Parts", listen: "Listen", next: "Next", handsFree: "Hands-free mode (read steps aloud)",
-        done: "Done when:", waitFor: "Wait {n} minutes", timerStart: "Start timer", timerStop: "Stop", timerDone: "Waiting time is over. Go on to the next step.", checkStep: "Check this step", share: "Share report", pdf: "Download PDF report", workshop: "Workshop sheets (large print)", hood: "Under the hood: models used", hs_listen: "Listen", hs_gate: "Text safety gate", hs_look: "Look at photo", hs_segment: "Mark parts", hs_diagnose: "Diagnose", hs_plan: "Plan steps", hs_safety: "Plan safety gate", hs_illustrate: "Helper diagram", hs_narrate: "Voice guide", wa: "Send shopping list to WhatsApp", buy: "Compare prices", garage: "My garage", garageNote: "Your repair history stays on this phone only. Guides open for 24 hours.", garageClear: "Clear history", again: "Fix something else", erase: "Delete my photos now", eraseAsk: "Delete the photos, voice and guide of this repair from the server now?", erased: "Deleted from the server.",
+        done: "Done when:", outcomeAsk: "Does it work again?", fixedBtn: "It works now 🎉", proBtn: "Took it to a mechanic", fixedThanks: "Great, repair done.", proThanks: "That is a safe choice. Show the PDF report to the mechanic.", savedTotal: "Total saved", savedFrom: "from", savedUnit: "repairs", waitFor: "Wait {n} minutes", timerStart: "Start timer", timerStop: "Stop", timerDone: "Waiting time is over. Go on to the next step.", checkStep: "Check this step", share: "Share report", pdf: "Download PDF report", workshop: "Workshop sheets (large print)", hood: "Under the hood: models used", hs_listen: "Listen", hs_gate: "Text safety gate", hs_look: "Look at photo", hs_segment: "Mark parts", hs_diagnose: "Diagnose", hs_plan: "Plan steps", hs_safety: "Plan safety gate", hs_illustrate: "Helper diagram", hs_narrate: "Voice guide", wa: "Send shopping list to WhatsApp", buy: "Compare prices", garage: "My garage", garageNote: "Your repair history stays on this phone only. Guides open for 24 hours.", garageClear: "Clear history", again: "Fix something else", erase: "Delete my photos now", eraseAsk: "Delete the photos, voice and guide of this repair from the server now?", erased: "Deleted from the server.",
         stuck: "Still broken, try another plan", stuckHere: "What happened? (e.g. tried it, still dead)",
         needPhoto: "Take or upload a photo first.", needDesc: "Describe the problem (voice or text).",
         footer: "Light repairs only. For gas, house wiring, or high voltage, call a professional.",
@@ -50,7 +50,7 @@ T.jv = Object.assign({}, T.id, {
   samples: "Jajal conto:", sMotor: "motor mogok", sPump: "pompa ora metu banyu", sFaucet: "kran netes", sRice: "rice cooker mati", sTire: "ban kempes",
   working: "Lagi dipriksa…", retry: "Jajal maneh", answerHere: "Wangsulanmu", send: "Kirim", diagnosis: "Diagnosa", safetyFirst: "Slamet dhisik",
   tools: "Piranti", materials: "Suku cadang", listen: "Rungokna", next: "Terus", handsFree: "Mode tanpa tangan (diwacakake otomatis)",
-  done: "Rampung yen:", waitFor: "Antosna {n} menit", timerStart: "Wiwiti pangetung wektu", timerStop: "Mandhegna", timerDone: "Wektu antosan wis rampung. Terus menyang langkah sabanjure.", checkStep: "Priksa langkah iki", share: "Bagekna laporan", pdf: "Undhuh laporan PDF", workshop: "Lembar bengkel (cetak gedhe)", hood: "Ing mburi layar: model sing dipakai", hs_listen: "Rungokake swara", hs_gate: "Priksa slamet teks", hs_look: "Delok foto", hs_segment: "Tandhani bagean", hs_diagnose: "Diagnosa", hs_plan: "Nyusun langkah", hs_safety: "Priksa slamet rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Swara panuntun", wa: "Kirim dhaptar blanja menyang WhatsApp", buy: "Golek rega", garage: "Garasiku",
+  done: "Rampung yen:", outcomeAsk: "Wis urip maneh?", fixedBtn: "Wis rampung 🎉", proBtn: "Digawa menyang bengkel", fixedThanks: "Apik! Ndandani rampung.", proThanks: "Ora apa-apa, digawa menyang ahli iku pilihan sing aman. Laporan PDF bisa dituduhake marang mekanik.", savedTotal: "Total irit", savedFrom: "saka", savedUnit: "ndandani", waitFor: "Antosna {n} menit", timerStart: "Wiwiti pangetung wektu", timerStop: "Mandhegna", timerDone: "Wektu antosan wis rampung. Terus menyang langkah sabanjure.", checkStep: "Priksa langkah iki", share: "Bagekna laporan", pdf: "Undhuh laporan PDF", workshop: "Lembar bengkel (cetak gedhe)", hood: "Ing mburi layar: model sing dipakai", hs_listen: "Rungokake swara", hs_gate: "Priksa slamet teks", hs_look: "Delok foto", hs_segment: "Tandhani bagean", hs_diagnose: "Diagnosa", hs_plan: "Nyusun langkah", hs_safety: "Priksa slamet rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Swara panuntun", wa: "Kirim dhaptar blanja menyang WhatsApp", buy: "Golek rega", garage: "Garasiku",
   garageNote: "Riwayat ndandani mung disimpen ing HP iki. Pandhuan bisa dibukak 24 jam.", garageClear: "Busak riwayat", again: "Ndandani barang liya", erase: "Busak fotoku saiki", eraseAsk: "Busak foto, swara, lan pandhuan iki saka server saiki?", erased: "Wis dibusak saka server.",
   stuck: "Isih rusak, jajal rencana liya", stuckHere: "Kepiye kedadeyane? (umpamane wis dijajal, tetep mati)",
   needPhoto: "Jupuk utawa unggah foto dhisik.", needDesc: "Critakna masalahe (swara utawa ketik).",
@@ -338,7 +338,7 @@ function render(s) {
   $("gDone").textContent = plan.done_check || ""; $("gPro").textContent = plan.when_to_call_pro ? "🧑‍🔧 " + plan.when_to_call_pro : "";
   $("disclaimer").textContent = (s.safety || {}).disclaimer || "";
   renderHood(s);
-  renderStep(); renderVerified();
+  renderStep(); renderVerified(); renderOutcome();
 }
 
 // "Under the hood": one row per pipeline stage with the model that did it (SPEC v2: show the Meta stack).
@@ -422,6 +422,24 @@ function showCheck(r) {
     + (r.correction ? `<p><b>→</b> ${esc(r.correction)}</p>` : "") + (r.escalate_hint ? `<p class="caution">${esc(r.escalate_hint)}</p>` : "");
 }
 
+function renderOutcome() {
+  const box = $("outcome"); if (!box || !S) return;
+  const oc = S.outcome || {}, r = oc.result || "";
+  box.classList.toggle("hidden", !S.plan);
+  $("fixedBtn").setAttribute("aria-pressed", String(r === "fixed")); $("proBtn").setAttribute("aria-pressed", String(r === "pro"));
+  $("outcomeMsg").textContent = r === "fixed" ? t("fixedThanks") + (oc.saved_idr ? ` ${t("save")} ${rupiah(oc.saved_idr)}.` : "") : r === "pro" ? t("proThanks") : "";
+}
+async function sendOutcome(result) {
+  if (!S || !S.id) return;
+  const fd = new FormData(); fd.append("result", result);
+  try {
+    const r = await fetch(`/api/sessions/${S.id}/outcome`, { method: "POST", body: fd });
+    const j = await r.json();
+    if (!r.ok) { $("outcomeMsg").textContent = "⚠️ " + (j.detail || r.statusText); return; }
+    S = j; setGarageOutcome(S.id, result, (S.outcome || {}).saved_idr); renderOutcome();
+  } catch (err) { $("outcomeMsg").textContent = "⚠️ " + netMsg(err); }
+}
+
 function renderVerified() {
   const n = S.plan.steps.filter((st) => ((S.checks || {})[String(st.n)] || {}).passed).length;
   $("verifiedCount").textContent = `✅ ${n}/${S.plan.steps.length} ${t("verified")}`;
@@ -431,6 +449,8 @@ function setupResult() {
   on("prevBtn", "click", () => { if (stepIdx > 0) { stepIdx--; renderStep(); } });
   on("nextBtn", "click", () => { if (stepIdx < S.plan.steps.length - 1) { stepIdx++; renderStep(); } });
   on("playBtn", "click", play);
+  on("fixedBtn", "click", () => sendOutcome("fixed"));
+  on("proBtn", "click", () => sendOutcome("pro"));
   on("stepPhoto", "change", async (e) => {
     const f0 = e.target.files[0]; if (!f0) return;
     const f = await shrinkImage(f0);
@@ -487,20 +507,30 @@ function saveGarage(s) {
   const steps = ((s.plan || {}).steps || []), checks = s.checks || {};
   const entry = { id: s.id, object: (s.object_report || {}).object || "", fix: (s.plan || {}).cause_title || "",
     level: (s.safety || {}).level || (s.diagnosis || {}).safety_level || "", status: s.status,
-    verified: steps.filter((st) => (checks[String(st.n)] || {}).passed).length, total: steps.length, at: Math.round((s.created || Date.now() / 1000) * 1000) };
+    verified: steps.filter((st) => (checks[String(st.n)] || {}).passed).length, total: steps.length, outcome: (s.outcome || {}).result || "", saved: Number((s.outcome || {}).saved_idr) || 0, at: Math.round((s.created || Date.now() / 1000) * 1000) };
   const g = [entry].concat(loadGarage().filter((e) => e && e.id !== s.id)).slice(0, GARAGE_MAX);
   try { localStorage.setItem(GARAGE_KEY, JSON.stringify(g)); } catch (_) {}
   renderGarage();
 }
+function setGarageOutcome(id, result, saved) {
+  const g = loadGarage();
+  g.forEach((e) => { if (e && e.id === id) { e.outcome = result; e.saved = Number(saved) || 0; } });
+  try { localStorage.setItem(GARAGE_KEY, JSON.stringify(g)); } catch (_) {}
+}
 function renderGarage() {
   if (!$("garage")) return;
   const g = loadGarage();
+  if ($("garageSaved")) {
+    const fixed = g.filter((e) => e && e.outcome === "fixed"), sum = fixed.reduce((a, e) => a + (Number(e.saved) || 0), 0);
+    $("garageSaved").textContent = sum > 0 ? `💰 ${t("savedTotal")} ${rupiah(sum)} ${t("savedFrom")} ${fixed.length} ${t("savedUnit")}` : "";
+    $("garageSaved").classList.toggle("hidden", !(sum > 0));
+  }
   $("garage").classList.toggle("hidden", !g.length || ($("capture") && $("capture").classList.contains("hidden")));
   $("garageList").innerHTML = g.map((e) => {
     const day = new Date(e.at).toLocaleDateString(lang === "en" ? "en-GB" : "id-ID", { day: "numeric", month: "short" });
     const lvl = ["green", "amber", "red"].includes(e.level) ? e.level : "";
     return `<li><a href="/guide/${encodeURIComponent(e.id)}">${esc(e.object || e.id)}</a> ` +
-      (lvl ? `<span class="level ${lvl}">${esc(t(lvl))}</span> ` : "") +
+      (lvl ? `<span class="level ${lvl}">${esc(t(lvl))}</span> ` : "") + (e.outcome === "fixed" ? "🎉 " : "") +
       `<span class="muted small">${esc(day)}${e.total ? ` · ${e.verified}/${e.total} ✓` : ""}${e.fix ? " · " + esc(e.fix) : ""}</span></li>`;
   }).join("");
 }

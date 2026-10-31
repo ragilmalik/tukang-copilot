@@ -36,7 +36,8 @@ Tukang Copilot looks at the actual object, marks the actual parts on your own ph
 7. **Still broken?** Say what happened and it re-plans for the next likely cause. When every safe cause is used up, it tells you to see a mechanic and gives you the report to show them.
 8. **Report + share.** A shareable read-only guide link and a **PDF repair report** (problem, fix, parts, steps verified by camera), plus **My garage**: past repairs kept on the phone only, no account.
 9. **Installable (PWA)** in Bahasa Indonesia, **Basa Jawa** (every UI string) and English. When reasoning runs on **Muse Spark Open** (open weights, `USE_OPEN_WEIGHTS=true` + Baseten key) the app shows a visible badge.
-10. **Safety escalation.** A red STOP card says why, what to do right now, finds a service centre nearby, gives the technician the PDF, and shows the 112 emergency line.
+10. **Closes the loop.** At the end you tap "It works now" (or "Took it to a mechanic"); the report records the result and My garage adds up what you saved against typical bengkel prices (estimates, on the phone only).
+11. **Safety escalation.** A red STOP card says why, what to do right now, finds a service centre nearby, gives the technician the PDF, and shows the 112 emergency line.
 
 Hard safety stops (gas, house wiring, opening 220 V internals, high voltage, brake hydraulics, fuel leaks, airbags, anything medical) are enforced in code, not just in prompts. See [docs/SAFETY.md](docs/SAFETY.md).
 

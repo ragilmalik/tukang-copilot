@@ -18,7 +18,8 @@
 8. **Follow the steps.** One step per screen. Tap 🔊 to hear it, or tick *Hands-free mode* so each step is read automatically. ◀ ▶ to move.
 9. **Check each step.** Tap *Check this step* and take a photo after you've done it. ✅ means move on. ⚠️ tells you exactly what to fix (or asks for a clearer photo).
 10. **Still broken?** At the bottom, type what happened ("plug cap is tight, still won't start") and tap *Still broken, try another plan*. It plans for the next likely cause. When nothing safe is left, it tells you to see a mechanic: show them the report.
-11. **Share** the guide with *Share report* (a read-only link).
+11. **Tell it how it went.** Under the steps, tap *It works now* (or *Took it to a mechanic*). The PDF report records it, and *My garage* on the home page adds up what you saved compared with typical bengkel prices (estimates only).
+12. **Share** the guide with *Share report* (a read-only link).
 
 **Tips:** photograph the part, not the whole room. Use your phone torch in dark engine bays. If voice fails, type. Photos are deleted after 24 hours, and there's no account.
 
@@ -38,7 +39,8 @@
 8. **Ikuti langkahnya.** Satu langkah per layar. Ketuk 🔊 untuk mendengarkan, atau centang *Mode tangan bebas*.
 9. **Cek tiap langkah.** Ketuk *Cek langkah ini* lalu foto hasilnya. ✅ berarti lanjut. ⚠️ memberi tahu apa yang perlu dibetulkan.
 10. **Masih rusak?** Ketik apa yang terjadi lalu ketuk *Masih rusak, coba rencana lain*. Kalau semua kemungkinan aman sudah dicoba, bawa ke bengkel dan tunjukkan laporannya.
-11. **Bagikan** panduan dengan *Bagikan laporan*.
+11. **Ceritakan hasilnya.** Di bawah langkah, ketuk *Sudah beres* (atau *Dibawa ke bengkel*). Laporan PDF mencatatnya, dan *Garasi saya* menjumlahkan penghematanmu dibanding harga bengkel biasanya (hanya perkiraan).
+12. **Bagikan** panduan dengan *Bagikan laporan*.
 
 **Tips:** foto bagiannya, bukan seluruh ruangan. Pakai senter HP di tempat gelap. Foto otomatis terhapus setelah 24 jam, tanpa akun.
 

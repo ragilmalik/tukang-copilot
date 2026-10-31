@@ -19,7 +19,8 @@ LABELS: dict[str, dict[str, str]] = {
     "id": {"title": "Laporan Perbaikan", "object": "Barang", "problem": "Masalah", "fix": "Penyebab yang diperbaiki", "safety": "Keselamatan",
            "steps": "Langkah", "verified": "terverifikasi kamera", "tools": "Alat", "parts": "Suku cadang", "total": "Perkiraan biaya suku cadang",
            "shop": "Harga bengkel biasanya (jasa + suku cadang)", "save": "Hemat sendiri (hanya suku cadang)",
-           "attempts": "Percobaan", "minutes": "menit", "status": "Status", "ok": "[OK]", "todo": "[  ]", "photo": "Foto dengan bagian yang ditandai (SAM 3.1)",
+           "attempts": "Percobaan", "minutes": "menit", "outcome": "Hasil", "o_fixed": "Beres: sudah jalan lagi (kata pemilik)",
+           "o_pro": "Dibawa ke bengkel/teknisi", "status": "Status", "ok": "[OK]", "todo": "[  ]", "photo": "Foto dengan bagian yang ditandai (SAM 3.1)",
            "disclaimer": "Panduan ini hanya untuk perbaikan ringan. Harga adalah perkiraan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.",
            "made": "Dibuat dengan Tukang Copilot (Meta Muse Spark + SAM 3.1)", "page": "Hal.", "demo": "Mode demo: jawaban contoh",
            "green": "AMAN", "amber": "HATI-HATI", "red": "STOP",
@@ -30,7 +31,8 @@ LABELS: dict[str, dict[str, str]] = {
     "en": {"title": "Repair Report", "object": "Item", "problem": "Problem", "fix": "Cause fixed", "safety": "Safety",
            "steps": "Steps", "verified": "verified by camera", "tools": "Tools", "parts": "Parts", "total": "Estimated parts cost",
            "shop": "Typical shop price (labour + parts)", "save": "Saved by doing it yourself (parts only)",
-           "attempts": "Attempts", "minutes": "min", "status": "Status", "ok": "[OK]", "todo": "[  ]", "photo": "Photo with the parts marked (SAM 3.1)",
+           "attempts": "Attempts", "minutes": "min", "outcome": "Result", "o_fixed": "Fixed: it works again (owner's word)",
+           "o_pro": "Handed to a mechanic/professional", "status": "Status", "ok": "[OK]", "todo": "[  ]", "photo": "Photo with the parts marked (SAM 3.1)",
            "disclaimer": "Light repairs only. Prices are estimates. For gas, house wiring, or high voltage, call a professional.",
            "made": "Made with Tukang Copilot (Meta Muse Spark + SAM 3.1)", "page": "Page", "demo": "Demo mode: sample answers",
            "green": "SAFE", "amber": "CAUTION", "red": "STOP",
@@ -40,7 +42,8 @@ LABELS: dict[str, dict[str, str]] = {
            "st_narrate": "Voice guide"},
 }
 LABELS["jv"] = dict(LABELS["id"], title="Laporan Ndandani", object="Barang", problem="Masalah", fix="Sing didandani", safety="Keslametan",
-                    steps="Langkah", tools="Piranti", made="Digawe nganggo Tukang Copilot (Meta Muse Spark + SAM 3.1)")
+                    steps="Langkah", tools="Piranti", made="Digawe nganggo Tukang Copilot (Meta Muse Spark + SAM 3.1)",
+                    outcome="Asil", o_fixed="Rampung: wis urip maneh (jarene sing duwe)", o_pro="Digawa menyang bengkel/teknisi")
 
 
 def _font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
@@ -200,6 +203,13 @@ def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: 
             doc.text(f"{L['shop']}: {rupiah(shop)}", 24)
             if saving:
                 doc.text(f"{L['save']}: {rupiah(saving)}", 24)
+
+    oc = rep.get("outcome") or {}
+    if oc.get("result") in ("fixed", "pro"):
+        doc.rule()
+        doc.text(f"{L['outcome']}: {L['o_' + oc['result']]}", 28, bold=True)
+        if oc.get("saved_idr"):
+            doc.text(f"{L['save']}: {rupiah(int(oc['saved_idr']))}", 24)
 
     if rep.get("attempts"):
         doc.rule()

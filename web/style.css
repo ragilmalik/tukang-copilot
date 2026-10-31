@@ -74,3 +74,5 @@ h1:focus,h2:focus{outline:none}
 
 .timer{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#eef6ff;color:#12385f;padding:8px 10px;border-radius:10px;margin:8px 0}
 .timer .clock{font-variant-numeric:tabular-nums;font-size:1.3em;font-weight:700}
+.outcome{margin-top:10px;padding-top:8px;border-top:1px solid #eee}.outcome .row{display:flex;gap:8px;flex-wrap:wrap}.outcome [aria-pressed="true"]{outline:3px solid #2296508c}
+#garageSaved{font-weight:600;color:#1f7a45}

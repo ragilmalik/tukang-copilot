@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.19.0 (2026-10-31 07:50 WIB)
+- Closes the loop. New `POST /api/sessions/{id}/outcome` (`fixed` or `pro`), "It works now" / "Took it to a mechanic" buttons on the result and shared guide pages (id/jv/en), a Result line in the PDF report, and a running "Total saved" line in My garage (sum of `diy_saving_idr` over repairs marked fixed, localStorage only). A re-plan clears the outcome. 12 tests (`test_outcome.py`), jsdom checks, smoke step.
+
 ## 1.18.0 (2026-10-31 07:15 WIB)
 - Waiting-time steps. A plan step can now carry `wait_minutes` (0 to 120; "let the engine cool 10 minutes", glue or sealant drying). The guide shows a countdown with Start/Stop, then vibrates and reads "waiting time is over" aloud (id/jv/en); the workshop sheet prints a tick-box line ("Wait 10 minutes"). `coerce.py` `_wait` repairs "about 15 min" style values and drops silly ones; `prompts/plan.md` asks for it; the motor mock plan's first step waits 10 minutes. Tests: `test_wait_timer.py` (9), a coerce test, and 7 jsdom checks (timer shown, 10:00, counts down, stops, absent on other scenarios). Timer ticks use wall-clock time so it stays right if the phone throttles the tab; if the screen locks the vibrate/voice alert may not fire (not testable without a real phone).
 

@@ -73,6 +73,8 @@ def main() -> int:
             rep = c.get(f"/api/sessions/{sid}/report").json()
             ok(bool(rep.get("problem")), "report")
             ok(c.get(f"/guide/{sid}").status_code == 200, "shareable guide page")
+            r = c.post(f"/api/sessions/{sid}/outcome", data={"result": "fixed"})
+            ok(r.status_code == 200 and r.json()["outcome"]["result"] == "fixed", "outcome: it works now")
             r = c.get(f"/api/sessions/{sid}/report.pdf")
             ok(r.status_code == 200 and r.content[:4] == b"%PDF", f"PDF report ({len(r.content) // 1024} KB)")
             ok(c.delete(f"/api/sessions/{sid}").json().get("deleted") is True and c.get(f"/api/sessions/{sid}").status_code == 404, "erase my photos now")

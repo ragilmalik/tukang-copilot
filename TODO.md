@@ -39,3 +39,4 @@ Owner: **M** = Malik, **H** = Malik.
 - [x] Fifth demo scenario: flat scooter tyre (v1.9.0)
 - [x] Bengkel price vs DIY saving chip + PDF lines (v1.17.0)
 - [x] Waiting-time steps with countdown timer (v1.18.0)
+- [x] Outcome buttons ("it works now"), PDF result line, garage total saved (v1.19.0)

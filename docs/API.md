@@ -58,6 +58,9 @@ Re-runs a session whose `status` is `error` (busy AI service, dropped signal). F
 ## `POST /api/sessions/{id}/replan` (form: `report`)
 Moves to the next likely cause and returns the updated session (`status` `ready`), or `exhausted` with `stop_reason`, or `stopped` if the report trips the safety gate.
 
+## `POST /api/sessions/{id}/outcome` (form: `result`)
+Closes the loop. `result` is `fixed` (it works now) or `pro` (a mechanic took over). Stores `outcome: {result, at, saved_idr}` on the session (`saved_idr` is the diagnosis `diy_saving_idr` for `fixed`, else 0) and returns the session. `422` for any other value, `409` when there is no plan (red stop), `404` unknown session. A re-plan removes the outcome. The PDF report gets a Result line.
+
 ## Session JSON: `trace`
 Every session object carries `trace`: nine rows in pipeline order, each `{stage, tool, kind, status, ms}`. `kind` is `meta` (a Meta model), `open` (Muse Spark Open on Baseten), `tts` (edge-tts) or `code` (rule-based safety gates). Used by the "Under the hood" panel and the PDF report.
 

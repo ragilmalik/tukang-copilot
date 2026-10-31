@@ -66,6 +66,7 @@
   <section id="garage" class="card hidden">
     <h2 data-t="garage">Garasi saya</h2>
     <p class="small muted" data-t="garageNote">Riwayat perbaikan hanya disimpan di HP ini.</p>
+    <p id="garageSaved" class="small hidden" aria-live="polite"></p>
     <ul id="garageList" class="garage"></ul>
     <button id="garageClear" class="btn link" type="button" data-t="garageClear">Hapus riwayat</button>
   </section>
@@ -129,6 +130,14 @@
       <p><b data-t="done">Selesai kalau:</b> <span id="gDone"></span></p>
       <p class="muted" id="gPro"></p>
       <p id="verifiedCount" class="small" aria-live="polite"></p>
+      <div id="outcome" class="outcome hidden">
+        <p><b data-t="outcomeAsk">Sudah jalan lagi?</b></p>
+        <div class="row">
+          <button id="fixedBtn" class="btn primary" type="button" aria-pressed="false" data-t="fixedBtn">Sudah beres 🎉</button>
+          <button id="proBtn" class="btn" type="button" aria-pressed="false" data-t="proBtn">Dibawa ke bengkel</button>
+        </div>
+        <p id="outcomeMsg" class="small" aria-live="polite"></p>
+      </div>
       <textarea id="stuckText" rows="2" maxlength="500" data-tp="stuckHere" placeholder="Apa yang terjadi? (mis. sudah dicoba, tetap mati)"></textarea>
       <button id="stuckBtn" class="btn" type="button" data-t="stuck">Masih rusak, coba rencana lain</button>
       <p id="stuckMsg" class="muted" aria-live="polite"></p>

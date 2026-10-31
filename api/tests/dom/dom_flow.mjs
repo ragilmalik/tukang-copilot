@@ -88,6 +88,14 @@ async function run(lang, sample) {
     const before = d.getElementById("stepNo").textContent;
     d.getElementById("nextBtn").click(); await sleep(100);
     check(`${lang}/${sample}: next step`, d.getElementById("stepNo").textContent !== before || (d.getElementById("stepTitle").textContent.startsWith("1 / 1")));
+    // outcome: "it works now" closes the loop and the garage tallies the saving
+    const oc = d.getElementById("outcome");
+    check(`${lang}/${sample}: outcome card visible and translated`, oc && !oc.classList.contains("hidden") && !/outcomeAsk|fixedBtn/.test(oc.textContent), oc && oc.textContent);
+    d.getElementById("fixedBtn").click();
+    check(`${lang}/${sample}: outcome fixed confirmed`, await until(() => d.getElementById("outcomeMsg").textContent.length > 5 && d.getElementById("fixedBtn").getAttribute("aria-pressed") === "true", 5000), d.getElementById("outcomeMsg").textContent);
+    check(`${lang}/${sample}: outcome message has no raw keys`, !/fixedThanks|undefined/.test(d.getElementById("outcomeMsg").textContent), d.getElementById("outcomeMsg").textContent);
+    const gar = JSON.parse(w.localStorage.getItem("tc_garage") || "[]");
+    check(`${lang}/${sample}: garage entry marked fixed`, gar.length > 0 && gar[0].outcome === "fixed", JSON.stringify(gar[0]));
     // garage persisted?
     check(`${lang}/${sample}: no uncaught page errors`, errors.length === 0, errors.join(" | "));
   }

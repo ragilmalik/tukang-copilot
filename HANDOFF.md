@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 07:55 WIB (v1.19.0)
+- **New:** outcome buttons ("It works now" / "Took it to a mechanic"), `POST /api/sessions/{id}/outcome`, PDF Result line, My garage "Total saved" line (localStorage, sums `diy_saving_idr` of repairs marked fixed). SUBMISSION, README, HOW_TO_USE, API docs updated with the 1.11 to 1.19 features that were missing from the write-up.
+- **Checks (real runs, 07:50 WIB):** ruff clean, `mypy api` strict no issues in 56 files, pytest **270 passed, 6 skipped** (Playwright only; jsdom runs after `npm install --prefix /tmp/jd jsdom`), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED (new outcome step), `make_test_report.py` ALL PASSED (270/276). Outcome UI only jsdom-verified (no Chromium here).
+- **Next up (Malik):** after first live key run: eval_fixtures live, tune prompts; re-take screenshots/video when a Chromium exists (timer, saving chip, outcome buttons not in current assets); Render preview smoke once deployed.
+
 ## State on 2026-10-31 07:15 WIB (v1.18.0)
 - **New:** waiting-time steps (`wait_minutes` on Step; guide countdown timer with vibrate and spoken alert; workshop sheet tick line; coerce `_wait`; prompt line). See CHANGELOG 1.18.0.
 - **Checks (real runs, 07:12 WIB):** ruff clean, `mypy api` strict no issues in 55 files, pytest **258 passed, 7 skipped** (Playwright only; jsdom runs with /tmp/jd, incl. 7 new timer checks), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED. Timer alert on a locked phone screen not testable here.

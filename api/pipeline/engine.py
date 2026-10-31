@@ -561,6 +561,7 @@ def replan(sid: str, report: str) -> dict[str, Any]:
         return s
     before_hist = list(s["history"][:-1])
     s["cause_index"] += 1
+    s.pop("outcome", None)  # a new plan means the earlier "fixed" no longer stands
     meter = cost.Meter(settings.max_cost_usd)
     cost.use(meter)
     try:
@@ -584,6 +585,23 @@ def replan(sid: str, report: str) -> dict[str, Any]:
     return s
 
 
+OUTCOMES = ("fixed", "pro")
+
+
+def set_outcome(sid: str, result: str) -> dict[str, Any]:
+    """Close the loop: the owner says it works now ("fixed") or that a professional took over ("pro").
+    The saving is only counted for "fixed", and only when the diagnosis carried a shop price."""
+    s = load(sid)
+    if not s.get("plan"):
+        raise ValueError("no plan yet")
+    if result not in OUTCOMES:
+        raise ValueError("unknown outcome")
+    saved = int((s.get("diagnosis") or {}).get("diy_saving_idr") or 0) if result == "fixed" else 0
+    s["outcome"] = {"result": result, "at": time.time(), "saved_idr": saved}
+    save(s)
+    return s
+
+
 def report(sid: str) -> dict[str, Any]:
     """Finish summary (SPEC §5.7)."""
     s = load(sid)
@@ -595,7 +613,7 @@ def report(sid: str) -> dict[str, Any]:
             "tools": dx.get("tools", []), "parts": dx.get("parts", []), "cost_estimate_idr": dx.get("cost_estimate_idr", 0),
             "shop_cost_estimate_idr": dx.get("shop_cost_estimate_idr", 0), "diy_saving_idr": dx.get("diy_saving_idr", 0),
             "minutes_estimate": dx.get("minutes_estimate"), "safety_level": s["safety"]["level"], "attempts": s.get("history", []),
-            "status": s["status"], "created": s["created"], "lang": s["lang"]}
+            "status": s["status"], "created": s["created"], "lang": s["lang"], "outcome": s.get("outcome")}
 
 
 def delete(sid: str) -> bool:
