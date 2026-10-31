@@ -3,7 +3,7 @@
 Deadline: **Thu Nov 5, 2026, 09:00 WIB** (Nov 4, 9 PM ET). Internal target: feature-complete Nov 3, 23:59 WIB.
 Owner: **M** = Malik, **H** = Malik.
 
-## Must (to submit) — see HANDOFF.md "Malik-only" list
+## Must (to submit): see HANDOFF.md "Malik-only" list
 - [ ] **M** Meta key → `python scripts/set_keys.py` → ALL GOOD (claim credits + set a spend limit on dev.meta.ai first)
 - [ ] **H** First live run on the 5 samples (no FALLBACK lines); fix real-API differences; update META_API_NOTES ⚠️ items and the "Honest status" lines in WRITEUP/SUBMISSION
 - [ ] **M** Real photos + 5 user trials (docs/USER_TRIAL_KIT.md) → **H** `scripts/impact_report.py`, replace MOCK impact numbers, tune prompts

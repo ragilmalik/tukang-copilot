@@ -22,7 +22,7 @@ Auto-filled (ragil malik / ragilmalika). Solo, nothing to add.
 
 ### 5. X post link (Most Viral, optional)
 ```
-[paste the X post URL after posting — draft below]
+[paste the X post URL after posting: draft below]
 ```
 
 ### 6. Project Description *
@@ -49,7 +49,7 @@ https://github.com/ragilmalik/tukang-copilot
 
 ### 8. 3-Minute Demo Video *
 ```
-[https://youtube.com/watch?v=…  — upload docs/demo/tukang-copilot-demo.mp4 (2:57) or the real-phone recording; Unlisted is fine, check it opens logged-out]
+[https://youtube.com/watch?v=… : upload docs/demo/tukang-copilot-demo.mp4 (2:57) or the real-phone recording; Unlisted is fine, check it opens logged-out]
 ```
 
 ### 9. Describe your use of Meta products to build the submitted project *
