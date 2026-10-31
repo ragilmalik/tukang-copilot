@@ -127,6 +127,9 @@ code.tool.code{background:#eaf5ee;color:#1b5e38}
 details.agent{margin-top:10px}details.agent summary{cursor:pointer;font-weight:600}
 #quickAns{margin:4px 0 8px}#quickAns .chip{min-height:44px;padding:8px 16px;font-size:1rem}
 .sampleCheck .btn{min-height:44px;margin:4px 4px 0 0}
-.tourBar{position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:50;display:flex;gap:10px;align-items:center;background:var(--ink);color:#fff;border-radius:14px;padding:10px 12px;box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:620px;margin:0 auto}
-.tourBar p{margin:0;flex:1;font-size:.92rem}.tourBar .btn{background:#fff;color:var(--ink);min-height:44px}
-body:has(#tourBar:not(.hidden)){padding-bottom:110px}
+.tourBar{position:fixed;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:50;display:flex;gap:6px;align-items:center;background:var(--ink);color:#fff;border-radius:14px;padding:4px 4px 4px 4px;box-shadow:0 4px 16px rgba(0,0,0,.25);max-width:min(360px,calc(100vw - 16px))}
+.tourBar p{margin:0;flex:1;font-size:.86rem;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.tourBar button{background:transparent;color:#fff;border:0;min-width:44px;min-height:44px;font-size:1.25rem;border-radius:10px;cursor:pointer;padding:0}
+.tourBar button:focus-visible{outline:3px solid #ffb366;outline-offset:1px}
+.tourBar.collapsed{border-radius:999px;padding:2px}.tourBar.collapsed p,.tourBar.collapsed .tourX{display:none}
+body:has(#tourBar:not(.hidden)){padding-bottom:96px}body:has(#tourBar.collapsed:not(.hidden)){padding-bottom:56px}

@@ -92,7 +92,7 @@ const T_EXTRA = {
         tourProgress: "Demo: AI sedang bekerja. Tiap baris = satu model Meta atau aturan keselamatan.", tourAsk: "AI belum yakin, jadi ia bertanya. Ketuk salah satu jawaban.",
         tourResult: "Lihat bagian yang ditandai SAM 3.1 dan log 'Yang dilakukan AI'. Lalu centang daftar keselamatan untuk membuka langkah 1.",
         tourCheck: "Coba 'Cek langkah ini' dengan foto contoh: foto gelap ditolak, foto benar lolos.",
-        tourStuck: "Lalu ketuk 'Masih rusak' di bawah untuk melihat AI menyusun ulang rencananya.", tourClose: "Tutup",
+        tourStuck: "Lalu ketuk 'Masih rusak' di bawah untuk melihat AI menyusun ulang rencananya.", tourClose: "Tutup", tourTip: "Tampilkan tip", tourHide: "Kecilkan tip",
         sampleTry: "Belum punya foto? Coba foto contoh:", sampleBad: "📷 Foto gelap ✗", sampleGood: "📷 Foto benar ✓" },
   jv: { demoBtn: "▶ Jajal demo sak tutulan", demoSub: "Tanpa foto, tanpa akun: delengen AI ndandani motor mogok saka wiwitan nganti dicek kamera.",
         how1: "📷 Foto + crita", how2: "🎯 AI nandhani perangane", how3: "✅ Saben langkah dicek kamera",
@@ -116,7 +116,7 @@ const T_EXTRA = {
         tourProgress: "Demo: AI lagi nyambut gawe. Saben baris = siji model Meta utawa aturan keamanan.", tourAsk: "AI durung yakin, mula takon. Tutul salah siji wangsulan.",
         tourResult: "Delengen perangan sing ditandhani SAM 3.1 lan log 'Sing ditindakake AI'. Banjur centhang dhaptar keamanan kanggo mbukak langkah 1.",
         tourCheck: "Jajal 'Priksa langkah iki' nganggo foto conto: foto peteng ditolak, foto bener lolos.",
-        tourStuck: "Banjur tutul 'Isih rusak' ing ngisor kanggo ndeleng AI nyusun rencana anyar.", tourClose: "Tutup",
+        tourStuck: "Banjur tutul 'Isih rusak' ing ngisor kanggo ndeleng AI nyusun rencana anyar.", tourClose: "Tutup", tourTip: "Tampilake pitutur", tourHide: "Cilikna pitutur",
         sampleTry: "Durung duwe foto? Jajal foto conto:", sampleBad: "📷 Foto peteng ✗", sampleGood: "📷 Foto bener ✓" },
   en: { demoBtn: "▶ Try the 1-tap demo", demoSub: "No photo, no account: watch the AI fix a bike that won't start, right up to the camera check.",
         how1: "📷 Snap + say it", how2: "🎯 AI marks the part", how3: "✅ Every step camera-checked",
@@ -140,7 +140,7 @@ const T_EXTRA = {
         tourProgress: "Demo: the AI is working. Each line is one Meta model or safety rule.", tourAsk: "The AI isn't sure, so it asks. Tap an answer.",
         tourResult: "See the parts SAM 3.1 outlined and the 'What the AI did' log. Then tick the safety list to unlock step 1.",
         tourCheck: "Try 'Check this step' with a sample photo: the dark one is rejected, the right one passes.",
-        tourStuck: "Then tap 'Still broken' below to watch the AI re-plan.", tourClose: "Close",
+        tourStuck: "Then tap 'Still broken' below to watch the AI re-plan.", tourClose: "Close", tourTip: "Show tip", tourHide: "Minimise tip",
         sampleTry: "No photo yet? Try a sample photo:", sampleBad: "📷 Dark photo ✗", sampleGood: "📷 Right photo ✓" },
 };
 /* I18N_EXTRA:end */
@@ -955,9 +955,17 @@ function tickElapsed() {
 function startElapsed() { progT0 = Date.now(); if (progTimer) clearInterval(progTimer); progTimer = setInterval(tickElapsed, 1000); tickElapsed(); }
 
 /* ---------------- 1-tap guided demo (v1.22) ---------------- */
-const tour = { on: false };
+// The tip bar is a small pill in the corner, never a full-width sheet over the main button. It opens wide for the
+// first tips, collapses to a 💡 chip by itself once the first step has been checked, and the owner can fold or
+// close it at any time. A new tip after a manual fold stays folded until tapped.
+const tour = { on: false, collapsed: false, userSet: false, key: "" };
 try { tour.on = sessionStorage.getItem("tc_tour") === "1"; } catch (_) { /* private mode */ }
-function setTour(v) { tour.on = v; try { v ? sessionStorage.setItem("tc_tour", "1") : sessionStorage.removeItem("tc_tour"); } catch (_) {} updateTour(); }
+function setTour(v) {
+  tour.on = v; tour.collapsed = false; tour.userSet = false; tour.key = "";
+  try { v ? sessionStorage.setItem("tc_tour", "1") : sessionStorage.removeItem("tc_tour"); } catch (_) {}
+  updateTour();
+}
+function toggleTour() { tour.collapsed = !tour.collapsed; tour.userSet = true; updateTour(); }
 function updateTour() {
   const bar = $("tourBar"); if (!bar) return;
   let key = "";
@@ -970,8 +978,17 @@ function updateTour() {
       key = !unlocked ? "tourResult" : passed ? "tourStuck" : "tourCheck";
     }
   }
+  // auto-collapse after the first step check (pass or fail), unless the owner chose otherwise
+  const checked = !!(S && S.checks && Object.keys(S.checks).length);
+  if (checked && !tour.userSet) tour.collapsed = true;
+  tour.key = key;
   bar.classList.toggle("hidden", !key);
-  if (key) $("tourText").textContent = t(key);
+  bar.classList.toggle("collapsed", !!key && tour.collapsed);
+  if (!key) return;
+  $("tourText").textContent = t(key);
+  const tg = $("tourToggle");
+  if (tg) { tg.setAttribute("aria-expanded", String(!tour.collapsed)); tg.setAttribute("aria-label", t(tour.collapsed ? "tourTip" : "tourHide")); tg.title = tg.getAttribute("aria-label"); }
+  const x = $("tourClose"); if (x) { x.setAttribute("aria-label", t("tourClose")); x.title = t("tourClose"); }
 }
 async function sampleCheck(kind) {
   if (!S || !S.sample) return;
@@ -986,6 +1003,7 @@ async function sampleCheck(kind) {
 function setupDemo() {
   on("demoBtn", "click", () => { setTour(true); submit("motor"); });
   on("tourClose", "click", () => setTour(false));
+  on("tourToggle", "click", toggleTour);
   on("sampleBad", "click", () => sampleCheck("dark"));
   on("sampleGood", "click", () => sampleCheck("ok"));
   document.querySelectorAll("#quickAns button").forEach((b) => b.addEventListener("click", () => {

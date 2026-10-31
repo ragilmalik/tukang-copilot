@@ -3,6 +3,7 @@ drawn as an image and saved as a multi-page PDF. Works the same in demo mode and
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Any
 
@@ -66,6 +67,131 @@ BRIEF: dict[str, dict[str, str]] = {
            "pass": "OK", "fail": "NOT YET", "status": "Status", "red": "Safety STOP", "exhausted": "Every safe cause was tried",
            "requested": "Owner asked for a mechanic", "photos": "Owner's photos", "photo": "Photo", "check": "Step check"},
 }
+
+
+# Agent log lines for the PDF, mirrored from web/app.js (ag_* strings) so the PDF reads like the screen.
+# api/tests/test_report_pdf.py checks the two stay in sync.
+AGENT: dict[str, dict[str, str]] = {
+    "id": {
+        "agentTitle": "Yang dilakukan AI",
+        "ag_listen": "Mendengar suaramu dan mengubahnya jadi teks",
+        "ag_gate_ok": "Cek kata berbahaya (gas, listrik rumah, rem…): aman, lanjut",
+        "ag_gate_stop": "Kata berbahaya terdeteksi ({category}): berhenti sebelum memanggil model",
+        "ag_look": "Melihat foto: {object}, {n} bagian dikenali",
+        "ag_segment": "Menandai {found} dari {of} bagian di fotomu (masker piksel)",
+        "ag_diagnose": "Paling mungkin: {cause} ({conf}%), dari {n} kemungkinan",
+        "ag_ask": "Baru yakin {conf}% (di bawah {threshold}%): bertanya satu hal dulu, bukan menebak",
+        "ag_answer": "Jawabanmu diterima, diagnosa diulang",
+        "ag_plan": "Menyusun {steps} langkah untuk: {cause}",
+        "ag_guard_ok": "Rencana dicek aturan keselamatan di kode: lolos ({level})",
+        "ag_guard_stop": "Rencana ditolak aturan keselamatan: STOP",
+        "ag_illustrate": "Menggambar {made} dari {of} diagram dari fotomu",
+        "ag_redrawn": ", {redrawn} digambar ulang setelah diperiksa",
+        "ag_check_ok": "Langkah {step} dicek dari foto baru: benar",
+        "ag_check_fail": "Langkah {step} dicek dari foto baru: belum pas, diberi koreksi",
+        "ag_check_esc": " (gagal berulang, menyarankan rencana lain)",
+        "ag_replan": "Masih rusak: rencana baru {steps} langkah untuk {cause}",
+        "ag_esc_red": "Terlalu berbahaya dikerjakan sendiri: diarahkan ke teknisi + laporan",
+        "ag_esc_exhausted": "Semua sebab yang aman sudah dicoba: diserahkan ke bengkel dengan laporan",
+        "ag_fallback": "Model live gagal setelah dicoba ulang: tahap {stage} memakai jawaban demo (diberi label)",
+        "ag_input_guard": "Ada kalimat berupa perintah di inputmu: diperlakukan sebagai data dan diabaikan",
+        "ag_outcome_fixed": "Kamu konfirmasi: sudah beres",
+        "ag_outcome_pro": "Kamu memilih membawa ke bengkel",
+        "ag_retry": "Mencoba ulang tahap yang gagal (ke-{n})",
+        "agCode": "kode",
+    },
+    "jv": {
+        "agentTitle": "Sing ditindakake AI",
+        "ag_listen": "Ngrungokake swaramu lan ngowahi dadi tulisan",
+        "ag_gate_ok": "Priksa tembung mbebayani (gas, listrik omah, rem…): aman, terus",
+        "ag_gate_stop": "Ana tembung mbebayani ({category}): mandheg sadurunge takon model",
+        "ag_look": "Ndeleng foto: {object}, {n} perangan ditemokake",
+        "ag_segment": "Nandhani {found} saka {of} perangan ing fotomu (masker piksel)",
+        "ag_diagnose": "Sing paling mungkin: {cause} ({conf}%), saka {n} kemungkinan",
+        "ag_ask": "Lagi yakin {conf}% (ing ngisor {threshold}%): takon siji bab dhisik, ora ngira-ira",
+        "ag_answer": "Wangsulanmu ditampa, diagnosa dibaleni",
+        "ag_plan": "Nyusun {steps} langkah kanggo: {cause}",
+        "ag_guard_ok": "Rencana dipriksa aturan keamanan ing kode: lolos ({level})",
+        "ag_guard_stop": "Rencana ditolak aturan keamanan: MANDHEG",
+        "ag_illustrate": "Nggambar {made} saka {of} diagram saka fotomu",
+        "ag_redrawn": ", {redrawn} digambar maneh sawise dipriksa",
+        "ag_check_ok": "Langkah {step} dipriksa saka foto anyar: bener",
+        "ag_check_fail": "Langkah {step} dipriksa saka foto anyar: durung pas, diwenehi koreksi",
+        "ag_check_esc": " (gagal bola-bali, nyaranake rencana liya)",
+        "ag_replan": "Isih rusak: rencana anyar {steps} langkah kanggo {cause}",
+        "ag_esc_red": "Kebangeten mbebayani yen digarap dhewe: diarahake menyang teknisi + laporan",
+        "ag_esc_exhausted": "Kabeh sebab sing aman wis dijajal: dipasrahake menyang bengkel karo laporan",
+        "ag_fallback": "Model live gagal sawise dijajal maneh: tahap {stage} nganggo wangsulan demo (ana labele)",
+        "ag_input_guard": "Ana ukara prentah ing inputmu: dianggep data lan ora digatekake",
+        "ag_outcome_fixed": "Sampeyan ngonfirmasi: wis rampung",
+        "ag_outcome_pro": "Sampeyan milih nggawa menyang bengkel",
+        "ag_retry": "Nyoba maneh tahap sing gagal (kaping {n})",
+        "agCode": "kode",
+    },
+    "en": {
+        "agentTitle": "What the AI did",
+        "ag_listen": "Listened to your voice note and turned it into text",
+        "ag_gate_ok": "Scanned your words for hazards (gas, mains, brakes…): clear",
+        "ag_gate_stop": "Hazard words found ({category}): stopped before any model call",
+        "ag_look": "Looked at the photo: {object}, {n} parts located",
+        "ag_segment": "Outlined {found} of {of} parts on your photo (pixel masks)",
+        "ag_diagnose": "Most likely: {cause} ({conf}%), out of {n} causes",
+        "ag_ask": "Only {conf}% sure (below {threshold}%): asked one question instead of guessing",
+        "ag_answer": "Got your answer, re-ran the diagnosis",
+        "ag_plan": "Planned {steps} steps for: {cause}",
+        "ag_guard_ok": "Plan checked by safety rules in code: passed ({level})",
+        "ag_guard_stop": "Plan blocked by safety rules: STOP",
+        "ag_illustrate": "Drew {made} of {of} helper diagrams from your photo",
+        "ag_redrawn": ", {redrawn} redrawn after review",
+        "ag_check_ok": "Step {step} checked from your new photo: correct",
+        "ag_check_fail": "Step {step} checked from your new photo: not yet, sent a correction",
+        "ag_check_esc": " (repeated fails, suggested another plan)",
+        "ag_replan": "Still broken: new {steps}-step plan for {cause}",
+        "ag_esc_red": "Too dangerous to do alone: handed off to a professional with a report",
+        "ag_esc_exhausted": "Every safe cause tried: handed off to a workshop with a report",
+        "ag_fallback": "Live model failed after retries: {stage} used the labelled demo answer",
+        "ag_input_guard": "Your input contained instruction-like text: treated as data and ignored",
+        "ag_outcome_fixed": "You confirmed: it works now",
+        "ag_outcome_pro": "You chose to take it to a mechanic",
+        "ag_retry": "Retried the failed stage (#{n})",
+        "agCode": "code",
+    },
+}
+
+def _fill(tpl: str, e: dict[str, Any]) -> str:
+    return re.sub(r"\{(\w+)\}", lambda m: str(e.get(m.group(1), "")), tpl)
+
+
+def agent_lines(session: dict[str, Any], lang: str) -> list[str]:
+    """The agent log ("What the AI did") as plain lines, same wording and rules as web/app.js agentLine()."""
+    A, L = AGENT.get(lang, AGENT["id"]), LABELS.get(lang, LABELS["id"])
+    out: list[str] = []
+    for e in session.get("agent_log") or []:
+        if not isinstance(e, dict):
+            continue
+        k = str(e.get("kind") or "")
+        if k == "gate":
+            line = A["ag_gate_ok"] if e.get("ok") else _fill(A["ag_gate_stop"], e)
+        elif k == "plan_guard":
+            line = _fill(A["ag_guard_ok"], {"level": L.get(str(e.get("level")), str(e.get("level") or ""))}) if e.get("ok") else A["ag_guard_stop"]
+        elif k == "illustrate":
+            line = _fill(A["ag_illustrate"], e) + (_fill(A["ag_redrawn"], e) if e.get("redrawn") else "")
+        elif k == "check":
+            line = _fill(A["ag_check_ok" if e.get("passed") else "ag_check_fail"], e) + (A["ag_check_esc"] if e.get("escalate") else "")
+        elif k == "escalate":
+            line = A["ag_esc_exhausted" if e.get("reason") == "exhausted" else "ag_esc_red"]
+        elif k == "outcome":
+            line = A["ag_outcome_fixed" if e.get("result") == "fixed" else "ag_outcome_pro"]
+        elif "ag_" + k in A:
+            line = _fill(A["ag_" + k], e)
+        else:
+            line = k
+        tool = str(e.get("model") or (A["agCode"] if k in ("gate", "plan_guard", "input_guard") else ""))
+        secs = f" {int(e['ms']) / 1000:.1f}s" if isinstance(e.get("ms"), (int, float)) and e["ms"] >= 100 else ""
+        t = e.get("t")
+        stamp = f"{float(t):.0f}s  " if isinstance(t, (int, float)) else ""
+        out.append(f"{stamp}{line}" + (f"  [{tool}]" if tool else "") + secs)
+    return out
 
 
 def brief_lines(session: dict[str, Any], lang: str) -> list[tuple[str, str]]:
@@ -337,6 +463,13 @@ def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: 
         doc.text(L["attempts"], 28, bold=True)
         for a in rep["attempts"]:
             doc.text(f"- {a}", 23, indent=10)
+
+    ag = agent_lines(session, lang)
+    if ag:
+        doc.rule()
+        doc.text(AGENT.get(lang, AGENT["id"])["agentTitle"], 28, bold=True)
+        for line in ag:
+            doc.text(f"- {line}", 21, indent=10, gap=5)
 
     rows = [r for r in build_trace(session) if r["status"] == "done"]
     if rows:

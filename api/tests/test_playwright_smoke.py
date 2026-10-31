@@ -133,6 +133,39 @@ def test_video_capture_flow(page, tmp_path):
     page.wait_for_selector("#result:not(.hidden), #question:not(.hidden)", timeout=30000)
 
 
+def test_tip_bar_is_compact_and_collapses_after_first_check(page):
+    """v1.22.0: the demo tip bar is a corner pill (not a full-width sheet), folds to a 💡 chip after the first step
+    check, can be reopened and closed, and never blocks the buttons the tips point at (clicks would fail if it did)."""
+    page.goto(page.base + "/")
+    page.select_option("#lang", "en")
+    page.click("#demoBtn")
+    page.wait_for_selector("#tourBar:not(.hidden):not(.collapsed)")
+    box = page.locator("#tourBar").bounding_box()
+    assert box and box["width"] <= 370 and box["height"] <= 120, box
+    page.wait_for_selector("#question:not(.hidden)", timeout=20000)
+    page.click('#quickAns button[data-q="qNo"]')
+    page.wait_for_selector("#result:not(.hidden)", timeout=20000)
+    for b in page.locator("#preList input").all():
+        b.check()
+    assert "collapsed" not in (page.get_attribute("#tourBar", "class") or "")
+    page.click("#sampleBad")
+    page.wait_for_selector("#tourBar.collapsed:not(.hidden)", timeout=15000)
+    chip = page.locator("#tourBar").bounding_box()
+    assert chip and chip["width"] <= 60 and chip["height"] <= 60, chip
+    assert page.get_attribute("#tourToggle", "aria-expanded") == "false"
+    assert page.get_attribute("#tourToggle", "aria-label") == "Show tip"
+    page.click("#sampleGood")                                   # not covered by the chip
+    page.wait_for_function("document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
+    page.click("#tourToggle")
+    page.wait_for_selector("#tourBar:not(.collapsed)")
+    assert page.get_attribute("#tourToggle", "aria-expanded") == "true" and "Still broken" in page.inner_text("#tourText")
+    page.click("#tourToggle")
+    page.wait_for_selector("#tourBar.collapsed")
+    page.click("#tourToggle")
+    page.click("#tourClose")
+    page.wait_for_selector("#tourBar.hidden", state="attached")
+
+
 def test_one_tap_demo_runs_the_whole_agent_loop(page):
     """v1.22 judge path: one tap, a quick answer, stand-in check photos (fail then pass), re-plan, agent log."""
     page.goto(page.base + "/")
