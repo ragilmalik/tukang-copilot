@@ -24,7 +24,7 @@ LABELS: dict[str, dict[str, str]] = {
            "disclaimer": "Panduan ini hanya untuk perbaikan ringan. Harga adalah perkiraan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.",
            "made": "Dibuat dengan Tukang Copilot (Meta Muse Spark + SAM 3.1)", "page": "Hal.", "demo": "Mode demo: jawaban contoh",
            "green": "AMAN", "amber": "HATI-HATI", "red": "STOP",
-           "hood": "Di balik layar: model yang dipakai",
+           "hood": "Di balik layar: model yang dipakai", "before": "Sebelum mulai, pastikan",
            "st_listen": "Dengar suara", "st_gate": "Cek keselamatan teks", "st_look": "Lihat foto", "st_segment": "Tandai bagian",
            "st_diagnose": "Diagnosa", "st_plan": "Susun langkah", "st_safety": "Cek keselamatan rencana", "st_illustrate": "Gambar bantu",
            "st_narrate": "Suara pemandu"},
@@ -36,7 +36,7 @@ LABELS: dict[str, dict[str, str]] = {
            "disclaimer": "Light repairs only. Prices are estimates. For gas, house wiring, or high voltage, call a professional.",
            "made": "Made with Tukang Copilot (Meta Muse Spark + SAM 3.1)", "page": "Page", "demo": "Demo mode: sample answers",
            "green": "SAFE", "amber": "CAUTION", "red": "STOP",
-           "hood": "Under the hood: models used",
+           "hood": "Under the hood: models used", "before": "Before you start, make sure",
            "st_listen": "Listen", "st_gate": "Text safety gate", "st_look": "Look at photo", "st_segment": "Mark parts",
            "st_diagnose": "Diagnose", "st_plan": "Plan steps", "st_safety": "Plan safety gate", "st_illustrate": "Helper diagram",
            "st_narrate": "Voice guide"},
@@ -165,6 +165,13 @@ def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: 
         doc.space(10)
         doc.text(L["photo"], 22, bold=True, color=MUTED, gap=4)
         doc.image(photo, 560)
+
+    pre = [str(x) for x in ((session.get("diagnosis") or {}).get("before_you_start") or []) if x]
+    if pre:
+        doc.space(6)
+        doc.text(L["before"], 24, bold=True, color=MUTED, gap=4)
+        for x in pre:
+            doc.text(f"{L['todo']}  {x}", 24, indent=10)
 
     steps = (session.get("plan") or {}).get("steps", [])
     if steps:

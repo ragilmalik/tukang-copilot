@@ -15,6 +15,8 @@ Rules:
   typical 2026 retail `est_price_idr` (integer rupiah). Label nothing as certain.
 - `shop_cost_estimate_idr`: what an Indonesian bengkel/servis would typically charge for the same fix, parts plus
   labour, integer rupiah; 0 if you cannot say or the safety level is red.
+- `before_you_start`: 1 to 3 very short things the owner must have done before step 1 (unplugged, engine off and cool,
+  water valve closed, hands dry). Empty list when safety is red. Plain statements the owner can tick, not steps.
 - `difficulty` 1-5, `minutes_estimate` for a first-timer.
 - If the top cause is below 60, write ONE short `follow_up_question` that would most change the answer.
 - Never give medical advice. Never suggest bypassing a safety device or fuse.

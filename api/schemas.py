@@ -63,6 +63,9 @@ class Diagnosis(BaseModel):
     difficulty: int = Field(ge=1, le=5)
     minutes_estimate: int = Field(ge=1, le=600)
     follow_up_question: str = ""   # asked when the top cause is below 60% confidence
+    # Short things the owner must have done BEFORE step 1 (unplug, engine cool, valve closed). The guide shows them
+    # as a tick list and keeps the steps locked until every box is ticked. Empty = nothing to confirm.
+    before_you_start: list[str] = Field(default_factory=list, max_length=4)
     # Typical price at a bengkel/servis for this same repair (parts + labour), rupiah; 0 = unknown or red stop.
     shop_cost_estimate_idr: int = Field(default=0, ge=0)
 

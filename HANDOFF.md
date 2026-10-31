@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 08:20 WIB (v1.20.0)
+- **New:** "Before you start" safety gate. `Diagnosis.before_you_start` (max 4), tick list on result and shared guide pages, step card dimmed and `inert` until all ticked (ticks kept in localStorage per repair), no hands-free voice while locked, PDF prints the list, prompt asks for it, red stops carry none. Also made the jsdom timer check less timing-sensitive (it flaked once under load: the 500 ms tick can still show 10:00 at 700 ms).
+- **Checks (real runs, 08:15 WIB):** ruff clean, `mypy api` strict no issues in 57 files, pytest **289 passed, 6 skipped** (Playwright only; jsdom runs after `npm install --prefix /tmp/jd jsdom`), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED, `make_test_report.py` ALL PASSED (289/295). Lock/unlock only jsdom-verified (no Chromium here, so no real-browser check of `inert`); the Playwright smoke does not click inside the step card, so it should be unaffected.
+- **Next up (Malik):** after first live key run: eval_fixtures live, tune prompts (check `before_you_start` is short and not generic); re-take screenshots/video when a Chromium exists (preflight card, timer, saving chip, outcome buttons not in current assets); Render preview smoke once deployed.
+
 ## State on 2026-10-31 07:55 WIB (v1.19.0)
 - **New:** outcome buttons ("It works now" / "Took it to a mechanic"), `POST /api/sessions/{id}/outcome`, PDF Result line, My garage "Total saved" line (localStorage, sums `diy_saving_idr` of repairs marked fixed). SUBMISSION, README, HOW_TO_USE, API docs updated with the 1.11 to 1.19 features that were missing from the write-up.
 - **Checks (real runs, 07:50 WIB):** ruff clean, `mypy api` strict no issues in 56 files, pytest **270 passed, 6 skipped** (Playwright only; jsdom runs after `npm install --prefix /tmp/jd jsdom`), `node --check web/app.js` ok, `smoke_e2e.py` ALL PASSED (new outcome step), `make_test_report.py` ALL PASSED (270/276). Outcome UI only jsdom-verified (no Chromium here).

@@ -88,7 +88,8 @@ def diagnosis(sc: str, lang: str) -> dict[str, Any]:
                 "safety_level": "amber", "safety_reason": _L(lang, "Pompa listrik 220V dekat air: selalu cabut steker dulu dan kerjakan dengan tangan kering.", "A 220V pump near water: always unplug first and work with dry hands."),
                 "tools": [{"name": _L(lang, "Kunci ring 17 mm", "17 mm ring spanner"), "est_price_idr": 20000}, {"name": _L(lang, "Ember atau gayung", "Bucket or water scoop"), "est_price_idr": 10000}],
                 "parts": [{"name": "Seal tape", "est_price_idr": 5000}, {"name": _L(lang, "Foot valve 1\" (cadangan)", "1\" foot valve (spare)"), "est_price_idr": 35000}],
-                "difficulty": 2, "minutes_estimate": 25, "follow_up_question": "", "shop_cost_estimate_idr": 150000}
+                "difficulty": 2, "minutes_estimate": 25, "follow_up_question": "", "shop_cost_estimate_idr": 150000,
+                "before_you_start": [_L(lang, "Steker pompa sudah dicabut", "The pump is unplugged"), _L(lang, "Tangan dan lantai kering", "Your hands and the floor are dry"), _L(lang, "Kran hisap dan keluar sudah ditutup", "The suction and outlet taps are closed")]}
     if sc == "tire":
         return {"problem_summary": _L(lang, "Ban belakang kempes pelan-pelan: ada paku menancap di tapak ban tubeless.", "The rear tyre is going flat: a nail is stuck in the tubeless tread."),
                 "causes": [{"title": _L(lang, "Paku menancap di tapak ban", "Nail stuck in the tread"), "confidence": 65, "evidence": [_L(lang, "Ada benda logam di tapak ban", "A metal object sits in the tread")], "component_ids": ["c1"]},
@@ -97,7 +98,8 @@ def diagnosis(sc: str, lang: str) -> dict[str, Any]:
                 "safety_level": "amber", "safety_reason": _L(lang, "Motor harus stabil di standar tengah dan jangan ditambal di jalan ramai; tambalan cacing hanya sementara.", "Keep the bike steady on its centre stand and never fix it on a busy road; a plug is a temporary repair."),
                 "tools": [{"name": _L(lang, "Set tambal ban tubeless (cacing)", "Tubeless tyre plug kit"), "est_price_idr": 25000}, {"name": _L(lang, "Tang", "Pliers"), "est_price_idr": 30000}, {"name": _L(lang, "Pompa tangan atau pompa angin", "Hand pump or air compressor"), "est_price_idr": 50000}],
                 "parts": [{"name": _L(lang, "Cacing tambal cadangan", "Spare plug strips"), "est_price_idr": 10000}, {"name": _L(lang, "Air sabun dalam botol semprot", "Soapy water in a spray bottle"), "est_price_idr": 3000}],
-                "difficulty": 2, "minutes_estimate": 25, "follow_up_question": "", "shop_cost_estimate_idr": 35000}
+                "difficulty": 2, "minutes_estimate": 25, "follow_up_question": "", "shop_cost_estimate_idr": 35000,
+                "before_you_start": [_L(lang, "Motor mati dan di tempat datar", "The bike is off and on level ground"), _L(lang, "Jauh dari jalan ramai", "You are away from traffic")]}
     if sc == "faucet":
         return {"problem_summary": _L(lang, "Kran menetes dari mulut kran saat ditutup.", "The faucet drips from the spout when closed."),
                 "causes": [{"title": _L(lang, "Seal karet di dalam kran aus", "Worn rubber washer"), "confidence": 75, "evidence": [_L(lang, "Tetes dari mulut kran saat tertutup", "Drip from spout when closed")], "component_ids": ["c1", "c2"]},
@@ -105,7 +107,8 @@ def diagnosis(sc: str, lang: str) -> dict[str, Any]:
                 "safety_level": "green", "safety_reason": _L(lang, "Air dan bagian kecil; risiko rendah.", "Water and small parts; low risk."),
                 "tools": [{"name": _L(lang, "Kunci inggris", "Adjustable wrench"), "est_price_idr": 45000}, {"name": _L(lang, "Obeng plus", "Phillips screwdriver"), "est_price_idr": 15000}],
                 "parts": [{"name": _L(lang, "Seal karet kran 1/2\"", "1/2\" faucet washer"), "est_price_idr": 3000}, {"name": "Seal tape", "est_price_idr": 5000}],
-                "difficulty": 2, "minutes_estimate": 30, "follow_up_question": "", "shop_cost_estimate_idr": 75000}
+                "difficulty": 2, "minutes_estimate": 30, "follow_up_question": "", "shop_cost_estimate_idr": 75000,
+                "before_you_start": [_L(lang, "Kran stop di bawah wastafel sudah ditutup", "The shut-off valve under the sink is closed")]}
     if sc == "rice":
         return {"problem_summary": _L(lang, "Rice cooker tidak memanas; lampu indikator mati.", "The rice cooker doesn't heat; indicator is off."),
                 "causes": [{"title": _L(lang, "Sekring termal di dalam putus", "Internal thermal fuse blown"), "confidence": 60, "evidence": [], "component_ids": []},
@@ -120,6 +123,7 @@ def diagnosis(sc: str, lang: str) -> dict[str, Any]:
             "tools": [{"name": _L(lang, "Kunci busi 16 mm", "16 mm spark plug socket"), "est_price_idr": 25000}, {"name": _L(lang, "Amplas halus / sikat kawat", "Fine sandpaper / wire brush"), "est_price_idr": 5000}],
             "parts": [{"name": _L(lang, "Busi NGK CPR8EA-9 (cadangan)", "NGK CPR8EA-9 plug (spare)"), "est_price_idr": 25000}],
             "difficulty": 2, "minutes_estimate": 20, "shop_cost_estimate_idr": 60000,
+            "before_you_start": [_L(lang, "Mesin mati dan sudah dingin (15 menit)", "The engine is off and has cooled (15 min)"), _L(lang, "Jauh dari api dan rokok", "No flames or cigarettes nearby")],
             "follow_up_question": _L(lang, "Apakah tercium bau bensin saat distarter?", "Do you smell fuel when you crank it?")}
 
 

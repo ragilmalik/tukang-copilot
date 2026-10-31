@@ -76,3 +76,9 @@ h1:focus,h2:focus{outline:none}
 .timer .clock{font-variant-numeric:tabular-nums;font-size:1.3em;font-weight:700}
 .outcome{margin-top:10px;padding-top:8px;border-top:1px solid #eee}.outcome .row{display:flex;gap:8px;flex-wrap:wrap}.outcome [aria-pressed="true"]{outline:3px solid #2296508c}
 #garageSaved{font-weight:600;color:#1f7a45}
+
+.preflight{border:2px solid #f0b429;border-radius:12px;padding:8px 12px;margin:10px 0;background:#fffaf0}
+.preflight legend{font-weight:700;padding:0 6px}
+.preItem{display:flex;gap:10px;align-items:center;min-height:44px;font-size:1.05em}
+.preItem input{width:24px;height:24px}
+#stepCard.locked{opacity:.45;filter:grayscale(.6)}

@@ -60,12 +60,22 @@ async function run(lang, sample) {
   if (ready) {
     check(`${lang}/${sample}: diagnosis text`, d.getElementById("dxObject").textContent.trim().length > 2);
     check(`${lang}/${sample}: steps rendered`, d.getElementById("stepText").textContent.trim().length > 5);
+    // "Before you start": steps stay locked until every box is ticked, and the ticks survive a re-render
+    const pre = d.getElementById("preflight"), card = d.getElementById("stepCard");
+    const boxes = Array.from(d.querySelectorAll("#preList input"));
+    check(`${lang}/${sample}: preflight shown with boxes`, pre && !pre.classList.contains("hidden") && boxes.length >= 1, boxes.length);
+    check(`${lang}/${sample}: preflight text translated`, !/preTitle|preLocked|preReady|undefined/.test(pre.textContent), pre.textContent);
+    check(`${lang}/${sample}: steps locked until ticked`, card.classList.contains("locked") && card.hasAttribute("inert"));
+    boxes.slice(0, -1).forEach((b) => { b.checked = true; b.dispatchEvent(new w.Event("change")); });
+    check(`${lang}/${sample}: still locked with one box open`, boxes.length === 1 || card.classList.contains("locked"));
+    boxes.forEach((b) => { b.checked = true; b.dispatchEvent(new w.Event("change")); });
+    check(`${lang}/${sample}: steps unlock when all ticked`, !card.classList.contains("locked") && !card.hasAttribute("inert") && /^✅/.test(d.getElementById("preState").textContent), d.getElementById("preState").textContent);
     const tm = d.getElementById("stepTimer");
     if (sample === "motor") {  // step 1 asks the owner to wait 10 minutes: countdown visible, starts and stops
       check(`${lang}/${sample}: wait timer shown`, tm && !tm.classList.contains("hidden") && /10/.test(d.getElementById("timerLabel").textContent), tm && tm.textContent);
       check(`${lang}/${sample}: timer clock 10:00`, d.getElementById("timerClock").textContent === "10:00", d.getElementById("timerClock").textContent);
       check(`${lang}/${sample}: timer label translated`, !/waitFor|timerStart/.test(tm.textContent), tm.textContent);
-      d.getElementById("timerBtn").click(); await sleep(700);
+      d.getElementById("timerBtn").click(); await sleep(1400);
       check(`${lang}/${sample}: timer counts down`, d.getElementById("timerBtn").dataset.state === "running" && d.getElementById("timerClock").textContent !== "10:00", d.getElementById("timerClock").textContent);
       d.getElementById("timerBtn").click();
       check(`${lang}/${sample}: timer stops and resets`, d.getElementById("timerBtn").dataset.state === "idle" && d.getElementById("timerClock").textContent === "10:00");

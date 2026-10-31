@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.20.0 (2026-10-31 08:20 WIB)
+- "Before you start" safety gate. Diagnosis has a new `before_you_start` list (up to 4 short statements: "the pump is unplugged", "the engine is off and cooled"). The result and shared guide pages show it as a tick list; the step card stays dimmed and `inert` (no taps, no keyboard focus, no hands-free voice) until every box is ticked, and the ticks are remembered per repair on the phone. Red stops carry none (`coerce.py` drops them). `prompts/diagnose.md` asks for it, all four non-red mock scenarios have it in id/jv/en, the PDF report prints it as a tick list before the steps. 19 tests (`test_preflight.py`) plus 7 jsdom checks per language and scenario (shown, translated, locked, still locked with one box open, unlocks).
+
 ## 1.19.0 (2026-10-31 07:50 WIB)
 - Closes the loop. New `POST /api/sessions/{id}/outcome` (`fixed` or `pro`), "It works now" / "Took it to a mechanic" buttons on the result and shared guide pages (id/jv/en), a Result line in the PDF report, and a running "Total saved" line in My garage (sum of `diy_saving_idr` over repairs marked fixed, localStorage only). A re-plan clears the outcome. 12 tests (`test_outcome.py`), jsdom checks, smoke step.
 

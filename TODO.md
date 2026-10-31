@@ -40,3 +40,4 @@ Owner: **M** = Malik, **H** = Malik.
 - [x] Bengkel price vs DIY saving chip + PDF lines (v1.17.0)
 - [x] Waiting-time steps with countdown timer (v1.18.0)
 - [x] Outcome buttons ("it works now"), PDF result line, garage total saved (v1.19.0)
+- [x] "Before you start" tick list that locks the steps until confirmed (v1.20.0)

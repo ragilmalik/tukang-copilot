@@ -165,6 +165,9 @@ def _diagnosis(d: dict[str, Any]) -> dict[str, Any]:
     shop = _price(d.get("shop_cost_estimate_idr"))
     d["shop_cost_estimate_idr"] = 0 if shop is None or d["safety_level"] == "red" else shop
     d["tools"], d["parts"] = _items(d.get("tools")), _items(d.get("parts"))
+    pre = _strs(d.get("before_you_start"))
+    d["before_you_start"] = [] if d["safety_level"] == "red" or not isinstance(pre, list) else [
+        x.strip()[:140] for x in pre if isinstance(x, str) and x.strip()][:4]
     causes = d.get("causes")
     if isinstance(causes, list):
         causes = [c for c in causes if isinstance(c, dict)]
