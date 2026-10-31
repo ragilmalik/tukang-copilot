@@ -137,3 +137,6 @@ Four features from the win plan (built 08:00–08:40 WIB), plus deploy readiness
 - 78 automated tests, ruff, GitHub Actions CI, Dockerfile, docker-compose, Render blueprint.
 - Docs: README, HANDOFF, TODO, setup tutorial, how-to-use (EN/ID), architecture, AI pipeline, API, safety, testing, test report, verification report, troubleshooting, demo script, submission text + X drafts, roadmap, attributions, decisions.
 - Fix: "gas" alone (motorbike throttle) no longer trips the gas safety stop; only LPG/cooking-gas phrases do.
+
+## v1.23.2
+- Share card Cache-Control cut from 300 s to 60 s so erased repairs leave crawler caches sooner (backlog J8).

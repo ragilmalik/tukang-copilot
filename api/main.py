@@ -244,7 +244,7 @@ def get_share_card(sid: str) -> FileResponse:
     from .render import share_card
 
     out = share_card.build(s, engine.session_dir(sid), engine.session_dir(sid) / "card.png")
-    return FileResponse(out, media_type="image/png", headers={"Cache-Control": "public, max-age=300"})
+    return FileResponse(out, media_type="image/png", headers={"Cache-Control": "public, max-age=60"})
 
 
 @app.get("/og.png")
