@@ -1,7 +1,7 @@
 // Tukang Copilot service worker: caches ONLY the app shell so the app opens fast and installs as a PWA.
 // API calls (/api/*), session files (/files/*) and guides are never cached: diagnosis needs the network,
 // and user photos must not linger on the device (24 h retention lives on the server).
-const CACHE = "tukang-shell-v1";
+const CACHE = "tukang-shell-v2";  // v1.22: bumped so phones drop the 1.21 shell
 const SHELL = ["/", "/static/style.css", "/static/app.js", "/manifest.webmanifest",
                "/static/icons/icon-192.png", "/static/icons/icon-512.png"];
 

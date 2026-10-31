@@ -72,6 +72,10 @@ def main() -> int:
             ok(r.status_code == 200 and "passed" in r.json(), f"check-my-step: passed={r.json().get('passed')}")
             r = c.post(f"/api/sessions/{sid}/replan", data={"report": "masih rusak"})
             ok(r.status_code == 200 and r.json()["cause_index"] == 1, "re-plan to next cause")
+            kinds = [e.get("kind") for e in r.json().get("agent_log", [])]
+            ok({"look", "diagnose", "plan", "check", "replan"} <= set(kinds), f"agent log ({len(kinds)} decisions)")
+            dark = c.get(f"/api/demo/check-photo/dark?sample={sample}")
+            ok(dark.status_code == 200 and dark.headers.get("content-type", "").startswith("image/jpeg"), "1-tap demo sample check photo")
             rep = c.get(f"/api/sessions/{sid}/report").json()
             ok(bool(rep.get("problem")), "report")
             ok(c.get(f"/guide/{sid}").status_code == 200, "shareable guide page")
