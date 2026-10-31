@@ -6,7 +6,7 @@ const T = {
         record: "Ketuk untuk bicara", stop: "Ketuk untuk berhenti", typeHere: "…atau ketik masalahnya di sini", go: "Periksa sekarang",
         samples: "Coba contoh:", sMotor: "motor mogok", sPump: "pompa tidak keluar air", sFaucet: "kran menetes", sRice: "rice cooker mati", sTire: "ban kempes",
         working: "Sedang memeriksa…", retry: "Coba lagi", answerHere: "Jawaban kamu", send: "Kirim", diagnosis: "Diagnosa", safetyFirst: "Keselamatan dulu",
-        tools: "Alat", materials: "Suku cadang", listen: "Dengarkan", next: "Lanjut", handsFree: "Mode tangan bebas (bacakan otomatis)",
+        tools: "Alat", materials: "Suku cadang", listen: "Dengarkan", next: "Lanjut", handsFree: "Mode tangan bebas (dibacakan + perintah suara)", vListening: "Mendengarkan… ucapkan lanjut, kembali, ulang, cek, masih rusak, atau berhenti.", vHelp: "Perintah suara — lanjut · kembali · ulang · cek · masih rusak · berhenti", vNoSR: "HP ini tidak bisa mendengar terus. Ketuk tombol mikrofon untuk setiap perintah.", ptt: "🎙️ Ketuk, lalu ucapkan perintah", pttRec: "⏹️ Bicara sekarang… (ketuk untuk kirim)", vHeard: "Terdengar «{text}»", vUnknown: "Belum paham «{text}». Coba lanjut, kembali, ulang, cek.", vOff: "Mode tangan bebas mati.",
         done: "Selesai kalau:", outcomeAsk: "Sudah jalan lagi?", fixedBtn: "Sudah beres 🎉", proBtn: "Dibawa ke bengkel", fixedThanks: "Mantap! Perbaikan selesai.", proThanks: "Tidak apa-apa, membawa ke ahli itu pilihan yang aman. Laporan PDF bisa ditunjukkan ke mekanik.", savedTotal: "Total hemat", savedFrom: "dari", savedUnit: "perbaikan", preTitle: "Sebelum mulai, pastikan:", preLocked: "Centang semua dulu, baru langkah 1 terbuka.", preReady: "✅ Siap. Langkah 1 terbuka.", waitFor: "Tunggu {n} menit", timerStart: "Mulai pengatur waktu", timerStop: "Hentikan", timerDone: "Waktu tunggu selesai. Lanjut ke langkah berikutnya.", checkStep: "Cek langkah ini", liveGuide: "Panduan kamera langsung", liveCheck: "📸 Cek sekarang", liveClose: "Tutup kamera", liveStart: "Menyalakan kamera…", liveAim: "Arahkan kamera ke {name}", liveFound: "🎯 Ketemu {name}", liveLost: "Belum ketemu {name}. Gerakkan HP pelan-pelan.", liveNoPart: "Langkah ini tidak menunjuk bagian tertentu. Pakai Cek sekarang.", liveNoCam: "Kamera langsung tidak bisa dipakai di HP ini. Pakai tombol foto untuk cek langkah.", liveLimit: "Batas kamera langsung untuk perbaikan ini sudah habis. Pakai foto untuk cek langkah.", share: "Bagikan laporan", pdf: "Unduh laporan PDF", workshop: "Lembar bengkel (cetak besar)", hood: "Di balik layar: model yang dipakai", hs_listen: "Dengar suara", hs_gate: "Cek keselamatan teks", hs_look: "Lihat foto", hs_segment: "Tandai bagian", hs_diagnose: "Diagnosa", hs_plan: "Susun langkah", hs_safety: "Cek keselamatan rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Suara pemandu", wa: "Kirim daftar belanja ke WhatsApp", buy: "Cari harga", garage: "Garasi saya", garageNote: "Riwayat perbaikan hanya disimpan di HP ini. Panduan bisa dibuka 24 jam.", garageClear: "Hapus riwayat", again: "Perbaiki barang lain", erase: "Hapus foto saya sekarang", eraseAsk: "Hapus foto, suara, dan panduan ini dari server sekarang?", erased: "Sudah dihapus dari server.",
         stuck: "Masih rusak, coba rencana lain", stuckHere: "Apa yang terjadi? (mis. sudah dicoba, tetap mati)",
         needPhoto: "Ambil atau unggah foto dulu.", needDesc: "Ceritakan masalahnya (suara atau ketik).",
@@ -26,7 +26,7 @@ const T = {
         record: "Tap to talk", stop: "Tap to stop", typeHere: "…or type the problem here", go: "Check it now",
         samples: "Try a sample:", sMotor: "bike won't start", sPump: "pump gives no water", sFaucet: "dripping tap", sRice: "dead rice cooker", sTire: "flat tyre",
         working: "Checking…", retry: "Try again", answerHere: "Your answer", send: "Send", diagnosis: "Diagnosis", safetyFirst: "Safety first",
-        tools: "Tools", materials: "Parts", listen: "Listen", next: "Next", handsFree: "Hands-free mode (read steps aloud)",
+        tools: "Tools", materials: "Parts", listen: "Listen", next: "Next", handsFree: "Hands-free mode (read aloud + voice commands)", vListening: "Listening… say next, back, repeat, check, still broken or stop.", vHelp: "Voice commands — next · back · repeat · check · still broken · stop", vNoSR: "This phone can't listen continuously. Tap the mic button for each command.", ptt: "🎙️ Tap, then say a command", pttRec: "⏹️ Speak now… (tap to send)", vHeard: "Heard «{text}»", vUnknown: "Didn't catch «{text}». Try next, back, repeat, check.", vOff: "Hands-free mode off.",
         done: "Done when:", outcomeAsk: "Does it work again?", fixedBtn: "It works now 🎉", proBtn: "Took it to a mechanic", fixedThanks: "Great, repair done.", proThanks: "That is a safe choice. Show the PDF report to the mechanic.", savedTotal: "Total saved", savedFrom: "from", savedUnit: "repairs", preTitle: "Before you start, make sure:", preLocked: "Tick everything first to unlock step 1.", preReady: "✅ Ready. Step 1 is open.", waitFor: "Wait {n} minutes", timerStart: "Start timer", timerStop: "Stop", timerDone: "Waiting time is over. Go on to the next step.", checkStep: "Check this step", liveGuide: "Live camera guide", liveCheck: "📸 Check now", liveClose: "Close camera", liveStart: "Starting the camera…", liveAim: "Point the camera at the {name}", liveFound: "🎯 Found {name}", liveLost: "Can't see the {name} yet. Move the phone slowly.", liveNoPart: "This step does not point at one part. Use Check now.", liveNoCam: "The live camera is not available on this phone. Use the photo button to check the step.", liveLimit: "The live camera limit for this repair is used up. Use a photo to check the step.", share: "Share report", pdf: "Download PDF report", workshop: "Workshop sheets (large print)", hood: "Under the hood: models used", hs_listen: "Listen", hs_gate: "Text safety gate", hs_look: "Look at photo", hs_segment: "Mark parts", hs_diagnose: "Diagnose", hs_plan: "Plan steps", hs_safety: "Plan safety gate", hs_illustrate: "Helper diagram", hs_narrate: "Voice guide", wa: "Send shopping list to WhatsApp", buy: "Compare prices", garage: "My garage", garageNote: "Your repair history stays on this phone only. Guides open for 24 hours.", garageClear: "Clear history", again: "Fix something else", erase: "Delete my photos now", eraseAsk: "Delete the photos, voice and guide of this repair from the server now?", erased: "Deleted from the server.",
         stuck: "Still broken, try another plan", stuckHere: "What happened? (e.g. tried it, still dead)",
         needPhoto: "Take or upload a photo first.", needDesc: "Describe the problem (voice or text).",
@@ -49,7 +49,7 @@ T.jv = Object.assign({}, T.id, {
   record: "Tutul kanggo ngomong", stop: "Tutul kanggo mandheg", typeHere: "…utawa ketik masalahe ing kene", go: "Priksa saiki",
   samples: "Jajal conto:", sMotor: "motor mogok", sPump: "pompa ora metu banyu", sFaucet: "kran netes", sRice: "rice cooker mati", sTire: "ban kempes",
   working: "Lagi dipriksa…", retry: "Jajal maneh", answerHere: "Wangsulanmu", send: "Kirim", diagnosis: "Diagnosa", safetyFirst: "Slamet dhisik",
-  tools: "Piranti", materials: "Suku cadang", listen: "Rungokna", next: "Terus", handsFree: "Mode tanpa tangan (diwacakake otomatis)",
+  tools: "Piranti", materials: "Suku cadang", listen: "Rungokna", next: "Terus", handsFree: "Mode tanpa tangan (diwacakake + prentah swara)", vListening: "Ngrungokake… ucapna terus, bali, baleni, priksa, isih rusak, utawa mandheg.", vHelp: "Prentah swara — terus · bali · baleni · priksa · isih rusak · mandheg", vNoSR: "HP iki ora bisa ngrungokake terus. Tutul tombol mikrofon saben prentah.", ptt: "🎙️ Tutul, banjur ucapna prentah", pttRec: "⏹️ Ngomong saiki… (tutul kanggo ngirim)", vHeard: "Krungu «{text}»", vUnknown: "Durung ngerti «{text}». Jajal terus, bali, baleni, priksa.", vOff: "Mode tanpa tangan mati.",
   done: "Rampung yen:", outcomeAsk: "Wis urip maneh?", fixedBtn: "Wis rampung 🎉", proBtn: "Digawa menyang bengkel", fixedThanks: "Apik! Ndandani rampung.", proThanks: "Ora apa-apa, digawa menyang ahli iku pilihan sing aman. Laporan PDF bisa dituduhake marang mekanik.", savedTotal: "Total irit", savedFrom: "saka", savedUnit: "ndandani", preTitle: "Sadurunge miwiti, priksa:", preLocked: "Centhang kabeh dhisik, banjur langkah 1 mbukak.", preReady: "✅ Siap. Langkah 1 wis mbukak.", waitFor: "Antosna {n} menit", timerStart: "Wiwiti pangetung wektu", timerStop: "Mandhegna", timerDone: "Wektu antosan wis rampung. Terus menyang langkah sabanjure.", checkStep: "Priksa langkah iki", liveGuide: "Pandhuan kamera langsung", liveCheck: "📸 Priksa saiki", liveClose: "Tutup kamera", liveStart: "Nguripake kamera…", liveAim: "Arahna kamera menyang {name}", liveFound: "🎯 Ketemu {name}", liveLost: "Durung ketemu {name}. Obahna HP alon-alon.", liveNoPart: "Langkah iki ora nuduhake perangan tartamtu. Enggo Priksa saiki.", liveNoCam: "Kamera langsung ora bisa dienggo ing HP iki. Enggo tombol foto kanggo mriksa langkah.", liveLimit: "Wates kamera langsung kanggo ndandani iki wis entek. Enggo foto kanggo mriksa langkah.", share: "Bagekna laporan", pdf: "Undhuh laporan PDF", workshop: "Lembar bengkel (cetak gedhe)", hood: "Ing mburi layar: model sing dipakai", hs_listen: "Rungokake swara", hs_gate: "Priksa slamet teks", hs_look: "Delok foto", hs_segment: "Tandhani bagean", hs_diagnose: "Diagnosa", hs_plan: "Nyusun langkah", hs_safety: "Priksa slamet rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Swara panuntun", wa: "Kirim dhaptar blanja menyang WhatsApp", buy: "Golek rega", garage: "Garasiku",
   garageNote: "Riwayat ndandani mung disimpen ing HP iki. Pandhuan bisa dibukak 24 jam.", garageClear: "Busak riwayat", again: "Ndandani barang liya", erase: "Busak fotoku saiki", eraseAsk: "Busak foto, swara, lan pandhuan iki saka server saiki?", erased: "Wis dibusak saka server.",
   stuck: "Isih rusak, jajal rencana liya", stuckHere: "Kepiye kedadeyane? (umpamane wis dijajal, tetep mati)",
@@ -434,9 +434,11 @@ function setupTimer(st) {
 
 function play() {
   const st = S.plan.steps[stepIdx], f = (S.audio || {})[String(st.n)];
+  voice.quietUntil = Date.now() + 1500;  // hands-free: don't take the guide's own voice as a command
   if (f) { $("player").src = S.files_base + f; $("player").play().catch(() => {}); return; }
   if (window.speechSynthesis) { // browser voice fallback (no server TTS)
     const u = new SpeechSynthesisUtterance(st.voice_text || st.instruction); u.lang = lang === "en" ? "en-US" : "id-ID";
+    u.onend = () => { voice.quietUntil = Date.now() + 800; };
     speechSynthesis.cancel(); speechSynthesis.speak(u);
   }
 }
@@ -580,6 +582,9 @@ function setupResult() {
   on("prevBtn", "click", () => { if (stepIdx > 0) { stepIdx--; renderStep(); } });
   on("nextBtn", "click", () => { if (stepIdx < S.plan.steps.length - 1) { stepIdx++; renderStep(); } });
   on("playBtn", "click", play);
+  on("handsFree", "change", (e) => setHandsFree(e.target.checked));
+  on("pttBtn", "click", pushToTalk);
+  if ($("player")) $("player").addEventListener("ended", () => { voice.quietUntil = Date.now() + 800; });
   on("fixedBtn", "click", () => sendOutcome("fixed"));
   on("proBtn", "click", () => sendOutcome("pro"));
   on("stepPhoto", "change", async (e) => {
@@ -624,6 +629,114 @@ window.SAFETY_BASE = {
   jv: ["Copot steker / pateni mesin lan enteni adhem sadurunge miwiti.", "Nganggo sarung tangan lan kacamata yen ana pecahan, bensin, utawa cairan."],
   en: ["Unplug it / switch the engine off and let it cool before you start.", "Wear gloves and eye protection around shards, fuel or liquids."],
 };
+
+/* ---------------- hands-free voice loop ----------------
+   Steps are read aloud (server MP3 or the browser voice). With SpeechRecognition the phone keeps listening for
+   commands; without it a push-to-talk button sends a short clip to /command (same ASR as the description).
+   parseCommand mirrors api/voice.py: same word lists (api/tests/test_voice.py checks both on the same cases). */
+/* VOICE_WORDS:start */const VOICE_WORDS = {"id":{"broken":["masih rusak","tetap rusak","masih mati","tetap mati","masih belum","tidak berhasil","nggak berhasil","gak berhasil","belum berhasil","rencana lain","masih bocor","masih netes"],"stop":["berhenti","stop","matikan suara","cukup","diam"],"back":["kembali","mundur","sebelumnya","balik"],"repeat":["ulang","ulangi","sekali lagi","apa tadi","bacakan lagi"],"check":["cek","periksa","foto","cekrek","lihat"],"next":["lanjut","terus","berikutnya","selanjutnya","oke","sudah","beres"]},"jv":{"broken":["isih rusak","tetep rusak","isih mati","tetep mati","ora kasil","durung kasil","rencana liya","isih bocor","isih netes"],"stop":["mandheg","mandeg","wis cukup","meneng","stop"],"back":["bali","mbalik","sadurunge","sakdurunge","mundur"],"repeat":["baleni","maneh","sepisan maneh","ulang","ulangi"],"check":["priksa","periksa","cek","foto","delokna"],"next":["terus","lanjut","sabanjure","wis","oke","rampung"]},"en":{"broken":["still broken","not working","doesn't work","does not work","didn't work","did not work","still dead","another plan","still leaking","still dripping"],"stop":["stop","quit","be quiet","stop listening","that's enough"],"back":["back","go back","previous","last step"],"repeat":["repeat","again","say again","say that again","read it again"],"check":["check","verify","photo","take a photo","look"],"next":["next","continue","go on","done","okay","ok","carry on"]}};/* VOICE_WORDS:end */
+const VOICE_ORDER = ["broken", "stop", "back", "repeat", "check", "next"], VOICE_NEG = ["jangan", "ojo", "aja", "don't", "do not", "not"];
+function normCmd(text) {
+  return String(text || "").toLowerCase().replace(/\u2019/g, "'").replace(/[^\p{L}\p{N}_' ]+/gu, " ").split(/\s+/).filter(Boolean).join(" ").slice(0, 200);
+}
+function hitCmd(text, word) {
+  const words = text.split(" "), ws = word.split(" ");
+  for (let i = 0; i + ws.length <= words.length; i++) {
+    if (ws.every((x, k) => words[i + k] === x)) { if (!(i > 0 && VOICE_NEG.includes(words[i - 1]))) return true; }
+  }
+  return false;
+}
+function parseCommand(text, lg) {
+  const tx = normCmd(text); if (!tx) return null;
+  const langs = (VOICE_WORDS[lg] ? [lg] : []).concat(Object.keys(VOICE_WORDS).filter((x) => x !== lg));
+  for (const l of langs) for (const c of VOICE_ORDER) if (VOICE_WORDS[l][c].some((w) => hitCmd(tx, w))) return c;
+  return null;
+}
+
+const SR_LANG = { id: "id-ID", jv: "jv-ID", en: "en-US" };
+const voice = { on: false, rec: null, ptt: null, quietUntil: 0 };
+const srCtor = () => (typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition)) || null;
+function guideSpeaking() {
+  return Date.now() < voice.quietUntil || (window.speechSynthesis && speechSynthesis.speaking) || ($("player") && $("player").src && !$("player").paused);
+}
+function setHandsFree(onb) {
+  voice.on = !!onb;
+  if ($("handsFree")) $("handsFree").checked = voice.on;
+  if ($("voiceBar")) $("voiceBar").classList.toggle("hidden", !voice.on);
+  document.body.classList.toggle("handsfree", voice.on);
+  if (voice.on) { startListening(); if (S && S.plan && !$("stepCard").classList.contains("locked")) play(); }
+  else { stopListening(); if ($("voiceState")) $("voiceState").textContent = t("vOff"); }
+}
+function pttMode(msgKey) {
+  if ($("pttBtn")) $("pttBtn").classList.remove("hidden");
+  if ($("voiceDot")) $("voiceDot").classList.remove("on");
+  if ($("voiceState")) $("voiceState").textContent = t(msgKey);
+}
+function startListening() {
+  if ($("voiceHelp")) $("voiceHelp").textContent = t("vHelp");
+  const C = srCtor();
+  if (!C) { pttMode("vNoSR"); return; }
+  try {
+    const r = new C();
+    r.lang = SR_LANG[lang] || "id-ID"; r.continuous = true; r.interimResults = false; r.maxAlternatives = 3;
+    r.onresult = (ev) => {
+      if (guideSpeaking()) return;
+      const res = ev.results[ev.results.length - 1]; if (!res) return;
+      let heard = "", cmd = null;
+      for (let i = 0; i < res.length && !cmd; i++) { heard = heard || res[i].transcript; cmd = parseCommand(res[i].transcript, lang); if (cmd) heard = res[i].transcript; }
+      doCommand(cmd, String(heard).trim());
+    };
+    r.onerror = (e) => { if (e && /not-allowed|service-not-allowed|audio-capture/.test(e.error || "")) { voice.rec = null; pttMode("vNoSR"); } };
+    r.onend = () => { if (voice.on && voice.rec === r) setTimeout(() => { if (voice.on && voice.rec === r) { try { r.start(); } catch (_) { /* already running */ } } }, 300); };
+    voice.rec = r; r.start();
+    if ($("voiceDot")) $("voiceDot").classList.add("on");
+    if ($("pttBtn")) $("pttBtn").classList.add("hidden");
+    if ($("voiceState")) $("voiceState").textContent = t("vListening");
+  } catch (_) { voice.rec = null; pttMode("vNoSR"); }
+}
+function stopListening() {
+  const r = voice.rec; voice.rec = null;
+  if (r) { try { r.abort ? r.abort() : r.stop(); } catch (_) { /* ended */ } }
+  if (voice.ptt && voice.ptt.state === "recording") voice.ptt.stop();
+  if ($("voiceDot")) $("voiceDot").classList.remove("on");
+  if ($("pttBtn")) $("pttBtn").classList.add("hidden");
+}
+function doCommand(cmd, heard) {
+  const vs = $("voiceState");
+  if (!cmd) { if (vs) vs.textContent = t("vUnknown").replace("{text}", heard || "…"); return null; }
+  if (vs) vs.textContent = heard ? t("vHeard").replace("{text}", heard) : "";
+  if (cmd === "stop") { setHandsFree(false); return cmd; }
+  if (!S || !S.plan || $("stepCard").classList.contains("locked")) return null;
+  if (cmd === "next") { if (stepIdx < S.plan.steps.length - 1) { stepIdx++; renderStep(); } else play(); }
+  else if (cmd === "back") { if (stepIdx > 0) { stepIdx--; renderStep(); } else play(); }
+  else if (cmd === "repeat") play();
+  else if (cmd === "check") { if (live.stream) liveCheckNow(); else if ($("liveBtn")) openLive(); else if ($("stepPhoto")) $("stepPhoto").click(); }
+  else if (cmd === "broken") { if ($("stuckBtn")) $("stuckBtn").click(); }
+  return cmd;
+}
+// Push-to-talk fallback: one short clip per command, transcribed on the server (POST /command).
+async function pushToTalk() {
+  if (voice.ptt && voice.ptt.state === "recording") { voice.ptt.stop(); return; }
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (_) { if ($("voiceState")) $("voiceState").textContent = t("micErr"); return; }
+  const parts = [], mr = new MediaRecorder(stream); voice.ptt = mr;
+  mr.ondataavailable = (e) => e.data.size && parts.push(e.data);
+  mr.onstop = async () => {
+    stream.getTracks().forEach((tr) => tr.stop());
+    $("pttBtn").setAttribute("aria-pressed", "false"); $("pttBtn").textContent = t("ptt");
+    const blob = new Blob(parts, { type: mr.mimeType || "audio/webm" });
+    const ext = blob.type.includes("mp4") ? "m4a" : blob.type.includes("ogg") ? "ogg" : "webm";
+    const fd = new FormData(); fd.append("audio", blob, "command." + ext);
+    try {
+      const r = await fetch(`/api/sessions/${S.id}/command`, { method: "POST", body: fd });
+      const j = await r.json();
+      if (!r.ok) { $("voiceState").textContent = "⚠️ " + (j.detail || r.statusText); return; }
+      doCommand(j.command, j.text);
+    } catch (err) { $("voiceState").textContent = "⚠️ " + netMsg(err); }
+  };
+  mr.start(); $("pttBtn").setAttribute("aria-pressed", "true"); $("pttBtn").textContent = t("pttRec");
+  setTimeout(() => mr.state === "recording" && mr.stop(), 4000);
+}
 
 /* ---------------- My garage (localStorage only, no account, SPEC v2) ---------------- */
 const GARAGE_KEY = "tc_garage", GARAGE_MAX = 20;

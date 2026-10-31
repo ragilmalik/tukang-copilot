@@ -90,3 +90,12 @@ h1:focus,h2:focus{outline:none}
 .liveView video{width:100%;height:auto;display:block;border-radius:8px;background:#000}
 .liveView canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
 #liveBtn[aria-pressed="true"]{outline:3px solid var(--o)}
+
+/* hands-free: visible listening indicator, bigger step buttons */
+.voiceBar{margin:8px 0;padding:8px 12px;border-radius:12px;background:#eef6ff;color:#12385f}
+.voiceBar p{margin:4px 0}
+.vdot{display:inline-block;width:14px;height:14px;border-radius:50%;background:#9aa3ad;vertical-align:middle}
+.vdot.on{background:#d62828;box-shadow:0 0 0 0 rgba(214,40,40,.6);animation:vpulse 1.4s infinite}
+@keyframes vpulse{0%{box-shadow:0 0 0 0 rgba(214,40,40,.6)}70%{box-shadow:0 0 0 12px rgba(214,40,40,0)}100%{box-shadow:0 0 0 0 rgba(214,40,40,0)}}
+body.handsfree .nav .btn{min-height:64px;font-size:1.2em;flex:1}
+#pttBtn[aria-pressed="true"]{background:#d62828;color:#fff}

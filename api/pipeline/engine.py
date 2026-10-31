@@ -585,6 +585,58 @@ def replan(sid: str, report: str) -> dict[str, Any]:
     return s
 
 
+MOCK_COMMAND = {"id": "lanjut", "jv": "terus", "en": "next"}  # demo mode: every push-to-talk clip "says" next
+MAX_COMMAND_SECONDS = 15.0
+
+
+def voice_command(sid: str, text: str = "", audio: Path | None = None) -> dict[str, Any]:
+    """Hands-free push-to-talk: a short clip (or text) -> {text, command}. Uses the same ASR as the repair
+    description (Voice Transcribe for id/en, Muse Spark audio for Javanese); the clip is deleted right after."""
+    from ..voice import parse_command
+
+    s = load(sid)
+    lang = s["lang"]
+    heard = (text or "").strip()[:200]
+    if audio is not None and not heard:
+        tmp = audio.with_suffix(".cmd.wav")
+        try:
+            try:
+                media.to_wav(audio, tmp)
+                secs = media.wav_seconds(tmp)
+            except (RuntimeError, OSError, EOFError) as e:
+                raise ValueError("Could not read the recording") from e
+            if secs > MAX_COMMAND_SECONDS:
+                raise ValueError("Command clip is too long (max 15 s)")
+            if settings.offline:
+                heard = MOCK_COMMAND[lang]
+            else:
+                from .. import meta_client
+
+                meter = cost.Meter(0.05)
+                cost.use(meter)
+                try:
+                    if lang == "jv":
+                        heard = meta_client.transcribe_with_spark_audio(tmp, "Javanese")
+                    else:
+                        heard = meta_client.transcribe(tmp, secs, language_bias=[{"id": "Indonesian", "en": "English"}[lang]],
+                                                       keywords=["lanjut", "kembali", "ulang", "cek", "masih rusak", "berhenti"])
+                finally:
+                    cost.use(None)
+                if meter.spent:
+                    s = load(sid)
+                    c = s.get("cost") or {"spent_usd": 0.0, "budget_usd": settings.max_cost_usd, "by_model": {}}
+                    c["spent_usd"] = round(float(c.get("spent_usd", 0)) + meter.spent, 4)
+                    bm = dict(c.get("by_model") or {})
+                    for k, v in meter.items.items():
+                        bm[k] = round(bm.get(k, 0) + v, 4)
+                    c["by_model"] = bm
+                    s["cost"] = c
+                    save(s)
+        finally:
+            tmp.unlink(missing_ok=True)
+    return {"text": heard[:200], "command": parse_command(heard, lang), "lang": lang}
+
+
 OUTCOMES = ("fixed", "pro")
 
 

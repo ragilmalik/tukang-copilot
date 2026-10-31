@@ -340,6 +340,28 @@ async def post_track(sid: str, n: int, frame: UploadFile = File(...)) -> dict[st
         p.unlink(missing_ok=True)
 
 
+@app.post("/api/sessions/{sid}/command")
+async def post_command(sid: str, text: str = Form(default=""), audio: UploadFile | None = File(default=None)) -> dict[str, Any]:
+    """Hands-free fallback for phones without SpeechRecognition: a push-to-talk clip (or text) -> one command
+    (next, back, repeat, check, broken, stop) or null. The clip is transcribed and deleted at once."""
+    _load(sid)
+    if len(text) > 200:
+        raise HTTPException(400, "Command text is too long")
+    p = await _save_upload(audio, AUDIO_TYPES, 2 * 1024 * 1024, ".webm") if audio is not None and audio.filename else None
+    if p is None and not text.strip():
+        raise HTTPException(400, "Say or type a command")
+    try:
+        return await asyncio.to_thread(engine.voice_command, sid, text, p)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        logging.getLogger("tukang").error("voice command failed: %s", errors.detail(e))
+        raise HTTPException(503, errors.friendly(e, _load(sid)["lang"]), headers={"Retry-After": "5"})
+    finally:
+        if p is not None:
+            p.unlink(missing_ok=True)
+
+
 @app.post("/api/sessions/{sid}/replan")
 def post_replan(sid: str, report: str = Form(default="")) -> dict[str, Any]:
     _load(sid)

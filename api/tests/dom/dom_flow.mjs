@@ -203,6 +203,37 @@ async function featureChecks(lang) {
   check(`${lang}/live: limit message`, !/liveLimit/.test(d.getElementById("liveState").textContent) && d.getElementById("liveState").textContent.length > 20);
   d.getElementById("liveClose").click();
   check(`${lang}/live: close hides the live box`, d.getElementById("live").classList.contains("hidden"));
+  // hands-free without SpeechRecognition: listening bar + push-to-talk fallback, translated
+  const hf = d.getElementById("handsFree");
+  hf.checked = true; hf.dispatchEvent(new w.Event("change"));
+  const vs = () => d.getElementById("voiceState").textContent;
+  check(`${lang}/voice: bar shown with push-to-talk fallback`, !d.getElementById("voiceBar").classList.contains("hidden") && !d.getElementById("pttBtn").classList.contains("hidden") && vs().length > 20 && !/vNoSR/.test(vs()), vs());
+  check(`${lang}/voice: help line translated`, d.getElementById("voiceHelp").textContent.length > 20 && !/vHelp/.test(d.getElementById("voiceHelp").textContent));
+  const word = { id: "lanjut", jv: "terus", en: "next" }[lang];
+  const n0 = d.getElementById("stepNo").textContent;
+  check(`${lang}/voice: parseCommand in page`, w.parseCommand(word, lang) === "next" && w.parseCommand({ id: "masih rusak", jv: "isih rusak", en: "still broken" }[lang], lang) === "broken");
+  w.doCommand(w.parseCommand(word, lang), word);
+  check(`${lang}/voice: next command moves a step`, d.getElementById("stepNo").textContent !== n0, d.getElementById("stepNo").textContent);
+  w.doCommand("back", "back");
+  check(`${lang}/voice: back command returns`, d.getElementById("stepNo").textContent === n0);
+  w.doCommand(null, "blabla");
+  check(`${lang}/voice: unknown text explained`, /blabla/.test(vs()) && !/vUnknown/.test(vs()), vs());
+  w.doCommand("stop", "stop");
+  check(`${lang}/voice: stop turns hands-free off`, !hf.checked && d.getElementById("voiceBar").classList.contains("hidden"));
+  // with a (fake) SpeechRecognition: continuous listening in the right language, red dot, results become commands
+  let fake = null;
+  w.webkitSpeechRecognition = class { constructor() { fake = this; this.started = 0; } start() { this.started++; } stop() {} abort() {} };
+  hf.checked = true; hf.dispatchEvent(new w.Event("change"));
+  check(`${lang}/voice: recognition started in ${lang}`, fake && fake.started === 1 && fake.continuous === true && fake.lang === { id: "id-ID", jv: "jv-ID", en: "en-US" }[lang], fake && fake.lang);
+  check(`${lang}/voice: listening dot on, no push-to-talk`, d.getElementById("voiceDot").classList.contains("on") && d.getElementById("pttBtn").classList.contains("hidden"));
+  await sleep(1700);  // past the guide's own read-aloud window
+  const n1 = d.getElementById("stepNo").textContent;
+  fake.onresult({ results: [[{ transcript: word }]] });
+  check(`${lang}/voice: spoken word moves a step`, d.getElementById("stepNo").textContent !== n1 && /«/.test(vs()), vs());
+  fake.onend();
+  await sleep(400);
+  check(`${lang}/voice: listening restarts after the browser stops it`, fake.started === 2, fake.started);
+  w.doCommand("stop", "");
   w.close();
 }
 

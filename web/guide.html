@@ -105,6 +105,11 @@
         <button id="nextBtn" class="btn primary" type="button"><span data-t="next">Lanjut</span> ▶</button>
       </div>
       <label class="small"><input type="checkbox" id="handsFree"> <span data-t="handsFree">Mode tangan bebas (bacakan otomatis)</span></label>
+      <div id="voiceBar" class="voiceBar hidden" role="status" aria-live="polite" data-testid="voice-bar">
+        <p><span id="voiceDot" class="vdot" aria-hidden="true"></span> <span id="voiceState"></span></p>
+        <button id="pttBtn" class="btn big hidden" type="button" aria-pressed="false" data-t="ptt">🎙️ Ketuk, lalu ucapkan perintah</button>
+        <p id="voiceHelp" class="small muted"></p>
+      </div>
     </div>
 
     <div class="card">
