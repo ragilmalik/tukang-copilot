@@ -94,7 +94,7 @@ const T_EXTRA = {
         tourCheck: "Coba 'Cek langkah ini' dengan foto contoh: foto gelap ditolak, foto benar lolos.",
         tourStuck: "Lalu ketuk 'Masih rusak' di bawah untuk melihat AI menyusun ulang rencananya.", tourClose: "Tutup", tourTip: "Tampilkan tip", tourHide: "Kecilkan tip",
         sampleTry: "Belum punya foto? Coba foto contoh:", sampleBad: "📷 Foto gelap ✗", sampleGood: "📷 Foto benar ✓",
-        pv_title: "Temuan sejauh ini", pv_seen: "👁️ Terlihat: {object}", pv_parts: "🎯 SAM 3.1 menandai {found} dari {of} bagian", pv_cause: "🧠 Paling mungkin: {cause} ({conf}%)", pv_steps: "📋 {n} langkah siap", pv_img: "Foto dengan bagian yang ditandai SAM 3.1" },
+        pv_title: "Temuan sejauh ini", pv_seen: "👁️ Terlihat: {object}", pv_parts: "🎯 SAM 3.1 menandai {found} dari {of} bagian", pv_cause: "🧠 Paling mungkin: {cause} ({conf}%)", pv_steps: "📋 {n} langkah siap", pv_img: "Foto dengan bagian yang ditandai SAM 3.1", ag_go: "Tunjukkan di layar" },
   jv: { demoBtn: "▶ Jajal demo sak tutulan", demoSub: "Tanpa foto, tanpa akun: delengen AI ndandani motor mogok saka wiwitan nganti dicek kamera.",
         how1: "📷 Foto + crita", how2: "🎯 AI nandhani perangane", how3: "✅ Saben langkah dicek kamera",
         agentTitle: "🤖 Sing ditindakake AI", agentSub: "Saben keputusan agen, piranti sing dienggo, lan kapan mandheg.", agentLive: "Log agen",
@@ -119,7 +119,7 @@ const T_EXTRA = {
         tourCheck: "Jajal 'Priksa langkah iki' nganggo foto conto: foto peteng ditolak, foto bener lolos.",
         tourStuck: "Banjur tutul 'Isih rusak' ing ngisor kanggo ndeleng AI nyusun rencana anyar.", tourClose: "Tutup", tourTip: "Tampilake pitutur", tourHide: "Cilikna pitutur",
         sampleTry: "Durung duwe foto? Jajal foto conto:", sampleBad: "📷 Foto peteng ✗", sampleGood: "📷 Foto bener ✓",
-        pv_title: "Temuan nganti saiki", pv_seen: "👁️ Katon: {object}", pv_parts: "🎯 SAM 3.1 nandhani {found} saka {of} perangan", pv_cause: "🧠 Sing paling mungkin: {cause} ({conf}%)", pv_steps: "📋 {n} langkah wis siyap", pv_img: "Foto karo perangan sing ditandhani SAM 3.1" },
+        pv_title: "Temuan nganti saiki", pv_seen: "👁️ Katon: {object}", pv_parts: "🎯 SAM 3.1 nandhani {found} saka {of} perangan", pv_cause: "🧠 Sing paling mungkin: {cause} ({conf}%)", pv_steps: "📋 {n} langkah wis siyap", pv_img: "Foto karo perangan sing ditandhani SAM 3.1", ag_go: "Tuduhna ing layar" },
   en: { demoBtn: "▶ Try the 1-tap demo", demoSub: "No photo, no account: watch the AI fix a bike that won't start, right up to the camera check.",
         how1: "📷 Snap + say it", how2: "🎯 AI marks the part", how3: "✅ Every step camera-checked",
         agentTitle: "🤖 What the AI did", agentSub: "Every decision the agent made, the tool it used, and when it stopped.", agentLive: "Agent log",
@@ -144,7 +144,7 @@ const T_EXTRA = {
         tourCheck: "Try 'Check this step' with a sample photo: the dark one is rejected, the right one passes.",
         tourStuck: "Then tap 'Still broken' below to watch the AI re-plan.", tourClose: "Close", tourTip: "Show tip", tourHide: "Minimise tip",
         sampleTry: "No photo yet? Try a sample photo:", sampleBad: "📷 Dark photo ✗", sampleGood: "📷 Right photo ✓",
-        pv_title: "Found so far", pv_seen: "👁️ Seen: {object}", pv_parts: "🎯 SAM 3.1 outlined {found} of {of} parts", pv_cause: "🧠 Most likely: {cause} ({conf}%)", pv_steps: "📋 {n} steps ready", pv_img: "Your photo with the parts SAM 3.1 outlined" },
+        pv_title: "Found so far", pv_seen: "👁️ Seen: {object}", pv_parts: "🎯 SAM 3.1 outlined {found} of {of} parts", pv_cause: "🧠 Most likely: {cause} ({conf}%)", pv_steps: "📋 {n} steps ready", pv_img: "Your photo with the parts SAM 3.1 outlined", ag_go: "Show it on screen" },
 };
 /* I18N_EXTRA:end */
 ["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_EXTRA[k]));
@@ -344,8 +344,8 @@ function poll(id) {
 function renderProgress(s) {
   if (!$("stageList") || !s.stages) return;
   $("stageList").innerHTML = Object.entries(s.stages).map(([k, v]) =>
-    `<li class="${esc(v.status)}">${esc(t("stages")[k] || k)}${v.status === "skipped" ? "" : ` <code class="tool">${esc(stageTool(s, k))}</code>`}<span class="note">${esc(stageNote(v.note))}</span></li>`).join("");
-  renderAgentLog(s, "agentLive"); renderPartial(s); tickElapsed(); updateTour();
+    `<li id="st-${esc(k)}" class="${esc(v.status)}">${esc(t("stages")[k] || k)}${v.status === "skipped" ? "" : ` <code class="tool">${esc(stageTool(s, k))}</code>`}<span class="note">${esc(stageNote(v.note))}</span></li>`).join("");
+  renderAgentLog(s, "agentLive"); renderPartial(s); reflash(); tickElapsed(); updateTour();
   if ($("progressStatus")) {  // short screen-reader status instead of re-announcing the whole list
     const run = Object.entries(s.stages).find(([, v]) => v.status === "running");
     const nDone = Object.values(s.stages).filter((v) => v.status === "done").length;
@@ -925,13 +925,68 @@ function renderAgentLog(s, boxId) {
   if (!ev.length) return;
   const seen = new Set(ev.map((e) => AG_PHASE[e.kind]));
   const loop = LOOP.map((p) => `<span class="lp${seen.has(p) ? " on" : ""}">${esc(t("lp_" + p))}</span>`).join("<span class=\"lpArrow\" aria-hidden=\"true\">→</span>");
-  const rows = ev.map((e) => {
+  const rows = ev.map((e, i) => {
     const tool = e.model ? `<code class="tool">${esc(e.model)}</code>` : (["gate", "plan_guard", "input_guard"].includes(e.kind) ? `<code class="tool code">${esc(t("agCode"))}</code>` : "");
     const secs = e.ms >= 100 ? ` <span class="muted">${(e.ms / 1000).toFixed(1)}s</span>` : "";
-    return `<li class="ag ${esc(AG_PHASE[e.kind] || "")}"><span class="agT muted">${esc(Number(e.t || 0).toFixed(0))}s</span> <span aria-hidden="true">${AG_ICON[e.kind] || "•"}</span> ${agentLine(e)} ${tool}${secs}</li>`;
+    const line = `<span class="agT muted">${esc(Number(e.t || 0).toFixed(0))}s</span> <span aria-hidden="true">${AG_ICON[e.kind] || "•"}</span> ${agentLine(e)} ${tool}${secs}`;
+    return `<li class="ag ${esc(AG_PHASE[e.kind] || "")}">${agTarget(e, boxId) ? `<button type="button" class="agGo" data-i="${i}" title="${esc(t("ag_go"))}">${line}<span class="agArrow" aria-hidden="true">›</span></button>` : line}</li>`;
   }).join("");
+  if (!box.dataset.go) {  // one delegated handler per log box: tap a line to see the stage, photo or step it is about
+    box.dataset.go = "1";
+    box.addEventListener("click", (ev) => {
+      const btn = ev.target.closest && ev.target.closest(".agGo"); if (!btn) return;
+      const e = ((S && S.agent_log) || [])[Number(btn.dataset.i)]; if (e) agGo(e, boxId);
+    });
+  }
   box.querySelector(".agLoop").innerHTML = loop;
   box.querySelector(".agList").innerHTML = rows;
+}
+
+/* ---------------- agent log lines link to what they are about (v1.23) ---------------- */
+// Progress screen: the stage row (or the streamed result row). Result and guide pages: the photo, the causes, the
+// safety list, or the exact step that was camera-checked (the step card jumps to it).
+const AG_STAGE = { listen: "listen", gate: "gate", input_guard: "gate", look: "look", segment: "segment", diagnose: "diagnose",
+  plan: "plan", replan: "plan", plan_guard: "safety", illustrate: "illustrate", ask: "question", answer: "question" };
+const AG_RESULT = { listen: "dxSummary", gate: "safetyBadge", input_guard: "safetyBadge", look: "dxObject", segment: "partsWrap",
+  diagnose: "dxCauses", ask: "dxCauses", answer: "dxCauses", plan: "stepCard", replan: "stepCard", plan_guard: "preflight",
+  illustrate: "stepCard", check: "stepCard", escalate: "handoff", outcome: "outcome", fallback: "fallbackNote" };
+function visible(el) { return !!(el && el.getClientRects().length && !el.closest(".hidden")); }
+function agTarget(e, boxId) {
+  if (boxId === "agentLive") {
+    const k = e.kind === "fallback" ? e.stage : AG_STAGE[e.kind];
+    if (!k) return null;
+    if (k === "question") return $("question");
+    return document.getElementById("lf-" + k) || document.getElementById("st-" + k);
+  }
+  let id = AG_RESULT[e.kind];
+  if (id === "preflight" && !visible($("preflight"))) id = "safetyBadge";
+  if (id === "handoff" && !visible($("handoff"))) id = visible($("stopBox")) ? "stopBox" : "stuckBtn";
+  if (id === "partsWrap" && !visible($("partsWrap"))) id = "dxCauses";
+  return id ? $(id) : null;
+}
+let flashT = { id: "", until: 0 };
+function flash(el) {
+  if (!el) return;
+  if (!el.id) el.id = "fl-" + Math.random().toString(36).slice(2, 8);
+  document.querySelectorAll(".flash").forEach((x) => x.classList.remove("flash"));
+  void el.offsetWidth; el.classList.add("flash");
+  flashT = { id: el.id, until: Date.now() + 1800 };
+  setTimeout(() => { if (flashT.id === el.id && Date.now() >= flashT.until - 50) el.classList.remove("flash"); }, 1800);
+}
+function reflash() {  // the stage list is redrawn on every update; keep a fresh highlight on it
+  if (Date.now() < flashT.until) { const el = document.getElementById(flashT.id); if (el) el.classList.add("flash"); }
+}
+function agGo(e, boxId) {
+  if (e.kind === "check" && boxId !== "agentLive" && S && S.plan && Array.isArray(S.plan.steps)) {
+    const i = S.plan.steps.findIndex((x) => x.n === e.step);
+    if (i >= 0 && i !== stepIdx) { stepIdx = i; renderStep(); }
+  }
+  const el = agTarget(e, boxId); if (!el) return;
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
+  if (!el.hasAttribute("tabindex") && !/^(BUTTON|A|INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) el.setAttribute("tabindex", "-1");
+  try { el.focus({ preventScroll: true }); } catch (_) { /* old browsers */ }
+  flash(el);
 }
 
 /* ---------------- progress: partial results stream in (v1.23) ---------------- */

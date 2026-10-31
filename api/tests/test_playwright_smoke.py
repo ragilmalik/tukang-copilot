@@ -234,3 +234,38 @@ def test_progress_screen_streams_partial_results(page, monkeypatch):
     order = page.eval_on_selector_all("#liveFind li", "els => els.map(e => e.dataset.k)")
     assert order[:3] == ["look", "segment", "diagnose"], order
     page.wait_for_selector("#result:not(.hidden)", timeout=20000)
+
+
+def _in_view(page, sel):
+    """Waits for a smooth scroll to bring the element into the viewport (fails after 5 s)."""
+    page.wait_for_function("(sel) => { const r = document.querySelector(sel).getBoundingClientRect();"
+                           " return r.top >= -2 && r.top < innerHeight - 40; }", arg=sel, timeout=5000)
+    return True
+
+
+def test_agent_log_lines_jump_to_what_they_describe(page):
+    """v1.23: tap a line of the agent log and the stage, photo or checked step it is about scrolls into view and
+    lights up. On the result page a step-check line brings that exact step back on the step card."""
+    page.goto(page.base + "/")
+    page.select_option("#lang", "en")
+    page.click("#demoBtn")
+    page.wait_for_selector("#question:not(.hidden)", timeout=20000)
+    page.locator("#agentLive .agGo", has_text="Looked at the photo").click()          # progress screen
+    page.wait_for_selector("#lf-look.flash, #st-look.flash")
+    page.click('#quickAns button[data-q="qNo"]')
+    page.wait_for_selector("#result:not(.hidden)", timeout=20000)
+    page.click("#tourClose")
+    for b in page.locator("#preList input").all():
+        b.check()
+    page.click("#sampleBad")
+    page.wait_for_function("document.querySelector('#checkResult').textContent.includes('⚠')", timeout=15000)
+    page.click("#sampleGood")
+    page.wait_for_function("document.querySelector('#stepNo').textContent.trim() === '2'", timeout=15000)  # auto-advance
+    page.locator("#agent .agGo", has_text="Outlined").click()
+    page.wait_for_selector("#partsWrap.flash")
+    assert _in_view(page, "#partsWrap")
+    page.locator("#agent .agGo", has_text="Step 1 checked").first.click()
+    page.wait_for_selector("#stepCard.flash")
+    assert page.inner_text("#stepNo").strip() == "1" and _in_view(page, "#stepCard")
+    assert page.get_attribute("#agent .agGo", "title") == "Show it on screen"
+    assert page.evaluate("document.activeElement.id") == "stepCard"                    # focus follows for keyboards

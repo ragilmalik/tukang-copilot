@@ -142,3 +142,9 @@ body.typing .tourBar{bottom:auto;top:calc(8px + env(safe-area-inset-top))}
 .lfImg{display:block;width:100%;height:auto;max-height:240px;object-fit:contain;aspect-ratio:4/3;margin-top:6px;border-radius:8px;background:#eee}
 @media (prefers-reduced-motion:no-preference){.lfList li.pop{animation:lfIn .35s ease-out}@keyframes lfIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}}
 .liveFind .level{white-space:nowrap;display:inline-block}
+/* v1.23: agent log lines are buttons that jump to the stage, photo or step they describe */
+.agGo{all:unset;box-sizing:border-box;display:block;width:100%;cursor:pointer;border-radius:8px;padding:2px 22px 2px 2px;position:relative;min-height:32px}
+.agGo:hover{background:rgba(0,0,0,.035)}.agGo:focus-visible{outline:3px solid #b45309;outline-offset:1px}
+.agArrow{position:absolute;right:6px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:1.1rem}
+.flash{outline:3px solid #d97706;outline-offset:3px;border-radius:8px;background-color:#fff4e0}
+@media (prefers-reduced-motion:no-preference){.flash{animation:tcFlash 1.8s ease-out}@keyframes tcFlash{0%{background-color:#ffd9a0}100%{background-color:#fff4e0}}}
