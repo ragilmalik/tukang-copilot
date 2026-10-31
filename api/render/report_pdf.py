@@ -24,6 +24,7 @@ LABELS: dict[str, dict[str, str]] = {
            "o_pro": "Dibawa ke bengkel/teknisi", "status": "Status", "ok": "[OK]", "todo": "[  ]", "photo": "Foto dengan bagian yang ditandai (SAM 3.1)",
            "disclaimer": "Panduan ini hanya untuk perbaikan ringan. Harga adalah perkiraan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.",
            "made": "Dibuat dengan Tukang Copilot (Meta Muse Spark + SAM 3.1)", "page": "Hal.", "demo": "Mode demo: jawaban contoh",
+           "fallback": "Jawaban contoh (API live tidak tersedia) untuk",
            "green": "AMAN", "amber": "HATI-HATI", "red": "STOP",
            "hood": "Di balik layar: model yang dipakai", "before": "Sebelum mulai, pastikan",
            "st_listen": "Dengar suara", "st_gate": "Cek keselamatan teks", "st_look": "Lihat foto", "st_segment": "Tandai bagian",
@@ -36,6 +37,7 @@ LABELS: dict[str, dict[str, str]] = {
            "o_pro": "Handed to a mechanic/professional", "status": "Status", "ok": "[OK]", "todo": "[  ]", "photo": "Photo with the parts marked (SAM 3.1)",
            "disclaimer": "Light repairs only. Prices are estimates. For gas, house wiring, or high voltage, call a professional.",
            "made": "Made with Tukang Copilot (Meta Muse Spark + SAM 3.1)", "page": "Page", "demo": "Demo mode: sample answers",
+           "fallback": "Demo answer (live API unavailable) for",
            "green": "SAFE", "amber": "CAUTION", "red": "STOP",
            "hood": "Under the hood: models used", "before": "Before you start, make sure",
            "st_listen": "Listen", "st_gate": "Text safety gate", "st_look": "Look at photo", "st_segment": "Mark parts",
@@ -248,6 +250,8 @@ def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: 
     doc.d.rectangle([0, 0, W, 14], fill=ORANGE)
     doc.text(f"Tukang Copilot: {L['title']}", 46, bold=True)
     doc.text(f"#{rep.get('id', '')}" + (f"   {L['demo']}" if session.get("mode") == "mock" else ""), 22, color=MUTED)
+    if session.get("fallback"):
+        doc.text(f"{L['fallback']}: {', '.join(str(x) for x in session['fallback'])}", 22, bold=True, color=SAFETY_COLOR["amber"])
     doc.rule()
 
     level = rep.get("safety_level") or ""

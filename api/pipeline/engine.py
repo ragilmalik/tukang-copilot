@@ -127,10 +127,29 @@ ModelT = TypeVar("ModelT", bound=BaseModel)
 
 
 def _chat_json(cls: type[ModelT], system: str, content: list[dict[str, Any]], name: str, mock_value: dict[str, Any], *,
-               model: str | None = None, effort: str = "medium", allow_open: bool = False) -> ModelT:
-    """Structured call + pydantic validation; on invalid output, one retry with the error fed back."""
+               model: str | None = None, effort: str = "medium", allow_open: bool = False,
+               fallback_into: dict[str, Any] | None = None) -> ModelT:
+    """Structured call + pydantic validation; on invalid output, one retry with the error fed back.
+    DEMO_FALLBACK: when the live call still fails (API down, invalid output), return the demo answer instead and
+    record the stage in fallback_into["fallback"] so the UI and PDF can label it. A budget stop never falls back."""
     if settings.offline:
         return cls.model_validate(mock_value)
+    try:
+        return _chat_json_live(cls, system, content, name, model=model, effort=effort, allow_open=allow_open)
+    except cost.BudgetExceeded:
+        raise
+    except Exception as e:
+        if not (settings.demo_fallback and mock_value and fallback_into is not None):
+            raise
+        log.warning("live %s failed, using the demo answer (DEMO_FALLBACK): %s", name, errors.detail(e))
+        fb = fallback_into.setdefault("fallback", [])
+        if name not in fb:
+            fb.append(name)
+        return cls.model_validate(mock_value)
+
+
+def _chat_json_live(cls: type[ModelT], system: str, content: list[dict[str, Any]], name: str, *,
+                    model: str | None, effort: str, allow_open: bool) -> ModelT:
     from .. import meta_client
 
     use_open = allow_open and settings.open_weights_active
@@ -205,7 +224,7 @@ def stage_look(s: dict[str, Any]) -> ObjectReport:
     d = session_dir(s["id"])
     content = [_photo_part(d / p) for p in s["photos"]] + [{"type": "text", "text": f"Owner's description:\n{description(s)}"}]
     rep = _chat_json(ObjectReport, prompts.get("look", lang_name=prompts.LANG_NAME[s["lang"]]), content, "object_report",
-                     mock.object_report(_scenario(s), s["lang"]), model=settings.vision_model, effort="medium")
+                     mock.object_report(_scenario(s), s["lang"]), model=settings.vision_model, effort="medium", fallback_into=s)
     s["object_report"] = rep.model_dump()
     _stage(s, "look", "done", rep.object[:90], int((time.time() - t0) * 1000))
     return rep
@@ -304,7 +323,8 @@ def stage_diagnose(s: dict[str, Any], rep: ObjectReport) -> Diagnosis:
     content = [_photo_part(session_dir(s["id"]) / s["photos"][0]),
                {"type": "text", "text": "Object report:\n" + json.dumps(rep.model_dump(), ensure_ascii=False) + f"\n\nOwner's description:\n{description(s)}"}]
     dx = _chat_json(Diagnosis, prompts.get("diagnose", lang_name=prompts.LANG_NAME[s["lang"]]), content, "diagnosis",
-                    mock.diagnosis(_scenario(s), s["lang"]), model=settings.reason_model, effort="high", allow_open=True)
+                    mock.diagnosis(_scenario(s), s["lang"]), model=settings.reason_model, effort="high", allow_open=True,
+                    fallback_into=s)
     s["diagnosis"] = dx.model_dump() | {"cost_estimate_idr": dx.cost_estimate_idr, "diy_saving_idr": dx.diy_saving_idr}
     s["safety"]["level"], s["safety"]["reason"] = dx.safety_level, dx.safety_reason
     _stage(s, "diagnose", "done", dx.causes[0].title[:90], int((time.time() - t0) * 1000))
@@ -324,7 +344,7 @@ def stage_plan(s: dict[str, Any], rep: ObjectReport, dx: Diagnosis, replan_repor
                 + "\n\nDiagnosis:\n" + json.dumps(dx.model_dump(), ensure_ascii=False)
                 + f"\n\nPlan for this cause: {dx.causes[idx].title}\nOwner's description:\n{description(s)}"}]
     plan = _chat_json(RepairPlan, system, content, "repair_plan", mock.plan(_scenario(s), s["lang"], idx),
-                      model=settings.reason_model, effort="medium", allow_open=True)
+                      model=settings.reason_model, effort="medium", allow_open=True, fallback_into=s)
     s["plan"] = plan.model_dump()
     s["checks"], s["diagrams"], s["audio"] = {}, {}, {}
     _stage(s, "plan", "done", f"{len(plan.steps)} steps", int((time.time() - t0) * 1000))
@@ -511,6 +531,7 @@ def check_step(sid: str, n: int, photo: Path) -> dict[str, Any]:
     overlay.normalize_photo(photo, d / name, settings.max_image_side)
     meter = cost.Meter(0.05)
     cost.use(meter)
+    check_fallback = False
     try:
         content = [{"type": "text", "text": f"Step {n}: {step.instruction}\nEXPECTED: {step.expected_state}\nREFERENCE (before):"},
                    _photo_part(d / s["photos"][0])]
@@ -520,17 +541,20 @@ def check_step(sid: str, n: int, photo: Path) -> dict[str, Any]:
         if settings.offline:
             res = StepCheck.model_validate(mock.step_check(d / name, s["lang"]))
         else:
-            res = _chat_json(StepCheck, prompts.get("verify_step", lang_name=prompts.LANG_NAME[s["lang"]]), content, "step_check", {},
-                             model=settings.vision_model, effort="medium")
+            fb: dict[str, Any] = {}
+            res = _chat_json(StepCheck, prompts.get("verify_step", lang_name=prompts.LANG_NAME[s["lang"]]), content, "step_check",
+                             mock.step_check(d / name, s["lang"]), model=settings.vision_model, effort="medium", fallback_into=fb)
+            check_fallback = bool(fb)
     finally:
         cost.use(None)
     rec = s["checks"].setdefault(str(n), {"passed": False, "fails": 0, "tries": []})
-    rec["tries"].append({"photo": name, **res.model_dump()})
-    rec["passed"] = res.passed
-    if not res.passed:
-        rec["fails"] += 1
+    rec["tries"].append({"photo": name, **res.model_dump(), **({"fallback": True} if check_fallback else {})})
+    if not check_fallback:  # a demo answer (live API down) never counts as camera-verified, nor as a fail
+        rec["passed"] = res.passed
+        if not res.passed:
+            rec["fails"] += 1
     escalate = rec["fails"] >= settings.max_check_fails
-    out = res.model_dump() | {"fails": rec["fails"], "escalate": escalate}
+    out = res.model_dump() | {"fails": rec["fails"], "escalate": escalate, "fallback": check_fallback}
     if escalate:
         out["escalate_hint"] = {"id": "Sudah dicoba beberapa kali. Ketuk 'Masih rusak' untuk rencana lain, atau panggil teknisi.",
                                 "jv": "Wis dijajal kaping pirang-pirang. Tutul 'Isih rusak' kanggo rencana liya, utawa undang teknisi.",

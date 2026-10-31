@@ -67,6 +67,9 @@ class Settings:
     max_check_fails: int = field(default_factory=lambda: int(_env("MAX_CHECK_FAILS", default="2")))
     diagram_checker: bool = field(default_factory=lambda: _flag("DIAGRAM_CHECKER", default="1"))
     narration_voice: bool = field(default_factory=lambda: _flag("NARRATION_VOICE", default="1"))
+    # Live mode only: when a Meta call still fails after its retries, carry on with the demo answer for that stage
+    # and label it in the UI and PDF ("demo answer, live API unavailable") instead of failing the repair.
+    demo_fallback: bool = field(default_factory=lambda: _flag("DEMO_FALLBACK", default="1"))
     # Live guide (camera overlay): SAM 3.1 on ~1 frame per second, capped per repair to keep cost bounded.
     max_track_frames: int = field(default_factory=lambda: int(_env("MAX_TRACK_FRAMES", default="120")))
     track_min_interval_s: float = field(default_factory=lambda: float(_env("TRACK_MIN_INTERVAL_S", default="0.6")))

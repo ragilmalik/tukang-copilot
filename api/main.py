@@ -171,7 +171,7 @@ def guide_page(sid: str) -> str:
 @app.get("/api/health")
 def health() -> dict[str, Any]:
     return {"ok": True, "version": __version__, "mode": settings.mode, "meta_api_key": bool(settings.meta_api_key),
-            "open_weights": settings.open_weights_active, "models": engine.models_used()}
+            "open_weights": settings.open_weights_active, "demo_fallback": settings.demo_fallback, "models": engine.models_used()}
 
 
 @app.post("/api/sessions")
