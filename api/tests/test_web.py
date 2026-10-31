@@ -52,3 +52,14 @@ def test_accessibility_hooks_present():
         assert needle in INDEX, needle
     assert 'lang === "jv" ? "jv"' in JS  # Javanese UI must not be tagged as Indonesian for screen readers
     assert "setAttribute(\"aria-pressed\"" in JS
+
+
+def test_a11y_basics_in_html_pages():
+    import re
+    from pathlib import Path
+
+    for name in ("index.html", "guide.html"):
+        html = (Path(__file__).resolve().parents[2] / "web" / name).read_text()
+        assert re.search(r"<html lang=\"[a-z]{2}\"", html), name
+        for tag in re.findall(r"<img\b[^>]*>", html):
+            assert "alt=" in tag, (name, tag)
