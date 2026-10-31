@@ -224,6 +224,24 @@ def segment(image_path: Path, phrase: str) -> list[dict[str, Any]]:
              "mw": mw, "mh": mh, "confidence": 0.9}]
 
 
+def track(frame: Path, phrase: str, seed: int = 0) -> list[dict[str, Any]]:
+    """Live guide stand-in: the demo box for `phrase`, nudged a little each frame (deterministic per seed),
+    so the overlay on the live camera visibly follows the part. Same record shape as segment()."""
+    import random
+
+    recs = segment(frame, phrase)
+    if not recs:
+        return []
+    w, h = Image.open(frame).size
+    rnd = random.Random(f"{phrase}:{seed}")
+    dx, dy = int(rnd.uniform(-0.015, 0.015) * w), int(rnd.uniform(-0.015, 0.015) * h)
+    r = dict(recs[0])
+    r["left"], r["right"] = max(0, r["left"] + dx), min(w, r["right"] + dx)
+    r["top"], r["bottom"] = max(0, r["top"] + dy), min(h, r["bottom"] + dy)
+    r["confidence"] = round(0.85 + rnd.uniform(0, 0.1), 3)
+    return [r]
+
+
 def step_check(photo: Path, lang: str) -> dict[str, Any]:
     """Deterministic: a dark or nearly blank photo fails (asks for more light), anything else passes."""
     stat = ImageStat.Stat(Image.open(photo).convert("L"))

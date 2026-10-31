@@ -179,6 +179,33 @@ async function xssChecks() {
   w.close();
 }
 
+// Live guide + hands-free + hand-off on a ready pump repair (jsdom has no camera, no canvas, no speech).
+async function featureChecks(lang) {
+  const vc = new VirtualConsole(); vc.on("jsdomError", () => {});
+  const dom = await JSDOM.fromURL(base + "/", { runScripts: "dangerously", resources: "usable", pretendToBeVisual: true, virtualConsole: vc,
+    beforeParse(w) { w.fetch = nodeFetch; w.localStorage.setItem("tc_lang", lang); w.scrollTo = () => {}; } });
+  const w = dom.window, d = w.document;
+  await until(() => d.readyState === "complete");
+  await sleep(300);
+  d.querySelector('button.sample[data-sample="pump"]').click();
+  const ready = await until(() => !d.getElementById("result").classList.contains("hidden"));
+  check(`${lang}/live: result ready`, ready);
+  if (!ready) { w.close(); return; }
+  Array.from(d.querySelectorAll("#preList input")).forEach((b) => { b.checked = true; b.dispatchEvent(new w.Event("change")); });
+  // live guide without a camera: falls back to the photo flow with a translated message
+  d.getElementById("liveBtn").click();
+  await until(() => d.getElementById("liveState").textContent.length > 10, 3000);
+  const ls = d.getElementById("liveState").textContent;
+  check(`${lang}/live: no-camera fallback message`, ls.length > 20 && !/liveNoCam|undefined/.test(ls) && !d.getElementById("live").classList.contains("hidden"), ls);
+  w.applyTrack({ step: 1, component_id: "c1", name: "PLUG-X", label: 1, found: true, boxes: [{ x1: 0.4, y1: 0.2, x2: 0.6, y2: 0.3, confidence: 0.9 }], polygon: [[0.4, 0.2], [0.6, 0.2], [0.6, 0.3]], frames_used: 1, limit_reached: false });
+  check(`${lang}/live: found text names the part`, /1\. PLUG-X/.test(d.getElementById("liveState").textContent), d.getElementById("liveState").textContent);
+  w.applyTrack({ step: 1, component_id: "c1", name: "PLUG-X", found: false, boxes: [], polygon: [], frames_used: 3, limit_reached: true });
+  check(`${lang}/live: limit message`, !/liveLimit/.test(d.getElementById("liveState").textContent) && d.getElementById("liveState").textContent.length > 20);
+  d.getElementById("liveClose").click();
+  check(`${lang}/live: close hides the live box`, d.getElementById("live").classList.contains("hidden"));
+  w.close();
+}
+
 async function offlineChecks() {
   for (const lang of ["id", "jv", "en"]) {
     const vc = new VirtualConsole(); vc.on("jsdomError", () => {});
@@ -213,6 +240,7 @@ try {
   await offlineChecks();
   await shrinkChecks();
   await xssChecks();
+  for (const l of ["id", "jv", "en"]) await featureChecks(l);
   await run("id", "faucet");
   await run("jv", "pump");
   await run("en", "motor");

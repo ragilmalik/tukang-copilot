@@ -118,6 +118,12 @@
       <p id="stepCheck" class="check"></p>
       <label class="btn" id="stepPhotoLabel">📸 <span data-t="checkStep">Cek langkah ini</span>
         <input id="stepPhoto" type="file" accept="image/*" capture="environment" hidden></label>
+      <button id="liveBtn" class="btn" type="button" aria-pressed="false">🎯 <span data-t="liveGuide">Panduan kamera langsung</span></button>
+      <div id="live" class="live hidden" data-testid="live-guide">
+        <div class="liveView"><video id="liveVideo" playsinline muted autoplay></video><canvas id="liveCanvas" aria-hidden="true"></canvas></div>
+        <p id="liveState" class="small" aria-live="polite"></p>
+        <div class="row"><button id="liveCheck" class="btn primary" type="button" data-t="liveCheck">📸 Cek sekarang</button><button id="liveClose" class="btn" type="button" data-t="liveClose">Tutup kamera</button></div>
+      </div>
       <div id="checkResult" class="hidden" aria-live="polite"></div>
       <div class="row nav">
         <button id="prevBtn" class="btn" type="button">◀</button>

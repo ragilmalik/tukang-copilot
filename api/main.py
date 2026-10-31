@@ -21,7 +21,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import __version__, errors, guard, shop
 from .trace import build_trace
-from .pipeline import engine, media, mock, photos
+from .pipeline import engine, media, mock, photos, track
 from .settings import ROOT, settings
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -253,6 +253,7 @@ def get_session(sid: str) -> dict[str, Any]:
 def delete_session(sid: str) -> dict[str, Any]:
     """Erase this repair (photos, voice, PDFs) from the server now, instead of waiting for RETENTION_HOURS."""
     _load(sid)
+    track.forget(sid)
     return {"id": sid, "deleted": engine.delete(sid)}
 
 
@@ -311,6 +312,30 @@ async def post_check(sid: str, n: int, photo: UploadFile = File(...)) -> dict[st
     except Exception as e:  # Meta API busy or offline: the photo is not lost, the person can simply retake it
         logging.getLogger("tukang").error("step check failed: %s", errors.detail(e))
         raise HTTPException(503, errors.friendly(e, _load(sid)["lang"]), headers={"Retry-After": "10"})
+    finally:
+        p.unlink(missing_ok=True)
+
+
+MAX_FRAME = 3 * 1024 * 1024
+
+
+@app.post("/api/sessions/{sid}/steps/{n}/track")
+async def post_track(sid: str, n: int, frame: UploadFile = File(...)) -> dict[str, Any]:
+    """Live guide: one small camera frame -> SAM 3.1 boxes and outline of this step's part (normalised 0..1).
+    About one frame per second; too fast gives 429, and after MAX_TRACK_FRAMES the answer has limit_reached."""
+    _load(sid)
+    p = await _save_upload(frame, IMAGE_TYPES, MAX_FRAME, ".jpg")
+    try:
+        return await asyncio.to_thread(track.track_step, sid, n, p)
+    except track.TooFast:
+        raise HTTPException(429, "Too many frames, slow down", headers={"Retry-After": "1"})
+    except ValueError as e:
+        raise HTTPException(409, str(e))
+    except OSError:
+        raise HTTPException(400, "Could not read that frame")
+    except Exception as e:  # SAM busy: the live view keeps running, the next frame tries again
+        logging.getLogger("tukang").error("track failed: %s", errors.detail(e))
+        raise HTTPException(503, errors.friendly(e, _load(sid)["lang"]), headers={"Retry-After": "3"})
     finally:
         p.unlink(missing_ok=True)
 

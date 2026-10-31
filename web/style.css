@@ -82,3 +82,11 @@ h1:focus,h2:focus{outline:none}
 .preItem{display:flex;gap:10px;align-items:center;min-height:44px;font-size:1.05em}
 .preItem input{width:24px;height:24px}
 #stepCard.locked{opacity:.45;filter:grayscale(.6)}
+
+/* live guide: SAM 3.1 highlight drawn over the live rear camera */
+.live{margin:10px 0;padding:8px;border:2px solid var(--o);border-radius:12px;background:#111}
+.live .small{color:#fff;margin:6px 2px}
+.liveView{position:relative;line-height:0}
+.liveView video{width:100%;height:auto;display:block;border-radius:8px;background:#000}
+.liveView canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+#liveBtn[aria-pressed="true"]{outline:3px solid var(--o)}

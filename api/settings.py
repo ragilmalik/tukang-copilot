@@ -67,6 +67,9 @@ class Settings:
     max_check_fails: int = field(default_factory=lambda: int(_env("MAX_CHECK_FAILS", default="2")))
     diagram_checker: bool = field(default_factory=lambda: _flag("DIAGRAM_CHECKER", default="1"))
     narration_voice: bool = field(default_factory=lambda: _flag("NARRATION_VOICE", default="1"))
+    # Live guide (camera overlay): SAM 3.1 on ~1 frame per second, capped per repair to keep cost bounded.
+    max_track_frames: int = field(default_factory=lambda: int(_env("MAX_TRACK_FRAMES", default="120")))
+    track_min_interval_s: float = field(default_factory=lambda: float(_env("TRACK_MIN_INTERVAL_S", default="0.6")))
 
     # Storage and web
     data_dir: Path = field(default_factory=lambda: Path(_env("DATA_DIR", default=str(ROOT / "data"))))

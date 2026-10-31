@@ -7,7 +7,7 @@ const T = {
         samples: "Coba contoh:", sMotor: "motor mogok", sPump: "pompa tidak keluar air", sFaucet: "kran menetes", sRice: "rice cooker mati", sTire: "ban kempes",
         working: "Sedang memeriksa…", retry: "Coba lagi", answerHere: "Jawaban kamu", send: "Kirim", diagnosis: "Diagnosa", safetyFirst: "Keselamatan dulu",
         tools: "Alat", materials: "Suku cadang", listen: "Dengarkan", next: "Lanjut", handsFree: "Mode tangan bebas (bacakan otomatis)",
-        done: "Selesai kalau:", outcomeAsk: "Sudah jalan lagi?", fixedBtn: "Sudah beres 🎉", proBtn: "Dibawa ke bengkel", fixedThanks: "Mantap! Perbaikan selesai.", proThanks: "Tidak apa-apa, membawa ke ahli itu pilihan yang aman. Laporan PDF bisa ditunjukkan ke mekanik.", savedTotal: "Total hemat", savedFrom: "dari", savedUnit: "perbaikan", preTitle: "Sebelum mulai, pastikan:", preLocked: "Centang semua dulu, baru langkah 1 terbuka.", preReady: "✅ Siap. Langkah 1 terbuka.", waitFor: "Tunggu {n} menit", timerStart: "Mulai pengatur waktu", timerStop: "Hentikan", timerDone: "Waktu tunggu selesai. Lanjut ke langkah berikutnya.", checkStep: "Cek langkah ini", share: "Bagikan laporan", pdf: "Unduh laporan PDF", workshop: "Lembar bengkel (cetak besar)", hood: "Di balik layar: model yang dipakai", hs_listen: "Dengar suara", hs_gate: "Cek keselamatan teks", hs_look: "Lihat foto", hs_segment: "Tandai bagian", hs_diagnose: "Diagnosa", hs_plan: "Susun langkah", hs_safety: "Cek keselamatan rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Suara pemandu", wa: "Kirim daftar belanja ke WhatsApp", buy: "Cari harga", garage: "Garasi saya", garageNote: "Riwayat perbaikan hanya disimpan di HP ini. Panduan bisa dibuka 24 jam.", garageClear: "Hapus riwayat", again: "Perbaiki barang lain", erase: "Hapus foto saya sekarang", eraseAsk: "Hapus foto, suara, dan panduan ini dari server sekarang?", erased: "Sudah dihapus dari server.",
+        done: "Selesai kalau:", outcomeAsk: "Sudah jalan lagi?", fixedBtn: "Sudah beres 🎉", proBtn: "Dibawa ke bengkel", fixedThanks: "Mantap! Perbaikan selesai.", proThanks: "Tidak apa-apa, membawa ke ahli itu pilihan yang aman. Laporan PDF bisa ditunjukkan ke mekanik.", savedTotal: "Total hemat", savedFrom: "dari", savedUnit: "perbaikan", preTitle: "Sebelum mulai, pastikan:", preLocked: "Centang semua dulu, baru langkah 1 terbuka.", preReady: "✅ Siap. Langkah 1 terbuka.", waitFor: "Tunggu {n} menit", timerStart: "Mulai pengatur waktu", timerStop: "Hentikan", timerDone: "Waktu tunggu selesai. Lanjut ke langkah berikutnya.", checkStep: "Cek langkah ini", liveGuide: "Panduan kamera langsung", liveCheck: "📸 Cek sekarang", liveClose: "Tutup kamera", liveStart: "Menyalakan kamera…", liveAim: "Arahkan kamera ke {name}", liveFound: "🎯 Ketemu {name}", liveLost: "Belum ketemu {name}. Gerakkan HP pelan-pelan.", liveNoPart: "Langkah ini tidak menunjuk bagian tertentu. Pakai Cek sekarang.", liveNoCam: "Kamera langsung tidak bisa dipakai di HP ini. Pakai tombol foto untuk cek langkah.", liveLimit: "Batas kamera langsung untuk perbaikan ini sudah habis. Pakai foto untuk cek langkah.", share: "Bagikan laporan", pdf: "Unduh laporan PDF", workshop: "Lembar bengkel (cetak besar)", hood: "Di balik layar: model yang dipakai", hs_listen: "Dengar suara", hs_gate: "Cek keselamatan teks", hs_look: "Lihat foto", hs_segment: "Tandai bagian", hs_diagnose: "Diagnosa", hs_plan: "Susun langkah", hs_safety: "Cek keselamatan rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Suara pemandu", wa: "Kirim daftar belanja ke WhatsApp", buy: "Cari harga", garage: "Garasi saya", garageNote: "Riwayat perbaikan hanya disimpan di HP ini. Panduan bisa dibuka 24 jam.", garageClear: "Hapus riwayat", again: "Perbaiki barang lain", erase: "Hapus foto saya sekarang", eraseAsk: "Hapus foto, suara, dan panduan ini dari server sekarang?", erased: "Sudah dihapus dari server.",
         stuck: "Masih rusak, coba rencana lain", stuckHere: "Apa yang terjadi? (mis. sudah dicoba, tetap mati)",
         needPhoto: "Ambil atau unggah foto dulu.", needDesc: "Ceritakan masalahnya (suara atau ketik).",
         footer: "Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.",
@@ -27,7 +27,7 @@ const T = {
         samples: "Try a sample:", sMotor: "bike won't start", sPump: "pump gives no water", sFaucet: "dripping tap", sRice: "dead rice cooker", sTire: "flat tyre",
         working: "Checking…", retry: "Try again", answerHere: "Your answer", send: "Send", diagnosis: "Diagnosis", safetyFirst: "Safety first",
         tools: "Tools", materials: "Parts", listen: "Listen", next: "Next", handsFree: "Hands-free mode (read steps aloud)",
-        done: "Done when:", outcomeAsk: "Does it work again?", fixedBtn: "It works now 🎉", proBtn: "Took it to a mechanic", fixedThanks: "Great, repair done.", proThanks: "That is a safe choice. Show the PDF report to the mechanic.", savedTotal: "Total saved", savedFrom: "from", savedUnit: "repairs", preTitle: "Before you start, make sure:", preLocked: "Tick everything first to unlock step 1.", preReady: "✅ Ready. Step 1 is open.", waitFor: "Wait {n} minutes", timerStart: "Start timer", timerStop: "Stop", timerDone: "Waiting time is over. Go on to the next step.", checkStep: "Check this step", share: "Share report", pdf: "Download PDF report", workshop: "Workshop sheets (large print)", hood: "Under the hood: models used", hs_listen: "Listen", hs_gate: "Text safety gate", hs_look: "Look at photo", hs_segment: "Mark parts", hs_diagnose: "Diagnose", hs_plan: "Plan steps", hs_safety: "Plan safety gate", hs_illustrate: "Helper diagram", hs_narrate: "Voice guide", wa: "Send shopping list to WhatsApp", buy: "Compare prices", garage: "My garage", garageNote: "Your repair history stays on this phone only. Guides open for 24 hours.", garageClear: "Clear history", again: "Fix something else", erase: "Delete my photos now", eraseAsk: "Delete the photos, voice and guide of this repair from the server now?", erased: "Deleted from the server.",
+        done: "Done when:", outcomeAsk: "Does it work again?", fixedBtn: "It works now 🎉", proBtn: "Took it to a mechanic", fixedThanks: "Great, repair done.", proThanks: "That is a safe choice. Show the PDF report to the mechanic.", savedTotal: "Total saved", savedFrom: "from", savedUnit: "repairs", preTitle: "Before you start, make sure:", preLocked: "Tick everything first to unlock step 1.", preReady: "✅ Ready. Step 1 is open.", waitFor: "Wait {n} minutes", timerStart: "Start timer", timerStop: "Stop", timerDone: "Waiting time is over. Go on to the next step.", checkStep: "Check this step", liveGuide: "Live camera guide", liveCheck: "📸 Check now", liveClose: "Close camera", liveStart: "Starting the camera…", liveAim: "Point the camera at the {name}", liveFound: "🎯 Found {name}", liveLost: "Can't see the {name} yet. Move the phone slowly.", liveNoPart: "This step does not point at one part. Use Check now.", liveNoCam: "The live camera is not available on this phone. Use the photo button to check the step.", liveLimit: "The live camera limit for this repair is used up. Use a photo to check the step.", share: "Share report", pdf: "Download PDF report", workshop: "Workshop sheets (large print)", hood: "Under the hood: models used", hs_listen: "Listen", hs_gate: "Text safety gate", hs_look: "Look at photo", hs_segment: "Mark parts", hs_diagnose: "Diagnose", hs_plan: "Plan steps", hs_safety: "Plan safety gate", hs_illustrate: "Helper diagram", hs_narrate: "Voice guide", wa: "Send shopping list to WhatsApp", buy: "Compare prices", garage: "My garage", garageNote: "Your repair history stays on this phone only. Guides open for 24 hours.", garageClear: "Clear history", again: "Fix something else", erase: "Delete my photos now", eraseAsk: "Delete the photos, voice and guide of this repair from the server now?", erased: "Deleted from the server.",
         stuck: "Still broken, try another plan", stuckHere: "What happened? (e.g. tried it, still dead)",
         needPhoto: "Take or upload a photo first.", needDesc: "Describe the problem (voice or text).",
         footer: "Light repairs only. For gas, house wiring, or high voltage, call a professional.",
@@ -50,7 +50,7 @@ T.jv = Object.assign({}, T.id, {
   samples: "Jajal conto:", sMotor: "motor mogok", sPump: "pompa ora metu banyu", sFaucet: "kran netes", sRice: "rice cooker mati", sTire: "ban kempes",
   working: "Lagi dipriksa…", retry: "Jajal maneh", answerHere: "Wangsulanmu", send: "Kirim", diagnosis: "Diagnosa", safetyFirst: "Slamet dhisik",
   tools: "Piranti", materials: "Suku cadang", listen: "Rungokna", next: "Terus", handsFree: "Mode tanpa tangan (diwacakake otomatis)",
-  done: "Rampung yen:", outcomeAsk: "Wis urip maneh?", fixedBtn: "Wis rampung 🎉", proBtn: "Digawa menyang bengkel", fixedThanks: "Apik! Ndandani rampung.", proThanks: "Ora apa-apa, digawa menyang ahli iku pilihan sing aman. Laporan PDF bisa dituduhake marang mekanik.", savedTotal: "Total irit", savedFrom: "saka", savedUnit: "ndandani", preTitle: "Sadurunge miwiti, priksa:", preLocked: "Centhang kabeh dhisik, banjur langkah 1 mbukak.", preReady: "✅ Siap. Langkah 1 wis mbukak.", waitFor: "Antosna {n} menit", timerStart: "Wiwiti pangetung wektu", timerStop: "Mandhegna", timerDone: "Wektu antosan wis rampung. Terus menyang langkah sabanjure.", checkStep: "Priksa langkah iki", share: "Bagekna laporan", pdf: "Undhuh laporan PDF", workshop: "Lembar bengkel (cetak gedhe)", hood: "Ing mburi layar: model sing dipakai", hs_listen: "Rungokake swara", hs_gate: "Priksa slamet teks", hs_look: "Delok foto", hs_segment: "Tandhani bagean", hs_diagnose: "Diagnosa", hs_plan: "Nyusun langkah", hs_safety: "Priksa slamet rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Swara panuntun", wa: "Kirim dhaptar blanja menyang WhatsApp", buy: "Golek rega", garage: "Garasiku",
+  done: "Rampung yen:", outcomeAsk: "Wis urip maneh?", fixedBtn: "Wis rampung 🎉", proBtn: "Digawa menyang bengkel", fixedThanks: "Apik! Ndandani rampung.", proThanks: "Ora apa-apa, digawa menyang ahli iku pilihan sing aman. Laporan PDF bisa dituduhake marang mekanik.", savedTotal: "Total irit", savedFrom: "saka", savedUnit: "ndandani", preTitle: "Sadurunge miwiti, priksa:", preLocked: "Centhang kabeh dhisik, banjur langkah 1 mbukak.", preReady: "✅ Siap. Langkah 1 wis mbukak.", waitFor: "Antosna {n} menit", timerStart: "Wiwiti pangetung wektu", timerStop: "Mandhegna", timerDone: "Wektu antosan wis rampung. Terus menyang langkah sabanjure.", checkStep: "Priksa langkah iki", liveGuide: "Pandhuan kamera langsung", liveCheck: "📸 Priksa saiki", liveClose: "Tutup kamera", liveStart: "Nguripake kamera…", liveAim: "Arahna kamera menyang {name}", liveFound: "🎯 Ketemu {name}", liveLost: "Durung ketemu {name}. Obahna HP alon-alon.", liveNoPart: "Langkah iki ora nuduhake perangan tartamtu. Enggo Priksa saiki.", liveNoCam: "Kamera langsung ora bisa dienggo ing HP iki. Enggo tombol foto kanggo mriksa langkah.", liveLimit: "Wates kamera langsung kanggo ndandani iki wis entek. Enggo foto kanggo mriksa langkah.", share: "Bagekna laporan", pdf: "Undhuh laporan PDF", workshop: "Lembar bengkel (cetak gedhe)", hood: "Ing mburi layar: model sing dipakai", hs_listen: "Rungokake swara", hs_gate: "Priksa slamet teks", hs_look: "Delok foto", hs_segment: "Tandhani bagean", hs_diagnose: "Diagnosa", hs_plan: "Nyusun langkah", hs_safety: "Priksa slamet rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Swara panuntun", wa: "Kirim dhaptar blanja menyang WhatsApp", buy: "Golek rega", garage: "Garasiku",
   garageNote: "Riwayat ndandani mung disimpen ing HP iki. Pandhuan bisa dibukak 24 jam.", garageClear: "Busak riwayat", again: "Ndandani barang liya", erase: "Busak fotoku saiki", eraseAsk: "Busak foto, swara, lan pandhuan iki saka server saiki?", erased: "Wis dibusak saka server.",
   stuck: "Isih rusak, jajal rencana liya", stuckHere: "Kepiye kedadeyane? (umpamane wis dijajal, tetep mati)",
   needPhoto: "Jupuk utawa unggah foto dhisik.", needDesc: "Critakna masalahe (swara utawa ketik).",
@@ -398,6 +398,7 @@ function renderStep() {
   $("prevBtn").disabled = stepIdx === 0; $("nextBtn").disabled = stepIdx === S.plan.steps.length - 1;
   const c = (S.checks || {})[String(st.n)];
   if (c && c.tries && c.tries.length) showCheck(c.tries[c.tries.length - 1]); else $("checkResult").classList.add("hidden");
+  if (live.last && live.last.step !== st.n) { live.last = null; drawLive(null); liveSay("liveAim", ""); }
   if ($("handsFree").checked && !$("stepCard").classList.contains("locked")) play();
 }
 
@@ -464,6 +465,112 @@ async function sendOutcome(result) {
   } catch (err) { $("outcomeMsg").textContent = "⚠️ " + netMsg(err); }
 }
 
+// "Check my step": send one photo of the current step, show pass / correction, move on after a pass.
+async function checkPhoto(f) {
+  const st = S.plan.steps[stepIdx], fd = new FormData(); fd.append("photo", f, f.name || "check.jpg");
+  $("checkResult").classList.remove("hidden"); $("checkResult").textContent = t("checking");
+  try {
+    const r = await fetch(`/api/sessions/${S.id}/steps/${st.n}/check`, { method: "POST", body: fd });
+    const j = await r.json();
+    if (!r.ok) { $("checkResult").textContent = j.detail; return null; }
+    S = await fetchSession(S.id); showCheck(j); renderVerified();
+    if (j.passed && stepIdx < S.plan.steps.length - 1) setTimeout(() => { stepIdx++; renderStep(); }, 1500);
+    return j;
+  } catch (err) { $("checkResult").textContent = "⚠️ " + netMsg(err); return null; }
+}
+
+/* ---------------- live guide: SAM 3.1 highlight over the live rear camera ----------------
+   About one small frame per second goes to /track; the answer (normalised boxes + outline of this step's part)
+   is drawn on a canvas over the video. No camera (old phone, denied, http) -> the photo button keeps working. */
+const LIVE_MS = 1000, LIVE_SIDE = 640;
+const live = { stream: null, timer: null, busy: false, last: null, n: 0 };
+const liveName = () => { const p = live.last; return (p && p.name) || ""; };
+function liveSay(key, name) { if ($("liveState")) $("liveState").textContent = t(key).replace("{name}", name || "…"); }
+async function openLive() {
+  if (!$("live")) return;
+  const md = typeof navigator !== "undefined" && navigator.mediaDevices;
+  $("live").classList.remove("hidden"); liveSay("liveStart");
+  if (!md || typeof md.getUserMedia !== "function") { liveFallback(); return; }
+  try {
+    live.stream = await md.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 } }, audio: false });
+  } catch (_) { live.stream = null; liveFallback(); return; }
+  const v = $("liveVideo"); v.srcObject = live.stream; try { await v.play(); } catch (_) { /* autoplay attribute */ }
+  $("liveBtn").setAttribute("aria-pressed", "true");
+  live.last = null; live.timer = setInterval(liveTick, LIVE_MS); liveTick();
+}
+function liveFallback() {
+  liveSay("liveNoCam");
+  if ($("liveVideo")) $("liveVideo").classList.add("hidden");
+  if ($("liveCheck")) $("liveCheck").classList.add("hidden");
+}
+function closeLive() {
+  if (live.timer) { clearInterval(live.timer); live.timer = null; }
+  if (live.stream) { live.stream.getTracks().forEach((tr) => tr.stop()); live.stream = null; }
+  live.last = null; live.busy = false;
+  if ($("live")) $("live").classList.add("hidden");
+  if ($("liveBtn")) $("liveBtn").setAttribute("aria-pressed", "false");
+  if ($("liveVideo")) $("liveVideo").classList.remove("hidden");
+  if ($("liveCheck")) $("liveCheck").classList.remove("hidden");
+  drawLive(null);
+}
+function grabFrame(maxSide, quality) {
+  const v = $("liveVideo"); if (!v || !v.videoWidth) return Promise.resolve(null);
+  const k = Math.min(1, maxSide / Math.max(v.videoWidth, v.videoHeight));
+  const c = document.createElement("canvas"); c.width = Math.round(v.videoWidth * k); c.height = Math.round(v.videoHeight * k);
+  const ctx = c.getContext && c.getContext("2d"); if (!ctx) return Promise.resolve(null);
+  ctx.drawImage(v, 0, 0, c.width, c.height);
+  return new Promise((res) => c.toBlob((b) => res(b), "image/jpeg", quality));
+}
+async function liveTick() {
+  if (live.busy || !live.stream || !S || !S.plan) return;
+  live.busy = true;
+  try {
+    const blob = await grabFrame(LIVE_SIDE, 0.7); if (!blob) return;
+    const st = S.plan.steps[stepIdx], fd = new FormData(); fd.append("frame", blob, "frame.jpg");
+    const r = await fetch(`/api/sessions/${S.id}/steps/${st.n}/track`, { method: "POST", body: fd });
+    if (r.status === 429) return;  // throttled: the next tick tries again
+    const j = await r.json(); if (!r.ok) { if ($("liveState")) $("liveState").textContent = "⚠️ " + (j.detail || r.statusText); return; }
+    if (j.step !== S.plan.steps[stepIdx].n) return;  // the owner moved to another step meanwhile
+    applyTrack(j);
+  } catch (err) { if ($("liveState")) $("liveState").textContent = "⚠️ " + netMsg(err);
+  } finally { live.busy = false; }
+}
+function applyTrack(j) {
+  live.last = j; live.n++;
+  drawLive(j);
+  if (!j.component_id) liveSay("liveNoPart");
+  else if (j.found) liveSay("liveFound", (j.label ? j.label + ". " : "") + j.name);
+  else liveSay(j.frames_used ? "liveLost" : "liveAim", j.name);
+  if (j.limit_reached && live.timer) { clearInterval(live.timer); live.timer = null; liveSay("liveLimit"); }
+}
+function drawLive(j) {
+  const c = $("liveCanvas"), v = $("liveVideo"); if (!c || !c.getContext) return;
+  const w = (v && v.clientWidth) || c.clientWidth || 640, h = (v && v.clientHeight) || c.clientHeight || 480;
+  c.width = w; c.height = h;
+  const g = c.getContext("2d"); if (!g) return;
+  g.clearRect(0, 0, w, h);
+  if (!j || !j.found) return;
+  g.lineWidth = 4; g.strokeStyle = "#ff7a00"; g.fillStyle = "rgba(255,122,0,0.30)";
+  const poly = j.polygon || [];
+  if (poly.length > 2) {
+    g.beginPath(); poly.forEach(([x, y], i) => (i ? g.lineTo(x * w, y * h) : g.moveTo(x * w, y * h))); g.closePath(); g.fill(); g.stroke();
+  }
+  const b = (j.boxes || [])[0];
+  if (b) {
+    g.setLineDash([10, 6]); g.strokeRect(b.x1 * w, b.y1 * h, (b.x2 - b.x1) * w, (b.y2 - b.y1) * h); g.setLineDash([]);
+    const tag = (j.label ? j.label + ". " : "") + (j.name || "");
+    g.font = "bold 18px sans-serif"; const tw = g.measureText(tag).width + 16;
+    const ty = b.y1 * h >= 30 ? b.y1 * h - 30 : Math.min(h - 28, b.y2 * h + 2), tx = Math.max(0, Math.min(b.x1 * w, w - tw));
+    g.fillStyle = "#ff7a00"; g.fillRect(tx, ty, tw, 28); g.fillStyle = "#fff"; g.fillText(tag, tx + 8, ty + 20);
+  }
+}
+async function liveCheckNow() {
+  if (!live.stream) { const inp = $("stepPhoto"); if (inp) inp.click(); return; }
+  const blob = await grabFrame(1600, 0.85);
+  if (!blob) return;
+  await checkPhoto(new File([blob], "live-check.jpg", { type: "image/jpeg" }));
+}
+
 function renderVerified() {
   const n = S.plan.steps.filter((st) => ((S.checks || {})[String(st.n)] || {}).passed).length;
   $("verifiedCount").textContent = `✅ ${n}/${S.plan.steps.length} ${t("verified")}`;
@@ -477,17 +584,12 @@ function setupResult() {
   on("proBtn", "click", () => sendOutcome("pro"));
   on("stepPhoto", "change", async (e) => {
     const f0 = e.target.files[0]; if (!f0) return;
-    const f = await shrinkImage(f0);
-    const st = S.plan.steps[stepIdx], fd = new FormData(); fd.append("photo", f, f.name || "check.jpg");
-    $("checkResult").classList.remove("hidden"); $("checkResult").textContent = t("checking");
-    try {
-      const r = await fetch(`/api/sessions/${S.id}/steps/${st.n}/check`, { method: "POST", body: fd });
-      const j = await r.json(); e.target.value = "";
-      if (!r.ok) { $("checkResult").textContent = j.detail; return; }
-      S = await fetchSession(S.id); showCheck(j); renderVerified();
-      if (j.passed && stepIdx < S.plan.steps.length - 1) setTimeout(() => { stepIdx++; renderStep(); }, 1500);
-    } catch (err) { e.target.value = ""; $("checkResult").textContent = "⚠️ " + netMsg(err); }
+    const f = await shrinkImage(f0); e.target.value = "";
+    await checkPhoto(f);
   });
+  on("liveBtn", "click", () => (live.stream ? closeLive() : openLive()));
+  on("liveClose", "click", closeLive);
+  on("liveCheck", "click", liveCheckNow);
   on("stuckBtn", "click", async () => {
     const fd = new FormData(); fd.append("report", $("stuckText").value.trim());
     $("stuckBtn").disabled = true; $("stuckMsg").textContent = t("working");
