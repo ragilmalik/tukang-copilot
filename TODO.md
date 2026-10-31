@@ -23,6 +23,10 @@ Owner: **M** = Malik, **H** = Malik.
 - [x] **H** Screenshots + demo video + vertical clip (docs/demo/), regenerated for v1.23 (26 shots, 2:57 video, GIF)
 - [x] **H** Re-shoot shots/video for the compact tip bar + PDF agent-log page (v1.23)
 - [x] **H** Streamed partial results on the progress screen (object, SAM overlay, top cause as each stage finishes) (v1.23)
+- [x] **H** Recorded 1-tap demo that plays when the free server sleeps or the phone is offline, labelled "Recorded demo" (v1.24, backlog J5)
+- [x] **H** Skeptical-judge audit 5 fixes: red stop on screen, result opens at top, re-plan banner, keyboard focus, PDF wording, neutral landing picture (v1.24)
+- [x] **H** Demo kit re-shot for v1.24 (27 shots incl. recorded demo, 2:57 video, 45 s X clip, GIF)
+- [ ] **M** Open the live link once a few minutes before judging/recording so the free server is awake (a brand-new visitor can't get the recording until the page itself loads)
 
 ## Could
 - [x] Abuse guard (rate limit + daily spend cap) and security headers for the public deploy

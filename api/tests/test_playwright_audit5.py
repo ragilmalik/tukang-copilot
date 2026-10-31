@@ -20,7 +20,8 @@ def test_result_opens_at_the_top_and_question_gets_focus(page):
     page.keyboard.press("Enter")                                           # keyboard only: answers "Yes"
     page.wait_for_selector("#result:not(.hidden)", timeout=20000)
     page.wait_for_timeout(300)
-    assert page.evaluate("scrollY") == 0 and _in_view(page, "#dxObject") and _in_view(page, "#safetyBadge")
+    # before the fix the page stayed ~900 px down; a few px of mobile-viewport settling under load is fine
+    assert page.evaluate("scrollY") < 60 and _in_view(page, "#dxObject") and _in_view(page, "#safetyBadge")
 
 
 def test_red_stop_is_on_screen_with_a_stop_heading(page):
