@@ -2,6 +2,16 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.22.0 (2026-10-31 11:45 WIB)
+Judge-facing polish: the agent now shows its work, a 1-tap demo runs the whole loop, and the public deploy is harder to abuse.
+- **Agent log "🤖 What the AI did"**: every decision (look, mark parts, diagnose, ask under 60 %, plan, code safety gate, verify, re-plan, hand off) with the Meta model or code rule that made it and how long it took; loop strip on progress, result and the shared guide page. Never holds the owner's own words, so it is safe on a shared link. **The PDF report now prints the same log** (same wording as the app in id/jv/en; a test keeps the two in sync).
+- **1-tap guided demo**: hero button runs the motor repair with tips, quick answers and labelled stand-in check photos (`GET /api/demo/check-photo/{dark|ok}`): a too-dark photo is rejected, the right one passes, *Still broken* re-plans. **The tip bar is a compact corner pill** that folds to a 💡 chip by itself after the first step check, with reopen/close buttons (aria labelled), so it never covers the main action.
+- **Prompt-injection hardening**: `api/untrusted.py` fences owner text as data, the re-plan report moved out of the system prompt, a photo-text rule, and an input guard that logs instruction-like phrases (they can never lift a code safety stop).
+- **Cost guards**: `FOLLOWUP_RATE_PER_HOUR` (240 model calls inside repairs per visitor), `MAX_STEP_CHECKS` (40 per repair), step-check spend counted in the session cost and the daily budget, length caps on answers and reports. Listed in render.yaml, .env.example and docs/DEPLOY.md.
+- Javanese demo answers (`mock_jv.py`), model chip + elapsed timer per stage on the progress screen, WCAG AA contrast, overlay drawing 8× faster (fast suite 118 s → ~70 s), stage notes translated.
+- README rewrite (60-second start, what judges should look at, Meta model → code table), service-worker cache `tukang-shell-v2`, two new smoke steps (agent log, demo check photo). Regenerated 23 screenshots, 2:53 video, 45 s vertical clip, README hero GIF.
+- Tests: **453 passed, 0 failed** (443 fast + 10 slow, real Chromium); ruff clean; mypy strict clean (73 files); smoke 60 checks pass.
+
 ## 1.21.0 (2026-10-31 09:30 WIB)
 Four features from the win plan (built 08:00–08:40 WIB), plus deploy readiness and a new demo kit.
 - **Live camera guide**: `POST /api/sessions/{id}/steps/{n}/track` runs SAM 3.1 on a live camera frame (≤3 MB JPEG, ~640 px) and returns the target part's boxes and polygon. The guide draws an orange outline over the video, and *Check now* verifies the step from the current frame. Throttled (`TRACK_MIN_INTERVAL_S` 0.6 s → 429 + Retry-After) and capped (`MAX_TRACK_FRAMES` 120 per repair, about $0.30). Frames are never stored. Real-Chromium test with a fake camera.

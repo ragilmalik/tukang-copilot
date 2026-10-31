@@ -1,6 +1,6 @@
 # Verification report
 
-Checked on **2026-10-31 09:30 WIB (v1.21.0)** against SPEC.md and the hackathon rules (first version 2026-10-30). Legend: ✅ verified by a test or run · 🟡 built, verified only offline (needs a real-key or real-phone check) · ⬜ not done yet (in TODO.md) · ↔️ done differently (see DECISIONS.md).
+Checked on **2026-10-31 11:40 WIB (v1.22.0)** against SPEC.md and the hackathon rules (first version 2026-10-30). Legend: ✅ verified by a test or run · 🟡 built, verified only offline (needs a real-key or real-phone check) · ⬜ not done yet (in TODO.md) · ↔️ done differently (see DECISIONS.md).
 
 Evidence names are tests in `api/tests/` (see TEST_REPORT.md for the run) or scripts.
 
@@ -100,6 +100,20 @@ Evidence names are tests in `api/tests/` (see TEST_REPORT.md for the run) or scr
 | Render config lists every setting | ✅ | render.yaml parses; keys incl. MAX_TRACK_FRAMES, TRACK_MIN_INTERVAL_S, DEMO_FALLBACK, IMPACT_TOKEN, PUBLIC_BASE_URL (sync:false) |
 
 **Run numbers (2026-10-31, v1.21.0):** pytest 410 passed, 0 failed (4 chunks: 141 + 88 + 173 fast, 8 slow); `ruff check api scripts` clean; `mypy api` strict no issues in 67 files; `smoke_e2e.py` ALL PASSED (52 PASS lines) on a local mock server; `deploy_check.py` READY on the same server.
+
+## 5c. v1.22.0 features
+
+| Feature | Status | Evidence |
+|---|---|---|
+| Agent log "What the AI did" (screen) | ✅ | `test_agent_log` (7 tests: full loop logged with tools, red stop / exhausted hand-offs, code gate before any model call, owner words never in the log, cap); jsdom checks per language (no `ag_`/`{` leftovers, the 60 % question explained); Playwright 1-tap test reads the log (muse-spark-1.3, sam-3.1, "Only 55% sure", re-plan line, ≥ 7 loop phases lit) |
+| Agent log in the PDF report | ✅ | `test_report_pdf`: strings identical to web/app.js in id/jv/en, every placeholder filled on a full faucet repair with a check and a re-plan, special kinds and bad entries handled; page inspected visually (2026-10-31 11:30 WIB) |
+| 1-tap guided demo | ✅ | Playwright `test_one_tap_demo_runs_the_whole_agent_loop` (real Chromium, 390×844): button above the fold, quick answer, dark photo rejected, right photo passes, re-plan; smoke step "1-tap demo sample check photo" |
+| Compact tip bar (folds after the first step check) | ✅ / 🟡 | Playwright `test_tip_bar_is_compact_and_collapses_after_first_check`: ≤ 370 px wide, ≤ 60 px chip after the first check, aria-expanded/labels, the button under it still clickable, reopen + close. Real small phones with the keyboard open unverified |
+| Prompt-injection hardening | ✅ | `test_injection` (8 tests: invisible/bidi characters stripped, fence can't be closed from inside, id/jv/en signals, re-plan report in the user turn not the system prompt, flagged + logged + not echoed, cannot lift a hard stop, photo-text rule) |
+| Cost guards | ✅ | `test_cost_guards` (step checks capped across a re-plan, step-check spend in the session cost, follow-up rate limit in live mode, none in demo mode, oversized answer/report refused) |
+| WCAG AA contrast, model chips, elapsed timer | ✅ / 🟡 | Chips and timer covered by jsdom/Playwright checks. Contrast was fixed by hand against AA ratios; no automated contrast test |
+
+**Run numbers (2026-10-31 11:40 WIB, v1.22.0):** pytest **453 passed, 0 failed** (`make_test_report.py` one run, 152 s; also in chunks 218 + 225 fast and 10 slow with real Chromium); `ruff check .` clean; `mypy api` strict no issues in 73 files; `smoke_e2e.py` ALL PASSED (60 PASS lines) on a local demo-mode server.
 
 ## 6. What is NOT verified yet (honest list)
 

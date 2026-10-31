@@ -39,7 +39,7 @@ How it works: an installable phone web app (no account). Snap photos or a 5–10
 • Bengkel hand-off: a WhatsApp summary, the nearest workshop, and a PDF brief for the mechanic. It also shows the bengkel price against the DIY cost, a PDF repair report, and "My garage" on the phone.
 • Diagnosis and planning can run on Muse Spark Open (open weights) via Baseten with one switch.
 
-Built from scratch during the hackathon (Oct 26 – Nov 4, 2026): FastAPI + vanilla-JS PWA, 410 automated tests (incl. real-Chromium tests with a fake camera), strict typing, Docker/Render deploy. Honest status: the demo video runs in labelled demo mode (stand-in photos, recorded answers). The live Meta path is tested against a stand-in server built from the official API docs [update after the first live-key run].
+Built from scratch during the hackathon (Oct 26 – Nov 4, 2026): FastAPI + vanilla-JS PWA, 453 automated tests (incl. real-Chromium tests with a fake camera), strict typing, Docker/Render deploy. Honest status: the demo video runs in labelled demo mode (stand-in photos, recorded answers). The live Meta path is tested against a stand-in server built from the official API docs [update after the first live-key run].
 ```
 
 ### 7. Public GitHub Repository *
@@ -104,8 +104,8 @@ Reply to your own post with the repo link and the live link (keeps the main post
 | **Most Viral** ($20K) | 45 s vertical clip with Bahasa captions (docs/demo/tukang-copilot-x-vertical.mp4). A relatable hook ("motor mogok, bengkel tutup") and a draft post ready. |
 | **Best Build on Open Weight Models** ($10K) | `USE_OPEN_WEIGHTS=1` runs diagnosis + plan on Muse Spark Open via Baseten. Tested end to end against a stand-in Baseten server (14 calls, smoke ALL PASSED), with a badge in the UI. |
 | **Community Vote** ($10K) | Solves an everyday Indonesian problem in Bahasa and Javanese, and anyone can try it free in demo mode from the live link. |
-| **Best Agentic Use-Case** ($5K) | A real multi-step loop: asks a follow-up when unsure → plans → verifies each step from a camera photo → re-plans for the next cause → escalates or hands off to a bengkel. The safety gate is enforced in code. |
+| **Best Agentic Use-Case** ($5K) | A real multi-step loop: asks a follow-up when unsure → plans → verifies each step from a camera photo → re-plans for the next cause → escalates or hands off to a bengkel. The safety gate is enforced in code. The **agent-trace panel "🤖 What the AI did"** shows every decision with the Meta model (or code rule) that made it, live on the progress screen, on the result, and in the PDF report. The **1-tap demo** runs the whole loop in about a minute with no photo: question → plan → a rejected and an accepted check photo → re-plan. |
 | **Best Creative Build** ($5K, Muse Image) | Muse Image edits the user's *own* photo into an instructional diagram, and Muse Spark reviews it and redraws a bad one. A creative use of image editing as a teaching tool. (Weakest claim: Muse Image is a supporting feature, not the core.) |
 
 ## Try it in 60 seconds (for the gallery / judges)
-Open the live link on a phone → under *Coba contoh* tap "motor mogok" → answer the one question → tick the safety list → try **🎯 Panduan kamera langsung** and **Mode tangan bebas** → tap *Cek langkah ini* and snap anything → tap "rice cooker mati" to see the red STOP with its PDF and hand-off card. Without a key the app runs in labelled demo mode.
+Open the live link on a phone → tap **▶ Coba demo 1 ketuk** (1-tap demo; the tips guide you through question → check photos → re-plan, and *🤖 Yang dilakukan AI* shows each decision). Or under *Coba contoh* tap "motor mogok" → answer the one question → tick the safety list → try **🎯 Panduan kamera langsung** and **Mode tangan bebas** → tap *Cek langkah ini* and snap anything → tap "rice cooker mati" to see the red STOP with its PDF and hand-off card. Without a key the app runs in labelled demo mode.

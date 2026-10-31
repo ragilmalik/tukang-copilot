@@ -2,7 +2,13 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
-## State on 2026-10-31 09:30 WIB (v1.21.0) — feature-complete for submission
+## State on 2026-10-31 11:45 WIB (v1.22.0) — feature-complete for submission
+- **New since 1.21:** agent log "What the AI did" (screen + PDF), 1-tap guided demo with a compact tip bar that folds after the first step check, prompt-injection hardening (`api/untrusted.py`), cost guards (`FOLLOWUP_RATE_PER_HOUR`, `MAX_STEP_CHECKS`), Javanese demo answers, model chips + timer on progress, WCAG AA contrast, faster overlay, README rewrite, regenerated screenshots/2:53 video/GIF. Details: CHANGELOG 1.22.0. Ranked backlog: `../work/IMPROVEMENT_BACKLOG.md`.
+- **Checks (real runs, 2026-10-31 11:40 WIB):** pytest **453 passed, 0 failed** (`make_test_report.py`, 152 s in one run; in chunks: `-m "not slow"` over 2 file groups = 218 + 225, `-m slow` = 10 with Chromium at /tmp/bin/chromium on PATH); `ruff check .` clean; `mypy api` strict no issues in 73 files; `smoke_e2e.py` ALL PASSED (60 PASS lines; port 8000 in this sandbox belongs to another app, so start a demo server with `MOCK=1 PORT=8765 python app.py` and pass `http://127.0.0.1:8765`, with `NO_PROXY=127.0.0.1,localhost`).
+- **Not in current assets:** the screenshots/video still show the old full-width tip bar and no PDF agent-log page (backlog item: re-shoot with `make_demo_assets.py shots`, then `video`).
+- **Honest status:** unchanged: no live Meta answer verified yet (needs the key); demo assets are demo mode; impact numbers are MOCK.
+
+## State on 2026-10-31 09:30 WIB (v1.21.0)
 - **New since 1.20 (win plan lanes A/B/C):** live camera guide (SAM 3.1 on camera frames, `POST /steps/{n}/track`), hands-free voice commands (`POST /command` push-to-talk fallback), bengkel hand-off (`GET /handoff`: WhatsApp + Maps + mechanic brief PDF), `DEMO_FALLBACK`, impact trial kit, Render free-plan deploy readiness, `scripts/deploy_check.py` (in LIVE mode it FAILs any session that silently used demo answers), regenerated demo kit (22 screenshots, 2:50 video, 45 s vertical clip, captions + voice-over), docs/WRITEUP.md, a field-by-field docs/SUBMISSION.md for the Cerebral Valley form. Details: CHANGELOG 1.21.0.
 - **Checks (real runs, 2026-10-31):** pytest **410 passed, 0 failed** (run in chunks under 110 s: `-m "not slow"` split over 3 file groups = 141 + 88 + 173, then `-m slow` = 8); `ruff check api scripts` clean; `mypy api` strict no issues in 67 files; `smoke_e2e.py` ALL PASSED on a local mock server (set `NO_PROXY=127.0.0.1,localhost`); `deploy_check.py` READY (mock), and in LIVE mode against the fake Meta server: wrong key → FAIL fallback flagged, right key → READY.
 - **Sandbox tips:** the full suite takes ~4 min, so split it (see above or `../work/run_tests.sh`). Demo assets: `python scripts/make_demo_assets.py shots|diagram|voice|video` (video takes ~3 min, so run it with nohup; segments are cached in `$TMPDIR/tukang-video`, delete that after changing screenshots). edge-tts needs the env proxy removed (the script does that unless `EDGE_TTS_PROXY` is set).
@@ -189,5 +195,5 @@ See docs/DECISIONS.md. Most important: single FastAPI process + plain JS (no Nex
 2. Optional: Baseten key for open weights (run `set_keys.py` again, set `USE_OPEN_WEIGHTS=1`).
 3. Real photos + 5 user trials (docs/USER_TRIAL_KIT.md).
 4. Approve the GitHub push (`ragilmalik/tukang-copilot`) and the Render deploy (docs/DEPLOY.md, free plan).
-5. Upload the video to YouTube (Unlisted is fine; the real recording or docs/demo/tukang-copilot-demo.mp4) and post the X clip (docs/demo/tukang-copilot-x-vertical.mp4, draft post in docs/SUBMISSION.md).
+5. Upload the video to YouTube (Unlisted is fine; the real recording or the 2:53 docs/demo/tukang-copilot-demo.mp4) and post the X clip (docs/demo/tukang-copilot-x-vertical.mp4, draft post in docs/SUBMISSION.md).
 6. Paste the docs/SUBMISSION.md fields into Cerebral Valley (account ragilmalika) and submit before **Thu Nov 5, 09:00 WIB**.
