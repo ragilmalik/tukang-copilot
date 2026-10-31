@@ -135,3 +135,10 @@ details.agent{margin-top:10px}details.agent summary{cursor:pointer;font-weight:6
 body:has(#tourBar:not(.hidden)){padding-bottom:96px}body:has(#tourBar.collapsed:not(.hidden)){padding-bottom:56px}
 /* While a text field has focus (keyboard open) the tip bar moves to the top so it never sits by Send. */
 body.typing .tourBar{bottom:auto;top:calc(8px + env(safe-area-inset-top))}
+/* v1.23: partial results stream in on the progress screen */
+.liveFind{margin:10px 0;padding:10px 12px;border:1px solid #f0ece6;border-radius:12px;background:#fffaf4}.lfTitle{margin:0 0 4px}
+.lfList{list-style:none;margin:0;padding:0}.lfList li{padding:6px 0;border-top:1px solid #f0ece6}.lfList li:first-child{border-top:0}
+.lfChips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.chip.sm{min-height:0;padding:2px 8px;font-size:.8rem}
+.lfImg{display:block;width:100%;height:auto;max-height:240px;object-fit:contain;aspect-ratio:4/3;margin-top:6px;border-radius:8px;background:#eee}
+@media (prefers-reduced-motion:no-preference){.lfList li.pop{animation:lfIn .35s ease-out}@keyframes lfIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}}
+.liveFind .level{white-space:nowrap;display:inline-block}

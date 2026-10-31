@@ -74,6 +74,8 @@ def save(s: dict[str, Any]) -> None:
 def _stage(s: dict[str, Any], name: str, status: str, note: str = "", ms: int | None = None) -> None:
     s["stages"][name] = {"status": status, "note": short(note), **({"ms": ms} if ms is not None else {})}
     save(s)
+    if status == "done" and settings.offline and settings.mock_pace_s > 0:
+        time.sleep(min(settings.mock_pace_s, 3.0))  # demo pacing (see settings.mock_pace_s); ms above is the real time
 
 
 def short(text: str, n: int = 90) -> str:
@@ -256,9 +258,9 @@ def stage_gate(s: dict[str, Any]) -> bool:
         _event(s, "gate", ok=False, category=g.category)
         _stop(s, g.reason, "gate")
         return False
-    _stage(s, "gate", "done")
     if not any(e.get("kind") == "gate" for e in s.get("agent_log", [])):  # a resumed run re-checks silently
         _event(s, "gate", ok=True)
+    _stage(s, "gate", "done")  # after the event: _stage saves both, then (demo only) holds the screen
     return True
 
 
@@ -270,8 +272,8 @@ def stage_look(s: dict[str, Any]) -> ObjectReport:
     rep = _chat_json(ObjectReport, prompts.get("look", lang_name=prompts.LANG_NAME[s["lang"]]), content, "object_report",
                      mock.object_report(_scenario(s), s["lang"]), model=settings.vision_model, effort="medium", fallback_into=s)
     s["object_report"] = rep.model_dump()
-    _stage(s, "look", "done", rep.object, int((time.time() - t0) * 1000))
     _event(s, "look", model=s["models"]["look"], object=rep.object, n=len(rep.components), ms=int((time.time() - t0) * 1000))
+    _stage(s, "look", "done", rep.object, int((time.time() - t0) * 1000))
     return rep
 
 
@@ -315,8 +317,8 @@ def stage_segment(s: dict[str, Any], rep: ObjectReport) -> None:
             overlay.draw_parts(photo, found, d / f"part_{f['id']}.jpg", only=str(f["id"]))
             s["parts"][f["id"]]["image"] = f"part_{f['id']}.jpg"
     hit = sum(1 for v in s["parts"].values() if v["found"])
-    _stage(s, "segment", "done", f"{hit}/{len(found)}", int((time.time() - t0) * 1000))
     _event(s, "segment", model=s["models"]["segment"], found=hit, of=len(found), ms=int((time.time() - t0) * 1000))
+    _stage(s, "segment", "done", f"{hit}/{len(found)}", int((time.time() - t0) * 1000))
 
 
 def box_prompt(size: tuple[int, int], rep: ObjectReport) -> tuple[str, dict[int, str]]:
@@ -373,9 +375,9 @@ def stage_diagnose(s: dict[str, Any], rep: ObjectReport) -> Diagnosis:
                     fallback_into=s)
     s["diagnosis"] = dx.model_dump() | {"cost_estimate_idr": dx.cost_estimate_idr, "diy_saving_idr": dx.diy_saving_idr}
     s["safety"]["level"], s["safety"]["reason"] = dx.safety_level, dx.safety_reason
-    _stage(s, "diagnose", "done", dx.causes[0].title, int((time.time() - t0) * 1000))
     _event(s, "diagnose", model=s["models"]["diagnose"], cause=dx.causes[0].title, conf=dx.causes[0].confidence,
            n=len(dx.causes), level=dx.safety_level, ms=int((time.time() - t0) * 1000))
+    _stage(s, "diagnose", "done", dx.causes[0].title, int((time.time() - t0) * 1000))
     return dx
 
 
@@ -397,10 +399,10 @@ def stage_plan(s: dict[str, Any], rep: ObjectReport, dx: Diagnosis, replan_repor
                       model=settings.reason_model, effort="medium", allow_open=True, fallback_into=s)
     s["plan"] = plan.model_dump()
     s["checks"], s["diagrams"], s["audio"] = {}, {}, {}
-    _stage(s, "plan", "done", f"{len(plan.steps)} steps", int((time.time() - t0) * 1000))
     _event(s, "replan" if replan_report else "plan", model=s["models"]["plan"], cause=dx.causes[idx].title,
            steps=len(plan.steps), **({"tried": dx.causes[max(0, idx - 1)].title} if replan_report else {}),
            ms=int((time.time() - t0) * 1000))
+    _stage(s, "plan", "done", f"{len(plan.steps)} steps", int((time.time() - t0) * 1000))
     return plan
 
 
@@ -412,8 +414,8 @@ def stage_safety(s: dict[str, Any], dx: Diagnosis, plan: RepairPlan) -> bool:
         _event(s, "plan_guard", ok=False, level="red", override=bool(not g.allowed and dx.safety_level != "red"))
         _stop(s, reason, "safety")
         return False
-    _stage(s, "safety", "done", dx.safety_level)
     _event(s, "plan_guard", ok=True, level=dx.safety_level, steps=len(plan.steps))
+    _stage(s, "safety", "done", dx.safety_level)
     return True
 
 
@@ -468,10 +470,10 @@ def stage_illustrate(s: dict[str, Any], plan: RepairPlan) -> None:
         for n, res in ex.map(one, wanted):
             s["diagrams"][str(n)] = res
     made = sum(1 for v in s["diagrams"].values() if v.get("file"))
-    _stage(s, "illustrate", "done", f"{made}/{len(wanted)}", int((time.time() - t0) * 1000))
     redrawn = sum(1 for v in s["diagrams"].values() if int(v.get("attempts") or 1) > 1)
     _event(s, "illustrate", model=s["models"]["illustrate"], made=made, of=len(wanted), redrawn=redrawn,
            ms=int((time.time() - t0) * 1000))
+    _stage(s, "illustrate", "done", f"{made}/{len(wanted)}", int((time.time() - t0) * 1000))
 
 
 def stage_narrate(s: dict[str, Any], plan: RepairPlan) -> None:

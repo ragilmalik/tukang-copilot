@@ -57,6 +57,10 @@ class Settings:
     # Behaviour
     mock: bool = field(default_factory=lambda: _flag("MOCK", "DEMO_MODE"))
     demo_mode: bool = field(default_factory=lambda: _flag("DEMO_MODE"))
+    # Demo mode only: canned answers arrive in milliseconds, so each finished stage is held this long on screen so
+    # a viewer can watch the object report, SAM masks and diagnosis stream in. Never applied to live Meta calls,
+    # and never counted in a stage's own timing. 0 turns it off (the tests do).
+    mock_pace_s: float = field(default_factory=lambda: float(_env("MOCK_PACE", default="0.6")))
     illustrate: bool = field(default_factory=lambda: _flag("ILLUSTRATE", default="1"))
     max_diagrams: int = field(default_factory=lambda: int(_env("MAX_DIAGRAMS", default="2")))
     max_cost_usd: float = field(default_factory=lambda: float(_env("MAX_COST_PER_SESSION_USD", default="0.50")))

@@ -18,6 +18,7 @@ def _tmp_data(tmp_path, monkeypatch):
     monkeypatch.setattr(settings, "data_dir", tmp_path)
     monkeypatch.setattr(settings, "mock", True)
     monkeypatch.setattr(settings, "narration_voice", False)
+    monkeypatch.setattr(settings, "mock_pace_s", 0.0)  # no demo pacing in tests; test_streaming.py turns it on
     monkeypatch.setattr(settings, "demo_fallback", False)  # outage tests expect real errors; test_demo_fallback.py turns it on
     yield
     # a pipeline thread started by this test must not outlive its temp data folder (it would write into the next test's)

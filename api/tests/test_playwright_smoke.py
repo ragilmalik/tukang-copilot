@@ -214,3 +214,23 @@ def test_tip_bar_moves_to_top_while_typing(page):
     page.wait_for_function("!document.body.classList.contains('typing')")
     back = page.locator("#tourBar").bounding_box()
     assert back and back["y"] > 844 / 2, back
+
+
+def test_progress_screen_streams_partial_results(page, monkeypatch):
+    """v1.23: while the agent works, what it saw, the SAM-outlined photo and the top cause appear one by one."""
+    from api.settings import settings
+    monkeypatch.setattr(settings, "mock_pace_s", 0.6)
+    page.goto(page.base + "/")
+    page.select_option("#lang", "en")
+    page.click('button.sample[data-sample="faucet"]')
+    page.wait_for_selector("#lf-look", timeout=15000)
+    assert "Seen:" in page.inner_text("#lf-look") and page.locator("#progress:not(.hidden)").count() == 1
+    assert page.locator("#lf-diagnose").count() == 0                       # diagnosis not there yet
+    page.wait_for_selector("#lf-segment img", timeout=15000)
+    page.wait_for_function("document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
+    assert "outlined" in page.inner_text("#lf-segment")
+    page.wait_for_selector("#lf-diagnose", timeout=15000)
+    assert "Most likely:" in page.inner_text("#lf-diagnose") and page.locator("#progress:not(.hidden)").count() == 1
+    order = page.eval_on_selector_all("#liveFind li", "els => els.map(e => e.dataset.k)")
+    assert order[:3] == ["look", "segment", "diagnose"], order
+    page.wait_for_selector("#result:not(.hidden)", timeout=20000)

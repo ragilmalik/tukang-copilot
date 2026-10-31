@@ -93,7 +93,8 @@ const T_EXTRA = {
         tourResult: "Lihat bagian yang ditandai SAM 3.1 dan log 'Yang dilakukan AI'. Lalu centang daftar keselamatan untuk membuka langkah 1.",
         tourCheck: "Coba 'Cek langkah ini' dengan foto contoh: foto gelap ditolak, foto benar lolos.",
         tourStuck: "Lalu ketuk 'Masih rusak' di bawah untuk melihat AI menyusun ulang rencananya.", tourClose: "Tutup", tourTip: "Tampilkan tip", tourHide: "Kecilkan tip",
-        sampleTry: "Belum punya foto? Coba foto contoh:", sampleBad: "📷 Foto gelap ✗", sampleGood: "📷 Foto benar ✓" },
+        sampleTry: "Belum punya foto? Coba foto contoh:", sampleBad: "📷 Foto gelap ✗", sampleGood: "📷 Foto benar ✓",
+        pv_title: "Temuan sejauh ini", pv_seen: "👁️ Terlihat: {object}", pv_parts: "🎯 SAM 3.1 menandai {found} dari {of} bagian", pv_cause: "🧠 Paling mungkin: {cause} ({conf}%)", pv_steps: "📋 {n} langkah siap", pv_img: "Foto dengan bagian yang ditandai SAM 3.1" },
   jv: { demoBtn: "▶ Jajal demo sak tutulan", demoSub: "Tanpa foto, tanpa akun: delengen AI ndandani motor mogok saka wiwitan nganti dicek kamera.",
         how1: "📷 Foto + crita", how2: "🎯 AI nandhani perangane", how3: "✅ Saben langkah dicek kamera",
         agentTitle: "🤖 Sing ditindakake AI", agentSub: "Saben keputusan agen, piranti sing dienggo, lan kapan mandheg.", agentLive: "Log agen",
@@ -117,7 +118,8 @@ const T_EXTRA = {
         tourResult: "Delengen perangan sing ditandhani SAM 3.1 lan log 'Sing ditindakake AI'. Banjur centhang dhaptar keamanan kanggo mbukak langkah 1.",
         tourCheck: "Jajal 'Priksa langkah iki' nganggo foto conto: foto peteng ditolak, foto bener lolos.",
         tourStuck: "Banjur tutul 'Isih rusak' ing ngisor kanggo ndeleng AI nyusun rencana anyar.", tourClose: "Tutup", tourTip: "Tampilake pitutur", tourHide: "Cilikna pitutur",
-        sampleTry: "Durung duwe foto? Jajal foto conto:", sampleBad: "📷 Foto peteng ✗", sampleGood: "📷 Foto bener ✓" },
+        sampleTry: "Durung duwe foto? Jajal foto conto:", sampleBad: "📷 Foto peteng ✗", sampleGood: "📷 Foto bener ✓",
+        pv_title: "Temuan nganti saiki", pv_seen: "👁️ Katon: {object}", pv_parts: "🎯 SAM 3.1 nandhani {found} saka {of} perangan", pv_cause: "🧠 Sing paling mungkin: {cause} ({conf}%)", pv_steps: "📋 {n} langkah wis siyap", pv_img: "Foto karo perangan sing ditandhani SAM 3.1" },
   en: { demoBtn: "▶ Try the 1-tap demo", demoSub: "No photo, no account: watch the AI fix a bike that won't start, right up to the camera check.",
         how1: "📷 Snap + say it", how2: "🎯 AI marks the part", how3: "✅ Every step camera-checked",
         agentTitle: "🤖 What the AI did", agentSub: "Every decision the agent made, the tool it used, and when it stopped.", agentLive: "Agent log",
@@ -141,7 +143,8 @@ const T_EXTRA = {
         tourResult: "See the parts SAM 3.1 outlined and the 'What the AI did' log. Then tick the safety list to unlock step 1.",
         tourCheck: "Try 'Check this step' with a sample photo: the dark one is rejected, the right one passes.",
         tourStuck: "Then tap 'Still broken' below to watch the AI re-plan.", tourClose: "Close", tourTip: "Show tip", tourHide: "Minimise tip",
-        sampleTry: "No photo yet? Try a sample photo:", sampleBad: "📷 Dark photo ✗", sampleGood: "📷 Right photo ✓" },
+        sampleTry: "No photo yet? Try a sample photo:", sampleBad: "📷 Dark photo ✗", sampleGood: "📷 Right photo ✓",
+        pv_title: "Found so far", pv_seen: "👁️ Seen: {object}", pv_parts: "🎯 SAM 3.1 outlined {found} of {of} parts", pv_cause: "🧠 Most likely: {cause} ({conf}%)", pv_steps: "📋 {n} steps ready", pv_img: "Your photo with the parts SAM 3.1 outlined" },
 };
 /* I18N_EXTRA:end */
 ["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_EXTRA[k]));
@@ -323,7 +326,7 @@ function follow(id) {
   if (window.EventSource) {
     es = new EventSource(`/api/sessions/${id}/events`);
     es.onmessage = (ev) => {
-      const snap = JSON.parse(ev.data); S = Object.assign(S || {}, snap); renderProgress(S);
+      const snap = JSON.parse(ev.data); S = Object.assign(S && S.id === snap.id ? S : {}, snap); renderProgress(S);
       if (!["created", "running"].includes(snap.status)) { es.close(); settle(); }
     };
     es.onerror = () => { es.close(); poll(id); };
@@ -342,7 +345,7 @@ function renderProgress(s) {
   if (!$("stageList") || !s.stages) return;
   $("stageList").innerHTML = Object.entries(s.stages).map(([k, v]) =>
     `<li class="${esc(v.status)}">${esc(t("stages")[k] || k)}${v.status === "skipped" ? "" : ` <code class="tool">${esc(stageTool(s, k))}</code>`}<span class="note">${esc(stageNote(v.note))}</span></li>`).join("");
-  renderAgentLog(s, "agentLive"); tickElapsed(); updateTour();
+  renderAgentLog(s, "agentLive"); renderPartial(s); tickElapsed(); updateTour();
   if ($("progressStatus")) {  // short screen-reader status instead of re-announcing the whole list
     const run = Object.entries(s.stages).find(([, v]) => v.status === "running");
     const nDone = Object.values(s.stages).filter((v) => v.status === "done").length;
@@ -929,6 +932,43 @@ function renderAgentLog(s, boxId) {
   }).join("");
   box.querySelector(".agLoop").innerHTML = loop;
   box.querySelector(".agList").innerHTML = rows;
+}
+
+/* ---------------- progress: partial results stream in (v1.23) ---------------- */
+// Each stage's result shows up the moment it is saved (SSE, or the polling fallback): what the AI saw, the photo
+// with SAM 3.1's outlines, the top cause, the step count. Rows are only appended or updated, never rebuilt, so a
+// row animates once and the screen does not jump.
+function partialRows(s) {
+  const st = s.stages || {}, rows = [], rep = s.object_report, dx = s.diagnosis;
+  if (rep && rep.object && st.look && st.look.status === "done") {
+    const comps = (rep.components || []).map((c) => `<span class="chip sm">${esc(c.name)}</span>`).join("");
+    rows.push(["look", `${esc(fillRaw("pv_seen", { object: rep.object }))}${comps ? `<div class="lfChips">${comps}</div>` : ""}`]);
+  }
+  if (s.parts_image && st.segment && st.segment.status === "done") {
+    const pf = Array.isArray(s.parts_found) ? s.parts_found : Object.values(s.parts || {});
+    const found = pf.filter((p) => p && p.found).length;
+    rows.push(["segment", `${esc(fillRaw("pv_parts", { found, of: pf.length }))}<img class="lfImg" src="${esc((s.files_base || `/files/${s.id}/`) + s.parts_image)}" alt="${esc(t("pv_img"))}" width="320" height="240" loading="eager">`]);
+  }
+  if (dx && dx.causes && dx.causes[0] && st.diagnose && st.diagnose.status === "done") {
+    const lvl = dx.safety_level ? ` <span class="level ${esc(dx.safety_level)}">${esc(t(dx.safety_level))}</span>` : "";
+    rows.push(["diagnose", esc(fillRaw("pv_cause", { cause: dx.causes[0].title, conf: dx.causes[0].confidence })) + lvl]);
+  }
+  const nSteps = s.plan_steps || (s.plan && s.plan.steps && s.plan.steps.length) || 0;
+  if (nSteps && st.plan && st.plan.status === "done") rows.push(["plan", esc(fillRaw("pv_steps", { n: nSteps }))]);
+  return rows;
+}
+function fillRaw(key, vals) { return t(key).replace(/\{(\w+)\}/g, (m, k) => (vals[k] !== undefined ? String(vals[k]) : m)); }
+function renderPartial(s) {
+  const box = $("liveFind"); if (!box) return;
+  const list = box.querySelector(".lfList");
+  if (box.dataset.sid !== String(s.id || "")) { list.innerHTML = ""; box.dataset.sid = String(s.id || ""); }
+  const rows = partialRows(s);
+  box.classList.toggle("hidden", !rows.length);
+  for (const [k, html] of rows) {
+    let li = list.querySelector(`li[data-k="${k}"]`);
+    if (!li) { li = document.createElement("li"); li.dataset.k = k; li.className = "pop"; li.id = "lf-" + k; list.appendChild(li); }
+    if (li.dataset.h !== html) { li.innerHTML = html; li.dataset.h = html; }
+  }
 }
 
 /* ---------------- progress: model per stage + elapsed time ---------------- */

@@ -152,6 +152,34 @@ def public(s: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
+def progress_view(s: dict[str, Any]) -> dict[str, Any]:
+    """What the progress screen streams (SSE) while the agent works: stage states plus each stage's result as soon
+    as it exists, so the viewer sees the object report, the SAM-marked photo and the top cause arrive one by one.
+    Built from public() so nothing private (owner's words, raw errors) can leak; trimmed to stay small."""
+    p = public(s)
+    out: dict[str, Any] = {k: p.get(k) for k in ("id", "lang", "status", "stages", "question", "error", "error_kind",
+                                                  "agent_log", "models", "files_base", "input_guard")}
+    rep = p.get("object_report")
+    if isinstance(rep, dict):
+        out["object_report"] = {"object": rep.get("object", ""), "brand_model_guess": rep.get("brand_model_guess", ""),
+                                "components": [{"id": c.get("id"), "name": c.get("name", "")} for c in rep.get("components") or []
+                                               if isinstance(c, dict)][:8],
+                                "visible_issues": list(rep.get("visible_issues") or [])[:3]}
+    if p.get("parts_image") and (s.get("stages", {}).get("segment", {}).get("status") == "done"):
+        found = [v for v in (p.get("parts") or {}).values() if isinstance(v, dict)]
+        out["parts_image"] = p["parts_image"]
+        out["parts_found"] = [{"label": v.get("label"), "name": v.get("name", ""), "found": bool(v.get("found"))} for v in found][:8]
+    dx = p.get("diagnosis")
+    if isinstance(dx, dict) and dx.get("causes"):
+        out["diagnosis"] = {"problem_summary": dx.get("problem_summary", ""), "safety_level": dx.get("safety_level", ""),
+                            "causes": [{"title": c.get("title", ""), "confidence": c.get("confidence", 0)}
+                                       for c in dx["causes"][:3] if isinstance(c, dict)]}
+    plan = p.get("plan")
+    if isinstance(plan, dict):
+        out["plan_steps"] = len(plan.get("steps") or [])
+    return out
+
+
 @app.get("/", response_class=HTMLResponse)
 def index() -> str:
     return (WEB / "index.html").read_text(encoding="utf-8")
@@ -304,8 +332,7 @@ async def events(sid: str) -> StreamingResponse:
         last = None
         for _ in range(900):  # ~7.5 min max
             s = engine.load(sid)
-            keys = ("status", "stages", "question", "error", "error_kind")
-            snap = json.dumps({k: s.get(k) for k in keys}, ensure_ascii=False)
+            snap = json.dumps(progress_view(s), ensure_ascii=False)
             if snap != last:
                 yield f"data: {snap}\n\n"
                 last = snap
