@@ -2,6 +2,19 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.24.0 (2026-11-01 WIB)
+The 1-tap demo now works even when the free server is asleep, and a skeptical-judge pass fixed what a first-time viewer trips over.
+- **Recorded demo (backlog J5)**: `scripts/record_replay.py` records the demo-mode motorbike run in id/jv/en into `web/replay/` (progress snapshots, follow-up question, ready session, one replayable "delta" per action: each step x both stand-in check photos, re-plan, outcome; SAM-marked photos, share cards, PDF reports). `web/replay.js` plays it when `/api/health` has not answered within 4 s (Render free tier cold start), when the phone is offline, or with `?replay=1`. A purple "▶ Recorded demo" badge is on every screen and a note explains the server is waking up. The visitor's own photo is refused with "needs the live server", never faked; the live camera guide and voice commands say the same; the workshop sheet button is hidden (not recorded). The service worker pre-caches the recording and shows the cached app shell after 3.5 s if the server is slow (`tukang-shell-v4`). `record_replay.py --check` (and a test) fails when the app's session shape drifts from the recording.
+- **Red stop on screen**: the progress heading becomes "⛔ Stopped for your safety" and the STOP card sits right under it (before, the heading kept saying "Checking…" and the card was ~1000 px down). One PDF button instead of two.
+- **Result opens at the top** (object name and safety badge were scrolled off after answering the question).
+- **Re-plan is visible**: "🔁 Plan 2 of 3: <cause>" banner at the top of the result; tried causes greyed with "✗ tried".
+- **Keyboard**: focus moves to the first quick answer when the follow-up question appears.
+- **PDF**: "Cause worked on" instead of "Cause fixed" (it was printed before anything was fixed).
+- **Landing**: the preview picture is an 11 KB language-neutral crop of the SAM-marked stand-in photo with a translated caption (was the Indonesian 81 KB og.png on every language). Laptops get a "Made for phones" note.
+- **Demo check text** names what it confirmed ("Looks right: The cap is off and the plug is visible.") instead of "It matches the expected state."
+- `/api/health` version now follows the full version (was stuck at 1.23.0); test compares it with the top CHANGELOG entry.
+- Tests: `test_replay.py`, `test_audit5.py`, `test_playwright_replay.py`, `test_playwright_audit5.py`, version sync.
+
 ## v1.23.5
 - Test keeping the app version and CHANGELOG in sync.
 
