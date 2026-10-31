@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## v1.23.4
+- Test locking the security headers on pages and errors.
+
 ## v1.23.3
 - Landing: result preview thumbnail under the demo button (backlog J6).
 
