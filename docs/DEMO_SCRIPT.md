@@ -17,7 +17,7 @@ Record: phone screen (Android: built-in screen recorder) + a second phone or fri
 | 2:15–2:45 | Architecture slide (docs/img/architecture.png). | "Five Meta models, one agent loop: plan, act, verify, re-plan." |
 | 2:45–2:55 | Logo + repo + live link. | "Tukang Copilot. Every phone becomes a mechanic's apprentice." |
 
-**Backup cut already made:** docs/demo/tukang-copilot-demo.mp4 (2:50, demo mode, labelled stand-in photos and Chromium's fake camera, English voice-over + captions .srt) follows the same order. It has 19 scenes: hook, intro, progress, question, diagnosis, parts, safety list, live camera, check ⚠, check ✓, hands-free, re-plan, hand-off, rice STOP, stop PDF, Javanese, open weights, architecture, close.
+**Backup cut already made:** docs/demo/tukang-copilot-demo.mp4 (2:57, demo mode, labelled stand-in photos and Chromium's fake camera, English voice-over + captions .srt) follows the same order. It has 22 scenes (v1.23): hook, intro, progress with streaming results, agent-log jump, question, diagnosis, parts, safety list, live camera, check ⚠, check ✓, hands-free, re-plan, hand-off, rice STOP, stop PDF, PDF agent log, share card, Javanese, open weights, architecture, close.
 
 ## Shot list / prep
 - [ ] Bike with plug cap slightly pulled off (safe, engine cold) so the fix is real

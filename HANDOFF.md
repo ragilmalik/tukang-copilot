@@ -2,11 +2,16 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-10-31 14:30 WIB (v1.23.0) — submission-ready, waiting on Malik's steps
+- **New since 1.22:** streaming progress (each stage's result appears as it finishes: what Muse Spark saw, the SAM 3.1 outlines, the top cause with confidence + safety level, step count; SSE carries a trimmed `progress_view`, no owner words); tappable agent log (each line jumps to the stage, photo, causes, safety list, hand-off or exact camera-checked step; checks from an earlier plan aren't linked); share card `GET /api/sessions/{id}/card.png` + Open Graph/twitter tags on guide pages and `web/og.png` on the front page; gzip for static files (app.js 90 KB → ~29 KB); favicon; follow-up question scrolled on screen. Demo kit re-made: 26 screenshots, **2:57** voice-over video, 45 s vertical X clip, README GIF. Details: CHANGELOG 1.23.0.
+- **Checks (real runs, 2026-10-31 14:08 WIB):** pytest **470 passed, 0 failed** (`make_test_report.py`, 202 s); `ruff check .` clean; `mypy api` strict no issues in 76 files; `smoke_e2e.py` ALL PASSED (65 checks, incl. share card PNG + link-preview tags; demo server `MOCK=1 PORT=8765 python app.py`, `NO_PROXY=127.0.0.1,localhost`).
+- **Deliverables:** `../docs-out/tukang-copilot.zip` (git archive of the v1.23.0 wrap-up commit) and `../docs-out/Tukang-Copilot-Guide-Bundle.pdf` (same 10 docs as before) rebuilt 2026-10-31.
+- **Honest status:** unchanged: no live Meta answer verified yet (needs the key); demo assets are demo mode; impact numbers are MOCK.
+
 ## State on 2026-10-31 11:45 WIB (v1.22.0) — feature-complete for submission
 - **New since 1.21:** agent log "What the AI did" (screen + PDF), 1-tap guided demo with a compact tip bar that folds after the first step check, prompt-injection hardening (`api/untrusted.py`), cost guards (`FOLLOWUP_RATE_PER_HOUR`, `MAX_STEP_CHECKS`), Javanese demo answers, model chips + timer on progress, WCAG AA contrast, faster overlay, README rewrite, regenerated screenshots/2:53 video/GIF. Details: CHANGELOG 1.22.0. Ranked backlog: `../work/IMPROVEMENT_BACKLOG.md`.
 - **Checks (real runs, 2026-10-31 11:40 WIB):** pytest **453 passed, 0 failed** (`make_test_report.py`, 152 s in one run; in chunks: `-m "not slow"` over 2 file groups = 218 + 225, `-m slow` = 10 with Chromium at /tmp/bin/chromium on PATH); `ruff check .` clean; `mypy api` strict no issues in 73 files; `smoke_e2e.py` ALL PASSED (60 PASS lines; port 8000 in this sandbox belongs to another app, so start a demo server with `MOCK=1 PORT=8765 python app.py` and pass `http://127.0.0.1:8765`, with `NO_PROXY=127.0.0.1,localhost`).
 - **Deliverables:** `../docs-out/tukang-copilot.zip` (git archive of the v1.22.0 wrap-up commit: no .env, .git, caches or data) and `../docs-out/Tukang-Copilot-Guide-Bundle.pdf` (README, SETUP_FOR_MALIK, HOW_TO_USE, DEPLOY, SUBMISSION, WRITEUP, USER_TRIAL_KIT, VERIFICATION_REPORT, HANDOFF, TODO; pandoc → weasyprint, emoji shown as plain symbols) rebuilt 2026-10-31.
-- **Not in current assets:** the screenshots/video still show the old full-width tip bar and no PDF agent-log page (backlog item: re-shoot with `make_demo_assets.py shots`, then `video`).
 - **Honest status:** unchanged: no live Meta answer verified yet (needs the key); demo assets are demo mode; impact numbers are MOCK.
 
 ## State on 2026-10-31 09:30 WIB (v1.21.0)
@@ -196,5 +201,5 @@ See docs/DECISIONS.md. Most important: single FastAPI process + plain JS (no Nex
 2. Optional: Baseten key for open weights (run `set_keys.py` again, set `USE_OPEN_WEIGHTS=1`).
 3. Real photos + 5 user trials (docs/USER_TRIAL_KIT.md).
 4. Approve the GitHub push (`ragilmalik/tukang-copilot`) and the Render deploy (docs/DEPLOY.md, free plan).
-5. Upload the video to YouTube (Unlisted is fine; the real recording or the 2:53 docs/demo/tukang-copilot-demo.mp4) and post the X clip (docs/demo/tukang-copilot-x-vertical.mp4, draft post in docs/SUBMISSION.md).
+5. Upload the video to YouTube (Unlisted is fine; the real recording or the 2:57 docs/demo/tukang-copilot-demo.mp4) and post the X clip (docs/demo/tukang-copilot-x-vertical.mp4, draft post in docs/SUBMISSION.md).
 6. Paste the docs/SUBMISSION.md fields into Cerebral Valley (account ragilmalika) and submit before **Thu Nov 5, 09:00 WIB**.

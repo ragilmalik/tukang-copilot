@@ -10,7 +10,7 @@ Owner: **M** = Malik, **H** = Malik.
 - [ ] **M** Approve GitHub push (`ragilmalik/tukang-copilot`) + Render deploy (docs/DEPLOY.md, free plan); set `PUBLIC_BASE_URL`
 - [ ] **H** `deploy_check.py <url> --live` → READY
 - [ ] **M** Phone test over 4G: camera, live guide, hands-free (Android Chrome jv-ID), WhatsApp hand-off, PDF
-- [ ] **M** Upload the video to YouTube (real recording per DEMO_SCRIPT.md, or the 2:53 backup cut), post the X clip
+- [ ] **M** Upload the video to YouTube (real recording per DEMO_SCRIPT.md, or the 2:57 backup cut), post the X clip
 - [ ] **H** Fill links in README + SUBMISSION
 - [ ] **M** Paste docs/SUBMISSION.md fields into Cerebral Valley (account ragilmalika) and submit before Nov 5 09:00 WIB
 
@@ -20,9 +20,9 @@ Owner: **M** = Malik, **H** = Malik.
 - [x] **H** PDF export of the report + local "My garage" history (localStorage)
 - [ ] **H** Open-weights run on Baseten (needs BASETEN_API_KEY); badge is built and shows when active
 - [ ] **M** Post the X clip (draft in SUBMISSION.md, 45 s clip ready); engagement counts until Nov 8
-- [x] **H** Screenshots + demo video + vertical clip (docs/demo/), regenerated for v1.22 (23 shots, 2:53 video, GIF)
-- [ ] **H** Re-shoot shots/video for the compact tip bar + PDF agent-log page (low priority)
-- [ ] **H** Streamed partial results on the progress screen (object, SAM overlay, top cause as each stage finishes); see ../work/IMPROVEMENT_BACKLOG.md
+- [x] **H** Screenshots + demo video + vertical clip (docs/demo/), regenerated for v1.23 (26 shots, 2:57 video, GIF)
+- [x] **H** Re-shoot shots/video for the compact tip bar + PDF agent-log page (v1.23)
+- [x] **H** Streamed partial results on the progress screen (object, SAM overlay, top cause as each stage finishes) (v1.23)
 
 ## Could
 - [x] Abuse guard (rate limit + daily spend cap) and security headers for the public deploy
@@ -51,3 +51,4 @@ Owner: **M** = Malik, **H** = Malik.
 - [x] 1-tap guided demo + compact, auto-folding tip bar (v1.22.0)
 - [x] Prompt-injection hardening, follow-up rate limit, photo-check cap (v1.22.0)
 - [x] Javanese demo answers, WCAG AA contrast, model chips + timer on progress (v1.22.0)
+- [x] Streaming progress, tappable agent log, share card + Open Graph tags, gzip, favicon (v1.23.0)

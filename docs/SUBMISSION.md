@@ -39,7 +39,7 @@ How it works: an installable phone web app (no account). Snap photos or a 5–10
 • Bengkel hand-off: a WhatsApp summary, the nearest workshop, and a PDF brief for the mechanic. It also shows the bengkel price against the DIY cost, a PDF repair report, and "My garage" on the phone.
 • Diagnosis and planning can run on Muse Spark Open (open weights) via Baseten with one switch.
 
-Built from scratch during the hackathon (Oct 26 – Nov 4, 2026): FastAPI + vanilla-JS PWA, 453 automated tests (incl. real-Chromium tests with a fake camera), strict typing, Docker/Render deploy. Honest status: the demo video runs in labelled demo mode (stand-in photos, recorded answers). The live Meta path is tested against a stand-in server built from the official API docs [update after the first live-key run].
+Built from scratch during the hackathon (Oct 26 – Nov 4, 2026): FastAPI + vanilla-JS PWA, 470 automated tests (incl. real-Chromium tests with a fake camera), strict typing, Docker/Render deploy. Honest status: the demo video runs in labelled demo mode (stand-in photos, recorded answers). The live Meta path is tested against a stand-in server built from the official API docs [update after the first live-key run].
 ```
 
 ### 7. Public GitHub Repository *
