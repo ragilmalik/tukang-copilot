@@ -34,3 +34,18 @@ def samples(tmp_path):
     from api.pipeline import mock
 
     return mock.make_sample_photos(tmp_path / "samples")
+
+
+# Browser-level tests (jsdom, real Chromium) take most of the suite's time. They carry the `slow` marker so the
+# fast chunk runs with `-m "not slow"` and the slow chunk with `-m slow` (scripts/check_all.sh runs both).
+SLOW_FILES = {"test_dom_jsdom.py", "test_playwright_smoke.py", "test_playwright_live.py"}
+
+
+def pytest_configure(config):
+    config.addinivalue_line("markers", "slow: browser-level test (jsdom or Chromium); run with -m slow")
+
+
+def pytest_collection_modifyitems(config, items):
+    for item in items:
+        if item.path.name in SLOW_FILES:
+            item.add_marker(pytest.mark.slow)
