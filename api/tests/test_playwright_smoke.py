@@ -131,3 +131,30 @@ def test_video_capture_flow(page, tmp_path):
     page.click('#cats [data-cat="pump"]')
     page.click("#goBtn")                                          # no photo, no text: the clip is enough
     page.wait_for_selector("#result:not(.hidden), #question:not(.hidden)", timeout=30000)
+
+
+def test_one_tap_demo_runs_the_whole_agent_loop(page):
+    """v1.22 judge path: one tap, a quick answer, stand-in check photos (fail then pass), re-plan, agent log."""
+    page.goto(page.base + "/")
+    page.select_option("#lang", "en")
+    box = page.locator("#demoBtn").bounding_box()
+    assert box and box["y"] + box["height"] < 844 and box["height"] >= 44   # above the fold on a 390x844 phone, big tap target
+    page.click("#demoBtn")
+    page.wait_for_selector("#tourBar:not(.hidden)")
+    page.wait_for_selector("#question:not(.hidden)", timeout=20000)
+    assert "60%" in page.inner_text("#agentLive")                         # the log says why it asks
+    page.click('#quickAns button[data-q="qNo"]')
+    page.wait_for_selector("#result:not(.hidden)", timeout=20000)
+    for b in page.locator("#preList input").all():
+        b.check()
+    page.click("#sampleBad")
+    page.wait_for_function("document.querySelector('#checkResult').textContent.includes('⚠')", timeout=15000)
+    page.click("#sampleGood")
+    page.wait_for_function("document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
+    page.fill("#stuckText", "tried it, still dead")
+    page.click("#stuckBtn")
+    page.wait_for_function("document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled", timeout=15000)
+    log = page.inner_text("#agent")
+    for bit in ("muse-spark-1.3", "sam-3.1", "Only 55% sure", "not yet", "correct", "Still broken: new"):
+        assert bit in log, bit
+    assert page.locator("#agent .agLoop .lp.on").count() >= 7

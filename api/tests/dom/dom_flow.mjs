@@ -41,7 +41,10 @@ async function run(lang, sample) {
     && d.querySelector('#cats .chip[data-cat="motor"]').getAttribute("aria-pressed") === "false");
   chip.click();
   d.getElementById("photoBox").dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-  d.querySelector(`button.sample[data-sample="${sample}"]`).click();
+  const viaDemo = sample === "motor" && lang === "en";  // the 1-tap demo button runs the motor sample with the tour
+  check(`${lang}: 1-tap demo button translated`, !/demoBtn/.test(d.getElementById("demoBtn").textContent) && d.getElementById("demoBtn").textContent.length > 8);
+  if (viaDemo) d.getElementById("demoBtn").click(); else d.querySelector(`button.sample[data-sample="${sample}"]`).click();
+  if (viaDemo) check(`${lang}: tour bar shows a tip`, await until(() => !d.getElementById("tourBar").classList.contains("hidden") && d.getElementById("tourText").textContent.length > 10, 8000));
   const shown = (id) => !d.getElementById(id).classList.contains("hidden");
   if (sample === "rice") {  // red safety stop: no repair steps, a stop box with a service-centre card
     const stopped = await until(() => shown("stopBox"));
@@ -54,6 +57,11 @@ async function run(lang, sample) {
   if (sample === "motor") {  // the agent asks one follow-up question first
     const asked = await until(() => shown("question"));
     check(`${lang}/${sample}: follow-up question shown`, asked && d.getElementById("questionText").textContent.length > 3);
+    const qa = [...d.querySelectorAll("#quickAns button")].map((b) => b.textContent.trim());
+    check(`${lang}/${sample}: quick answers translated`, qa.length === 3 && qa.every((x) => x && !/^q[A-Z]/.test(x)), qa.join("|"));
+    const live = d.getElementById("agentLive");
+    check(`${lang}/${sample}: live agent log explains the question`, live && !live.classList.contains("hidden") && /60/.test(live.textContent) && !/ag_|lp_|\{/.test(live.textContent), live && live.textContent);
+    check(`${lang}/${sample}: progress shows the model per stage`, /muse-spark-1\.3/.test(d.getElementById("stageList").textContent) && /sam-3\.1/.test(d.getElementById("stageList").textContent));
     if (asked) { d.getElementById("answerText").value = "Busi basah, motor sempat kehujanan"; d.getElementById("answerBtn").click(); }
   }
   const ready = await until(() => shown("result"));
@@ -83,6 +91,14 @@ async function run(lang, sample) {
     } else {
       check(`${lang}/${sample}: no timer when no wait`, !tm || tm.classList.contains("hidden"));
     }
+    const ag = d.getElementById("agent");
+    check(`${lang}/${sample}: agent log card visible`, ag && !ag.classList.contains("hidden"));
+    const agRows = d.querySelectorAll("#agent .agList li").length;
+    check(`${lang}/${sample}: agent log rows >= 5`, agRows >= 5, agRows);
+    check(`${lang}/${sample}: agent log has no raw keys or placeholders`, !/ag_|lp_|\{\w+\}|undefined/.test(ag.textContent), ag.textContent.slice(0, 300));
+    check(`${lang}/${sample}: agent loop strip lights up`, d.querySelectorAll("#agent .agLoop .lp.on").length >= 4);
+    const sc = d.getElementById("sampleCheckBox");
+    check(`${lang}/${sample}: sample check photos offered on a sample repair`, sc && !sc.classList.contains("hidden") && !/sampleTry|sampleBad/.test(sc.textContent));
     const hood = d.getElementById("hood");
     check(`${lang}/${sample}: hood panel visible`, hood && !hood.classList.contains("hidden"));
     const rows = d.querySelectorAll("#hoodList li").length;

@@ -1,4 +1,5 @@
-:root{--o:#ff7a00;--ink:#1d232b;--mut:#6b7480;--bg:#f6f3ee;--card:#fff;--ok:#1f9d55;--bad:#c0392b}
+/* v1.22 contrast: --o #b85200 gives 4.9:1 for white text on it and 4.5:1+ as text on the cream/white cards (WCAG AA); the bright brand #ff7a00 stays for the header theme and accents */
+:root{--o:#b85200;--brand:#ff7a00;--ink:#1d232b;--mut:#5f6873;--bg:#f6f3ee;--card:#fff;--ok:#17834a;--bad:#c0392b}
 *{box-sizing:border-box}
 body{margin:0;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
 .top{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--ink);color:#fff;position:sticky;top:0;z-index:5}
@@ -9,7 +10,7 @@ h1{font-size:1.6rem;margin:.2em 0}h2{font-size:1.25rem;margin:.2em 0}h3{margin:0
 .muted{color:var(--mut)}.small{font-size:.85rem}.hidden{display:none!important}
 .err{color:var(--bad);min-height:1em}
 .badge{max-width:640px;margin:8px auto 0;padding:6px 12px;border-radius:999px;background:#fff3e6;color:#8a4500;font-size:.85rem;text-align:center}
-.photoBox{display:flex;align-items:center;justify-content:center;min-height:200px;border:2px dashed #d5cfc5;border-radius:14px;margin:12px 0;cursor:pointer;overflow:hidden;background:#faf8f4;font-size:1.1rem}
+.photoBox{display:flex;align-items:center;justify-content:center;min-height:150px;border:2px dashed #d5cfc5;border-radius:14px;margin:12px 0;cursor:pointer;overflow:hidden;background:#faf8f4;font-size:1.1rem}
 .photoBox img{width:100%;max-height:360px;object-fit:contain}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
 .btn{border:0;border-radius:12px;padding:10px 14px;background:#ece7df;color:var(--ink);font-size:1rem;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
@@ -46,7 +47,7 @@ footer{text-align:center;padding:24px 16px}
 .chip{border:0;cursor:pointer}.chip.on{background:var(--o);color:#fff}
 #cats{margin:8px 0}
 .level{border-radius:999px;padding:1px 10px;font-weight:700;font-size:.8rem;color:#fff}
-.level.green{background:var(--ok)}.level.amber{background:#e69500}.level.red{background:var(--bad)}
+.level.green{background:var(--ok)}.level.amber{background:#e69500;color:var(--ink)}.level.red{background:var(--bad)}
 .pass{color:var(--ok);font-weight:700}.fail{color:var(--bad);font-weight:700}
 .center{text-align:center}
 .garage{list-style:none;padding:0;margin:6px 0}.garage li{padding:6px 0;border-bottom:1px solid #eee}
@@ -107,3 +108,25 @@ body.handsfree .nav .btn{min-height:64px;font-size:1.2em;flex:1}
 .btn.wa{background:#25d366;color:#fff;font-weight:700}
 .hoText{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.85em;background:#fff;padding:8px;border-radius:8px;border:1px solid #e3e3e8}
 .fbNote{display:inline-block;background:#fff4d6;color:#7a5200;border:1px solid #f0b429;border-radius:999px;padding:2px 10px;font-size:.85em}
+
+/* v1.22: 1-tap demo, how-it-works strip, agent log, model chips, tour bar, quick answers, sample check photos */
+.how{display:flex;gap:6px;flex-wrap:wrap;list-style:none;padding:0;margin:8px 0 10px;font-size:.88rem}.how li{background:#f3efe8;border-radius:10px;padding:5px 9px}
+.btn.demo{width:100%;justify-content:center;background:var(--ink);color:#fff;font-weight:700;min-height:48px}
+.demoSub{margin:6px 0 4px}
+code.tool{font-size:.72rem;background:#eef1f6;color:#2d3a4f;border-radius:6px;padding:1px 6px;margin-left:4px;white-space:nowrap}
+code.tool.code{background:#eaf5ee;color:#1b5e38}
+.stages li.running{font-weight:600}
+@media (prefers-reduced-motion:no-preference){.stages li.running::before{display:inline-block;animation:tcspin 1s linear infinite}}
+@keyframes tcspin{to{transform:rotate(360deg)}}
+.agent .agLoop{display:flex;flex-wrap:wrap;gap:3px;align-items:center;margin:6px 0 8px;font-size:.78rem}
+.agent .lp{border:1px solid #d9d3c8;border-radius:999px;padding:2px 8px;color:var(--mut)}.agent .lp.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.agent .lpArrow{color:#b9b2a6}
+.agList{padding-left:0;list-style:none;margin:0}.agList li{padding:6px 0;border-bottom:1px solid #f0ece6;line-height:1.45}
+.agList .agT{display:inline-block;min-width:2.4em;font-variant-numeric:tabular-nums}
+.agList li.guard{background:#f6fbf7}.agList li.handoff{background:#fff5f3}.agList li.ask,.agList li.replan{background:#fffaf1}
+details.agent{margin-top:10px}details.agent summary{cursor:pointer;font-weight:600}
+#quickAns{margin:4px 0 8px}#quickAns .chip{min-height:44px;padding:8px 16px;font-size:1rem}
+.sampleCheck .btn{min-height:44px;margin:4px 4px 0 0}
+.tourBar{position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:50;display:flex;gap:10px;align-items:center;background:var(--ink);color:#fff;border-radius:14px;padding:10px 12px;box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:620px;margin:0 auto}
+.tourBar p{margin:0;flex:1;font-size:.92rem}.tourBar .btn{background:#fff;color:var(--ink);min-height:44px}
+body:has(#tourBar:not(.hidden)){padding-bottom:110px}

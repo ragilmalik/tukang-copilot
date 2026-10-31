@@ -127,7 +127,9 @@ def _load(sid: str) -> dict[str, Any]:
 
 
 def public(s: dict[str, Any]) -> dict[str, Any]:
-    out = {k: v for k, v in s.items() if k not in {"text", "history", "error_detail"}}
+    # never on the wire: the owner's own words (text, history, phrases the injection guard caught) and raw errors
+    out = {k: v for k, v in s.items() if k not in {"text", "history", "error_detail", "input_flags"}}
+    out["input_guard"] = len(s.get("input_flags") or [])
     out["files_base"] = f"/files/{s['id']}/"
     out["trace"] = build_trace(s)
     dx = out.get("diagnosis")
@@ -230,7 +232,7 @@ async def create_session(request: Request, photos: list[UploadFile] | None = Fil
         if not text.strip() and audio_path is None:
             raise HTTPException(400, "Describe the problem by voice or text")
         try:
-            s = engine.create(photo_paths, language, text, audio_path, category)
+            s = engine.create(photo_paths, language, text, audio_path, category, sample=sample)
         except RuntimeError as e:
             raise HTTPException(400, str(e))
         except OSError:
@@ -242,6 +244,30 @@ async def create_session(request: Request, photos: list[UploadFile] | None = Fil
             shutil.rmtree(d, ignore_errors=True)
     engine.start(s["id"])
     return {"id": s["id"]}
+
+
+@app.get("/api/demo/check-photo/{kind}")
+def demo_check_photo(kind: str, sample: str = "motor") -> Response:
+    """1-tap demo: a labelled STAND-IN 'after' photo so a visitor with no broken object can try "Check my step".
+    kind=ok: the scenario's after-photo (or its sample photo); kind=dark: a too-dark shot that the check rejects."""
+    if kind not in {"ok", "dark"} or sample not in SAMPLE_TEXT:
+        raise HTTPException(404)
+    if kind == "ok":
+        p = SAMPLES / f"check_{sample}.jpg"
+        return FileResponse(p if p.exists() else SAMPLES / f"{sample}.jpg", media_type="image/jpeg")
+    return Response(_dark_photo(), media_type="image/jpeg", headers={"Cache-Control": "max-age=3600"})
+
+
+def _dark_photo() -> bytes:
+    import io
+
+    from PIL import Image, ImageDraw
+
+    im = Image.new("RGB", (800, 600), (8, 8, 10))
+    ImageDraw.Draw(im).text((16, 12), "STAND-IN - too dark (demo)", fill=(70, 70, 76))
+    buf = io.BytesIO()
+    im.save(buf, "JPEG", quality=80)
+    return buf.getvalue()
 
 
 @app.get("/api/sessions/{sid}")

@@ -15,6 +15,8 @@ from typing import Any
 import numpy as np
 from PIL import Image, ImageDraw, ImageStat
 
+from .mock_jv import jv
+
 TRANSCRIPTS = {
     "id": "Motor saya Honda Beat susah hidup dari pagi, distarter cuma bunyi tapi mesin nggak nyala.",
     "jv": "Motorku Honda Beat angel urip wiwit esuk, distarter mung muni nanging mesine ora urip.",
@@ -36,7 +38,7 @@ def scenario(text: str, category: str = "") -> str:
 
 
 def _L(lang: str, id_: str, en: str) -> str:
-    return en if lang == "en" else id_
+    return en if lang == "en" else jv(id_) if lang == "jv" else id_
 
 
 # ------------------------------------------------------------------ Look
@@ -196,8 +198,8 @@ def plan(sc: str, lang: str, cause_index: int = 0) -> dict[str, Any]:
     waits = {1: 10} if sc == "motor" and cause_index == 0 else {}   # first motor step: let the engine cool 10 minutes
     steps = []
     for i, (cid, ins_id, ins_en, exp_id, exp_en, diag) in enumerate(s, 1):
-        ins = ins_en if lang == "en" else ins_id
-        steps.append({"n": i, "component_id": cid, "instruction": ins, "why": "", "expected_state": exp_en if lang == "en" else exp_id,
+        ins, exp = _L(lang, ins_id, ins_en), _L(lang, exp_id, exp_en)
+        steps.append({"n": i, "component_id": cid, "instruction": ins, "why": "", "expected_state": exp,
                       "warnings": [], "voice_text": ins, "needs_diagram": diag, "wait_minutes": waits.get(i, 0),
                       "diagram_prompt": "cutaway of the part being serviced, orange arrow showing the motion" if diag else ""})
     return {"cause_title": cause, "steps": steps, "done_check": done, "when_to_call_pro": pro}

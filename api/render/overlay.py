@@ -53,11 +53,16 @@ def draw_parts(photo: Path, found: list[dict[str, Any]], out: Path, only: str | 
             union |= full_mask(seg, w, h)
         if not union.any():
             continue
-        m = Image.fromarray((union * 255).astype(np.uint8), "L")
-        tint.paste(Image.new("RGBA", base.size, color + (90,)), (0, 0), m)
-        edge = m.filter(ImageFilter.FIND_EDGES).filter(ImageFilter.MaxFilter(5))
-        edges.paste(Image.new("RGBA", base.size, color + (255,)), (0, 0), edge)
         ys, xs = np.nonzero(union)
+        # Work on the part's bounding box (plus a margin for the outline) instead of the whole photo: the edge
+        # filters are the slowest step of the pipeline and the result is identical outside the box.
+        x0, y0 = max(0, int(xs.min()) - 4), max(0, int(ys.min()) - 4)
+        x1, y1 = min(w, int(xs.max()) + 5), min(h, int(ys.max()) + 5)
+        m = Image.fromarray((union[y0:y1, x0:x1] * 255).astype(np.uint8), "L")
+        size = (x1 - x0, y1 - y0)
+        tint.paste(Image.new("RGBA", size, color + (90,)), (x0, y0), m)
+        edge = m.filter(ImageFilter.FIND_EDGES).filter(ImageFilter.MaxFilter(5))
+        edges.paste(Image.new("RGBA", size, color + (255,)), (x0, y0), edge)
         badges.append((part["label"], int(xs.min()), int(ys.min()), color))
     img = Image.alpha_composite(Image.alpha_composite(base.convert("RGBA"), tint), edges)
     d = ImageDraw.Draw(img)

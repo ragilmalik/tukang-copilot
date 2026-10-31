@@ -68,6 +68,81 @@ T.jv = Object.assign({}, T.id, {
   exhausted: "Wis kabeh dijajal", newPlan: "Rencana anyar wis siap.", photos: "foto", videoBtn: "🎥 Utawa rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar paling cetha dijupuk otomatis)", videoBig: "Videone kegedhen. Rekam 5–10 detik wae.",
 });
 
+/* I18N_EXTRA:start (v1.22: 1-tap demo, agent log, progress, quick answers). api/tests/test_i18n.py checks all three. */
+const T_EXTRA = {
+  id: { demoBtn: "▶ Coba demo 1 ketuk", demoSub: "Tanpa foto, tanpa akun: lihat AI memperbaiki motor mogok dari awal sampai cek kamera.",
+        how1: "📷 Foto + cerita", how2: "🎯 AI tandai bagiannya", how3: "✅ Tiap langkah dicek kamera",
+        agentTitle: "🤖 Yang dilakukan AI", agentSub: "Tiap keputusan agen, alat yang dipakai, dan kapan ia berhenti.", agentLive: "Log agen",
+        lp_see: "Lihat", lp_think: "Nalar", lp_ask: "Tanya", lp_plan: "Rencana", lp_guard: "Jaga", lp_verify: "Cek", lp_replan: "Ulang rencana", lp_handoff: "Serahkan",
+        ag_listen: "Mendengar suaramu dan mengubahnya jadi teks", ag_gate_ok: "Cek kata berbahaya (gas, listrik rumah, rem…): aman, lanjut",
+        ag_gate_stop: "Kata berbahaya terdeteksi ({category}): berhenti sebelum memanggil model", ag_look: "Melihat foto: {object}, {n} bagian dikenali",
+        ag_segment: "Menandai {found} dari {of} bagian di fotomu (masker piksel)", ag_diagnose: "Paling mungkin: {cause} ({conf}%), dari {n} kemungkinan",
+        ag_ask: "Baru yakin {conf}% (di bawah {threshold}%): bertanya satu hal dulu, bukan menebak", ag_answer: "Jawabanmu diterima, diagnosa diulang",
+        ag_plan: "Menyusun {steps} langkah untuk: {cause}", ag_guard_ok: "Rencana dicek aturan keselamatan di kode: lolos ({level})",
+        ag_guard_stop: "Rencana ditolak aturan keselamatan: STOP", ag_illustrate: "Menggambar {made} dari {of} diagram dari fotomu",
+        ag_redrawn: ", {redrawn} digambar ulang setelah diperiksa", ag_check_ok: "Langkah {step} dicek dari foto baru: benar",
+        ag_check_fail: "Langkah {step} dicek dari foto baru: belum pas, diberi koreksi", ag_check_esc: " (gagal berulang, menyarankan rencana lain)",
+        ag_replan: "Masih rusak: rencana baru {steps} langkah untuk {cause}", ag_esc_red: "Terlalu berbahaya dikerjakan sendiri: diarahkan ke teknisi + laporan",
+        ag_esc_exhausted: "Semua sebab yang aman sudah dicoba: diserahkan ke bengkel dengan laporan",
+        ag_fallback: "Model live gagal setelah dicoba ulang: tahap {stage} memakai jawaban demo (diberi label)",
+        ag_input_guard: "Ada kalimat berupa perintah di inputmu: diperlakukan sebagai data dan diabaikan",
+        ag_outcome_fixed: "Kamu konfirmasi: sudah beres", ag_outcome_pro: "Kamu memilih membawa ke bengkel", ag_retry: "Mencoba ulang tahap yang gagal (ke-{n})",
+        agCode: "kode", elapsed: "{n} dtk", qYes: "Ya", qNo: "Tidak", qUnsure: "Tidak tahu",
+        tourProgress: "Demo: AI sedang bekerja. Tiap baris = satu model Meta atau aturan keselamatan.", tourAsk: "AI belum yakin, jadi ia bertanya. Ketuk salah satu jawaban.",
+        tourResult: "Lihat bagian yang ditandai SAM 3.1 dan log 'Yang dilakukan AI'. Lalu centang daftar keselamatan untuk membuka langkah 1.",
+        tourCheck: "Coba 'Cek langkah ini' dengan foto contoh: foto gelap ditolak, foto benar lolos.",
+        tourStuck: "Lalu ketuk 'Masih rusak' di bawah untuk melihat AI menyusun ulang rencananya.", tourClose: "Tutup",
+        sampleTry: "Belum punya foto? Coba foto contoh:", sampleBad: "📷 Foto gelap ✗", sampleGood: "📷 Foto benar ✓" },
+  jv: { demoBtn: "▶ Jajal demo sak tutulan", demoSub: "Tanpa foto, tanpa akun: delengen AI ndandani motor mogok saka wiwitan nganti dicek kamera.",
+        how1: "📷 Foto + crita", how2: "🎯 AI nandhani perangane", how3: "✅ Saben langkah dicek kamera",
+        agentTitle: "🤖 Sing ditindakake AI", agentSub: "Saben keputusan agen, piranti sing dienggo, lan kapan mandheg.", agentLive: "Log agen",
+        lp_see: "Ndeleng", lp_think: "Mikir", lp_ask: "Takon", lp_plan: "Rancangan", lp_guard: "Njaga", lp_verify: "Mriksa", lp_replan: "Rancang maneh", lp_handoff: "Pasrahake",
+        ag_listen: "Ngrungokake swaramu lan ngowahi dadi tulisan", ag_gate_ok: "Priksa tembung mbebayani (gas, listrik omah, rem…): aman, terus",
+        ag_gate_stop: "Ana tembung mbebayani ({category}): mandheg sadurunge takon model", ag_look: "Ndeleng foto: {object}, {n} perangan ditemokake",
+        ag_segment: "Nandhani {found} saka {of} perangan ing fotomu (masker piksel)", ag_diagnose: "Sing paling mungkin: {cause} ({conf}%), saka {n} kemungkinan",
+        ag_ask: "Lagi yakin {conf}% (ing ngisor {threshold}%): takon siji bab dhisik, ora ngira-ira", ag_answer: "Wangsulanmu ditampa, diagnosa dibaleni",
+        ag_plan: "Nyusun {steps} langkah kanggo: {cause}", ag_guard_ok: "Rencana dipriksa aturan keamanan ing kode: lolos ({level})",
+        ag_guard_stop: "Rencana ditolak aturan keamanan: MANDHEG", ag_illustrate: "Nggambar {made} saka {of} diagram saka fotomu",
+        ag_redrawn: ", {redrawn} digambar maneh sawise dipriksa", ag_check_ok: "Langkah {step} dipriksa saka foto anyar: bener",
+        ag_check_fail: "Langkah {step} dipriksa saka foto anyar: durung pas, diwenehi koreksi", ag_check_esc: " (gagal bola-bali, nyaranake rencana liya)",
+        ag_replan: "Isih rusak: rencana anyar {steps} langkah kanggo {cause}", ag_esc_red: "Kebangeten mbebayani yen digarap dhewe: diarahake menyang teknisi + laporan",
+        ag_esc_exhausted: "Kabeh sebab sing aman wis dijajal: dipasrahake menyang bengkel karo laporan",
+        ag_fallback: "Model live gagal sawise dijajal maneh: tahap {stage} nganggo wangsulan demo (ana labele)",
+        ag_input_guard: "Ana ukara prentah ing inputmu: dianggep data lan ora digatekake",
+        ag_outcome_fixed: "Sampeyan ngonfirmasi: wis rampung", ag_outcome_pro: "Sampeyan milih nggawa menyang bengkel", ag_retry: "Nyoba maneh tahap sing gagal (kaping {n})",
+        agCode: "kode", elapsed: "{n} dtk", qYes: "Iya", qNo: "Ora", qUnsure: "Ora ngerti",
+        tourProgress: "Demo: AI lagi nyambut gawe. Saben baris = siji model Meta utawa aturan keamanan.", tourAsk: "AI durung yakin, mula takon. Tutul salah siji wangsulan.",
+        tourResult: "Delengen perangan sing ditandhani SAM 3.1 lan log 'Sing ditindakake AI'. Banjur centhang dhaptar keamanan kanggo mbukak langkah 1.",
+        tourCheck: "Jajal 'Priksa langkah iki' nganggo foto conto: foto peteng ditolak, foto bener lolos.",
+        tourStuck: "Banjur tutul 'Isih rusak' ing ngisor kanggo ndeleng AI nyusun rencana anyar.", tourClose: "Tutup",
+        sampleTry: "Durung duwe foto? Jajal foto conto:", sampleBad: "📷 Foto peteng ✗", sampleGood: "📷 Foto bener ✓" },
+  en: { demoBtn: "▶ Try the 1-tap demo", demoSub: "No photo, no account: watch the AI fix a bike that won't start, right up to the camera check.",
+        how1: "📷 Snap + say it", how2: "🎯 AI marks the part", how3: "✅ Every step camera-checked",
+        agentTitle: "🤖 What the AI did", agentSub: "Every decision the agent made, the tool it used, and when it stopped.", agentLive: "Agent log",
+        lp_see: "See", lp_think: "Reason", lp_ask: "Ask", lp_plan: "Plan", lp_guard: "Guard", lp_verify: "Verify", lp_replan: "Re-plan", lp_handoff: "Hand off",
+        ag_listen: "Listened to your voice note and turned it into text", ag_gate_ok: "Scanned your words for hazards (gas, mains, brakes…): clear",
+        ag_gate_stop: "Hazard words found ({category}): stopped before any model call", ag_look: "Looked at the photo: {object}, {n} parts located",
+        ag_segment: "Outlined {found} of {of} parts on your photo (pixel masks)", ag_diagnose: "Most likely: {cause} ({conf}%), out of {n} causes",
+        ag_ask: "Only {conf}% sure (below {threshold}%): asked one question instead of guessing", ag_answer: "Got your answer, re-ran the diagnosis",
+        ag_plan: "Planned {steps} steps for: {cause}", ag_guard_ok: "Plan checked by safety rules in code: passed ({level})",
+        ag_guard_stop: "Plan blocked by safety rules: STOP", ag_illustrate: "Drew {made} of {of} helper diagrams from your photo",
+        ag_redrawn: ", {redrawn} redrawn after review", ag_check_ok: "Step {step} checked from your new photo: correct",
+        ag_check_fail: "Step {step} checked from your new photo: not yet, sent a correction", ag_check_esc: " (repeated fails, suggested another plan)",
+        ag_replan: "Still broken: new {steps}-step plan for {cause}", ag_esc_red: "Too dangerous to do alone: handed off to a professional with a report",
+        ag_esc_exhausted: "Every safe cause tried: handed off to a workshop with a report",
+        ag_fallback: "Live model failed after retries: {stage} used the labelled demo answer",
+        ag_input_guard: "Your input contained instruction-like text: treated as data and ignored",
+        ag_outcome_fixed: "You confirmed: it works now", ag_outcome_pro: "You chose to take it to a mechanic", ag_retry: "Retried the failed stage (#{n})",
+        agCode: "code", elapsed: "{n} s", qYes: "Yes", qNo: "No", qUnsure: "Not sure",
+        tourProgress: "Demo: the AI is working. Each line is one Meta model or safety rule.", tourAsk: "The AI isn't sure, so it asks. Tap an answer.",
+        tourResult: "See the parts SAM 3.1 outlined and the 'What the AI did' log. Then tick the safety list to unlock step 1.",
+        tourCheck: "Try 'Check this step' with a sample photo: the dark one is rejected, the right one passes.",
+        tourStuck: "Then tap 'Still broken' below to watch the AI re-plan.", tourClose: "Close",
+        sampleTry: "No photo yet? Try a sample photo:", sampleBad: "📷 Dark photo ✗", sampleGood: "📷 Right photo ✓" },
+};
+/* I18N_EXTRA:end */
+["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_EXTRA[k]));
+
 let lang = localStorage.getItem("tc_lang") || "id";
 let videoFile = null;
 let photoFiles = [], audioBlob = null, rec = null, chunks = [], S = null, stepIdx = 0, category = "", es = null;
@@ -205,7 +280,7 @@ async function submit(sample) {
     const j = await r.json();
     if (!r.ok) throw new Error(j.detail || r.statusText);
     history.replaceState(null, "", "#" + j.id);
-    show("progress"); follow(j.id);
+    show("progress"); startElapsed(); follow(j.id);
   } catch (e) { $("formErr").textContent = netMsg(e); }
   finally { $("goBtn").disabled = false; }
 }
@@ -263,7 +338,8 @@ function poll(id) {
 function renderProgress(s) {
   if (!$("stageList") || !s.stages) return;
   $("stageList").innerHTML = Object.entries(s.stages).map(([k, v]) =>
-    `<li class="${esc(v.status)}">${esc(t("stages")[k] || k)}<span class="note">${esc(v.note || "")}</span></li>`).join("");
+    `<li class="${esc(v.status)}">${esc(t("stages")[k] || k)}${v.status === "skipped" ? "" : ` <code class="tool">${esc(stageTool(s, k))}</code>`}<span class="note">${esc(v.note || "")}</span></li>`).join("");
+  renderAgentLog(s, "agentLive"); tickElapsed(); updateTour();
   if ($("progressStatus")) {  // short screen-reader status instead of re-announcing the whole list
     const run = Object.entries(s.stages).find(([, v]) => v.status === "running");
     const nDone = Object.values(s.stages).filter((v) => v.status === "done").length;
@@ -285,7 +361,7 @@ async function sendAnswer() {
     const r = await fetch(`/api/sessions/${S.id}/answer`, { method: "POST", body: fd });
     if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || t("netErr"));
   } catch (e) { $("jobErr").textContent = netMsg(e); return; }
-  $("jobErr").textContent = ""; $("answerText").value = ""; follow(S.id);
+  $("jobErr").textContent = ""; $("answerText").value = ""; startElapsed(); follow(S.id);
 }
 
 /* ---------------- safety stop / escalation card ---------------- */
@@ -357,9 +433,12 @@ function render(s) {
   $("gDone").textContent = plan.done_check || ""; $("gPro").textContent = plan.when_to_call_pro ? "🧑‍🔧 " + plan.when_to_call_pro : "";
   $("disclaimer").textContent = (s.safety || {}).disclaimer || "";
   if ($("fallbackNote")) { const fb = (s.fallback || []).length > 0; $("fallbackNote").textContent = fb ? t("fbNote") : ""; $("fallbackNote").classList.toggle("hidden", !fb); }
-  renderHood(s);
+  renderHood(s); renderAgentLog(s, "agent");
   renderPreflight(s, dx);
   renderStep(); renderVerified(); renderOutcome();
+  const sharedPage = !!document.body.dataset.sid && !document.body.dataset.sid.startsWith("{{");
+  if ($("sampleCheckBox")) $("sampleCheckBox").classList.toggle("hidden", !s.sample || sharedPage);
+  updateTour();
 }
 
 // "Before you start": things the owner must confirm (unplugged, engine cool) before the steps unlock.
@@ -500,7 +579,7 @@ async function sendOutcome(result) {
     const r = await fetch(`/api/sessions/${S.id}/outcome`, { method: "POST", body: fd });
     const j = await r.json();
     if (!r.ok) { $("outcomeMsg").textContent = "⚠️ " + (j.detail || r.statusText); return; }
-    S = j; setGarageOutcome(S.id, result, (S.outcome || {}).saved_idr); renderOutcome();
+    S = j; setGarageOutcome(S.id, result, (S.outcome || {}).saved_idr); renderOutcome(); renderAgentLog(S, "agent");
     if (result === "pro") showHandoff("handoff");
   } catch (err) { $("outcomeMsg").textContent = "⚠️ " + netMsg(err); }
 }
@@ -513,7 +592,7 @@ async function checkPhoto(f) {
     const r = await fetch(`/api/sessions/${S.id}/steps/${st.n}/check`, { method: "POST", body: fd });
     const j = await r.json();
     if (!r.ok) { $("checkResult").textContent = j.detail; return null; }
-    S = await fetchSession(S.id); showCheck(j); renderVerified();
+    S = await fetchSession(S.id); showCheck(j); renderVerified(); renderAgentLog(S, "agent");
     if (j.passed && stepIdx < S.plan.steps.length - 1) setTimeout(() => { stepIdx++; renderStep(); }, 1500);
     return j;
   } catch (err) { $("checkResult").textContent = "⚠️ " + netMsg(err); return null; }
@@ -813,9 +892,102 @@ function renderGarage() {
   }).join("");
 }
 
+/* ---------------- agent log: "What the AI did" (v1.22) ----------------
+   One line per agent decision from s.agent_log (api/pipeline/engine.py _event): what it perceived, decided,
+   checked or handed off, and which tool did it. Every value is escaped; the log never holds the owner's words. */
+const fillT = (key, d) => t(key).replace(/\{(\w+)\}/g, (_, k) => esc(d[k] ?? ""));
+const AG_PHASE = { listen: "see", look: "see", segment: "see", gate: "guard", input_guard: "guard", plan_guard: "guard", diagnose: "think",
+  ask: "ask", answer: "ask", plan: "plan", illustrate: "plan", check: "verify", replan: "replan", escalate: "handoff", outcome: "verify",
+  fallback: "guard", retry: "think" };
+const AG_ICON = { listen: "👂", look: "👁️", segment: "🎯", gate: "🛡️", input_guard: "🛡️", plan_guard: "🛡️", diagnose: "🧠", ask: "❓", answer: "💬",
+  plan: "📋", illustrate: "🖼️", check: "📸", replan: "🔁", escalate: "🧑‍🔧", outcome: "🎉", fallback: "🧪", retry: "↻" };
+const LOOP = ["see", "think", "ask", "plan", "guard", "verify", "replan", "handoff"];
+function agentLine(e) {
+  const k = e.kind;
+  if (k === "gate") return e.ok ? t("ag_gate_ok") : fillT("ag_gate_stop", e);
+  if (k === "plan_guard") return e.ok ? fillT("ag_guard_ok", { level: t(e.level) }) : t("ag_guard_stop");
+  if (k === "illustrate") return fillT("ag_illustrate", e) + (e.redrawn ? fillT("ag_redrawn", e) : "");
+  if (k === "check") return fillT(e.passed ? "ag_check_ok" : "ag_check_fail", e) + (e.escalate ? t("ag_check_esc") : "");
+  if (k === "escalate") return t(e.reason === "exhausted" ? "ag_esc_exhausted" : "ag_esc_red");
+  if (k === "outcome") return t(e.result === "fixed" ? "ag_outcome_fixed" : "ag_outcome_pro");
+  return T.en["ag_" + k] !== undefined ? fillT("ag_" + k, e) : esc(k);
+}
+function renderAgentLog(s, boxId) {
+  const box = $(boxId); if (!box) return;
+  const ev = (s && s.agent_log) || [];
+  box.classList.toggle("hidden", !ev.length);
+  if (!ev.length) return;
+  const seen = new Set(ev.map((e) => AG_PHASE[e.kind]));
+  const loop = LOOP.map((p) => `<span class="lp${seen.has(p) ? " on" : ""}">${esc(t("lp_" + p))}</span>`).join("<span class=\"lpArrow\" aria-hidden=\"true\">→</span>");
+  const rows = ev.map((e) => {
+    const tool = e.model ? `<code class="tool">${esc(e.model)}</code>` : (["gate", "plan_guard", "input_guard"].includes(e.kind) ? `<code class="tool code">${esc(t("agCode"))}</code>` : "");
+    const secs = e.ms >= 100 ? ` <span class="muted">${(e.ms / 1000).toFixed(1)}s</span>` : "";
+    return `<li class="ag ${esc(AG_PHASE[e.kind] || "")}"><span class="agT muted">${esc(Number(e.t || 0).toFixed(0))}s</span> <span aria-hidden="true">${AG_ICON[e.kind] || "•"}</span> ${agentLine(e)} ${tool}${secs}</li>`;
+  }).join("");
+  box.querySelector(".agLoop").innerHTML = loop;
+  box.querySelector(".agList").innerHTML = rows;
+}
+
+/* ---------------- progress: model per stage + elapsed time ---------------- */
+const STAGE_TOOL = { listen: "listen", look: "look", segment: "segment", diagnose: "diagnose", plan: "plan", illustrate: "illustrate" };
+function stageTool(s, k) {
+  const m = s.models || {};
+  if (k === "listen" && s.lang === "jv" && m.listen_javanese) return m.listen_javanese;
+  if (STAGE_TOOL[k]) return m[STAGE_TOOL[k]] || "";
+  return k === "narrate" ? "edge-tts" : t("agCode");
+}
+let progT0 = 0, progTimer = null;
+function tickElapsed() {
+  const el = $("elapsed"); if (!el) return;
+  const running = S && ["created", "running"].includes(S.status) && !$("progress").classList.contains("hidden");
+  el.textContent = running ? "⏱ " + t("elapsed").replace("{n}", String(Math.round((Date.now() - progT0) / 1000))) : "";
+  if (!running && progTimer) { clearInterval(progTimer); progTimer = null; }
+}
+function startElapsed() { progT0 = Date.now(); if (progTimer) clearInterval(progTimer); progTimer = setInterval(tickElapsed, 1000); tickElapsed(); }
+
+/* ---------------- 1-tap guided demo (v1.22) ---------------- */
+const tour = { on: false };
+try { tour.on = sessionStorage.getItem("tc_tour") === "1"; } catch (_) { /* private mode */ }
+function setTour(v) { tour.on = v; try { v ? sessionStorage.setItem("tc_tour", "1") : sessionStorage.removeItem("tc_tour"); } catch (_) {} updateTour(); }
+function updateTour() {
+  const bar = $("tourBar"); if (!bar) return;
+  let key = "";
+  if (tour.on && S) {
+    if (S.status === "needs_answer") key = "tourAsk";
+    else if (["created", "running"].includes(S.status)) key = "tourProgress";
+    else if (S.status === "ready" && S.plan) {
+      const unlocked = !$("stepCard") || !$("stepCard").hasAttribute("inert");
+      const passed = Object.values(S.checks || {}).some((c) => c && c.passed);
+      key = !unlocked ? "tourResult" : passed ? "tourStuck" : "tourCheck";
+    }
+  }
+  bar.classList.toggle("hidden", !key);
+  if (key) $("tourText").textContent = t(key);
+}
+async function sampleCheck(kind) {
+  if (!S || !S.sample) return;
+  try {
+    const r = await fetch(`/api/demo/check-photo/${kind}?sample=${encodeURIComponent(S.sample)}`);
+    if (!r.ok) throw new Error(r.statusText);
+    const blob = await r.blob();
+    await checkPhoto(new File([blob], `sample-${kind}.jpg`, { type: "image/jpeg" }));
+  } catch (e) { $("checkResult").classList.remove("hidden"); $("checkResult").textContent = "⚠️ " + netMsg(e); }
+  updateTour();
+}
+function setupDemo() {
+  on("demoBtn", "click", () => { setTour(true); submit("motor"); });
+  on("tourClose", "click", () => setTour(false));
+  on("sampleBad", "click", () => sampleCheck("dark"));
+  on("sampleGood", "click", () => sampleCheck("ok"));
+  document.querySelectorAll("#quickAns button").forEach((b) => b.addEventListener("click", () => {
+    $("answerText").value = t(b.dataset.q); sendAnswer();
+  }));
+  if ($("preList")) $("preList").addEventListener("change", () => setTimeout(updateTour, 0));
+}
+
 /* ---------------- boot ---------------- */
 document.addEventListener("DOMContentLoaded", () => {
-  setupOffline(); applyLang(); health(); setupResult();
+  setupOffline(); applyLang(); health(); setupResult(); setupDemo();
   const shared = document.body.dataset.sid;
   if (shared && !shared.startsWith("{{")) { // read-only /guide/<id> page
     on("lang", "change", (e) => { lang = e.target.value; applyLang(); });
@@ -827,7 +999,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadGarage().forEach((e) => { if (e && e.id) fetch(`/api/sessions/${encodeURIComponent(e.id)}`, { method: "DELETE" }).catch(() => null); }); // best effort: erase on the server too
     localStorage.removeItem(GARAGE_KEY); renderGarage();
   });
-  if (location.hash.length > 1) { show("progress"); follow(location.hash.slice(1)); }
+  if (location.hash.length > 1) { show("progress"); startElapsed(); follow(location.hash.slice(1)); }
 });
 
 // PWA: install to home screen. The worker only caches the app shell; it fails quietly when sw.js is absent.

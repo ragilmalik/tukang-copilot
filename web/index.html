@@ -27,6 +27,9 @@
   <section id="capture" class="card">
     <h1 data-t="hero">Apa yang rusak?</h1>
     <p class="muted" data-t="heroSub">Foto barangnya, ceritakan masalahnya, dapat panduan perbaikan.</p>
+    <ol class="how" aria-label="How it works"><li data-t="how1">📷 Foto + cerita</li><li data-t="how2">🎯 AI tandai bagiannya</li><li data-t="how3">✅ Tiap langkah dicek kamera</li></ol>
+    <button id="demoBtn" class="btn demo big" type="button" data-testid="demo-btn" data-t="demoBtn">▶ Coba demo 1 ketuk</button>
+    <p class="small muted demoSub" data-t="demoSub">Tanpa foto, tanpa akun: lihat AI memperbaiki motor mogok dari awal sampai cek kamera.</p>
 
     <label class="photoBox" id="photoBox">
       <input id="photo" type="file" accept="image/*" capture="environment" multiple hidden>
@@ -74,16 +77,19 @@
   <!-- 2. Progress -->
   <section id="progress" class="card hidden">
     <h2 data-t="working">Sedang memeriksa…</h2>
+    <p id="elapsed" class="small muted" aria-live="off"></p>
     <p id="progressStatus" class="sr-only" aria-live="polite"></p>
     <ol id="stageList" class="stages"></ol>
     <div id="question" class="hidden">
       <p class="q" id="questionText"></p>
+      <div id="quickAns" class="chips"><button type="button" class="chip" data-q="qYes" data-t="qYes">Ya</button><button type="button" class="chip" data-q="qNo" data-t="qNo">Tidak</button><button type="button" class="chip" data-q="qUnsure" data-t="qUnsure">Tidak tahu</button></div>
       <input id="answerText" maxlength="500" data-tp="answerHere" placeholder="Jawaban kamu">
       <button id="answerBtn" class="btn primary" type="button" data-t="send">Kirim</button>
     </div>
     <div id="stopBox" class="stop hidden" role="alert" aria-live="assertive"></div>
     <p id="jobErr" class="err" role="alert"></p>
     <button id="retryBtn" class="btn primary hidden" type="button" data-t="retry">Coba lagi</button>
+    <details id="agentLive" class="agent hidden" open data-testid="agent-live"><summary data-t="agentLive">Log agen</summary><div class="agLoop"></div><ol class="agList small"></ol></details>
   </section>
 
   <!-- 3. Result -->
@@ -95,6 +101,12 @@
       <p id="dxSummary"></p>
       <ul id="dxCauses" class="causes"></ul>
       <div id="partsWrap" class="hidden"><img id="partsImg" alt="Highlighted parts" class="partsImg"><ul id="partsList" class="legend"></ul></div>
+    </div>
+
+    <div class="card agent hidden" id="agent" data-testid="agent-log">
+      <h2 data-t="agentTitle">🤖 Yang dilakukan AI</h2>
+      <p class="small muted" data-t="agentSub">Tiap keputusan agen, alat yang dipakai, dan kapan ia berhenti.</p>
+      <div class="agLoop"></div><ol class="agList small"></ol>
     </div>
 
     <div class="card">
@@ -119,6 +131,8 @@
       <p id="stepCheck" class="check"></p>
       <label class="btn" id="stepPhotoLabel">📸 <span data-t="checkStep">Cek langkah ini</span>
         <input id="stepPhoto" type="file" accept="image/*" capture="environment" hidden></label>
+      <p id="sampleCheckBox" class="small sampleCheck hidden" data-testid="sample-check"><span data-t="sampleTry">Belum punya foto? Coba foto contoh:</span>
+        <button id="sampleBad" class="btn" type="button" data-t="sampleBad">📷 Foto gelap ✗</button> <button id="sampleGood" class="btn" type="button" data-t="sampleGood">📷 Foto benar ✓</button></p>
       <button id="liveBtn" class="btn" type="button" aria-pressed="false">🎯 <span data-t="liveGuide">Panduan kamera langsung</span></button>
       <div id="live" class="live hidden" data-testid="live-guide">
         <div class="liveView"><video id="liveVideo" playsinline muted autoplay></video><canvas id="liveCanvas" aria-hidden="true"></canvas></div>
@@ -172,6 +186,7 @@
 </main>
 <p class="muted small center" id="disclaimer"></p>
 <footer class="muted small" data-t="footer">Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.</footer>
+<div id="tourBar" class="tourBar hidden" role="status" aria-live="polite" data-testid="tour-bar"><p id="tourText"></p><button id="tourClose" class="btn" type="button" data-t="tourClose">Tutup</button></div>
 <audio id="player"></audio>
 <script src="/static/app.js"></script>
 </body>
