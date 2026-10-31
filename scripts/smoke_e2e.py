@@ -46,6 +46,9 @@ def main() -> int:
         ok(c.get("/").status_code == 200 and "Tukang" in c.get("/").text, "home page loads")
         ok(c.get("/manifest.webmanifest").status_code == 200 and c.get("/sw.js").status_code == 200, "PWA manifest + service worker")
         ok(c.get("/og.png").status_code == 200 and 'property="og:image"' in c.get("/").text, "front-page link preview (og.png)")
+        rp = c.get("/static/replay/demo.json")
+        ok(rp.status_code == 200 and rp.json().get("kind") == "recorded-demo" and c.get("/static/replay.js").status_code == 200
+           and set(rp.json().get("langs", {})) == {"id", "jv", "en"}, "recorded demo for a sleeping server (/static/replay/)")
         for sample, expect in (("motor", "ready"), ("pump", "ready"), ("faucet", "ready"), ("rice", "stopped"), ("tire", "ready")):
             print(f"[{sample}]")
             t0 = time.time()

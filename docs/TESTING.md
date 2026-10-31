@@ -4,7 +4,7 @@
 ```bash
 pip install -r requirements-dev.txt
 python -m playwright install chromium  # optional: browser tests skip cleanly without a Chromium
-scripts/check_all.sh                   # ruff + mypy strict (mypy.ini) + all 470 tests (fast and slow chunks)
+scripts/check_all.sh                   # ruff + mypy strict (mypy.ini) + all 496 tests (fast and slow chunks: 475 fast, 21 browser)
 ```
 CI (`.github/workflows/ci.yml`) runs the same on every push. Browser tests also find a system Chromium (`/usr/bin/chromium`) or `PLAYWRIGHT_CHROMIUM=/path`.
 
@@ -24,6 +24,10 @@ CI (`.github/workflows/ci.yml`) runs the same on every push. Browser tests also 
 | `test_set_keys.py` | One-step key swap writes MODEL_API_KEY/MOCK=0 (+ Baseten) and runs the checks; no key → .env untouched |
 | `test_report_pdf.py` | PDF repair report |
 | `test_web.py` | `app.js` parses; every element id the JS uses exists; every UI string has id + en text; shared page is read-only; no secrets in web files |
+
+## Recorded demo (v1.24)
+- `python scripts/record_replay.py` re-records `web/replay/` after a change to the mock answers, the session shape or the demo flow; `--check` exits 1 when the recording no longer matches (also a test in `test_replay.py`).
+- `test_playwright_replay.py`: with every `/api` call hanging (sleeping server) the 1-tap demo still runs end to end from the recording, labelled; a visitor's own photo is refused, never faked; `?replay=1` sends nothing to the server.
 
 ## Fake Meta server
 `python -m api.testing.fake_meta` serves `http://127.0.0.1:8765/v1` with key `test-key`, built from the documented request/response shapes. Run the app against it:

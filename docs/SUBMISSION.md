@@ -39,7 +39,7 @@ How it works: an installable phone web app (no account). Snap photos or a 5–10
 • Bengkel hand-off: a WhatsApp summary, the nearest workshop, and a PDF brief for the mechanic. It also shows the bengkel price against the DIY cost, a PDF repair report, and "My garage" on the phone.
 • Diagnosis and planning can run on Muse Spark Open (open weights) via Baseten with one switch.
 
-Built from scratch during the hackathon (Oct 26 – Nov 4, 2026): FastAPI + vanilla-JS PWA, 470 automated tests (incl. real-Chromium tests with a fake camera), strict typing, Docker/Render deploy. Honest status: the demo video runs in labelled demo mode (stand-in photos, recorded answers). The live Meta path is tested against a stand-in server built from the official API docs [update after the first live-key run].
+Built from scratch during the hackathon (Oct 26 – Nov 4, 2026): FastAPI + vanilla-JS PWA, 496 automated tests (incl. real-Chromium tests with a fake camera), strict typing, Docker/Render deploy. Honest status: the demo video runs in labelled demo mode (stand-in photos, recorded answers). The live Meta path is tested against a stand-in server built from the official API docs [update after the first live-key run].
 ```
 
 ### 7. Public GitHub Repository *
@@ -109,3 +109,4 @@ Reply to your own post with the repo link and the live link (keeps the main post
 
 ## Try it in 60 seconds (for the gallery / judges)
 Open the live link on a phone → tap **▶ Coba demo 1 ketuk** (1-tap demo; the tips guide you through question → check photos → re-plan, and *🤖 Yang dilakukan AI* shows each decision). Or under *Coba contoh* tap "motor mogok" → answer the one question → tick the safety list → try **🎯 Panduan kamera langsung** and **Mode tangan bebas** → tap *Cek langkah ini* and snap anything → tap "rice cooker mati" to see the red STOP with its PDF and hand-off card. Without a key the app runs in labelled demo mode.
+If the live link is slow (the free server sleeps, ~50 s to wake), the 1-tap demo plays a **recorded demo-mode run** after 4 s, labelled "▶ Demo rekaman / Recorded demo" on screen; add `?replay=1` to the link to force it. Own photos, the live camera and voice commands need the awake server.

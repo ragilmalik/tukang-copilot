@@ -228,7 +228,7 @@ def shots() -> None:
         pg.fill("#stuckText", "Sudah dicoba, mesin tetap tidak nyala."); pg.click("#stuckBtn")
         pg.wait_for_function("document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled",
                              timeout=20000); pg.wait_for_timeout(600)
-        pg.locator("#stepCard").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,-260)"); snap("09_replan")
+        pg.wait_for_selector("#planBanner:not(.hidden)"); pg.evaluate("window.scrollTo(0, 0)"); snap("09_replan")  # v1.24: re-plan banner + tried cause
         pg.evaluate("document.querySelector('#agent').scrollIntoView({block: 'start'}); window.scrollBy(0, -70)"); snap("23_agent_log")
         msid = pg.evaluate("S && S.id")
         mpdf = Path(tempfile.mkdtemp()) / "motor.pdf"
@@ -257,7 +257,7 @@ def shots() -> None:
         # safety stop with PDF + hand-off
         go_sample("rice"); pg.wait_for_selector("#stopBox:not(.hidden)", timeout=30000)
         pg.wait_for_selector("#stopHandoff:not(.hidden)", timeout=10000)
-        pg.evaluate("document.querySelector('#stopBox').scrollIntoView({block: 'start'}); window.scrollBy(0, -80)"); snap("11_rice_stop")
+        pg.evaluate("window.scrollTo(0, 0)"); snap("11_rice_stop")  # v1.24: the STOP card sits under the "Stopped for your safety" heading
         pg.evaluate("document.querySelector('#stopHandoff').scrollIntoView({block: 'end'}); window.scrollBy(0, 40)"); snap("22_stop_handoff")
         sid = pg.evaluate("S && S.id")
         pdf = Path(tempfile.mkdtemp()) / "stop.pdf"
@@ -273,6 +273,10 @@ def shots() -> None:
         settings.use_open_weights, settings.baseten_api_key = True, "stand-in-not-a-key"
         pg.goto(base + "/"); pg.select_option("#lang", "en"); pg.wait_for_selector("#owBadge:not(.hidden)", timeout=5000); snap("21_open_weights")
         settings.use_open_weights, settings.baseten_api_key = False, ""
+        # v1.24 recorded demo: what a judge sees when the server sleeps (forced here with ?replay=1)
+        pg.goto(base + "/?replay=1"); pg.select_option("#lang", "en"); pg.click("#demoBtn")
+        pg.wait_for_selector("#question:not(.hidden)", timeout=20000); pg.click('#quickAns button[data-q="qNo"]')
+        pg.wait_for_selector("#result:not(.hidden)", timeout=20000); pg.evaluate("window.scrollTo(0, 0)"); snap("27_recorded_demo")
         b.close()
     srv.should_exit = True
     print("screenshots ->", SHOTS, sorted(p.name for p in SHOTS.glob("*.png")))

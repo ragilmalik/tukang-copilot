@@ -18,6 +18,7 @@ Open http://localhost:8000 and tap **▶ Try the 1-tap demo**. It runs a full re
 - **🤖 What the AI did**: the agent log on every result shows each decision (see → reason → ask → plan → guard → verify → re-plan → hand off) and the Meta model that made it.
 - **Safety in code**: try *rice cooker mati*: a hard STOP with a PDF and a bengkel hand-off, no steps.
 - **Basa Jawa**: switch the language at the top; the UI *and* the demo answers are Javanese.
+- **Live link slow to wake?** The free server sleeps (~50 s cold start). If it hasn't answered within 4 s, the 1-tap demo plays a **recorded demo-mode run** right away, labelled "▶ Recorded demo" on screen (`?replay=1` forces it). Your own photos still need the live server.
 
 | | |
 |---|---|
@@ -51,7 +52,7 @@ All Meta calls go through one file, [`api/meta_client.py`](api/meta_client.py) (
 | **Live camera guide** | **Bengkel hand-off** | **Safety stop** | **Basa Jawa** |
 | ![live](docs/demo/screenshots/16_live_guide.png) | ![hand-off](docs/demo/screenshots/18_handoff.png) | ![stop](docs/demo/screenshots/11_rice_stop.png) | ![jawa](docs/demo/screenshots/20_javanese_result.png) |
 
-<sub>All 26 screenshots in [docs/demo/screenshots](docs/demo/screenshots) (demo mode, labelled stand-in photos).</sub>
+<sub>All 27 screenshots in [docs/demo/screenshots](docs/demo/screenshots) (demo mode, labelled stand-in photos).</sub>
 
 ---
 
