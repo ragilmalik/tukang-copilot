@@ -32,6 +32,8 @@ Start on Free. Switching later is one click (step 14) and needs no redeploy of c
 6. Render asks for the secret values from render.yaml:
    - **MODEL_API_KEY**: paste your Meta key (or leave empty for demo mode).
    - **BASETEN_API_KEY**: paste your Baseten key, or leave empty.
+   - **IMPACT_TOKEN**: optional. Any long random word; it lets you download the trial outcome log later. Empty is fine.
+   - **PUBLIC_BASE_URL**: leave empty for now (you get the address in step 9), then fill it in (step 11).
 7. Click **Deploy Blueprint** (older screens call it **Apply**).
 8. Click the **tukang-copilot** service, then **Logs**. The first build takes 5–8 minutes (it installs Python packages and ffmpeg). Wait until the top shows a green **Live** and the log says `Uvicorn running on http://0.0.0.0:10000`.
 9. Your link is at the top of the service page, like `https://tukang-copilot.onrender.com` (Render may add a few letters if the name is taken). Open it on your phone over 4G: you should see the app, and no orange *Demo mode* line if you pasted a key.
@@ -45,10 +47,13 @@ Start on Free. Switching later is one click (step 14) and needs no redeploy of c
     You want **READY** at the end. Each line is PASS / WARN / FAIL; every FAIL has a `fix:` line in plain English. It checks https, `/api/health`, live vs demo mode, open weights, the home page, install-to-home-screen files, security headers (camera allowed), a PDF report, and all five demo repairs end to end.
     - In LIVE mode the PDF and the five repairs make real model calls, so they only run when you add `--live` (well under $1). Do that once after the first deploy.
     - A *"server took 50s to answer (it was asleep)"* WARN is normal on the free plan.
+    - A *"LIVE repair silently used demo answers"* FAIL means `DEMO_FALLBACK` covered for a failing live call (almost always a wrong key or no credit). Fix the key; while testing you can set `DEMO_FALLBACK` to `0` so errors show instead.
 
 ## Change settings or add a key later
 
 11. Service page → **Environment** (left menu) → find the name (e.g. `MODEL_API_KEY`) → **Edit** → paste → **Save, rebuild, and deploy** (or **Save and deploy**). It is live again in about a minute.
+    - **PUBLIC_BASE_URL**: set it to your https Render address from step 9 (e.g. `https://tukang-copilot.onrender.com`, no slash at the end). The mechanic hand-off and WhatsApp links use it.
+    - Other settings already in render.yaml: `MAX_TRACK_FRAMES` 120 (live camera frames per repair, about $0.30 of SAM at most), `TRACK_MIN_INTERVAL_S` 0.6 (at most ~1.6 frames a second), `DEMO_FALLBACK` 1 (a failing live call uses the labelled demo answer for that step so a judge never sees a dead end), `IMPACT_TOKEN` (optional, to download `/api/impact/outcomes.jsonl` with header `X-Impact-Token`).
     - Turn on open weights: set `USE_OPEN_WEIGHTS` to `1` and make sure `BASETEN_API_KEY` is filled.
     - Emergency switch if the live Meta API misbehaves during judging: set `MOCK` to `1`. The app keeps working on recorded demo answers at no cost. Set it back to `0` afterwards.
     - Spend caps are already set: `MAX_COST_PER_SESSION_USD` 0.50 per repair, `DAILY_BUDGET_USD` 10 per 24 h for the whole site, `RATE_LIMIT_PER_HOUR` 30 new repairs per visitor. Also set a spend limit on dev.meta.ai → Billing.

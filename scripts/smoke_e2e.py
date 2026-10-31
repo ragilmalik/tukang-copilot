@@ -31,6 +31,8 @@ def wait(c: httpx.Client, sid: str, timeout: float = 240) -> dict:
     while time.time() - t0 < timeout:
         s = c.get(f"/api/sessions/{sid}").json()
         if s["status"] not in ("created", "running"):
+            if s.get("fallback"):  # DEMO_FALLBACK answered a stage because the live call failed (deploy_check flags it)
+                print(f"  FALLBACK session {sid}: demo answer used for {', '.join(map(str, s['fallback']))}")
             return s
         time.sleep(1)
     raise TimeoutError(sid)

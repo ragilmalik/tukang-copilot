@@ -8,7 +8,8 @@ Prints PASS / WARN / FAIL lines, each FAIL with a plain-English fix. Exit 0 = no
 
 What it checks: https, /api/health fields and mode, home page, PWA manifest + service worker (install to
 home screen), security headers (the camera needs `camera=(self)`), a PDF report, and then the full
-scripts/smoke_e2e.py run (all five demo scenarios).
+scripts/smoke_e2e.py run (all five demo scenarios). In LIVE mode any session whose `fallback` list is
+non-empty is a FAIL: DEMO_FALLBACK (on by default) would otherwise hide a bad key behind demo answers.
 
 Spend: in DEMO mode everything is free. In LIVE mode every repair calls real Meta models, so the PDF check
 and the full smoke only run with --live (about 5 repairs, roughly $0.10 to $0.50 in total, each repair is
@@ -31,6 +32,9 @@ STAGES = ("listen", "look", "segment", "diagnose", "plan", "illustrate", "verify
 _COLOR = sys.stdout.isatty()
 G, R, Y, D, E = (("\033[32m", "\033[31m", "\033[33m", "\033[2m", "\033[0m") if _COLOR else ("",) * 5)
 counts = {"PASS": 0, "WARN": 0, "FAIL": 0}
+FALLBACK_FIX = ("DEMO_FALLBACK=1 hid a failing live call (usually a wrong or expired MODEL_API_KEY, or no credit). "
+                "Run  python scripts/check_keys.py  with the same key, fix it in Render > Environment, or set "
+                "DEMO_FALLBACK=0 while testing so errors show instead of demo answers.")
 
 
 def line(status: str, what: str, fix: str = "") -> None:
@@ -121,6 +125,9 @@ def main() -> int:
         else:
             line("WARN", "DEMO mode: no MODEL_API_KEY on the server (free recorded answers)",
                  "Render > your service > Environment > add MODEL_API_KEY with your dev.meta.ai key, Save (it redeploys by itself).")
+        if mode == "live" and h.get("demo_fallback"):
+            line("PASS", "demo fallback ON: if a live call fails the repair still finishes on a labelled demo answer "
+                         "(this check flags any session that used it)")
         if h.get("open_weights"):
             line("PASS", "open weights ON: diagnosis and plan run on Muse Spark Open (badge shows in the app)")
         else:
@@ -183,6 +190,12 @@ def main() -> int:
                     if st not in ("created", "running"):
                         break
                     time.sleep(1)
+                fb = c.get(f"/api/sessions/{sid}").json().get("fallback") or []
+                if mode == "live" and fb:
+                    line("FAIL", f"LIVE repair silently used demo answers for: {', '.join(map(str, fb))}",
+                         FALLBACK_FIX)
+                elif mode == "live":
+                    line("PASS", "LIVE sample repair answered by real models (no demo fallback)")
                 pdf = c.get(f"/api/sessions/{sid}/report.pdf")
                 if pdf.status_code == 200 and pdf.content[:4] == b"%PDF":
                     line("PASS", f"PDF report downloads ({len(pdf.content) // 1024} KB, sample repair finished as '{st}' in {time.time() - t0:.0f}s)")
@@ -203,6 +216,11 @@ def main() -> int:
         print(f"\n{D}Running scripts/smoke_e2e.py (all five demo repairs)...{E}")
         p = subprocess.run([sys.executable, str(ROOT / "scripts" / "smoke_e2e.py"), base], capture_output=True, text=True, timeout=1500)
         fails = [ln.strip() for ln in p.stdout.splitlines() if ln.strip().startswith("FAIL")]
+        fbs = [ln.strip() for ln in p.stdout.splitlines() if ln.strip().startswith("FALLBACK")]
+        if mode == "live" and fbs:
+            line("FAIL", f"{len(fbs)} LIVE smoke session(s) silently used demo answers: {'; '.join(fbs[:3])}", FALLBACK_FIX)
+        elif mode == "live":
+            line("PASS", "no smoke session needed the demo fallback (every answer came from the live models)")
         if p.returncode == 0:
             n = sum(1 for ln in p.stdout.splitlines() if ln.strip().startswith("PASS"))
             line("PASS", f"end-to-end smoke: {n} checks passed across all five demo repairs")

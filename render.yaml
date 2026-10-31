@@ -1,5 +1,6 @@
 # One-click deploy on Render: dashboard.render.com -> New -> Blueprint -> pick this repo. Step by step: docs/DEPLOY.md
-# Only two values are secret and asked for during setup: MODEL_API_KEY (needed for LIVE mode) and BASETEN_API_KEY (optional).
+# Render asks for four values during setup: MODEL_API_KEY (needed for LIVE mode), BASETEN_API_KEY (optional),
+# IMPACT_TOKEN (optional) and PUBLIC_BASE_URL (fill in the https Render URL once you know it; empty is OK at first).
 # With no MODEL_API_KEY the app still deploys and runs in free DEMO mode.
 services:
   - type: web
@@ -19,6 +20,10 @@ services:
         sync: false
       - key: BASETEN_API_KEY
         sync: false
+      - key: IMPACT_TOKEN               # optional: lets you download the trial outcome log (header X-Impact-Token)
+        sync: false
+      - key: PUBLIC_BASE_URL            # set to your https Render URL (e.g. https://tukang-copilot.onrender.com) after
+        sync: false                     # the first deploy: mechanic hand-off / WhatsApp links use it
       # ---- mode ----
       - key: MOCK                       # 1 = demo answers only, no Meta spend (instant fallback if the live API misbehaves)
         value: "0"
@@ -39,6 +44,8 @@ services:
       - key: TRACK_MIN_INTERVAL_S
         value: "0.6"
       # ---- behaviour ----
+      - key: DEMO_FALLBACK              # 1 = a live call that still fails after retries uses the labelled demo answer
+        value: "1"                      # for that stage (scripts/deploy_check.py flags any session that needed it)
       - key: ILLUSTRATE
         value: "1"
       - key: DIAGRAM_CHECKER
