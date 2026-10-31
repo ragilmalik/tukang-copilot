@@ -55,13 +55,16 @@ def reset() -> None:
         _spend_cache = (0.0, 0.0)
 
 
-def check_rate(client: str, now: float | None = None) -> None:
-    limit = settings.rate_limit_per_hour
+def check_rate(client: str, now: float | None = None, bucket: str = "new", limit: int | None = None) -> None:
+    """Sliding one-hour window per visitor. bucket "new" = new repairs (RATE_LIMIT_PER_HOUR); "followup" = model
+    calls inside a repair (FOLLOWUP_RATE_PER_HOUR), counted separately so a long repair never blocks a new one."""
+    if limit is None:
+        limit = settings.rate_limit_per_hour if bucket == "new" else settings.followup_rate_per_hour
     if limit <= 0:
         return
     t = time.time() if now is None else now
     with _lock:
-        q = _hits[client]
+        q = _hits[client if bucket == "new" else f"{bucket}:{client}"]
         while q and q[0] <= t - WINDOW_S:
             q.popleft()
         if len(q) >= limit:

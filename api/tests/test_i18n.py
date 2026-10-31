@@ -34,7 +34,7 @@ def test_v122_extra_strings_exist_in_all_three_languages_and_differ():
         keys[k] = dict(re.findall(r"(\w+): \"([^\"]*)\"", body))
     assert set(keys["id"]) == set(keys["jv"]) == set(keys["en"]), set(keys["id"]) ^ set(keys["jv"]) ^ set(keys["en"])
     assert len(keys["id"]) >= 40
-    same_as_id = [k for k in keys["jv"] if keys["jv"][k] == keys["id"][k] and k not in {"agCode", "elapsed", "agentLive", "tourClose"}]
+    same_as_id = [k for k in keys["jv"] if keys["jv"][k] == keys["id"][k] and k not in {"agCode", "elapsed", "agentLive", "tourClose", "note_steps"}]
     assert not same_as_id, same_as_id  # Javanese is written out, not copied from Indonesian
     # every {placeholder} used in a template is the same in all three languages
     for k in keys["id"]:

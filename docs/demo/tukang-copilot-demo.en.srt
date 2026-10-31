@@ -47,29 +47,29 @@ Your hands are dirty, so go hands-free. Each step is read aloud and the phone li
 Still broken? Say what happened, and the agent re-plans to the next most likely cause. Plan, act, verify, re-plan.
 
 13
-00:01:47,124 --> 00:01:57,784
-And when it's a job for a pro, one tap hands it off: a WhatsApp summary of what was found and tried, a search for the nearest bengkel, and a PDF with a brief for the mechanic.
+00:01:47,124 --> 00:01:55,792
+Every decision is on screen: what it saw, why it asked, each photo check, each re-plan, and which Meta model did it.
 
 14
-00:01:57,784 --> 00:02:06,812
-It also knows when to say no. A rice cooker that won't heat would mean opening 220 volt internals, so the safety gate stops the guidance.
+00:01:55,792 --> 00:02:06,452
+And when it's a job for a pro, one tap hands it off: a WhatsApp summary of what was found and tried, a search for the nearest bengkel, and a PDF with a brief for the mechanic.
 
 15
-00:02:06,812 --> 00:02:12,840
-The stop still gives you a PDF report and the hand-off card, so you're never left at a dead end.
+00:02:06,452 --> 00:02:15,480
+It also knows when to say no. A rice cooker that won't heat would mean opening 220 volt internals, so the safety gate stops the guidance.
 
 16
-00:02:12,840 --> 00:02:19,468
+00:02:15,480 --> 00:02:22,108
 The whole app runs in Bahasa Indonesia, Javanese and English, with Javanese voice input.
 
 17
-00:02:19,468 --> 00:02:29,024
+00:02:22,108 --> 00:02:31,664
 And with one switch, diagnosis and planning run on Muse Spark Open, Meta's open-weights model, on Baseten. The app shows a badge when it does.
 
 18
-00:02:29,024 --> 00:02:45,132
+00:02:31,664 --> 00:02:47,772
 Under the hood: Voice Transcribe, Muse Spark for vision, diagnosis, planning and verification, SAM 3.1 for masks and live tracking, and Muse Image for diagrams your photo can't show. The safety gate is enforced in code, in three layers.
 
 19
-00:02:45,132 --> 00:02:50,132
+00:02:47,772 --> 00:02:52,772
 Tukang Copilot. Every phone becomes a mechanic's apprentice.

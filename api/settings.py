@@ -61,6 +61,9 @@ class Settings:
     max_diagrams: int = field(default_factory=lambda: int(_env("MAX_DIAGRAMS", default="2")))
     max_cost_usd: float = field(default_factory=lambda: float(_env("MAX_COST_PER_SESSION_USD", default="0.50")))
     rate_limit_per_hour: int = field(default_factory=lambda: int(_env("RATE_LIMIT_PER_HOUR", default="30")))
+    # Calls inside a repair that reach a model (answer, retry, step check, voice command, re-plan): live mode only.
+    followup_rate_per_hour: int = field(default_factory=lambda: int(_env("FOLLOWUP_RATE_PER_HOUR", default="240")))
+    max_step_checks: int = field(default_factory=lambda: int(_env("MAX_STEP_CHECKS", default="40")))  # per repair
     daily_budget_usd: float = field(default_factory=lambda: float(_env("DAILY_BUDGET_USD", default="10")))
     max_image_side: int = field(default_factory=lambda: int(_env("MAX_IMAGE_SIDE", default="1536")))
     retention_hours: float = field(default_factory=lambda: float(_env("RETENTION_HOURS", default="24")))

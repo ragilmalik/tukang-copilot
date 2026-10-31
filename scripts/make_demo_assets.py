@@ -64,10 +64,10 @@ SCENES: list[Scene] = [
           "Indonesia runs on ~130 million motorbikes, water pumps and rice cookers.",
           "In Indonesia, a small fault on a motorbike or a water pump can cost a day's wage, or days without water. "
           "Repair videos online are not for your model, not in your language, and they can't see your problem.", 8),
-    Scene("intro", "01_home", "Tukang Copilot: photo + voice in Bahasa, Javanese or English.",
+    Scene("intro", "01_home", "Photo + voice in Bahasa, Javanese or English. No photo? ▶ 1-tap demo.",
           "Tukang Copilot turns any phone into a mechanic's apprentice. Take a photo and say what's wrong. "
           "This recording runs in demo mode, with labelled stand-in photos.", 6),
-    Scene("progress", "02_progress", "Listening → Looking → Finding the parts → Diagnosing.",
+    Scene("progress", "02_progress", "Each stage shows the Meta model doing it: Muse Spark, SAM 3.1, Muse Image.",
           "Muse Voice Transcribe hears the problem, Muse Spark looks at the photo, and SAM 3.1 finds the exact parts.", 5),
     Scene("question", "03_question", "Unsure? It asks ONE question instead of guessing.",
           "When the evidence is ambiguous, it asks one short question instead of guessing.", 4),
@@ -90,14 +90,15 @@ SCENES: list[Scene] = [
           "Phones without continuous listening get push-to-talk through Voice Transcribe.", 9),
     Scene("replan", "09_replan", "Still broken? The agent re-plans to the next likely cause.",
           "Still broken? Say what happened, and the agent re-plans to the next most likely cause. Plan, act, verify, re-plan.", 6),
+    Scene("agent", "23_agent_log", "“What the AI did”: every decision, the model that made it, and why it asked.",
+          "Every decision is on screen: what it saw, why it asked, each photo check, each re-plan, and which Meta model did it.", 6),
     Scene("handoff", "18_handoff", "Hand-off to a bengkel: WhatsApp summary, nearest workshop, PDF with a mechanic brief.",
           "And when it's a job for a pro, one tap hands it off: a WhatsApp summary of what was found and tried, "
           "a search for the nearest bengkel, and a PDF with a brief for the mechanic.", 8),
     Scene("rice", "11_rice_stop", "RED STOP: opening 220 V internals → take it to a service centre.",
           "It also knows when to say no. A rice cooker that won't heat would mean opening 220 volt internals, "
           "so the safety gate stops the guidance.", 7),
-    Scene("stop_pdf", "19_stop_pdf", "The stop comes with a report PDF and the same hand-off card.",
-          "The stop still gives you a PDF report and the hand-off card, so you're never left at a dead end.", 5),
+    # v1.22: the stop-PDF scene was dropped to make room for the agent log and keep the cut under 3:00
     Scene("lang", "20_javanese_result", "Basa Jawa UI and Javanese voice input, plus English.",
           "The whole app runs in Bahasa Indonesia, Javanese and English, with Javanese voice input.", 5),
     Scene("ow", "21_open_weights", "One switch: reasoning on Muse Spark Open (open weights) via Baseten.",
@@ -189,6 +190,7 @@ def shots() -> None:
         pg.goto(base + "/"); pg.wait_for_selector("#modeBadge:not(.hidden)")
         pg.set_input_files("#photo", str(FIX / "standin_motor_plug_area.jpg"))
         pg.fill("#text", "Motor saya Honda Beat susah hidup, distarter cuma bunyi tapi mesin nggak nyala.")
+        pg.evaluate("document.activeElement && document.activeElement.blur(); window.scrollTo(0, 0)")
         snap("01_home")
         pg.click("#goBtn"); pg.wait_for_selector("#progress:not(.hidden)"); pg.wait_for_timeout(250)
         snap("02_progress")
@@ -212,6 +214,7 @@ def shots() -> None:
         pg.uncheck("#handsFree")
         pg.fill("#stuckText", "Sudah dicoba, mesin tetap tidak nyala."); pg.click("#stuckBtn"); pg.wait_for_timeout(1500)
         pg.locator("#stepCard").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,-260)"); snap("09_replan")
+        pg.evaluate("document.querySelector('#agent').scrollIntoView({block: 'start'}); window.scrollBy(0, -70)"); snap("23_agent_log")
         pg.click("#mechBtn"); pg.wait_for_selector("#handoff:not(.hidden)", timeout=10000)
         pg.evaluate("document.querySelector('#handoff details') && (document.querySelector('#handoff details').open = true)")
         pg.evaluate("document.querySelector('#mechBtn').scrollIntoView({block: 'start'}); window.scrollBy(0, -90)"); snap("18_handoff")
@@ -450,9 +453,28 @@ def vertical(work: Path, has_voice: bool) -> None:
     print("vertical ->", out)
 
 
+GIF_SHOTS = ["01_home", "02_progress", "03_question", "05_parts", "23_agent_log", "15_preflight", "07_check_fail", "08_check_pass",
+             "16_live_guide", "09_replan", "11_rice_stop", "20_javanese_result"]
+
+
+def gif() -> None:
+    """README hero: the phone flow as a small looping GIF (~1.4 s per screen, 320 px wide) from the screenshots."""
+    work = Path(tempfile.mkdtemp())
+    for i, name in enumerate(GIF_SHOTS):
+        im = Image.open(SHOTS / f"{name}.png").convert("RGB")
+        im = im.resize((320, int(im.height * 320 / im.width)), Image.Resampling.LANCZOS).crop((0, 0, 320, 600))
+        im.save(work / f"{i:02}.png")
+    out = DEMO / "hero.gif"
+    vf = "fps=10,split[a][b];[a]palettegen=max_colors=96:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=4"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", "1/1.4", "-i", str(work / "%02d.png"), "-vf", vf,
+                    "-loop", "0", str(out)], check=True)
+    print("gif ->", out, f"{out.stat().st_size // 1024} KB")
+
+
 def main() -> None:
     cmd = sys.argv[1] if len(sys.argv) > 1 else "all"
-    steps = {"shots": [shots], "diagram": [diagram], "voice": [voice], "video": [video], "all": [shots, diagram, voice, video]}
+    steps = {"shots": [shots], "diagram": [diagram], "voice": [voice], "video": [video], "gif": [gif],
+             "all": [shots, diagram, voice, video, gif]}
     for fn in steps[cmd]:
         fn()
 

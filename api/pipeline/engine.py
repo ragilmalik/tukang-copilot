@@ -580,11 +580,17 @@ def answer(sid: str, text: str) -> dict[str, Any]:
     return s
 
 
+class LimitReached(ValueError):
+    """A per-repair cap was hit (step checks); the API answers 429."""
+
+
 def check_step(sid: str, n: int, photo: Path) -> dict[str, Any]:
     """Stage 8: compare the user's new photo with the step's expected state."""
     s = load(sid)
     if not s.get("plan"):
         raise ValueError("no plan yet")
+    if int(s.get("checks_used", 0)) >= settings.max_step_checks:
+        raise LimitReached("This repair has used all its photo checks. Use 'Still broken' or the PDF report.")
     plan = RepairPlan.model_validate(s["plan"])
     step = next((st for st in plan.steps if st.n == n), None)
     if step is None:
@@ -610,6 +616,15 @@ def check_step(sid: str, n: int, photo: Path) -> dict[str, Any]:
             check_fallback = bool(fb)
     finally:
         cost.use(None)
+    s = load(sid)  # reload: the live guide may have written meanwhile
+    s["checks_used"] = int(s.get("checks_used", 0)) + 1  # survives a re-plan (checks{} is reset per plan)
+    if meter.spent:  # step-check spend counts toward the session cost, so DAILY_BUDGET_USD sees it
+        c = s.get("cost") or {"spent_usd": 0.0, "budget_usd": settings.max_cost_usd, "by_model": {}}
+        c["spent_usd"] = round(float(c.get("spent_usd", 0)) + meter.spent, 4)
+        c["by_model"] = {**(c.get("by_model") or {})}
+        for k, v in meter.items.items():
+            c["by_model"][k] = round(c["by_model"].get(k, 0) + v, 4)
+        s["cost"] = c
     rec = s["checks"].setdefault(str(n), {"passed": False, "fails": 0, "tries": []})
     rec["tries"].append({"photo": name, **res.model_dump(), **({"fallback": True} if check_fallback else {})})
     if not check_fallback:  # a demo answer (live API down) never counts as camera-verified, nor as a fail

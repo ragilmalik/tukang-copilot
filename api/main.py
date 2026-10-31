@@ -126,6 +126,18 @@ def _load(sid: str) -> dict[str, Any]:
         raise HTTPException(404, "Session not found")
 
 
+def _guard_followup(request: Request, sid: str) -> None:
+    """Live mode: a model call inside a repair counts toward FOLLOWUP_RATE_PER_HOUR and the daily budget."""
+    if not guard.active():
+        return
+    try:
+        guard.check_budget()
+        guard.check_rate(guard.client_key(request.headers.get("x-forwarded-for"), request.client.host if request.client else None),
+                         bucket="followup")
+    except guard.Blocked as b:
+        raise HTTPException(b.status, guard.message(b.kind, str(_load(sid).get("lang", "id"))), headers={"Retry-After": str(b.retry_after)})
+
+
 def public(s: dict[str, Any]) -> dict[str, Any]:
     # never on the wire: the owner's own words (text, history, phrases the injection guard caught) and raw errors
     out = {k: v for k, v in s.items() if k not in {"text", "history", "error_detail", "input_flags"}}
@@ -305,8 +317,11 @@ async def events(sid: str) -> StreamingResponse:
 
 
 @app.post("/api/sessions/{sid}/answer")
-def post_answer(sid: str, text: str = Form(...)) -> dict[str, Any]:
+def post_answer(sid: str, request: Request, text: str = Form(...)) -> dict[str, Any]:
     _load(sid)
+    if len(text) > 2000:
+        raise HTTPException(400, "Answer is too long")
+    _guard_followup(request, sid)
     try:
         engine.answer(sid, text)
     except ValueError as e:
@@ -316,9 +331,10 @@ def post_answer(sid: str, text: str = Form(...)) -> dict[str, Any]:
 
 
 @app.post("/api/sessions/{sid}/retry")
-def post_retry(sid: str) -> dict[str, Any]:
+def post_retry(sid: str, request: Request) -> dict[str, Any]:
     """Run again a session that stopped on an error (busy AI service, dropped signal ...)."""
     _load(sid)
+    _guard_followup(request, sid)
     try:
         engine.retry(sid)
     except ValueError as e:
@@ -328,11 +344,14 @@ def post_retry(sid: str) -> dict[str, Any]:
 
 
 @app.post("/api/sessions/{sid}/steps/{n}/check")
-async def post_check(sid: str, n: int, photo: UploadFile = File(...)) -> dict[str, Any]:
+async def post_check(sid: str, n: int, request: Request, photo: UploadFile = File(...)) -> dict[str, Any]:
     _load(sid)
+    _guard_followup(request, sid)
     p = await _save_upload(photo, IMAGE_TYPES, MAX_PHOTO, ".jpg")
     try:
         return engine.check_step(sid, n, p)
+    except engine.LimitReached as e:
+        raise HTTPException(429, str(e))
     except ValueError as e:
         raise HTTPException(409, str(e))
     except OSError:  # not a readable picture: the owner should retake it, the service is fine
@@ -369,12 +388,14 @@ async def post_track(sid: str, n: int, frame: UploadFile = File(...)) -> dict[st
 
 
 @app.post("/api/sessions/{sid}/command")
-async def post_command(sid: str, text: str = Form(default=""), audio: UploadFile | None = File(default=None)) -> dict[str, Any]:
+async def post_command(sid: str, request: Request, text: str = Form(default=""), audio: UploadFile | None = File(default=None)) -> dict[str, Any]:
     """Hands-free fallback for phones without SpeechRecognition: a push-to-talk clip (or text) -> one command
     (next, back, repeat, check, broken, stop) or null. The clip is transcribed and deleted at once."""
     _load(sid)
     if len(text) > 200:
         raise HTTPException(400, "Command text is too long")
+    if audio is not None and audio.filename:  # typed commands never reach a model
+        _guard_followup(request, sid)
     p = await _save_upload(audio, AUDIO_TYPES, 2 * 1024 * 1024, ".webm") if audio is not None and audio.filename else None
     if p is None and not text.strip():
         raise HTTPException(400, "Say or type a command")
@@ -391,8 +412,11 @@ async def post_command(sid: str, text: str = Form(default=""), audio: UploadFile
 
 
 @app.post("/api/sessions/{sid}/replan")
-def post_replan(sid: str, report: str = Form(default="")) -> dict[str, Any]:
+def post_replan(sid: str, request: Request, report: str = Form(default="")) -> dict[str, Any]:
     _load(sid)
+    if len(report) > 2000:
+        raise HTTPException(400, "Report is too long")
+    _guard_followup(request, sid)
     try:
         return public(engine.replan(sid, report))
     except ValueError as e:

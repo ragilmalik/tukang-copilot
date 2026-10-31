@@ -56,7 +56,7 @@ Start on Free. Switching later is one click (step 14) and needs no redeploy of c
     - Other settings already in render.yaml: `MAX_TRACK_FRAMES` 120 (live camera frames per repair, about $0.30 of SAM at most), `TRACK_MIN_INTERVAL_S` 0.6 (at most ~1.6 frames a second), `DEMO_FALLBACK` 1 (a failing live call uses the labelled demo answer for that step so a judge never sees a dead end), `IMPACT_TOKEN` (optional, to download `/api/impact/outcomes.jsonl` with header `X-Impact-Token`).
     - Turn on open weights: set `USE_OPEN_WEIGHTS` to `1` and make sure `BASETEN_API_KEY` is filled.
     - Emergency switch if the live Meta API misbehaves during judging: set `MOCK` to `1`. The app keeps working on recorded demo answers at no cost. Set it back to `0` afterwards.
-    - Spend caps are already set: `MAX_COST_PER_SESSION_USD` 0.50 per repair, `DAILY_BUDGET_USD` 10 per 24 h for the whole site, `RATE_LIMIT_PER_HOUR` 30 new repairs per visitor. Also set a spend limit on dev.meta.ai → Billing.
+    - Spend caps are already set: `MAX_COST_PER_SESSION_USD` 0.50 per repair, `DAILY_BUDGET_USD` 10 per 24 h for the whole site, `RATE_LIMIT_PER_HOUR` 30 new repairs per visitor, `FOLLOWUP_RATE_PER_HOUR` 240 model calls inside repairs per visitor, `MAX_STEP_CHECKS` 40 photo checks per repair. Also set a spend limit on dev.meta.ai → Billing.
 
 ## Updates
 

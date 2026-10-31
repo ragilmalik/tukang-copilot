@@ -91,6 +91,7 @@ async function run(lang, sample) {
     } else {
       check(`${lang}/${sample}: no timer when no wait`, !tm || tm.classList.contains("hidden"));
     }
+    if (lang !== "en") check(`${lang}/${sample}: stage notes translated`, !/\btyped\b|\bsteps\b|safety stop|browser voice/.test(d.getElementById("stageList").textContent), d.getElementById("stageList").textContent);
     const ag = d.getElementById("agent");
     check(`${lang}/${sample}: agent log card visible`, ag && !ag.classList.contains("hidden"));
     const agRows = d.querySelectorAll("#agent .agList li").length;

@@ -36,6 +36,10 @@ services:
         value: "10"
       - key: RATE_LIMIT_PER_HOUR
         value: "30"
+      - key: FOLLOWUP_RATE_PER_HOUR
+        value: "240"
+      - key: MAX_STEP_CHECKS
+        value: "40"
       - key: MAX_DIAGRAMS
         value: "2"
       # Live camera guide: SAM 3.1 on about 1 frame per second, capped per repair

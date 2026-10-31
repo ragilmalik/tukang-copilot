@@ -87,6 +87,7 @@ const T_EXTRA = {
         ag_fallback: "Model live gagal setelah dicoba ulang: tahap {stage} memakai jawaban demo (diberi label)",
         ag_input_guard: "Ada kalimat berupa perintah di inputmu: diperlakukan sebagai data dan diabaikan",
         ag_outcome_fixed: "Kamu konfirmasi: sudah beres", ag_outcome_pro: "Kamu memilih membawa ke bengkel", ag_retry: "Mencoba ulang tahap yang gagal (ke-{n})",
+        note_typed: "diketik", note_stop: "dihentikan demi keselamatan", note_photo: "foto sudah cukup", note_browser: "suara browser", note_nocomp: "tidak ada bagian terlihat", note_steps: "{n} langkah",
         agCode: "kode", elapsed: "{n} dtk", qYes: "Ya", qNo: "Tidak", qUnsure: "Tidak tahu",
         tourProgress: "Demo: AI sedang bekerja. Tiap baris = satu model Meta atau aturan keselamatan.", tourAsk: "AI belum yakin, jadi ia bertanya. Ketuk salah satu jawaban.",
         tourResult: "Lihat bagian yang ditandai SAM 3.1 dan log 'Yang dilakukan AI'. Lalu centang daftar keselamatan untuk membuka langkah 1.",
@@ -110,6 +111,7 @@ const T_EXTRA = {
         ag_fallback: "Model live gagal sawise dijajal maneh: tahap {stage} nganggo wangsulan demo (ana labele)",
         ag_input_guard: "Ana ukara prentah ing inputmu: dianggep data lan ora digatekake",
         ag_outcome_fixed: "Sampeyan ngonfirmasi: wis rampung", ag_outcome_pro: "Sampeyan milih nggawa menyang bengkel", ag_retry: "Nyoba maneh tahap sing gagal (kaping {n})",
+        note_typed: "ditulis", note_stop: "dimandhegake kanggo keamanan", note_photo: "foto wis cukup", note_browser: "swara browser", note_nocomp: "ora ana perangan sing katon", note_steps: "{n} langkah",
         agCode: "kode", elapsed: "{n} dtk", qYes: "Iya", qNo: "Ora", qUnsure: "Ora ngerti",
         tourProgress: "Demo: AI lagi nyambut gawe. Saben baris = siji model Meta utawa aturan keamanan.", tourAsk: "AI durung yakin, mula takon. Tutul salah siji wangsulan.",
         tourResult: "Delengen perangan sing ditandhani SAM 3.1 lan log 'Sing ditindakake AI'. Banjur centhang dhaptar keamanan kanggo mbukak langkah 1.",
@@ -133,6 +135,7 @@ const T_EXTRA = {
         ag_fallback: "Live model failed after retries: {stage} used the labelled demo answer",
         ag_input_guard: "Your input contained instruction-like text: treated as data and ignored",
         ag_outcome_fixed: "You confirmed: it works now", ag_outcome_pro: "You chose to take it to a mechanic", ag_retry: "Retried the failed stage (#{n})",
+        note_typed: "typed", note_stop: "safety stop", note_photo: "photo is enough", note_browser: "browser voice", note_nocomp: "no visible parts", note_steps: "{n} steps",
         agCode: "code", elapsed: "{n} s", qYes: "Yes", qNo: "No", qUnsure: "Not sure",
         tourProgress: "Demo: the AI is working. Each line is one Meta model or safety rule.", tourAsk: "The AI isn't sure, so it asks. Tap an answer.",
         tourResult: "See the parts SAM 3.1 outlined and the 'What the AI did' log. Then tick the safety list to unlock step 1.",
@@ -338,7 +341,7 @@ function poll(id) {
 function renderProgress(s) {
   if (!$("stageList") || !s.stages) return;
   $("stageList").innerHTML = Object.entries(s.stages).map(([k, v]) =>
-    `<li class="${esc(v.status)}">${esc(t("stages")[k] || k)}${v.status === "skipped" ? "" : ` <code class="tool">${esc(stageTool(s, k))}</code>`}<span class="note">${esc(v.note || "")}</span></li>`).join("");
+    `<li class="${esc(v.status)}">${esc(t("stages")[k] || k)}${v.status === "skipped" ? "" : ` <code class="tool">${esc(stageTool(s, k))}</code>`}<span class="note">${esc(stageNote(v.note))}</span></li>`).join("");
   renderAgentLog(s, "agentLive"); tickElapsed(); updateTour();
   if ($("progressStatus")) {  // short screen-reader status instead of re-announcing the whole list
     const run = Object.entries(s.stages).find(([, v]) => v.status === "running");
@@ -929,6 +932,12 @@ function renderAgentLog(s, boxId) {
 }
 
 /* ---------------- progress: model per stage + elapsed time ---------------- */
+// Fixed stage notes come from the server in English; show them in the UI language (model text passes through).
+const NOTE_KEY = { typed: "note_typed", "safety stop": "note_stop", "photo is enough": "note_photo", "browser voice": "note_browser", "no visible components": "note_nocomp" };
+function stageNote(note) {
+  const n = String(note || ""), m = /^(\d+) steps$/.exec(n);
+  return m ? t("note_steps").replace("{n}", m[1]) : NOTE_KEY[n] ? t(NOTE_KEY[n]) : n;
+}
 const STAGE_TOOL = { listen: "listen", look: "look", segment: "segment", diagnose: "diagnose", plan: "plan", illustrate: "illustrate" };
 function stageTool(s, k) {
   const m = s.models || {};
