@@ -48,6 +48,7 @@ async function run(lang, sample) {
     check(`${lang}/${sample}: red stop box shown`, stopped);
     check(`${lang}/${sample}: no result page on red stop`, !shown("result"));
     check(`${lang}/${sample}: stop box has text`, d.getElementById("stopBox").textContent.trim().length > 40, d.getElementById("stopBox").textContent);
+    check(`${lang}/${sample}: stop box has the bengkel hand-off`, await until(() => !!d.querySelector('#stopHandoff a[href^="https://wa.me/"]'), 5000));
     w.close(); return;
   }
   if (sample === "motor") {  // the agent asks one follow-up question first
@@ -234,6 +235,12 @@ async function featureChecks(lang) {
   await sleep(400);
   check(`${lang}/voice: listening restarts after the browser stops it`, fake.started === 2, fake.started);
   w.doCommand("stop", "");
+  // bengkel hand-off on request
+  d.getElementById("mechBtn").click();
+  const ho = d.getElementById("handoff");
+  check(`${lang}/handoff: card shown on request`, await until(() => !ho.classList.contains("hidden"), 5000));
+  check(`${lang}/handoff: WhatsApp + Maps + PDF links`, !!ho.querySelector('a[href^="https://wa.me/?text="]') && !!ho.querySelector('a[href*="google.com/maps/search"]') && !!ho.querySelector('a[href$="/report.pdf"]'), ho.innerHTML.slice(0, 200));
+  check(`${lang}/handoff: translated`, !/hoWa|hoMaps|hoSub|undefined/.test(ho.textContent), ho.textContent);
   w.close();
 }
 

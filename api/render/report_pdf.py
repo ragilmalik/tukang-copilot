@@ -8,6 +8,7 @@ from typing import Any
 
 from PIL import Image, ImageDraw, ImageFont
 
+from .. import handoff
 from ..trace import build_trace
 
 W, H = 1240, 1754  # A4 at 150 dpi
@@ -44,6 +45,115 @@ LABELS: dict[str, dict[str, str]] = {
 LABELS["jv"] = dict(LABELS["id"], title="Laporan Ndandani", object="Barang", problem="Masalah", fix="Sing didandani", safety="Keslametan",
                     steps="Langkah", tools="Piranti", made="Digawe nganggo Tukang Copilot (Meta Muse Spark + SAM 3.1)",
                     outcome="Asil", o_fixed="Rampung: wis urip maneh (jarene sing duwe)", o_pro="Digawa menyang bengkel/teknisi")
+
+
+BRIEF: dict[str, dict[str, str]] = {
+    "id": {"title": "Ringkasan untuk mekanik", "sub": "Halaman ini bisa dicetak atau ditunjukkan ke bengkel supaya tidak mulai dari nol.",
+           "found": "Yang ditemukan", "issues": "Terlihat di foto", "causes": "Kemungkinan penyebab", "marked": "Bagian yang ditandai",
+           "tried": "Yang sudah dicoba", "nothing": "Belum ada: dihentikan sebelum mulai demi keselamatan.", "checks": "Cek kamera per langkah",
+           "pass": "OK", "fail": "BELUM", "status": "Status", "red": "STOP keselamatan", "exhausted": "Semua penyebab aman sudah dicoba",
+           "requested": "Pemilik minta bantuan mekanik", "photos": "Foto dari pemilik", "photo": "Foto", "check": "Cek langkah"},
+    "jv": {"title": "Ringkesan kanggo mekanik", "sub": "Kaca iki bisa dicithak utawa dituduhake menyang bengkel supaya ora miwiti saka nol.",
+           "found": "Sing ditemokake", "issues": "Katon ing foto", "causes": "Sebab sing mungkin", "marked": "Perangan sing ditandhani",
+           "tried": "Sing wis dijajal", "nothing": "Durung ana: dimandhegake sadurunge miwiti kanggo keslametan.", "checks": "Cek kamera saben langkah",
+           "pass": "OK", "fail": "DURUNG", "status": "Status", "red": "MANDHEG keslametan", "exhausted": "Kabeh sebab sing aman wis dijajal",
+           "requested": "Sing duwe njaluk bantuan mekanik", "photos": "Foto saka sing duwe", "photo": "Foto", "check": "Cek langkah"},
+    "en": {"title": "Mechanic brief", "sub": "Print this page or show it to the workshop so they don't start from zero.",
+           "found": "What was found", "issues": "Seen in the photo", "causes": "Likely causes", "marked": "Parts marked",
+           "tried": "What was tried", "nothing": "Nothing: stopped before starting, for safety.", "checks": "Camera check per step",
+           "pass": "OK", "fail": "NOT YET", "status": "Status", "red": "Safety STOP", "exhausted": "Every safe cause was tried",
+           "requested": "Owner asked for a mechanic", "photos": "Owner's photos", "photo": "Photo", "check": "Step check"},
+}
+
+
+def brief_lines(session: dict[str, Any], lang: str) -> list[tuple[str, str]]:
+    """The mechanic brief as (kind, text) rows: kind is h (heading), t (text), m (muted). Pure, so it is testable."""
+    B = BRIEF.get(lang, BRIEF["id"])
+    rep, dx = session.get("object_report") or {}, session.get("diagnosis") or {}
+    why = handoff.reason(session)
+    rows: list[tuple[str, str]] = [("m", B["sub"]), ("h", B["status"]), ("t", B[why])]
+    if why == "red" and session.get("stop_reason"):
+        rows.append(("t", str(session["stop_reason"])))
+    rows.append(("h", B["found"]))
+    obj, brand = str(rep.get("object") or ""), str(rep.get("brand_model_guess") or "")
+    if brand and brand.lower().split()[0] not in obj.lower():
+        obj = f"{obj} ({brand})".strip()
+    if obj:
+        rows.append(("t", obj))
+    if dx.get("problem_summary"):
+        rows.append(("t", str(dx["problem_summary"])))
+    if rep.get("visible_issues"):
+        rows.append(("m", f"{B['issues']}: " + "; ".join(str(x) for x in rep["visible_issues"])))
+    for c in dx.get("causes") or []:
+        ev = "; ".join(str(e) for e in c.get("evidence") or [])
+        rows.append(("t", f"- {c.get('title', '')} ({int(c.get('confidence') or 0)}%)" + (f": {ev}" if ev else "")))
+    marked = [f"{v.get('label')}. {v.get('name')}" for v in (session.get("parts") or {}).values() if v.get("found")]
+    if marked:
+        rows.append(("m", f"{B['marked']}: " + ", ".join(marked)))
+    rows.append(("h", B["tried"]))
+    done = handoff.tried(session, why)
+    rows += [("t", f"- {x}") for x in done] or [("t", B["nothing"])]
+    for a in session.get("history") or []:
+        rows.append(("m", f"  {a}"))
+    checks = session.get("checks") or {}
+    steps = (session.get("plan") or {}).get("steps") or []
+    tried_steps = [st for st in steps if checks.get(str(st.get("n")), {}).get("tries")]
+    if tried_steps:
+        rows.append(("h", B["checks"]))
+        for st in tried_steps:
+            last = checks[str(st["n"])]["tries"][-1]
+            mark = B["pass"] if last.get("passed") else B["fail"]
+            n_try = len(checks[str(st["n"])]["tries"])
+            rows.append(("t", f"{st['n']}. [{mark}] {st.get('instruction', '')}"))
+            rows.append(("m", f"   {last.get('observation', '')}" + (f" ({n_try}x)" if n_try > 1 else "")))
+    return rows
+
+
+def brief_photos(session: dict[str, Any], session_dir: Path, lang: str, limit: int = 6) -> list[tuple[Path, str]]:
+    """Owner's photos first, then the newest step-check photos, as (path, caption)."""
+    B = BRIEF.get(lang, BRIEF["id"])
+    out = [(session_dir / p, f"{B['photo']} {i}") for i, p in enumerate(session.get("photos") or [], 1)]
+    checks = []
+    for n, rec in (session.get("checks") or {}).items():
+        for t in rec.get("tries") or []:
+            checks.append((session_dir / str(t.get("photo")), f"{B['check']} {n}: {B['pass'] if t.get('passed') else B['fail']}"))
+    out += checks[::-1]
+    return [(p, c) for p, c in out if p.exists()][:limit]
+
+
+def _draw_brief(doc: _Doc, session: dict[str, Any], session_dir: Path, lang: str) -> None:
+    B = BRIEF.get(lang, BRIEF["id"])
+    doc._new_page()
+    doc.d.rectangle([0, 0, W, 14], fill=ORANGE)
+    doc.text(B["title"], 40, bold=True)
+    for kind, txt in brief_lines(session, lang):
+        if kind == "h":
+            doc.space(8)
+            doc.text(txt, 28, bold=True)
+        elif kind == "m":
+            doc.text(txt, 21, color=MUTED, indent=10)
+        else:
+            doc.text(txt, 24, indent=10)
+    pics = brief_photos(session, session_dir, lang)
+    if not pics:
+        return
+    doc.space(8)
+    doc.text(B["photos"], 28, bold=True)
+    cell_w, cell_h = (W - 2 * M - 30) // 2, 330
+    for i in range(0, len(pics), 2):
+        doc.need(cell_h + 40)
+        for j, (path, cap) in enumerate(pics[i:i + 2]):
+            try:
+                with Image.open(path) as src:
+                    pic = src.convert("RGB")
+            except OSError:
+                continue
+            pic.thumbnail((cell_w, cell_h))
+            x = M + j * (cell_w + 30)
+            doc.im.paste(pic, (x, doc.y))
+            doc.d.rectangle([x, doc.y, x + pic.width, doc.y + pic.height], outline=(200, 200, 205), width=2)
+            doc.d.text((x, doc.y + pic.height + 6), cap, font=_font(20), fill=MUTED)
+        doc.y += cell_h + 40
 
 
 def _font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
@@ -233,6 +343,7 @@ def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: 
             doc.text(f"- {L.get('st_' + r['stage'], r['stage'])}: {r['tool']}{secs}", 20, color=MUTED, indent=10)
     doc.rule()
     doc.text(L["disclaimer"], 22, color=MUTED)
+    _draw_brief(doc, session, session_dir, lang)
     pages = doc.finish()
     out.parent.mkdir(parents=True, exist_ok=True)
     pages[0].save(out, "PDF", resolution=150.0, save_all=True, append_images=pages[1:])

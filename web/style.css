@@ -99,3 +99,10 @@ h1:focus,h2:focus{outline:none}
 @keyframes vpulse{0%{box-shadow:0 0 0 0 rgba(214,40,40,.6)}70%{box-shadow:0 0 0 12px rgba(214,40,40,0)}100%{box-shadow:0 0 0 0 rgba(214,40,40,0)}}
 body.handsfree .nav .btn{min-height:64px;font-size:1.2em;flex:1}
 #pttBtn[aria-pressed="true"]{background:#d62828;color:#fff}
+
+/* bengkel hand-off card */
+.handoff{margin:10px 0;padding:10px 12px;border:2px solid #25d366;border-radius:12px;background:#f3fff7;color:var(--ink)}
+.hoTitle{font-weight:800;margin:0 0 4px}
+.hoBtns{display:flex;gap:8px;flex-wrap:wrap}.hoBtns .btn{text-decoration:none}
+.btn.wa{background:#25d366;color:#fff;font-weight:700}
+.hoText{white-space:pre-wrap;font-size:.85em;background:#fff;padding:8px;border-radius:8px;border:1px solid #e3e3e8}

@@ -19,7 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import __version__, errors, guard, shop
+from . import __version__, errors, guard, handoff, shop
 from .trace import build_trace
 from .pipeline import engine, media, mock, photos, track
 from .settings import ROOT, settings
@@ -309,6 +309,8 @@ async def post_check(sid: str, n: int, photo: UploadFile = File(...)) -> dict[st
         return engine.check_step(sid, n, p)
     except ValueError as e:
         raise HTTPException(409, str(e))
+    except OSError:  # not a readable picture: the owner should retake it, the service is fine
+        raise HTTPException(400, "Could not read that photo. Try a JPG or PNG.")
     except Exception as e:  # Meta API busy or offline: the photo is not lost, the person can simply retake it
         logging.getLogger("tukang").error("step check failed: %s", errors.detail(e))
         raise HTTPException(503, errors.friendly(e, _load(sid)["lang"]), headers={"Retry-After": "10"})
@@ -384,6 +386,14 @@ def post_outcome(sid: str, result: str = Form(...)) -> dict[str, Any]:
         raise HTTPException(409 if "plan" in str(e) else 422, str(e))
 
 
+@app.get("/api/sessions/{sid}/handoff")
+def get_handoff(sid: str, request: Request) -> dict[str, Any]:
+    """Bengkel hand-off card: WhatsApp summary (guide + PDF links), Google Maps search for the right workshop."""
+    s = _load(sid)
+    base = settings.public_base_url or str(request.base_url)
+    return handoff.build(s, base)
+
+
 @app.get("/api/sessions/{sid}/report")
 def get_report(sid: str) -> dict[str, Any]:
     _load(sid)
@@ -394,7 +404,7 @@ def get_report(sid: str) -> dict[str, Any]:
 def get_report_pdf(sid: str) -> FileResponse:
     """Printable repair report (A4 PDF): safety level, marked photo, steps with camera checks, tools, cost."""
     s = _load(sid)
-    if not s.get("diagnosis"):
+    if not s.get("diagnosis") and s.get("status") != "stopped":  # a safety stop before diagnosis still gets a stop report
         raise HTTPException(409, "The diagnosis is not ready yet")
     from .render import report_pdf
 

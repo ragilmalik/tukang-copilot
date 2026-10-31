@@ -24,7 +24,7 @@ TRANSCRIPTS = {
 
 def scenario(text: str, category: str = "") -> str:
     t = (text or "").lower() + " " + (category or "")
-    if re.search(r"\b(rice cooker|magic ?com|penanak|nasi|appliance)\b", t):
+    if re.search(r"\b(rice ?cooker\w*|magic ?com\w*|penanak|nasi|appliance)\b", t):
         return "rice"
     if re.search(r"\b(pompa|pump|shimizu|sanyo|panasonic pump|sumur|jet pump|foot valve|klep)\b", t):
         return "pump"
