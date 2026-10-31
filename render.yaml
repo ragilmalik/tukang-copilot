@@ -1,20 +1,56 @@
-# One-click deploy on Render (render.com -> New -> Blueprint -> pick this repo).
+# One-click deploy on Render: dashboard.render.com -> New -> Blueprint -> pick this repo. Step by step: docs/DEPLOY.md
+# Only two values are secret and asked for during setup: MODEL_API_KEY (needed for LIVE mode) and BASETEN_API_KEY (optional).
+# With no MODEL_API_KEY the app still deploys and runs in free DEMO mode.
 services:
   - type: web
     name: tukang-copilot
     runtime: docker
-    plan: starter
+    dockerfilePath: ./Dockerfile
+    # free = $0 but sleeps after 15 min idle (first visit then takes about a minute).
+    # starter = about $7/month, always awake: switch to it in Settings before judging/demo day if you want.
+    plan: free
+    region: singapore
+    branch: main
+    autoDeploy: true
     healthCheckPath: /health
     envVars:
+      # ---- secrets (Render asks for these; never put them in this file) ----
       - key: MODEL_API_KEY
         sync: false
       - key: BASETEN_API_KEY
         sync: false
-      - key: USE_OPEN_WEIGHTS
+      # ---- mode ----
+      - key: MOCK                       # 1 = demo answers only, no Meta spend (instant fallback if the live API misbehaves)
         value: "0"
+      - key: USE_OPEN_WEIGHTS           # 1 = diagnosis + plan on Muse Spark Open via Baseten (needs BASETEN_API_KEY)
+        value: "0"
+      # ---- spend caps (live mode only) ----
       - key: MAX_COST_PER_SESSION_USD
         value: "0.50"
-      - key: RATE_LIMIT_PER_HOUR
-        value: "30"
       - key: DAILY_BUDGET_USD
         value: "10"
+      - key: RATE_LIMIT_PER_HOUR
+        value: "30"
+      - key: MAX_DIAGRAMS
+        value: "2"
+      # Live camera guide: SAM 3.1 on about 1 frame per second, capped per repair
+      - key: MAX_TRACK_FRAMES
+        value: "120"
+      - key: TRACK_MIN_INTERVAL_S
+        value: "0.6"
+      # ---- behaviour ----
+      - key: ILLUSTRATE
+        value: "1"
+      - key: DIAGRAM_CHECKER
+        value: "1"
+      - key: NARRATION_VOICE
+        value: "1"
+      - key: MAX_CHECK_FAILS
+        value: "2"
+      # ---- storage and privacy ----
+      # The free plan has no disk, so photos live in /tmp and vanish on every restart/redeploy (fine: they are
+      # deleted after RETENTION_HOURS anyway). Shared guide links therefore last until the next restart.
+      - key: DATA_DIR
+        value: /tmp/tukang-data
+      - key: RETENTION_HOURS
+        value: "24"

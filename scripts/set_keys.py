@@ -62,7 +62,7 @@ def main(argv: list[str] | None = None) -> int:
         text = set_var(text, "BASETEN_API_KEY", bt)
         text = set_var(text, "USE_OPEN_WEIGHTS", "1")
     ENV.write_text(text, encoding="utf-8")
-    print(f"Saved to {ENV.name}. Checking the keys now...\n")
+    print(f"Saved to {ENV.name} (demo mode is now off). Checking the keys now...\n", flush=True)
     return subprocess.call(check, cwd=ROOT)
 
 

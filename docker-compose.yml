@@ -1,6 +1,18 @@
+# Local run that behaves like the Render deploy:  docker compose up --build  ->  http://localhost:8000
+# Without a .env file (or with no MODEL_API_KEY in it) the app runs in free demo mode.
 services:
   tukang:
     build: .
     ports: ["8000:8000"]
-    env_file: .env
-    volumes: ["./data:/app/data"]
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      PORT: "8000"
+      DATA_DIR: /app/data
+    volumes:
+      - tukang-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  tukang-data:
