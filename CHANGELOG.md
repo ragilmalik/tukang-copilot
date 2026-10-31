@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## v1.23.5
+- Test keeping the app version and CHANGELOG in sync.
+
 ## v1.23.4
 - Test locking the security headers on pages and errors.
 
