@@ -1,4 +1,4 @@
-# Tukang Copilot — Full Product, Technical & Documentation Spec
+# Tukang Copilot, Full Product, Technical & Documentation Spec
 Meta Global AI Developer Hackathon (Meta × Cerebral Valley) · Indie Developer track (solo) · Theme: **Push the Frontier** ("give a machine a new capability / understand and control a physical system"), secondary fit: Build for Your World
 Owner: Ragil Artza Rozaksyah ("Malik"), Semarang, Indonesia. Cerebral Valley account: ragilmalika.
 Malik is NOT a developer. The project agent writes 100% of the code and docs, from zero to a finished, deployed, submitted-ready project. Explain any manual step in plain words with exact clicks.
@@ -52,7 +52,7 @@ All model calls go through `meta_client.py` (single place for auth, retries, tim
 | 1 | Listen | Muse Voice Transcribe | audio → transcript, language |
 | 2 | Look | Muse Spark (vision) | photos + transcript + category → `ObjectReport` JSON: object, brand/model guess, visible components with approx. locations (point or box prompts), visible damage |
 | 3 | Find parts | SAM 3.1 | photo + point/box/text prompts from step 2 → masks per component; overlay rendered server-side (Pillow/OpenCV) with labels |
-| 4 | Diagnose | Muse Spark (reasoning) — toggle to Muse Spark Open on Baseten (`meta-models/muse-spark-open-1026`) via `USE_OPEN_WEIGHTS=true` | ObjectReport + transcript → `Diagnosis` JSON (causes, confidence, safety level, tools, parts, difficulty) |
+| 4 | Diagnose | Muse Spark (reasoning), toggle to Muse Spark Open on Baseten (`meta-models/muse-spark-open-1026`) via `USE_OPEN_WEIGHTS=true` | ObjectReport + transcript → `Diagnosis` JSON (causes, confidence, safety level, tools, parts, difficulty) |
 | 5 | Plan | Muse Spark | Diagnosis → `RepairPlan` JSON: ordered steps, each with target component id (→ mask), action, expected visual state, warnings, voice text |
 | 6 | Illustrate | Muse Image | for steps where the user's photo can't show the action (e.g., inside view), generate a clean instructional diagram consistent with the object; otherwise use the annotated real photo |
 | 7 | Narrate | Meta TTS if offered by Model API; else open-source TTS (document choice) | step voice text → audio |
@@ -147,7 +147,7 @@ Deliver a PDF bundle of README + SETUP_FOR_MALIK + SUBMISSION to Malik in the pr
 - 0:30–1:45 Live phone capture: photo + voice in Bahasa → parts highlighted on his own bike → diagnosis → 3 guided steps with "Check my step" ✅ and one ⚠️ correction → engine starts.
 - 1:45–2:15 Second quick case: water pump prime, or the rice cooker RED safety stop.
 - 2:15–2:45 Under the hood: diagram of Meta models (Voice Transcribe → Spark vision → SAM 3.1 masks → Spark plan → Muse Image → Spark verify), open-weights toggle on Muse Spark Open.
-- 2:45–3:00 Impact + close: "Tukang Copilot — every phone becomes a mechanic's apprentice." Repo + live link.
+- 2:45–3:00 Impact + close: "Tukang Copilot, every phone becomes a mechanic's apprentice." Repo + live link.
 Only show work built during the hackathon.
 
 ## 14. Prizes targeted & promotion
