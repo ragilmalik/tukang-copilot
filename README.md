@@ -22,7 +22,7 @@ Open http://localhost:8000 and tap **▶ Try the 1-tap demo**. It runs a full re
 | | |
 |---|---|
 | Live app | _add your Render URL here after deploy_ |
-| 3-min video | _add YouTube link_ · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:53, demo mode, captions + voice-over) |
+| 3-min video | _add YouTube link_ · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:57, demo mode, captions + voice-over) |
 | X post | _add link_ |
 | License | MIT |
 
@@ -51,7 +51,7 @@ All Meta calls go through one file, [`api/meta_client.py`](api/meta_client.py) (
 | **Live camera guide** | **Bengkel hand-off** | **Safety stop** | **Basa Jawa** |
 | ![live](docs/demo/screenshots/16_live_guide.png) | ![hand-off](docs/demo/screenshots/18_handoff.png) | ![stop](docs/demo/screenshots/11_rice_stop.png) | ![jawa](docs/demo/screenshots/20_javanese_result.png) |
 
-<sub>All 23 screenshots in [docs/demo/screenshots](docs/demo/screenshots) (demo mode, labelled stand-in photos).</sub>
+<sub>All 26 screenshots in [docs/demo/screenshots](docs/demo/screenshots) (demo mode, labelled stand-in photos).</sub>
 
 ---
 

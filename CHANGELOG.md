@@ -2,6 +2,14 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.23.0 (2026-10-31 WIB)
+Judges can now watch the agent think, tap through its decisions, and share a result that previews well.
+- **Streaming progress**: as each stage finishes, its result appears on the progress screen: what Muse Spark saw (object + parts), the photo with SAM 3.1's outlines, the top cause with confidence and safety level, then the step count. Server-Sent Events carry a trimmed `progress_view` (built from `public()`, so no owner words or raw errors); the polling fallback renders the same. In demo mode `MOCK_PACE` (default 0.6 s) holds each finished stage on screen during the first analysis only; it is never applied to live Meta calls or re-plans and never counted in a stage's timing.
+- **Agent log lines link to what they describe**: tap a line to scroll to and highlight the stage or streamed result (progress), or the photo, causes, safety list, hand-off or the exact camera-checked step (result and guide pages; the step card jumps back to that step). Checks from an earlier plan are not linked (`check` events now carry `cause`). Lines are real buttons; focus follows for keyboard users.
+- **Share card / link previews**: `GET /api/sessions/{id}/card.png` (1200×630: marked photo, object, top cause, safety badge, plan line, honest DEMO label; never the owner's words; 404 after erase). Guide pages carry Open Graph + `twitter:card` tags, the front page uses `web/og.png` (`scripts/make_og.py`, labelled stand-in photo). The Share button sends the object and cause with the link.
+- **Judge-audit fixes** (390×844, id/jv/en): the follow-up question is scrolled on screen when it appears (streaming had pushed it below the fold); gzip for static files (app.js 90 KB → ~29 KB; SSE not compressed); favicon (removes a console 404). Tip-bar-moves-up-while-typing (ffc24d8) verified in real Chromium with a new test.
+- Demo kit re-made: 26 screenshots (new: streaming progress, log jump, PDF agent-log page, share card), 2:57 voice-over video, 45 s vertical X clip (now with streaming progress and the share card), README GIF. Smoke test checks the share card and link-preview tags (65 checks). Service-worker cache `tukang-shell-v3`.
+
 ## 1.22.0 (2026-10-31 11:45 WIB)
 Judge-facing polish: the agent now shows its work, a 1-tap demo runs the whole loop, and the public deploy is harder to abuse.
 - **Agent log "🤖 What the AI did"**: every decision (look, mark parts, diagnose, ask under 60 %, plan, code safety gate, verify, re-plan, hand off) with the Meta model or code rule that made it and how long it took; loop strip on progress, result and the shared guide page. Never holds the owner's own words, so it is safe on a shared link. **The PDF report now prints the same log** (same wording as the app in id/jv/en; a test keeps the two in sync).

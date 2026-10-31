@@ -38,7 +38,7 @@ curl -N localhost:8000/api/sessions/d2b5d598d8c6/events
 data: {"status": "running", "stages": {...}, "question": null}
 data: {"status": "needs_answer", "stages": {...}, "question": "Apakah tercium bau bensin saat distarter?"}
 ```
-Closes when the status leaves `created`/`running`.
+Closes when the status leaves `created`/`running`. Since v1.23 each message is the trimmed `progress_view`: `status`, `stages`, `question`, `error`, `agent_log`, `models`, `files_base`, plus each stage's result as soon as it exists: `object_report` (object, model guess, component names), `parts_image` + `parts_found` (after SAM 3.1), `diagnosis` (summary, safety level, top 3 causes with confidence) and `plan_steps`. Built from the public session view, so it never carries the owner's own words or raw errors. Demo mode holds each finished stage on screen for `MOCK_PACE` seconds (default 0.6, first analysis only, never in live mode).
 
 ## `POST /api/sessions/{id}/answer` (form: `text`)
 Answers the follow-up question and resumes. 409 if the session isn't waiting.
@@ -72,6 +72,9 @@ curl -o report.pdf http://localhost:8000/api/sessions/$ID/report.pdf
 
 ## `GET /api/sessions/{id}/workshop.pdf`
 Large-print workshop sheets (A4) to pin up next to the job: a cover with the safety banner, the marked photo and a tick list of tools and parts, then one page per step (giant step number, instruction, warnings in a red box, what the camera should see, the step diagram or marked photo, a tick box) and a final "Done when" page. Session language. `409` while there is no plan (including a red safety stop), `404` for an unknown session.
+
+## `GET /api/sessions/{id}/card.png`, `GET /og.png`
+Link-preview cards (1200×630 PNG, Open Graph size). The session card shows the SAM-marked photo, the object, the most likely cause with confidence, the safety badge and a plan line (steps, minutes, DIY saving), plus "DEMO MODE" in demo mode; it never shows the owner's own words. `409` before the photo has been looked at, `404` for an unknown or erased session. `/guide/{id}` carries `og:*` and `twitter:card` tags pointing at it (absolute URL from `PUBLIC_BASE_URL`, else the request host); the front page points at `/og.png` (`web/og.png`, made by `scripts/make_og.py` from a labelled stand-in photo).
 
 ## `GET /manifest.webmanifest`, `GET /sw.js`
 PWA manifest and the app-shell service worker, served from the root so the app can be installed to the home screen. `404` if the file is missing.

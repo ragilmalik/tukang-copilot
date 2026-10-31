@@ -49,7 +49,7 @@ https://github.com/ragilmalik/tukang-copilot
 
 ### 8. 3-Minute Demo Video *
 ```
-[https://youtube.com/watch?v=…  — upload docs/demo/tukang-copilot-demo.mp4 (2:50) or the real-phone recording; Unlisted is fine, check it opens logged-out]
+[https://youtube.com/watch?v=…  — upload docs/demo/tukang-copilot-demo.mp4 (2:57) or the real-phone recording; Unlisted is fine, check it opens logged-out]
 ```
 
 ### 9. Describe your use of Meta products to build the submitted project *
@@ -101,10 +101,10 @@ Reply to your own post with the repo link and the live link (keeps the main post
 ## Bonus prizes we target (one line of evidence each)
 | Prize | Evidence |
 |---|---|
-| **Most Viral** ($20K) | 45 s vertical clip with Bahasa captions (docs/demo/tukang-copilot-x-vertical.mp4). A relatable hook ("motor mogok, bengkel tutup") and a draft post ready. |
+| **Most Viral** ($20K) | 45 s vertical clip with Bahasa captions (docs/demo/tukang-copilot-x-vertical.mp4). A relatable hook ("motor mogok, bengkel tutup") and a draft post ready. Every shared repair link unfurls as a preview card (Open Graph), so each share advertises the app. |
 | **Best Build on Open Weight Models** ($10K) | `USE_OPEN_WEIGHTS=1` runs diagnosis + plan on Muse Spark Open via Baseten. Tested end to end against a stand-in Baseten server (14 calls, smoke ALL PASSED), with a badge in the UI. |
-| **Community Vote** ($10K) | Solves an everyday Indonesian problem in Bahasa and Javanese, and anyone can try it free in demo mode from the live link. |
-| **Best Agentic Use-Case** ($5K) | A real multi-step loop: asks a follow-up when unsure → plans → verifies each step from a camera photo → re-plans for the next cause → escalates or hands off to a bengkel. The safety gate is enforced in code. The **agent-trace panel "🤖 What the AI did"** shows every decision with the Meta model (or code rule) that made it, live on the progress screen, on the result, and in the PDF report. The **1-tap demo** runs the whole loop in about a minute with no photo: question → plan → a rejected and an accepted check photo → re-plan. |
+| **Community Vote** ($10K) | Solves an everyday Indonesian problem in Bahasa and Javanese, and anyone can try it free in demo mode from the live link. A shared guide link previews as a card in WhatsApp/X (marked photo, likely cause, safety level; `/api/sessions/{id}/card.png`), and the front page has its own preview card. |
+| **Best Agentic Use-Case** ($5K) | A real multi-step loop: asks a follow-up when unsure → plans → verifies each step from a camera photo → re-plans for the next cause → escalates or hands off to a bengkel. The safety gate is enforced in code. The **agent-trace panel "🤖 What the AI did"** shows every decision with the Meta model (or code rule) that made it, live on the progress screen, on the result, and in the PDF report. Results **stream in** as each stage finishes (what it saw, the SAM 3.1 outlines, the top cause), and **every log line is tappable**: it jumps to the stage, photo or exact camera-checked step it describes. The **1-tap demo** runs the whole loop in about a minute with no photo: question → plan → a rejected and an accepted check photo → re-plan. |
 | **Best Creative Build** ($5K, Muse Image) | Muse Image edits the user's *own* photo into an instructional diagram, and Muse Spark reviews it and redraws a bad one. A creative use of image editing as a teaching tool. (Weakest claim: Muse Image is a supporting feature, not the core.) |
 
 ## Try it in 60 seconds (for the gallery / judges)

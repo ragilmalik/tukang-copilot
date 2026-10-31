@@ -10,10 +10,10 @@ for the submission; this one is the backup and the source of screenshots.
 
 | File | What |
 |---|---|
-| `tukang-copilot-demo.mp4` | 2:50 (170 s), 1920×1080, H.264 + AAC, English voice-over (edge-tts `en-US-AndrewNeural`), captions burned in. 19 scenes incl. live camera guide, hands-free, bengkel hand-off, stop PDF, Javanese, open weights |
+| `tukang-copilot-demo.mp4` | 2:57 (177 s, v1.23), 1920×1080, H.264 + AAC, English voice-over (edge-tts `en-US-AndrewNeural`), captions burned in. 22 scenes incl. streaming progress, agent-log jump, PDF agent log, share card, live camera guide, hands-free, bengkel hand-off, stop PDF, Javanese, open weights |
 | `tukang-copilot-demo.en.srt` | Captions (the voice-over text) as a separate subtitle file for YouTube |
-| `tukang-copilot-x-vertical.mp4` | 45 s, 1080×1920, silent with Bahasa captions, for the X post (hook, parts, live camera, check, hands-free, hand-off, STOP, models, close) |
-| `screenshots/01…22_*.png` | Phone screenshots (390×844 @2x) of every stage: home, progress, follow-up question, diagnosis, SAM parts, step, ⚠ check, ✓ check, re-plan, pump, rice-cooker STOP, report/PDF, English, Basa Jawa + garage, **15** safety tick list, **16** live camera guide, **17** hands-free listening, **18** bengkel hand-off, **19** stop report PDF page, **20** Javanese result, **21** open-weights badge, **22** stop card hand-off |
+| `tukang-copilot-x-vertical.mp4` | 45 s, 1080×1920, silent with Bahasa captions, for the X post (hook, streaming progress, parts, live camera, check, share card, STOP, models, close) |
+| `screenshots/01…26_*.png` | 23 = agent log, 24 = tap a log line → that step, 25 = PDF agent-log page, 26 = share card (link preview, 1200×630).  Phone screenshots (390×844 @2x) of every stage: home, progress, follow-up question, diagnosis, SAM parts, step, ⚠ check, ✓ check, re-plan, pump, rice-cooker STOP, report/PDF, English, Basa Jawa + garage, **15** safety tick list, **16** live camera guide, **17** hands-free listening, **18** bengkel hand-off, **19** stop report PDF page, **20** Javanese result, **21** open-weights badge, **22** stop card hand-off |
 | `voice/*.mp3` | One voice-over clip per scene (inputs to the video) |
 | `../img/architecture.png` | Architecture diagram used in the video and README |
 
