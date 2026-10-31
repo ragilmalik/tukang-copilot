@@ -741,7 +741,16 @@ function setupResult() {
     const url = location.origin + "/guide/" + S.id;
     const dx = (S && S.diagnosis) || {}, c = (dx.causes || [])[S.cause_index || 0] || (dx.causes || [])[0];
     const text = [S.object_report && S.object_report.object, c && c.title].filter(Boolean).join(": ");  // the link preview card shows the rest
-    if (navigator.share) { try { await navigator.share({ title: "Tukang Copilot", text, url }); return; } catch (_) {} }
+    if (navigator.share) {
+      try {
+        const cr = await fetch(`/api/sessions/${S.id}/card.png`);
+        if (cr.ok && navigator.canShare) {
+          const files = [new File([await cr.blob()], "tukang-copilot.png", { type: "image/png" })];
+          if (navigator.canShare({ files })) { await navigator.share({ title: "Tukang Copilot", text, url, files }); return; }
+        }
+      } catch (e) { if (e && e.name === "AbortError") return; }
+      try { await navigator.share({ title: "Tukang Copilot", text, url }); return; } catch (_) {}
+    }
     try { await navigator.clipboard.writeText(url); alert(t("copied")); } catch (_) { prompt("Link", url); }
   });
   on("eraseBtn", "click", () => {

@@ -2,6 +2,9 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## v1.23.1
+- Share button now attaches the result card image via Web Share files when the phone supports it, link fallback otherwise.
+
 ## 1.23.0 (2026-10-31 WIB)
 Judges can now watch the agent think, tap through its decisions, and share a result that previews well.
 - **Streaming progress**: as each stage finishes, its result appears on the progress screen: what Muse Spark saw (object + parts), the photo with SAM 3.1's outlines, the top cause with confidence and safety level, then the step count. Server-Sent Events carry a trimmed `progress_view` (built from `public()`, so no owner words or raw errors); the polling fallback renders the same. In demo mode `MOCK_PACE` (default 0.6 s) holds each finished stage on screen during the first analysis only; it is never applied to live Meta calls or re-plans and never counted in a stage's timing.
