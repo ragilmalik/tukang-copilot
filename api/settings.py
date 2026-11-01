@@ -83,6 +83,18 @@ class Settings:
     max_track_frames: int = field(default_factory=lambda: int(_env("MAX_TRACK_FRAMES", default="120")))
     track_min_interval_s: float = field(default_factory=lambda: float(_env("TRACK_MIN_INTERVAL_S", default="0.6")))
 
+    # WhatsApp channel (api/channels/whatsapp.py, docs/WHATSAPP.md). Off unless all four are set.
+    wa_token: str = field(default_factory=lambda: _env("WA_TOKEN"))
+    wa_phone_number_id: str = field(default_factory=lambda: _env("WA_PHONE_NUMBER_ID"))
+    wa_verify_token: str = field(default_factory=lambda: _env("WA_VERIFY_TOKEN"))
+    wa_app_secret: str = field(default_factory=lambda: _env("WA_APP_SECRET"))
+    wa_graph_base: str = field(default_factory=lambda: _env("WA_GRAPH_BASE", default="https://graph.facebook.com").rstrip("/"))
+    wa_graph_version: str = field(default_factory=lambda: _env("WA_GRAPH_VERSION", default="v26.0"))
+    wa_debounce_s: float = field(default_factory=lambda: float(_env("WA_DEBOUNCE_S", default="2")))
+    # The WhatsApp simulator page (/wa) always runs in demo mode; WA_SIM=1 also allows it with a live key.
+    wa_sim: bool = field(default_factory=lambda: _flag("WA_SIM"))
+    wa_sim_rate_per_hour: int = field(default_factory=lambda: int(_env("WA_SIM_RATE_PER_HOUR", default="120")))
+
     # Storage and web
     data_dir: Path = field(default_factory=lambda: Path(_env("DATA_DIR", default=str(ROOT / "data"))))
     public_base_url: str = field(default_factory=lambda: _env("PUBLIC_BASE_URL").rstrip("/"))
