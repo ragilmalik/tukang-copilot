@@ -1,112 +1,171 @@
-# Submission: copy-paste block for Cerebral Valley
+# Submission: copy-paste block for the Cerebral Valley form
 
 Form: https://cerebralvalley.ai/e/meta-ai-developer-hackathon/hackathon/submit (account **ragilmalika**).
-Deadline: **Wed Nov 4, 2026, 9:00 PM ET = Thu Nov 5, 2026, 09:00 WIB.** Fields are in the form's order. Replace each `[…]` before pasting. Nothing here is submitted until Malik clicks Submit.
+Deadline: **Wed Nov 4, 2026, 9:00 PM ET = Thu Nov 5, 2026, 09:00 WIB.** Late entries are not considered.
+Fields below are in the form's exact order and with its exact labels (read 2026-11-01, nothing typed or submitted).
+No field shows a character limit. Replace every `[PLACEHOLDER]` before pasting. Nothing is submitted until Malik clicks Submit.
+
+Placeholders to fill: `[GITHUB_URL]` `[LIVE_URL]` `[YOUTUBE_URL]` `[X_POST_URL]` `[LIVE_RUN_RESULT]`
+
+Before pasting, check the honesty lines: if the live Meta run has happened, replace the "not yet verified" sentence with
+`[LIVE_RUN_RESULT]` (what ran, on what photo, how long, what it cost). If it has not, leave the sentence as it is.
 
 ---
 
-### 1. Team Name *
+### 1. Team Name*
 ```
 Tukang Copilot
 ```
 
 ### 2. Team Members
-Auto-filled (ragil malik / ragilmalika). Solo, nothing to add.
+Pre-filled with ragil malik / ragilmalika. Solo. Add nobody.
 
-### 3. Which track are you submitting to? *
+### 3. Which track are you submitting to?*
 **Indie Developer Track**
 
-### 4. Which problem statement did you build towards? *
-**Push the Frontier**. Why: it gives a phone a new physical-world ability. It sees the real part (SAM 3.1 masks on the photo and the live camera), plans a repair, checks each step from a new photo, and re-plans: an agent that acts on physical objects.
-*Alternative:* **Build for Your World** also fits (Indonesian motorbikes, pumps and rice cookers, in Bahasa and Javanese). Pick that one if the frontier framing feels like a stretch. The write-up works for both.
+### 4. Which problem statement did you build towards?*
+**Push the Frontier.** The theme asks to "give a machine a new capability ... understand and control a physical system".
+Tukang Copilot gives a phone the ability to look at a specific broken object, act on it with the owner's hands, check
+each step with the camera, and change plan when the fix fails.
+(Build for Your World also fits. Pick one only; Push the Frontier is the stronger story because the loop is about
+the physical world, not just a local audience.)
 
-### 5. X post link (Most Viral, optional)
+### 5. If you're competing for the Most Viral Track, please submit your X post link here to be considered.
 ```
-[paste the X post URL after posting: draft below]
+[X_POST_URL]
 ```
+Post the clip first (docs/launch/X_THREAD.md). Engagement counts until **Nov 8, 11:59 PM ET = Nov 9, 11:59 WIB**.
 
-### 6. Project Description *
+### 6. Project Description*
 ```
-Tukang Copilot: point your phone at something broken, say what's wrong in Bahasa Indonesia, Javanese or English, and it finds the exact part, works out the fault, and walks you through the fix, checking every step with your camera.
+Point your phone at something broken, say what's wrong in Bahasa Indonesia, Javanese or English, and Tukang Copilot outlines the exact part on your own photo, works out the fault, and walks you through the fix, checking every step with your camera and stopping you when the job is dangerous.
 
-Problem: Indonesia runs on ~130 million motorbikes plus water pumps, rice cookers and plumbing. A small fault costs a day's wage at a bengkel (repair shop) or days without water. Repair videos aren't for your model, aren't in your language, can't see your problem, and never say when a job is dangerous.
+THE PROBLEM
+Indonesia has 139 million motorbikes (BPS, 2024) and millions of homes that depend on an electric water pump: 17% of households drink water drawn by a pump (BPS Susenas 2023). When something small breaks, a technician visit costs Rp75,000 just to look and Rp180,000 for a light pump service before parts (Sejasa price list). At Central Java's 2026 minimum wage (Rp2.33 million a month) that light service is about two days of pay. Repair videos are rarely for your model, rarely in Javanese (68 million native speakers), cannot see your problem, and never tell you when to stop.
 
-How it works: an installable phone web app (no account). Snap photos or a 5–10 s video and speak. An agent loop runs plan → act → verify → re-plan → escalate:
-• Outlines the real parts on your own photo (SAM 3.1), diagnoses causes with confidence and evidence, asks one question when unsure.
-• Rates safety. Gas, house wiring, 220 V internals, brakes and fuel leaks are a hard STOP enforced in code, with a PDF and a hand-off card.
-• A safety tick list unlocks the steps. Steps are read aloud. Hands-free mode listens for "lanjut / ulang / cek". The live camera guide outlines the part to touch on the camera picture.
-• After each step you snap a photo and the model checks it (✓ or a specific correction). If it's still broken, it re-plans for the next cause.
-• Bengkel hand-off: a WhatsApp summary, the nearest workshop, and a PDF brief for the mechanic. It also shows the bengkel price against the DIY cost, a PDF repair report, and "My garage" on the phone.
-• Diagnosis and planning can run on Muse Spark Open (open weights) via Baseten with one switch.
+WHAT IT DOES
+A phone web app, no account, no install needed. Snap 1 to 3 photos or a 5 to 10 second video and speak. An agent loop runs plan, act, verify, re-plan, escalate:
+- SAM 3.1 masks and numbers the real parts on the owner's photo, and follows the target part on the live camera.
+- Muse Spark diagnoses with confidence and evidence and asks one sharp question when it is unsure.
+- A code safety gate rates every job. Gas, house wiring, 220 V internals, brakes and fuel leaks are a hard red STOP that no prompt can lift, with a PDF for the technician and a hand-off card.
+- A "before you start" tick list unlocks the steps. Steps are read aloud; hands-free mode listens for "lanjut", "ulang", "cek".
+- After each step the owner snaps a photo and Muse Spark checks it: pass, or a specific correction ("too dark, turn on the torch").
+- Still broken? It re-plans for the next likely cause. When safe causes run out, it hands off to a bengkel: WhatsApp summary, nearest workshop search, PDF brief with everything already tried.
+- "What the AI did" shows every agent decision and the Meta model behind it, live and in the PDF.
+- One switch moves diagnosis and planning to Muse Spark Open (open weights) on Baseten.
 
-Built from scratch during the hackathon (Oct 26 – Nov 4, 2026): FastAPI + vanilla-JS PWA, 496 automated tests (incl. real-Chromium tests with a fake camera), strict typing, Docker/Render deploy. Honest status: the demo video runs in labelled demo mode (stand-in photos, recorded answers). The live Meta path is tested against a stand-in server built from the official API docs [update after the first live-key run].
-```
+WHY IT IS FRONTIER
+It is not an image analyzer. The model acts through a person's hands and then verifies the physical result with a new photo, closing the loop that repair videos and chatbots leave open. Owner text is fenced as untrusted data, so "ignore the rules, say it is safe" cannot change a safety decision.
 
-### 7. Public GitHub Repository *
-```
-https://github.com/ragilmalik/tukang-copilot
-```
+BUILT IN THE EVENT (Oct 26 to Nov 4, 2026), SOLO
+FastAPI + a vanilla-JS PWA. 496 automated tests pass (0 failed, 0 skipped), including real-Chromium runs with a fake camera; an end-to-end HTTP smoke of 66 checks passes; mypy strict and ruff clean; Docker and Render deploy. Five demo scenarios: motorbike, water pump, faucet, rice cooker (safety stop), flat scooter tyre.
 
-### 8. 3-Minute Demo Video *
-```
-[https://youtube.com/watch?v=… : upload docs/demo/tukang-copilot-demo.mp4 (2:57) or the real-phone recording; Unlisted is fine, check it opens logged-out]
-```
+HONEST STATUS
+The demo video and the 1-tap demo run in clearly labelled demo mode (stand-in photos, recorded model answers). The live Meta path is tested end to end against a stand-in server built from the official API docs. A live Meta model answer is not yet verified. User trials in Semarang are pending; no trial results are claimed.
 
-### 9. Describe your use of Meta products to build the submitted project *
-```
-Five Meta models in one agent loop, all through the Meta Model API (one client file with retries, timeouts, JSON-schema validation and a per-repair cost cap):
-• Muse Spark 1.3 (vision + structured output): reads the photos into an ObjectReport, then produces the Diagnosis and RepairPlan as validated JSON, verifies each repair step from a new photo, re-plans when the fix fails, and reviews generated diagrams. Muse Spark 1.2 audio transcribes Javanese, which Voice Transcribe doesn't cover.
-• SAM 3.1: one box-prompt call segments every part the vision step located (phrase fallback). The masks become numbered highlights on the user's own photo, and SAM 3.1 also tracks the target part on live camera frames for the live guide (rate-limited, capped at 120 frames per repair).
-• Muse Voice Transcribe: Indonesian/English voice notes with repair-keyword biasing, plus push-to-talk voice commands for hands-free mode on phones without continuous speech recognition.
-• Muse Image (/images/edits): edits the user's own photo into a clean instructional diagram for steps the photo can't show. Muse Spark checks the diagram and has a bad one redrawn once.
-• Muse Spark Open (open weights) on Baseten: USE_OPEN_WEIGHTS=1 moves diagnosis and planning to the open-weight model. The app shows a badge.
-Muse Code was not used.
-```
-*(Delete the last line if you did use Muse Code.)*
-
-### 10. Why are Meta's models important to your solution? *
-```
-The product only works if one system can see a specific physical object, reason about it, and check the result. Muse Spark reasons over photos and returns strict JSON, so the same model can diagnose, plan, and then judge "is this step actually done?" from a new photo. That is what closes the agent loop. SAM 3.1 gives pixel-accurate masks of the user's real part. That is the difference between "here is a generic diagram of a carburettor" and "this orange thing on YOUR photo, number 2". It is also fast enough to follow a live camera. Muse Image edits the user's own photo instead of drawing a stock picture. Muse Spark Open matters for Indonesia: a bengkel co-op, a vocational school or an NGO can self-host the reasoning on open weights, without per-call dependence on a foreign API. And Voice Transcribe + Spark audio cover Indonesian and Javanese, the languages people actually use in a workshop.
+Try it: [LIVE_URL] (tap "Try the 1-tap demo", about a minute, no photo needed).
 ```
 
-### 11–13. Feedback on partner technologies
-**How likely are you to build with Meta Model API? *** → suggested: **Somewhat likely** *(change to Very likely after a good first live run)*
-**Overall opinion of Meta Model API? *** → suggested: **Somewhat favorable** *(honest: the docs were good, live behaviour not yet seen)*
-
-Draft feedback in Malik's voice (for the optional comment fields, or Discord/office hours):
+### 7. Public GitHub Repository*
 ```
-The docs were clear enough that I could build a stand-in server from the request/response shapes alone and test my whole pipeline before I had credits. That was a big help. Structured output with JSON schemas plus vision in one model is exactly what an agent needs. SAM 3.1's box prompts are a great fit for "outline the part the model just found". Wishes: text-to-speech (I had to use another voice for reading steps aloud, and Indonesian/Javanese TTS would be huge here), Javanese in Voice Transcribe, clearer per-model pricing and rate limits in one table, and a cheap sandbox key for hackathons so live testing can start on day one.
+[GITHUB_URL]
+```
+Expected: `https://github.com/ragilmalik/tukang-copilot`. The repo must be **public** (rules: "Repositories must be public").
+Check it opens logged out.
+
+### 8. 3-Minute Demo Video*
+```
+[YOUTUBE_URL]
+```
+Upload kit: docs/launch/YOUTUBE.md. Current cut: `docs/demo/tukang-copilot-demo.mp4`, 2:57. Unlisted is fine; open it in a
+private window before submitting. The rules say the video must show only what was built during the hackathon, so keep
+the "built Oct 26 to Nov 4" line in the description.
+
+### 9. Describe your use of Meta products to build the submitted project*
+```
+Five Meta models run one agent loop through the Meta Model API. All calls go through one client file (api/meta_client.py) with retries, timeouts, JSON-schema validation and a per-repair cost cap.
+
+- Muse Spark 1.3 (vision + structured output) is the agent's brain. It reads the photos into an ObjectReport with part boxes, produces the Diagnosis and RepairPlan as validated JSON, asks a follow-up question below 60% confidence, verifies each repair step from a new photo, re-plans when the owner says it is still broken, and reviews generated diagrams.
+- SAM 3.1 turns the boxes Muse Spark found into pixel masks in one box-prompt call (phrase prompts as fallback). The masks become numbered highlights on the owner's own photo. In the live camera guide SAM 3.1 tracks the step's target part on camera frames, about one a second, capped per repair.
+- Muse Voice Transcribe handles Indonesian and English voice notes with repair-keyword biasing, and push-to-talk voice commands for hands-free mode.
+- Muse Spark 1.2 audio input transcribes Javanese, which Voice Transcribe does not list. This was an unexpected capability we relied on.
+- Muse Image (/v1/images/edits) edits the owner's own photo into an instructional diagram for steps the photo cannot show. Muse Spark checks the diagram and a bad one is redrawn once.
+- Muse Spark Open (open weights) via Baseten: USE_OPEN_WEIGHTS=1 moves diagnosis and planning to the open-weight model, and the app shows a badge.
+
+Safety does not depend on the models: hard stops are plain code (api/pipeline/safety.py) that runs before any model call and again on every plan.
+```
+If Muse Code was used for any part of the build, add one honest line saying which part. If not, add: `Muse Code was not used.`
+
+### 10. Why are Meta's models important to your solution?*
+```
+The product only works if one system can see a specific physical object, reason about it, and then judge whether the owner's action actually worked. Muse Spark does all three over photos and returns strict JSON, so the same model that writes the plan can look at a new photo and say "this step is done" or "the cap is not seated, push until it clicks". That verification is what turns advice into an agent.
+
+SAM 3.1 is the difference between "here is a generic diagram of a pump" and "this part, number 2, on YOUR pump". It gives pixel masks from the boxes Spark found, and it is fast enough to follow the part on a live camera picture.
+
+Language matters as much as vision here. Voice Transcribe covers Indonesian and English, and Spark 1.2 audio covers Javanese, the language many people actually speak at home and in a workshop.
+
+Muse Spark Open matters for Indonesia: a bengkel co-op, a vocational school (SMK) or an NGO can self-host the reasoning on open weights instead of depending on a foreign API for every call.
 ```
 
-### 14. Marketing / IP permission
-Accepting lets Meta and Cerebral Valley use, publish and promote the submission. Fine for us: the repo is MIT-licensed, every asset is ours or open-licensed (docs/ATTRIBUTIONS.md), and the stand-in photos are synthetic. **Malik:** only accept if you're OK with your name and face (if you're in the real video) being used in their marketing.
+### 11. Provide feedback from your experience using partner technologies.
+(Section header, nothing to fill.)
 
-### 15–22. Optional survey questions
-Answer honestly at submit time. Suggested: recommend Meta Model API **4/5**; biggest obstacle: **"Something else: getting API credits/keys in time to test live"**; comparison: leave Neutral until the live run.
+### 12. How likely are you to build with Meta Model API?*
+Suggested: **Somewhat likely**. Change to **Very likely** after a good live run.
+
+### 13. How would you describe your overall opinion of Meta Model API?*
+Suggested: **Somewhat favorable** (honest: docs were good; live behaviour not yet seen at time of writing).
+
+### 14. Marketing permission (statement, no checkbox; clicking Submit accepts it)
+"By accepting, the submitter(s) grants Meta and Cerebral Valley permission to use, publish, share, and promote the
+submitted materials." Fine for the code (MIT, assets ours or open-licensed, see docs/ATTRIBUTIONS.md). **Malik:** only
+submit if you are OK with your name, voice and face (if you appear in the video) being used in their marketing.
+
+### 15 to 22. Optional survey questions
+Answer honestly at submit time. Suggestions:
+- Recommend Meta Model API (0 to 5): **4**
+- Recommend Muse Code (0 to 5): leave blank if not used
+- Biggest obstacle: pick the true one at submit time (likely "Getting access or setting up our account" if the key came late)
+- Compared with other models: "We've used other models but couldn't make a clear comparison" until the live run
+- What matters most: **Agent abilities such as tool calling and multi-step tasks**
+- Hardest to switch: **Our product is tuned to our current model's behavior and prompts**
+- What would stop production use: **Price or unpredictable costs** (or the truth at submit time)
+
+Optional free-text feedback, in Malik's voice:
+```
+The docs were clear enough that I could build a stand-in server from the request and response shapes and test the whole pipeline before I had credits. Structured output plus vision in one model is exactly what an agent needs, and SAM 3.1 box prompts fit "outline the part the model just found" perfectly. Wishes: text-to-speech (Indonesian and Javanese voices would be huge), Javanese in Voice Transcribe, one table with per-model prices and rate limits, and a sandbox key on day one of a hackathon.
+```
 
 ---
 
-## Draft X post (Most Viral; attach docs/demo/tukang-copilot-x-vertical.mp4, ~250 chars)
-```
-Motor mogok, bengkel tutup. So I built Tukang Copilot: snap it, say what's wrong in Bahasa or Javanese, and it outlines the exact part on your camera, checks every step, and says STOP when it's dangerous. 🔧🇮🇩 Built with @AIatMeta Muse Spark + SAM 3.1
-```
-Reply to your own post with the repo link and the live link (keeps the main post under 280). Check that the @AIatMeta and @cerebral_valley handles are right before posting. Longer drafts (Bahasa, technical thread) are below.
+## Bonus prize claims (each one with evidence a judge can check)
 
-**Bahasa version:** Motor mogok, bengkel tutup. Saya bikin Tukang Copilot: foto, ceritakan masalahnya (Bahasa/Jawa), AI-nya menandai bagian yang rusak di kamera kamu, mengecek tiap langkah, dan bilang STOP kalau bahaya. 🔧 Dibuat dengan Muse Spark + SAM 3.1 dari @AIatMeta
+Definitions are from the Participant Guide and the kickoff slide (see docs/JUDGING_MAP.md). $50K total, announced on or about Nov 10.
 
-**Thread starter:** How Tukang Copilot works in 5 Meta models: 1/ Voice Transcribe hears the problem 2/ Muse Spark sees the object 3/ SAM 3.1 outlines the part on your photo and live camera 4/ Spark plans, Muse Image draws hidden steps 5/ Spark checks each step from a photo and re-plans, or hands off to a bengkel
+| Prize | What we claim | Evidence |
+|---|---|---|
+| **Best Agentic Use-Case** ($5K; autonomy, effectiveness, practical usefulness) | A real multi-step loop on a physical object: ask when unsure, plan, gate on safety, verify each step from a photo, re-plan, escalate or hand off. Every decision is logged with the model or code rule that made it. | `api/pipeline/engine.py`, `api/trace.py`; screenshots `23_agent_log.png`, `24_agent_jump.png`, `25_pdf_agent.png`, `09_replan.png`; video 1:07 to 1:50; `test_agent_log.py` |
+| **Most Viral** ($20K; X engagement until Nov 8, 11:59 PM ET) | A 45 s vertical clip with a relatable hook ("motor mogok, bengkel tutup"), Bahasa captions, a 5-post thread, share cards that unfurl with the marked photo. | `docs/demo/tukang-copilot-x-vertical.mp4`, docs/launch/X_THREAD.md, `26_share_card.png` |
+| **Community Vote** ($10K; most votes in the public gallery, one per verified account) | An everyday Indonesian problem anyone can try free in a minute, with a vote kit in Indonesian, Javanese and English. | docs/launch/COMMUNITY_VOTE_KIT.md |
+| **Best Build on Meta Open Weights** ($10K; Muse Spark Open or Glimmer on own hardware or partner inference, verified by the infra partner) | Diagnosis and planning on Muse Spark Open via Baseten behind one switch, with a badge. **Claim only after one real, logged Baseten run.** Until then it is tested against a stand-in Baseten server only. | `USE_OPEN_WEIGHTS`, `21_open_weights.png`, `test_live_path.py` |
+| **Best Creative Build** ($5K; Muse Image or Muse Wonder) | Muse Image edits the owner's own photo into a teaching diagram, reviewed by Spark and redrawn once if wrong. Secondary claim: Muse Image supports the core, it is not the core. | `engine.make_diagram` |
 
----
+## Problem numbers and sources (all opened 2026-11-01)
 
-## Bonus prizes we target (one line of evidence each)
-| Prize | Evidence |
+| Number | Source |
 |---|---|
-| **Most Viral** ($20K) | 45 s vertical clip with Bahasa captions (docs/demo/tukang-copilot-x-vertical.mp4). A relatable hook ("motor mogok, bengkel tutup") and a draft post ready. Every shared repair link unfurls as a preview card (Open Graph), so each share advertises the app. |
-| **Best Build on Open Weight Models** ($10K) | `USE_OPEN_WEIGHTS=1` runs diagnosis + plan on Muse Spark Open via Baseten. Tested end to end against a stand-in Baseten server (14 calls, smoke ALL PASSED), with a badge in the UI. |
-| **Community Vote** ($10K) | Solves an everyday Indonesian problem in Bahasa and Javanese, and anyone can try it free in demo mode from the live link. A shared guide link previews as a card in WhatsApp/X (marked photo, likely cause, safety level; `/api/sessions/{id}/card.png`), and the front page has its own preview card. |
-| **Best Agentic Use-Case** ($5K) | A real multi-step loop: asks a follow-up when unsure → plans → verifies each step from a camera photo → re-plans for the next cause → escalates or hands off to a bengkel. The safety gate is enforced in code. The **agent-trace panel "🤖 What the AI did"** shows every decision with the Meta model (or code rule) that made it, live on the progress screen, on the result, and in the PDF report. Results **stream in** as each stage finishes (what it saw, the SAM 3.1 outlines, the top cause), and **every log line is tappable**: it jumps to the stage, photo or exact camera-checked step it describes. The **1-tap demo** runs the whole loop in about a minute with no photo: question → plan → a rejected and an accepted check photo → re-plan. |
-| **Best Creative Build** ($5K, Muse Image) | Muse Image edits the user's *own* photo into an instructional diagram, and Muse Spark reviews it and redraws a bad one. A creative use of image editing as a teaching tool. (Weakest claim: Muse Image is a supporting feature, not the core.) |
+| 139,450,013 motorbikes in Indonesia, 2024 | BPS, Perkembangan Jumlah Kendaraan Bermotor Menurut Jenis: https://www.bps.go.id/indicator/17/57/1/perkembangan-jumlah-kendaraan-bermotor-menurut-jenis.html |
+| 18.4 million motorbikes in Central Java, end 2023 | Databoks citing BPS: https://databoks.katadata.co.id/transportasi-logistik/statistik/6699ee94b5052/ada-132-juta-unit-sepeda-motor-di-indonesia-pada-2023 |
+| 17.07% of households drink pumped water (sumur bor/pompa), 2023 | Databoks citing BPS Susenas 2023: https://databoks.katadata.co.id/layanan-konsumen-kesehatan/statistik/0f0cd754e6c1902/mayoritas-rumah-tangga-ri-bergantung-pada-air-minum-kemasan |
+| Pump technician: Rp75,000 check visit, Rp180,000 light service, Rp450,000 major service, parts extra | Sejasa price list: https://www.sejasa.com/layanan/service-pompa-air |
+| Central Java minimum wage 2026 Rp2,327,386; Kota Semarang UMK 2026 Rp3,701,709 | https://jatengprov.go.id/publik/gubernur-ahmad-luthfi-tetapkan-ump-jawa-tengah-2026-rp2-327-38607 and https://disnaker.semarangkota.go.id/informasi/umk |
+| Javanese: 68 million native speakers (Ethnologue via Wikipedia); UGM estimates more than 80 million speakers | https://en.wikipedia.org/wiki/Javanese_language and https://ugm.ac.id/en/news/number-of-javanese-speakers-surpasses-80-million-amid-preservation-challenges |
 
-## Try it in 60 seconds (for the gallery / judges)
-Open the live link on a phone → tap **▶ Coba demo 1 ketuk** (1-tap demo; the tips guide you through question → check photos → re-plan, and *🤖 Yang dilakukan AI* shows each decision). Or under *Coba contoh* tap "motor mogok" → answer the one question → tick the safety list → try **🎯 Panduan kamera langsung** and **Mode tangan bebas** → tap *Cek langkah ini* and snap anything → tap "rice cooker mati" to see the red STOP with its PDF and hand-off card. Without a key the app runs in labelled demo mode.
-If the live link is slow (the free server sleeps, ~50 s to wake), the 1-tap demo plays a **recorded demo-mode run** after 4 s, labelled "▶ Demo rekaman / Recorded demo" on screen; add `?replay=1` to the link to force it. Own photos, the live camera and voice commands need the awake server.
+"About two days of pay": Rp180,000 / (Rp2,327,386 / 25 working days) = 1.9 days. In Kota Semarang (higher UMK) it is about 1.2 days.
+
+## Try it in 60 seconds (for the gallery or judges)
+Open [LIVE_URL] on a phone and tap **Try the 1-tap demo**. The tips walk you through: one question, the safety tick list,
+a rejected and an accepted check photo, then a re-plan. Tap "What the AI did" to see each decision. Then try "rice cooker
+mati" for the red STOP with its PDF and hand-off card, and switch the language to Basa Jawa.
+If the free server is asleep (about 50 s to wake), the 1-tap demo plays a recorded demo-mode run after 4 s, labelled
+"Recorded demo" on screen; `?replay=1` forces it. Own photos, the live camera and voice commands need the awake server.

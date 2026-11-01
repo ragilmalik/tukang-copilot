@@ -1,35 +1,46 @@
 # 🔧 Tukang Copilot
 
-**Point your phone at something broken, say what's wrong in Bahasa Indonesia, Javanese or English, and Tukang Copilot finds the exact part, works out the fault, and walks you through the fix step by step, checking each step with your camera.**
+**Every phone becomes a mechanic's apprentice.** Point your phone at something broken, say what's wrong in Bahasa
+Indonesia, Javanese or English. Tukang Copilot outlines the exact part on *your* photo (SAM 3.1), works out the fault and
+plans the fix (Muse Spark), checks every step you do with the camera, re-plans when it is still broken, and says
+**STOP** when the job is dangerous.
 
-Meta Global AI Developer Hackathon 2026 (Meta × Cerebral Valley) · Indie Developer track · Theme: **Push the Frontier** (give a machine a new capability: understanding and repairing physical systems).
+Meta Global AI Developer Hackathon 2026 (Meta x Cerebral Valley) · Indie Developer track · **Push the Frontier** ·
+built solo in Semarang, Oct 26 to Nov 4, 2026.
 
 <table><tr>
 <td width="330"><img src="docs/demo/hero.gif" width="320" alt="Phone flow: 1-tap demo, SAM 3.1 parts, agent log, safety tick list, camera step check, live guide, re-plan, red stop, Basa Jawa"></td>
 <td>
 
-**Try it in 60 seconds (no key, no account, free demo mode)**
-```bash
-./start.sh            # Windows: start.bat · Docker: docker compose up
-```
-Open http://localhost:8000 and tap **▶ Try the 1-tap demo**. It runs a full repair: the AI asks one question (tap an answer), marks the parts on the photo, unlocks the steps after a safety tick list, rejects a too-dark check photo and accepts the right one (sample photos provided), and re-plans when you tap *Still broken*.
-
-**What to look at (judges)**
-- **🤖 What the AI did**: the agent log on every result shows each decision (see → reason → ask → plan → guard → verify → re-plan → hand off) and the Meta model that made it.
-- **Safety in code**: try *rice cooker mati*: a hard STOP with a PDF and a bengkel hand-off, no steps.
-- **Basa Jawa**: switch the language at the top; the UI *and* the demo answers are Javanese.
-- **Live link slow to wake?** The free server sleeps (~50 s cold start). If it hasn't answered within 4 s, the 1-tap demo plays a **recorded demo-mode run** right away, labelled "▶ Recorded demo" on screen (`?replay=1` forces it). Your own photos still need the live server.
-
 | | |
 |---|---|
-| Live app | _add your Render URL here after deploy_ |
-| 3-min video | _add YouTube link_ · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:57, demo mode, captions + voice-over) |
-| X post | _add link_ |
-| License | MIT |
+| **Live app** | [LIVE_URL] |
+| **3-min video** | [YOUTUBE_URL] · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:57, demo mode, captions + voice-over) |
+| **Code** | [GITHUB_URL] (MIT) |
+| **For judges** | [Judging map](docs/JUDGING_MAP.md) (every criterion to evidence) · [Judge FAQ](docs/launch/JUDGE_FAQ.md) · [One-pager PDF](docs/launch/one-pager.pdf) |
+| **Write-up** | [docs/WRITEUP.md](docs/WRITEUP.md) · form copy: [docs/SUBMISSION.md](docs/SUBMISSION.md) |
+| **Launch kit** | [YouTube](docs/launch/YOUTUBE.md) · [X thread](docs/launch/X_THREAD.md) · [Community vote](docs/launch/COMMUNITY_VOTE_KIT.md) |
 
 </td></tr></table>
 
-<sub>Demo mode uses clearly labelled stand-in photos and recorded model answers (no API calls); the live guide uses Chromium's fake camera. No live Meta answer has been verified yet (needs the API key). Short write-up: [docs/WRITEUP.md](docs/WRITEUP.md).</sub>
+## 60-second judge path
+
+1. **Open [LIVE_URL] on a phone** (or run it locally: `./start.sh`, then http://localhost:8000; no key, no account).
+2. **Tap ▶ Try the 1-tap demo.** Watch results stream in: what Muse Spark saw, the parts SAM 3.1 outlined, the likely cause.
+3. **Answer the one question** it asks (it asks only when it is under 60% sure), **tick the safety list**, and the steps unlock.
+4. **Tap Check this step** and pick the dark sample photo: rejected with a specific fix ("turn on your torch"). Pick the right one: passed.
+5. **Tap Still broken.** It re-plans for the next cause ("Plan 2 of 3").
+6. **Open 🤖 What the AI did.** Every decision with the Meta model or code rule that made it; tap a line to jump to it.
+7. **Try the "dead rice cooker" sample** ("rice cooker mati" in Bahasa) for a red STOP with a technician PDF and bengkel hand-off, then **switch to Basa Jawa** at the top.
+
+> **Recorded demo note.** The free server sleeps (about 50 s to wake). If it has not answered within 4 s, the 1-tap demo
+> plays a **recorded demo-mode run**, labelled "▶ Recorded demo" on screen (`?replay=1` forces it). Your own photos, the
+> live camera and voice commands need the awake server.
+
+<sub>**Honest status.** The video, screenshots and 1-tap demo run in clearly labelled demo mode: stand-in photos and recorded
+model answers, no API calls; the live guide uses Chromium's fake camera. The live Meta path is tested end to end against
+a stand-in server built from the official API docs (496 automated tests pass). A live Meta model answer is not yet
+verified (needs the API key). Impact numbers in docs/IMPACT.md are mock data until real trials run.</sub>
 
 ### How Meta models are used (and where in the code)
 
@@ -58,7 +69,7 @@ All Meta calls go through one file, [`api/meta_client.py`](api/meta_client.py) (
 
 ## Why
 
-Indonesia runs on ~130 million motorbikes, water pumps, rice cookers, fans and household plumbing. A small fault costs a day's wage at a bengkel, or days without water. Repair videos are rarely for your exact model, rarely in your language, and they can't see *your* problem.
+Indonesia runs on 139 million motorbikes (BPS 2024), electric water pumps (17% of households drink pumped water, BPS 2023), rice cookers, fans and household plumbing. A small fault costs a day's wage at a bengkel, or days without water. Repair videos are rarely for your exact model, rarely in your language, and they can't see *your* problem.
 
 Tukang Copilot looks at the actual object, marks the actual parts on your own photo, and checks every step you do. It also says clearly, in your language, when a job is dangerous and needs a professional.
 
@@ -156,8 +167,10 @@ Step-by-step for non-developers (accounts, keys, deploy to Render, phone testing
 | [docs/VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md) | Every requirement → evidence, and what is still unverified |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Errors and fixes |
 | [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) | 3-minute video script + shot list + backup plan |
-| [docs/SUBMISSION.md](docs/SUBMISSION.md) | Field-by-field copy-paste block for the Cerebral Valley form + X post |
-| [docs/WRITEUP.md](docs/WRITEUP.md) | ~400-word write-up: problem, how it works, models, safety, impact, honest status |
+| [docs/SUBMISSION.md](docs/SUBMISSION.md) | Field-by-field copy-paste block matching the live Cerebral Valley form, sourced problem numbers, bonus prize claims |
+| [docs/WRITEUP.md](docs/WRITEUP.md) | Write-up (~850 words): problem, user, demo, how it works, safety, eval, honest status, what's next |
+| [docs/JUDGING_MAP.md](docs/JUDGING_MAP.md) | Official criteria and bonus prize rules → evidence in the repo, and the open gaps |
+| [docs/launch/](docs/launch/) | Launch kit: YouTube (title, chapters, thumbnail), X thread, community vote kit (id/jv/en), judge FAQ, one-pager PDF, architecture diagram |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Render deploy click by click, settings, roll back |
 | [docs/USER_TRIAL_KIT.md](docs/USER_TRIAL_KIT.md) | 5-person user trial kit → impact report |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | After the hackathon |

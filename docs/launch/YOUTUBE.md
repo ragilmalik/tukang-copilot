@@ -1,0 +1,90 @@
+# YouTube upload kit
+
+Upload: the real-phone recording if it exists, otherwise `docs/demo/tukang-copilot-demo.mp4` (2:57, demo mode).
+Visibility: **Unlisted** is fine for judging; **Public** helps Most Viral and Community Vote. Open the link in a private
+window before pasting it into the form. Captions: upload `docs/demo/tukang-copilot-demo.en.srt` as English subtitles.
+Thumbnail: `docs/launch/thumbnail.png` (1280x720; custom thumbnails need a phone-verified YouTube account).
+
+## Title options
+1. **Tukang Copilot: AI finds the broken part and checks every repair step (Muse Spark + SAM 3.1)**
+2. Motor mogok? This AI outlines the exact part and checks your repair with the camera
+3. Every phone becomes a mechanic's apprentice: Tukang Copilot (Bahasa, Jawa, English)
+4. Plan, act, verify, re-plan: an AI repair agent for Indonesian homes
+
+**Pick: option 1.** It says what it does, names the Meta models judges are scoring, and fits YouTube's 100-character limit (92).
+
+## Description (paste as is, then fill the placeholders)
+```
+Point your phone at something broken, say what's wrong in Bahasa Indonesia, Javanese or English, and Tukang Copilot outlines the exact part on your own photo, walks you through the fix, checks every step with your camera, and says STOP when the job is dangerous.
+
+Built solo for the Meta Global AI Developer Hackathon (Indie track, Push the Frontier). Everything shown was built during the event, Oct 26 to Nov 4, 2026.
+
+This recording runs in clearly labelled demo mode: stand-in photos and recorded model answers, no API cost.
+
+Try it (1-tap demo, no photo needed): [LIVE_URL]
+Code (MIT): [GITHUB_URL]
+
+Chapters
+[paste the chapter block for the cut you upload, from below]
+
+How it works
+- Muse Spark 1.3: sees the object, diagnoses, plans, verifies each step from a new photo, re-plans
+- SAM 3.1: pixel masks of the real parts on your photo, and tracking on the live camera
+- Muse Voice Transcribe + Muse Spark 1.2 audio: Indonesian, English and Javanese voice
+- Muse Image: turns your photo into a diagram for hidden steps
+- Muse Spark Open (open weights) on Baseten: one switch for diagnosis and planning
+- Safety stops (gas, house wiring, 220 V internals, brakes, fuel) are enforced in code, not prompts
+
+Why: Indonesia has 139 million motorbikes (BPS 2024) and millions of homes on an electric water pump. A light pump service costs about two days of Central Java's minimum wage before parts. Repair videos can't see your problem and aren't in your language.
+
+#MetaAI #MuseSpark #SAM3 #AIagents #Indonesia #BahasaJawa #DIY #hackathon
+```
+
+## Chapters
+
+YouTube rules: the first chapter must be 0:00, at least 3 chapters, each at least 10 seconds.
+
+### A. Current backup cut (`tukang-copilot-demo.mp4`, 2:57, timings from `tukang-copilot-demo.en.srt`)
+```
+0:00 A small fault costs a day's wage
+0:16 Watch the agent work, one question when unsure
+0:32 Diagnosis and SAM 3.1 parts on your photo
+0:47 Safety tick list and live camera guide
+1:07 Check my step: the camera verifies
+1:20 Hands-free and re-plan
+1:37 What the AI did: the agent log
+1:50 Bengkel hand-off, PDF and share card
+2:14 Safety STOP and Basa Jawa
+2:30 Open weights and how it works
+```
+If the code lane re-cuts the video (planned: a 3 second hook title card), every time after 0:00 moves. Re-read the
+`.srt` and shift each chapter by the same amount before uploading.
+
+### B. Real-phone recording (timings from docs/DEMO_SCRIPT.md)
+```
+0:00 Motor mogok, bengkel tutup
+0:12 Meet Tukang Copilot
+0:22 Snap and speak, one question
+0:40 Parts on my own photo, safety list
+0:55 Live camera guide
+1:15 Hands-free and step check
+1:35 It runs again
+1:45 Safety STOP and bengkel hand-off
+2:05 Basa Jawa and open weights
+2:15 Five Meta models, one agent loop
+2:45 Every phone becomes a mechanic's apprentice
+```
+Adjust to the real edit. Keep the total under 3:00 (the form field is "3-Minute Demo Video").
+
+## Tags (YouTube tags box, comma separated, under 500 characters)
+```
+Tukang Copilot, Meta AI, Muse Spark, SAM 3.1, Segment Anything, Meta Model API, Muse Spark Open, open weights, AI agent, agentic AI, repair assistant, DIY repair, Indonesia, Bahasa Indonesia, Basa Jawa, Javanese, motorbike repair, water pump repair, pompa air, motor mogok, hackathon, Cerebral Valley
+```
+
+## Upload checklist
+- [ ] Title option 1, description with [LIVE_URL] and [GITHUB_URL] filled
+- [ ] Chapters block matching the uploaded cut
+- [ ] English subtitles from the `.srt`
+- [ ] Thumbnail `docs/launch/thumbnail.png`
+- [ ] "Not made for kids", category Science & Technology
+- [ ] Opens logged out; the link goes into form field 8 and README

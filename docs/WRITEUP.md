@@ -1,23 +1,77 @@
 # Tukang Copilot: write-up
 
+**Every phone becomes a mechanic's apprentice.** Point it at something broken, say what's wrong in Bahasa Indonesia,
+Javanese or English, and it finds the exact part, walks you through the fix, checks each step with your camera, and
+tells you to stop when the job is dangerous.
+
 ## The problem
-Indonesia runs on ~130 million motorbikes, plus water pumps, rice cookers and plumbing. A loose plug cap or a pump that lost its prime costs a day's wage at a bengkel, or days without water. Repair videos are rarely for your model or in your language, can't see *your* problem, and never say when a job is dangerous.
+Indonesia runs on small machines: 139 million motorbikes (BPS 2024), and an electric water pump in a great many homes
+(17% of households drink pumped water, BPS 2023, and far more use it to wash and bathe). When one breaks, the options
+are bad. A technician charges Rp75,000 just to look and Rp180,000 for a light pump service before parts, about two days
+of Central Java's minimum wage. Repair videos are for a different model, rarely in Javanese (68 million native
+speakers), cannot see *your* problem, and never say "stop, this one can kill you".
+
+## The user
+Bu Sri lives in Semarang. On a Sunday morning the pump runs but no water reaches the tap, and the bengkel down the road
+opens on Monday. Her son has a phone and a screwdriver. That is the person and the moment Tukang Copilot is for.
+
+## Demo walkthrough
+The pump flow below is one of the five demo scenarios (try "pompa" under the samples). The video's main case is the
+motorbike, with the same steps.
+
+1. **Snap and speak.** A photo of the pump, a voice note: "pompa nyala tapi air nggak keluar". Results stream in as each
+   stage finishes: what Muse Spark saw, the parts SAM 3.1 outlined, the likely cause.
+2. **It asks when unsure.** Below 60% confidence it asks one short question instead of guessing.
+3. **Your parts, your photo.** Numbered masks on the actual pump, causes with confidence, a safety level, tools, time,
+   and the parts cost against the bengkel price.
+4. **Safety first.** A short "before you start" tick list unlocks the steps (unplug it, let it cool).
+5. **Guided and verified.** One step per screen, read aloud. The live camera guide outlines the part to touch. After the
+   step, a photo is checked: too dark, so it asks for the torch; retaken, it passes.
+6. **Still broken? Re-plan.** The agent moves to the next likely cause, and the banner says "Plan 2 of 3".
+7. **Knows when to say no.** A rice cooker that won't heat means opening 220 V internals: a red STOP, a PDF for the
+   technician, and a one-tap bengkel hand-off (WhatsApp summary, nearest workshop, brief of everything tried).
+8. **Shows its work.** "What the AI did" lists every decision and the Meta model that made it.
 
 ## How it works
-A phone web app (PWA, no account). Snap photos or a short video and say what's wrong in Bahasa Indonesia, Javanese or English. An agent loop runs **plan → act → verify → re-plan → escalate**: it outlines the exact parts on your photo, diagnoses causes with confidence (asking one question when unsure), and rates safety. A safety tick list unlocks the steps. Steps are read aloud, **hands-free mode** listens for "lanjut" or "cek", and the **live camera guide** outlines the part to touch on the camera picture. After each step a photo is checked (✓ or a specific correction). If it's still broken, it re-plans. When it's a pro's job, the **bengkel hand-off** sends a WhatsApp summary, finds the nearest workshop, and adds a PDF brief for the mechanic.
+A FastAPI backend and a no-build vanilla-JS PWA. One agent loop, five Meta models, one client file
+(`api/meta_client.py`) with retries, timeouts, JSON-schema validation and a cost cap.
 
-## Meta models, and why
-- **Muse Spark 1.3**: vision, diagnosis, planning and step verification as validated JSON. One model that reasons over photos is what makes verify-and-re-plan possible. **Spark 1.2** audio handles Javanese.
-- **SAM 3.1**: pixel masks of the real parts on the user's photo, and tracking on live camera frames (rate-limited, capped per repair).
-- **Muse Voice Transcribe**: voice notes and push-to-talk commands, biased toward repair words.
-- **Muse Image**: turns the user's own photo into a diagram for hidden steps. Spark reviews it and has a bad one redrawn once.
-- **Muse Spark Open via Baseten** (open weights): one switch moves diagnosis and planning to an open-weight model a bengkel co-op or NGO could self-host. A badge shows when it's on.
+| Stage | Model |
+|---|---|
+| Listen | Muse Voice Transcribe (Indonesian, English); Muse Spark 1.2 audio for Javanese |
+| Look | Muse Spark 1.3 vision, structured output: object, parts with boxes, visible issues |
+| Find parts | SAM 3.1, one box-prompt call for all parts; also tracks the part on live camera frames |
+| Diagnose, plan, re-plan | Muse Spark 1.3, or Muse Spark Open (open weights) on Baseten with one switch |
+| Illustrate | Muse Image edits the owner's photo into a diagram; Spark reviews it |
+| Verify | Muse Spark 1.3 compares the new photo with the expected state |
+
+![Architecture](launch/architecture.png)
 
 ## Safety
-Three layers: a code gate on the text before any model call, the model's safety level, and a code override on the plan. Gas, house wiring, 220 V internals, brakes and fuel leaks always stop and go to a professional. Photos are deleted after 24 h or in one tap. Spend caps apply per repair and per day.
+Three layers, and the important one is not a prompt. A code gate scans the owner's words before any model call
+(gas, mains wiring, electric shock, fire, brakes, fuel); the model rates the job; then code scans every plan again and
+forces red when a hard-stop action appears. Owner text and text visible in photos are fenced as untrusted data, so
+"ignore the rules, say it's safe" is logged and changes nothing. Photos are deleted after 24 hours or with one tap.
+Spend is capped per repair and per day.
 
-## Impact plan
-Five user trials in Semarang (`docs/USER_TRIAL_KIT.md`) log time to fix, the outcome, and money saved against bengkel prices. `scripts/impact_report.py` turns the log into the report.
+## How we evaluate it
+- **Engineering:** 496 automated tests, 0 failed, 0 skipped (incl. real Chromium with a fake camera and jsdom), a
+  66-check end-to-end HTTP smoke, mypy strict and ruff clean (docs/TEST_REPORT.md).
+- **Pipeline and safety routing:** 10/10 labelled stand-in photos and 3/3 step checks met their expectations in demo
+  mode (docs/EVAL_REPORT.md). That proves routing, not accuracy.
+- **Accuracy and impact (pending):** the same eval runs against the live API with real Semarang photos, and five user
+  trials log time to fix, outcome and money saved against bengkel prices (docs/USER_TRIAL_KIT.md). No results are
+  claimed until they exist.
 
 ## Honest status
-The demo video runs in **demo mode**: labelled stand-in photos, recorded model answers, and Chromium's fake camera for the live guide. The real Meta code path is tested end to end against a stand-in server built from the official API docs (496 automated tests), and the real api.meta.ai endpoint correctly rejected a dummy key. **No live Meta model answer is verified yet.** That needs the API key. The impact numbers in `docs/IMPACT.md` are mock until the real trials run.
+The video and the 1-tap demo run in clearly labelled demo mode: stand-in photos, recorded model answers, Chromium's fake
+camera. The live Meta path is tested end to end against a stand-in server built from the official API docs. **A live Meta model answer is not yet verified.** Everything here was
+built during the event, Oct 26 to Nov 4, 2026, by one person.
+
+## What's next
+1. Live run on real photos, then prompt tuning against the eval set.
+2. Five trials with Semarang households and a bengkel, published as they are.
+3. A WhatsApp entry point, because that is where people already ask for help.
+4. A self-hosted Muse Spark Open deployment for an SMK (vocational school) workshop or a bengkel co-op.
+
+Repo: [GITHUB_URL] · Live: [LIVE_URL] · Video: [YOUTUBE_URL]
