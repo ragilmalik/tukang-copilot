@@ -2,6 +2,18 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.26.0 (2026-11-02 WIB)
+Judge QA: a skeptical judge played every flow on a phone-sized Chromium in Bahasa, Basa Jawa and English, then read the PDFs and the shared guide page. Everything they tripped over is fixed and tested.
+- **Failing brakes are a safety stop.** "Rem motorku blong", "rem ora makan", "my brakes don't work" or "spongy brakes" on the owner's own motorbike used to get a repair guide; only a car's brake line stopped. They now get a red stop that says not to ride it and to push or tow it to a workshop. Everyday brake words that are not a failure (a dead brake light, squeaky pads) still get help. The red-team eval grew to 33 cases, all stopped.
+- **A safety stop is no longer a dead end.** A "Fix something else" button sits under the stop card, and the "Do this now" list fits the hazard: close the gas valve and open the windows for gas, switch off the breaker for house wiring, don't ride it for brakes.
+- **The demo's one question now matters.** In the 1-tap demo the answer to "Do you smell fuel when you crank it?" moves the diagnosis (70% with a fuel smell, 58% without) and shows up as evidence. The recorded demo, screenshots and demo video were re-made; the video shows the 70% result.
+- **The 1-tap demo survives a server that stops answering.** If the page loaded but the server then goes quiet or returns a gateway error, the demo plays the recording instead of showing "No connection".
+- **Honest numbers and plain words.** The share card counts the steps that really passed a camera check instead of claiming every step was checked. The cost chip says "parts" (tools are reusable and not in the estimate). "It works now" reads "You saved about Rp35.000 compared with a workshop.", and the garage says "1 repair", not "1 repairs".
+- **The mechanic brief tells the truth after a fix.** After "It works now" the PDF's status line says the owner reports it works again, not that the owner asked for a mechanic.
+- **A shared guide is read-only.** Whoever opens someone else's guide link sees the owner's answer but can no longer change it with the outcome buttons. The share fallback label is translated ("Tautan", "Pranala", "Link").
+- **No near-empty last page on the workshop sheet.** "Done when" now closes the last step page when it fits there.
+- New tests: `test_judge_qa.py` (safety gate, demo diagnosis, share card, mechanic brief, workshop sheet, read-only guide wiring) and `test_playwright_judge_qa.py` (real Chromium: stop button, hazard lists, cost chip and wording, demo fallback, read-only guide). Offline cache bumped to v11 so phones pick up the new app. Full test report: 710 tests, all passed.
+
 ## 1.25.10 (2026-11-01 WIB)
 Audit 16 (the shared guide page /guide/{id} and the large-print workshop sheet, read in Bahasa, Basa Jawa and English in Chromium 390x844 and as PDFs).
 - **The shared guide page now leads with the repair.** Whoever opens a shared link (the friend, the mechanic, a judge) used to land on the diagnosis followed by a nine-row "What the AI did" log, with the checklist and the steps two screens down. The log now sits after the steps and the outcome question, still complete and still tappable. The phone app's own result screen is unchanged (it is in the demo assets). Workshop sheet read in all three languages: nothing to fix.
