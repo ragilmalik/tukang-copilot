@@ -1,4 +1,4 @@
-"""Judge QA 2026-11-02 (v1.26.0), real Chromium at 390x844: what a judge saw on screen.
+"""1.26.0 fixes for what showed up on screen when I played every flow (real Chromium at 390x844).
 
 - A red safety stop was a dead end: no way back to try another repair except the browser's Back button.
 - The stop card's "do this now" list was one generic line for every hazard ("unplug it / close the gas / stop the
@@ -6,7 +6,7 @@
 - "💰 est. Rp25.000" sat next to items adding up to Rp55.000 (the estimate counts parts only, tools are reusable):
   the chip now says "parts".
 - "Great, repair done. save Rp35.000." and "Total saved Rp35.000 from 1 repairs" read as broken English.
-- The 1-tap demo left a judge on "No connection" when the page had loaded but the server then stopped answering;
+- The 1-tap demo got stuck on "No connection" when the page had loaded but the server then stopped answering;
   it now plays the recorded demo.
 """
 from pathlib import Path

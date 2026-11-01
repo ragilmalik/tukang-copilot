@@ -1,4 +1,4 @@
-"""Judge QA 2026-11-02 (v1.26.0): bugs a skeptical judge hit while playing every flow.
+"""Bugs I found in 1.26.0 by playing every flow end to end.
 
 1. Brake failure on the owner's own motorbike ("rem motorku blong", "rem ora makan", "my brakes don't work")
    slipped past the safety gate; only "rem mobil blong" was caught. Now a red stop with a brake-specific message.
@@ -120,7 +120,7 @@ def test_share_card_png_still_renders_after_checks():
     assert r.status_code == 200 and r.content[:8] == b"\x89PNG\r\n\x1a\n"
 
 
-# ---- v1.26.0 follow-ups from the same judge QA pass -------------------------------------------------------
+# --- more fixes from the same pass
 def _ready(sample="faucet", lang="en"):
     sid = client.post("/api/sessions", data={"sample": sample, "language": lang}).json()["id"]
     assert _wait(sid)["status"] == "ready"

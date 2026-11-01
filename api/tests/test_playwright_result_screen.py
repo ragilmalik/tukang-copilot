@@ -1,4 +1,4 @@
-"""v1.24 skeptical-judge audit fixes in real Chromium (390x844 phone, and a 1280x800 laptop)."""
+"""Fixes from the 1.24 review pass, in real Chromium (390x844 phone, and a 1280x800 laptop)."""
 import pytest
 
 pytest.importorskip("playwright.sync_api")

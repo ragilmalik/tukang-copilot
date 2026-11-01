@@ -1,4 +1,4 @@
-"""v1.24 skeptical-judge audit fixes that do not need a browser (the browser ones are in test_playwright_audit5.py)."""
+"""Fixes from the 1.24 review pass that need no browser (the browser ones are in test_playwright_result_screen.py)."""
 import re
 from pathlib import Path
 

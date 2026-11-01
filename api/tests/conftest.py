@@ -40,7 +40,7 @@ def samples(tmp_path):
 
 # Browser-level tests (jsdom, real Chromium) take most of the suite's time. They carry the `slow` marker so the
 # fast chunk runs with `-m "not slow"` and the slow chunk with `-m slow` (scripts/check_all.sh runs both).
-SLOW_FILES = {"test_dom_jsdom.py", "test_playwright_smoke.py", "test_playwright_live.py", "test_playwright_replay.py", "test_playwright_audit5.py", "test_playwright_desk.py", "test_playwright_static.py", "test_run_eval.py", "test_playwright_judge_qa.py"}
+SLOW_FILES = {"test_dom_jsdom.py", "test_playwright_smoke.py", "test_playwright_live.py", "test_playwright_replay.py", "test_playwright_result_screen.py", "test_playwright_desk.py", "test_playwright_static.py", "test_run_eval.py", "test_playwright_stop_and_outcome.py"}
 
 
 def pytest_configure(config):
