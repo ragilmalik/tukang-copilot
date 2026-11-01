@@ -115,45 +115,49 @@ And when it's a job for a pro, one tap hands it off: a WhatsApp summary of what 
 a search for the nearest bengkel, and a PDF with a brief for the mechanic.
 
 30
-00:02:07,584 --> 00:02:14,908
-Share the guide, and WhatsApp or X shows a card with your marked photo, the likely cause and the safety level.
-
-31
-00:02:14,908 --> 00:02:16,684
+00:02:07,584 --> 00:02:09,360
 It also knows when to say no.
 
-32
-00:02:16,684 --> 00:02:23,936
+31
+00:02:09,360 --> 00:02:16,612
 A rice cooker that won't heat would mean opening 220 volt internals, so the safety gate stops the guidance.
 
+32
+00:02:16,612 --> 00:02:19,071
+It also works in WhatsApp, in Javanese.
+
 33
-00:02:23,936 --> 00:02:30,564
-The whole app runs in Bahasa Indonesia, Javanese and English, with Javanese voice input.
+00:02:19,071 --> 00:02:25,691
+Send a photo, and the same agent replies with the marked photo, the diagnosis and a button for each step.
 
 34
-00:02:30,564 --> 00:02:37,222
-And with one switch, diagnosis and planning run on Muse Spark Open, Meta's open-weights model, on Baseten.
+00:02:25,691 --> 00:02:28,472
+A gas leak still gets a red stop.
 
 35
-00:02:37,222 --> 00:02:40,120
-The app shows a badge when it does.
+00:02:28,472 --> 00:02:35,130
+And with one switch, diagnosis and planning run on Muse Spark Open, Meta's open-weights model, on Baseten.
 
 36
-00:02:40,120 --> 00:02:43,918
-Under the hood: Voice Transcribe, Muse Spark to see,
+00:02:35,130 --> 00:02:38,028
+The app shows a badge when it does.
 
 37
-00:02:43,918 --> 00:02:49,980
-reason and check, SAM 3.1 for masks and live tracking, and Muse Image for diagrams.
+00:02:38,028 --> 00:02:41,826
+Under the hood: Voice Transcribe, Muse Spark to see,
 
 38
-00:02:49,980 --> 00:02:52,652
-Safety is enforced in code.
+00:02:41,826 --> 00:02:47,888
+reason and check, SAM 3.1 for masks and live tracking, and Muse Image for diagrams.
 
 39
-00:02:52,652 --> 00:02:53,616
-Tukang Copilot.
+00:02:47,888 --> 00:02:50,560
+Safety is enforced in code.
 
 40
-00:02:53,616 --> 00:02:57,652
+00:02:50,560 --> 00:02:51,524
+Tukang Copilot.
+
+41
+00:02:51,524 --> 00:02:55,560
 Every phone becomes a mechanic's apprentice.
