@@ -5,7 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
-import build_static  # noqa: E402
+import build_static  # type: ignore[import-not-found]  # noqa: E402
 
 
 def test_build_is_relative_complete_and_flagged(tmp_path):

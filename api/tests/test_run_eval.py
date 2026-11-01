@@ -4,7 +4,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
-import run_eval  # noqa: E402
+import run_eval  # type: ignore[import-not-found]  # noqa: E402
 
 
 def test_eval_mock_mode_safety_and_injection():
