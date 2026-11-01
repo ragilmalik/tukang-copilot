@@ -130,7 +130,7 @@ Evidence names are tests in `api/tests/` (see TEST_REPORT.md for the run) or scr
 
 **Run numbers (2026-11-01, v1.25.0 final):** `make_test_report.py` ALL PASSED: pytest **530 passed, 0 failed, 0 skipped** (550 s, real Chromium + jsdom), ruff, check_keys --fake, smoke; `ruff check api scripts` clean; `mypy api` strict no issues in 99 files; `smoke_e2e.py` ALL PASSED (66 checks) on a local demo-mode server.
 
-**Run numbers (2026-11-01, v1.25.2):** `make_test_report.py` ALL PASSED: pytest **542 passed, 0 failed, 0 skipped** (499 s, real Chromium + jsdom), ruff, check_keys --fake, smoke; `mypy api` strict no issues in 102 files; `smoke_e2e.py` ALL PASSED on a local demo-mode server. New and covered: first-screen language by phone / `?lang=`, Back / Forward button handling, thumb-sized small links (1.25.2).
+**Run numbers (2026-11-01, v1.25.3):** `make_test_report.py` ALL PASSED: pytest **550 passed, 0 failed, 0 skipped** (445 s, real Chromium + jsdom), ruff, check_keys --fake, smoke; `mypy api` strict no issues in 103 files; `smoke_e2e.py` ALL PASSED on a local demo-mode server. New and covered: first-screen language by phone / `?lang=`, Back / Forward button handling, thumb-sized small links (1.25.2), refusals of a wrong file in the owner's language and an at-once refusal of a non-photo (1.25.3).
 
 ## 6. What is NOT verified yet (honest list)
 

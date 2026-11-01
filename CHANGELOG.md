@@ -2,6 +2,12 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.25.3 (2026-11-01 WIB)
+Audit 9 (capture screen with a text file, a broken JPG, a 20 px image and a 6000x4000 photo, in Bahasa / Basa Jawa / English, real Chromium 390x844).
+- **Refusals in the owner's language.** A wrong file or a broken photo showed the server's English ("Unsupported file type .txt", "Could not read that photo. Try a JPG or PNG.") on the Indonesian and Javanese pages. The app now translates every refusal a person can cause (not a photo, unreadable photo, too big, empty, text too long, missing photo or description) in all three languages, on every request path (start, answer, step check, re-plan, report).
+- **A non-photo is refused at once.** Picking a PDF or text file used to leave a blank dashed box and say nothing until Go. Now the picker rejects it on the spot with the translated message and keeps nothing. A photo the browser cannot draw (e.g. HEIC on some phones) shows its file name instead of a blank box. 8 Chromium tests (`test_playwright_capture.py`; the language ones fail on 1.25.2).
+- Service worker cache `tukang-shell-v8`.
+
 ## 1.25.2 (2026-11-01 WIB)
 Audit 8 (accessibility of the small controls, English flow at 390x844 in real Chromium, a script that measures every visible control).
 - **Thumb-sized small links.** The "Compare prices" / "Shopee" links were 16 px tall, the sample links under the camera 30 px, the garage entries the browser's default blue, and the "Agent log" / "models used" summaries 24 px: hard to hit with greasy or gloved hands. Now 40 px (shop and sample links), 44 px (record-a-video), garage entries themed and 8 px padded, summaries 44 px. 3 Chromium tests measure the real boxes (`test_playwright_targets.py`; all three fail on 1.25.1).

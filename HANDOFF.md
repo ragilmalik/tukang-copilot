@@ -2,6 +2,12 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-11-01 14:40 WIB (v1.25.3): submission-ready, waiting on Malik's steps
+- **New since 1.25.2 (audit 9, `../work/IMPROVEMENT_BACKLOG.md` N1 to N4):** a wrong file or a broken photo is refused in the owner's language (Bahasa / Basa Jawa / English) instead of the server's English, and a non-photo picked from the file chooser is refused at once instead of leaving a blank box. 8 new real-Chromium tests (`test_playwright_capture.py`; the language ones fail on 1.25.2). UI otherwise unchanged, so screenshots, GIF and video were not re-shot.
+- **Checks (real runs):** `make_test_report.py` ALL PASSED: pytest **550 passed, 0 failed, 0 skipped** (445 s; fast 521, slow 29), ruff, check_keys --fake, smoke; `mypy api` strict no issues in 103 files; `smoke_e2e.py` ALL PASSED on `MOCK=1 PORT=8765 python app.py`.
+- **Sandbox restore (it was reset mid-session once):** same apt/dpkg Chromium recipe as the 1.25.1 state below (wrapper /tmp/bin/chromium, `export PATH=/tmp/bin:$PATH`), `npm install --prefix /tmp/jd jsdom`; run `make_test_report.py` with the shell tool's `background: true` (a `nohup ... &` inside a foreground call can be killed when the call ends).
+- **Honest status:** unchanged: no live Meta answer verified yet (needs the key).
+
 ## State on 2026-11-01 (v1.25.2): submission-ready, waiting on Malik's steps
 - **New since 1.25.1 (audit 8, `../work/IMPROVEMENT_BACKLOG.md` M1 to M5):** small text links are thumb-sized (shop "Compare prices" / "Shopee" 16 px to 40 px, sample links 30 to 40 px, garage entries themed and padded, summaries 44 px). 3 real-Chromium tests measure the boxes (`test_playwright_targets.py`, all fail on 1.25.1). UI otherwise unchanged, so screenshots, GIF and video were not re-shot.
 - **Checks (real runs):** `make_test_report.py` ALL PASSED: pytest **542 passed, 0 failed, 0 skipped** (499 s; fast 513 in two chunks 250 + 263, slow 29), ruff, check_keys --fake, smoke; `mypy api` strict no issues in 102 files; `smoke_e2e.py` ALL PASSED on `MOCK=1 PORT=8765 python app.py`; `run_eval.py` regenerated (app 1.25.2).

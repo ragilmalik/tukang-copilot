@@ -20,7 +20,7 @@ const T = {
         green: "AMAN", amber: "HATI-HATI", red: "STOP", pass: "✅ Langkah ini beres", fail: "⚠️ Belum pas", checking: "Memeriksa foto…",
         verified: "langkah terverifikasi kamera", recording: "Merekam…", recorded: "Suara terekam ✓", micErr: "Mikrofon tidak bisa dipakai. Ketik saja masalahnya.",
         netErr: "Koneksi terputus. Cek sinyal lalu coba lagi.", offline: "Tidak ada internet. Diagnosis butuh sinyal; foto kamu tetap aman di HP.",
-        exhausted: "Sudah semua", newPlan: "Rencana baru siap.", photos: "foto", videoBtn: "🎥 Atau rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar terbaik diambil otomatis)", videoBig: "Videonya terlalu besar. Rekam 5–10 detik saja." },
+        exhausted: "Sudah semua", newPlan: "Rencana baru siap.", photos: "foto", videoBtn: "🎥 Atau rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar terbaik diambil otomatis)", videoBig: "Videonya terlalu besar. Rekam 5–10 detik saja.", badFile: "Berkas itu bukan foto. Pilih foto JPG, PNG, atau HEIC.", unreadPhoto: "Foto itu tidak bisa dibaca. Coba foto JPG atau PNG.", bigFile: "Berkasnya terlalu besar. Coba foto yang lebih kecil.", emptyFile: "Berkasnya kosong. Coba ambil lagi.", tooLong: "Teksnya terlalu panjang. Persingkat dulu." },
   en: { hero: "What's broken?", heroSub: "Snap it, say what's wrong, get a step-by-step repair guide.", takePhoto: "Take photos (1–3)",
         catMotor: "Motorbike", catPump: "Water pump", catAppliance: "Home appliance", catPlumbing: "Pipes/taps", catOther: "Other",
         record: "Tap to talk", stop: "Tap to stop", typeHere: "…or type the problem here", go: "Check it now",
@@ -40,7 +40,7 @@ const T = {
         green: "SAFE", amber: "CAUTION", red: "STOP", pass: "✅ Step looks right", fail: "⚠️ Not quite", checking: "Checking photo…",
         verified: "steps verified by camera", recording: "Recording…", recorded: "Voice recorded ✓", micErr: "Microphone unavailable. Please type the problem.",
         netErr: "Connection lost. Check your signal and try again.", offline: "You are offline. Diagnosis needs a signal; your photos stay on your phone.",
-        exhausted: "All tried", newPlan: "New plan ready.", photos: "photos", videoBtn: "🎥 Or record a 5–10 s video", videoOk: "Video ready ✓ (the 3 sharpest frames are picked for you)", videoBig: "That video is too big. Record 5–10 seconds." },
+        exhausted: "All tried", newPlan: "New plan ready.", photos: "photos", videoBtn: "🎥 Or record a 5–10 s video", videoOk: "Video ready ✓ (the 3 sharpest frames are picked for you)", videoBig: "That video is too big. Record 5–10 seconds.", badFile: "That file is not a photo. Pick a JPG, PNG or HEIC picture.", unreadPhoto: "That photo could not be read. Try a JPG or PNG.", bigFile: "That file is too big. Try a smaller photo.", emptyFile: "That file is empty. Take it again.", tooLong: "That text is too long. Shorten it a little." },
 };
 // Basa Jawa (ngoko, as spoken around Semarang). Falls back to Bahasa Indonesia for any key not listed.
 T.jv = Object.assign({}, T.id, {
@@ -65,7 +65,7 @@ T.jv = Object.assign({}, T.id, {
   green: "AMAN", amber: "ATI-ATI", red: "MANDHEG", pass: "✅ Langkah iki wis bener", fail: "⚠️ Durung pas", checking: "Mriksa foto…",
   verified: "langkah wis dicek kamera", recording: "Ngrekam…", recorded: "Swara kerekam ✓", micErr: "Mikrofon ora bisa dienggo. Ketik wae masalahe.",
   netErr: "Sambungan megat. Priksa sinyal banjur coba maneh.", offline: "Ora ana internet. Diagnosis butuh sinyal; foto sampeyan tetep aman ing HP.",
-  exhausted: "Wis kabeh dijajal", newPlan: "Rencana anyar wis siap.", photos: "foto", videoBtn: "🎥 Utawa rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar paling cetha dijupuk otomatis)", videoBig: "Videone kegedhen. Rekam 5–10 detik wae.",
+  exhausted: "Wis kabeh dijajal", newPlan: "Rencana anyar wis siap.", photos: "foto", videoBtn: "🎥 Utawa rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar paling cetha dijupuk otomatis)", videoBig: "Videone kegedhen. Rekam 5–10 detik wae.", badFile: "Berkas iku dudu foto. Pilih foto JPG, PNG, utawa HEIC.", unreadPhoto: "Foto iku ora bisa diwaca. Jajal foto JPG utawa PNG.", bigFile: "Berkase kegedhen. Jajal foto sing luwih cilik.", emptyFile: "Berkase kosong. Jupuk maneh.", tooLong: "Tulisane kepanjangen. Cekak-ana dhisik.",
 });
 
 /* I18N_EXTRA:start (v1.22: 1-tap demo, agent log, progress, quick answers). api/tests/test_i18n.py checks all three. */
@@ -267,8 +267,20 @@ async function useReplay() {
 }
 
 /* Network trouble: friendly text instead of "Failed to fetch", plus a banner while the phone is offline. */
+/* The server's refusals are English; show the owner's language for the ones a person can cause. */
+const SERVER_MSGS = [
+  [/unsupported file type/i, "badFile"], [/could not read that (photo|frame)/i, "unreadPhoto"], [/file too large/i, "bigFile"],
+  [/empty file/i, "emptyFile"], [/too long/i, "tooLong"], [/describe the problem by voice or text/i, "needDesc"],
+  [/take or upload a photo/i, "needPhoto"],
+];
+function localServerMsg(m) {
+  const hit = SERVER_MSGS.find(([re]) => re.test(m));
+  return hit ? t(hit[1]) : "";
+}
 function netMsg(e) {
   const m = e && e.message ? String(e.message) : "";
+  const local = localServerMsg(m);
+  if (local) return local;
   return (!e || e.name === "TypeError" || /failed to fetch|load failed|networkerror|network request/i.test(m) || (typeof navigator !== "undefined" && navigator.onLine === false)) ? t("netErr") : (m || t("netErr"));
 }
 function setupOffline() {
@@ -279,6 +291,9 @@ function setupOffline() {
 }
 
 /* ---------------- capture ---------------- */
+function isPhotoFile(f) {
+  return /^image\//i.test(f.type || "") || /\.(jpe?g|png|webp|gif|bmp|heic|heif|jfif)$/i.test(f.name || "");
+}
 function setupCapture() {
   on("lang", "change", (e) => { lang = e.target.value; localStorage.setItem("tc_lang", lang); applyLang(); });
   on("video", "change", (e) => {
@@ -287,10 +302,17 @@ function setupCapture() {
     $("videoHint").textContent = videoFile ? t("videoOk") : "";
   });
   on("photo", "change", (e) => {
-    photoFiles = [...e.target.files].slice(0, 3);
+    const picked = [...e.target.files];
+    photoFiles = picked.filter(isPhotoFile).slice(0, 3);
+    $("formErr").textContent = picked.length && !photoFiles.length ? t("badFile") : "";  // say so now, not after Go
+    const pv = $("photoPreview");
     if (photoFiles.length) {
-      $("photoPreview").src = URL.createObjectURL(photoFiles[0]); $("photoPreview").classList.remove("hidden");
+      pv.onerror = () => { pv.classList.add("hidden"); $("photoHint").textContent = "📷 " + (photoFiles[0].name || "") + (photoFiles.length > 1 ? ` +${photoFiles.length - 1}` : ""); };  // e.g. HEIC the browser can't draw
+      pv.src = URL.createObjectURL(photoFiles[0]); pv.classList.remove("hidden");
       $("photoHint").textContent = photoFiles.length > 1 ? `${photoFiles.length} ${t("photos")}` : "";
+    } else if (picked.length) {
+      pv.removeAttribute("src"); pv.classList.add("hidden"); $("photoHint").textContent = "📷 " + t("takePhoto");
+      e.target.value = "";
     }
   });
   document.querySelectorAll("#cats .chip").forEach((b) => b.addEventListener("click", () => {
