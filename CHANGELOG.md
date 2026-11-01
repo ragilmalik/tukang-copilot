@@ -2,6 +2,11 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.25.8 (2026-11-01 WIB)
+Audit 14 (recorded demo in Bahasa, Basa Jawa and English with no server, then a read of every number the docs quote).
+- **No stale test count in the docs.** `docs/TESTING.md` still said "all 550 tests" while the README, SUBMISSION and WRITEUP said 620. It now points to docs/TEST_REPORT.md, and a new test (`test_doc_counts.py`) fails if any submission doc quotes a test count different from the last real run, so a judge never sees two numbers.
+- The recorded demo (`?replay=1`) was walked end to end in id/jv/en (landing, progress, question, result, all four camera-checked steps, outcome, PDF and WhatsApp buttons): no console errors, nothing in the wrong language.
+
 ## 1.25.7 (2026-11-01 WIB)
 Audit 13 (result + steps: walked all four steps of the demo repair in Bahasa Jawa and English, fast like a real owner).
 - **A passed camera check no longer skips a step.** After "Step looks right" the app moves on by itself after 1.5 s. An owner who tapped Next (or Back) in the meantime was moved a second time: step 2 jumped to step 4, and on the last step the stale timer ran past the end and threw "Cannot read properties of undefined". Any other move to a step now cancels the timer.
