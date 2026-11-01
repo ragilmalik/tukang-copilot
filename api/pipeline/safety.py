@@ -55,11 +55,11 @@ _TEXT_RULES: list[tuple[str, str]] = [
     (r"\b(brake (line|hose|pipe)s?|selang rem|pipa rem|minyak rem\w*|rem (mobil(ku)? )?blong|brakes? (failed|failure|gone))\b", "hv"),
     # "gas" alone also means the throttle on a motorbike ("tarik gas"), so only cooking/LPG gas contexts stop
     (r"\b(elpiji|lpg|tabung gas|selang gas|regulator gas|bau gas|gas bocor|bocor gas|kompor gas|gas leak|gas smell|smell gas|gas line|gas hose)\b", "gas"),
-    (r"\b(mcb|panel listrik|sekring utama|meteran pln|kwh meter|fuse box|breaker box|kabel (di )?dalam tembok|instalasi listrik|stop ?kontak (terbakar|meleleh)|korsleting|konsleting|konslet|korslet|short circuit)\b", "mains"),
-    (r"\b(microwave|magnetron|crt|kapasitor tegangan tinggi|high voltage|airbag|minyak rem|rem hidrolik|brake fluid|brake hydraulic|bensin bocor|fuel leak|freon|refrigerant|kompresor ac|ac compressor)\b", "hv"),
-    (r"\b(kesetrum|ke setrum|tersetrum|disetrum|kena setrum|tersengat listrik|sengatan listrik|electric shock|electrocut\w*|got shocked|shocked me)\b", "shock"),
-    (r"\b(kebakaran|terbakar|api menyala|keluar api|keluar asap|berasap|on fire|caught fire|catching fire|flames?|smoke coming|baterai( \w+)? (menggembung|kembung|mlembung)|swollen battery|battery swelling)\b", "fire"),
-    (r"\b(luka|berdarah|sakit|obat|dokter|demam|pingsan|patah tulang|injury|bleeding|medicine|doctor|symptom)\b", "medical"),
+    (r"\b(mcb|panel listrik|sekring utama|meteran pln|kwh meter|fuse box|breaker box|kabel (di )?dalam tembok|instalasi listrik|stop ?kontak (terbakar|meleleh)|korsleting|konsleting|konslet|korslet|short circuit|kabel pln|tiang listrik|tiang pln|jaringan pln|kabel listrik (putus|jatuh|menjuntai|njuntai)|power line|downed line|(trafo|travo|transformer)( \w+)? (meledak|terbakar|njeblug|mbledug|bocor|exploded)|tiga fase|3 fase|three.?phase|(380|400) ?v(olt)?)\b", "mains"),
+    (r"\b(microwave|magnetron|crt|kapasitor tegangan tinggi|high voltage|airbag|minyak rem|rem hidrolik|brake fluid|brake hydraulic|bensin bocor|fuel leak|freon|refrigerant|kompresor ac|ac compressor|kompresor (kulkas|lemari es|freezer|fridge)|(tv|televisi|monitor) tabung|(bensin|pertalite|fuel|petrol|gasoline)( \w+)? (netes|menetes|merembes|ngeces|dripping|seeping|leaking)( \w+){0,4} (panas|knalpot|exhaust|muffler|hot)|(panas|knalpot|exhaust|muffler|hot)( \w+){0,4} (bensin|pertalite|fuel|petrol|gasoline)( \w+)? (netes|menetes|merembes|ngeces|dripping|seeping|leaking))\b", "hv"),
+    (r"\b(kesetrum|ke setrum|tersetrum|disetrum|kena setrum|tersengat listrik|sengatan listrik|electric shock|electrocut\w*|got shocked|shocked me|nyetrum(?! ?(aki|accu|baterai|batre|hp))\w*|nyetrom\w*|kesetrom|kesengat listrik|disengat listrik|kesengat arus|dialiri listrik)\b", "shock"),
+    (r"\b(kebakaran|terbakar|api menyala|keluar api|keluar asap|berasap|on fire|caught fire|catching fire|flames?|smoke coming|(baterai|batre|aki|accu|battery|lithium)( \w+){0,2} (n?g?g?embung|menggembung|kembung|mlembung|bengkak|mengembang|swollen|bloated|puffed)|swollen battery|battery swelling|percik(an)? api (dari|di|pada|ing) (stop ?kontak|kabel|colokan|listrik|mcb|saklar|kipas|setrika)|stop ?kontak\w* .{0,15}percik\w* api|ngeletik|meletik|sparks? (from|coming|flying)|sparking(?! plug)|(aki|accu|baterai|batre|kompor|tabung|trafo|travo|transformer|kabel|kapasitor|capacitor|battery|stove)( \w+){0,2} (meledak|mbledug|mbledos|njeblug|ngeblug|njeblugi|exploded|explodes|blew up|burst into flames?)|kompor( \w+)?( \w+)? (nyemprot\w*|nyembur\w*|menyembur|menyemprot)\b)", "fire"),
+    (r"\b(luka|berdarah|sakit|obat|dokter|demam|pingsan|patah tulang|injury|bleeding|medicine|doctor|symptom|keracunan|diracuni|poison\w*|sesak (napas|nafas)|tidak bisa (bernapas|bernafas)|can.?t breathe)\b", "medical"),
 ]
 
 # actions a plan must never ask for (checked on instruction text, any language)
@@ -74,6 +74,15 @@ _PLAN_RULES: list[tuple[str, str]] = [
     (r"(buka|bongkar|ganti|open|replace|swap|rewire).{0,30}(panel listrik|mcb|consumer unit|breaker|rcd|fuse box)", "mains"),
     (r"(sambung|splice|connect|reconnect|join).{0,40}(kabel|wire|wiring).{0,40}(plafon|ceiling|langit-langit)", "mains"),
     (r"(lepas|ganti|buka|remove|replace|disconnect).{0,30}(brake (line|hose|pipe)|selang rem|pipa rem)", "hv"),
+    # v1.25.4 audit 10: refrigerant, CRT, gas pipes, tank patching, swollen cells, live testing, bypassed safeties
+    (r"(isi|tambah|refill|recharge|charge|ganti|bocor).{0,25}(freon|refrigerant)|\bmanifold (gauge|set)\b|\b(flyback|crt|tv tabung|anode cap)\b", "hv"),
+    (r"(buang muatan|discharge|cabut|lepas|remove).{0,30}(kapasitor|capacitor).{0,30}(besar|tv|crt|microwave|tabung|high|large)", "hv"),
+    (r"(perbaiki|tambal|tutup|sambung|las|repair|patch|seal|fix|lakban|tape).{0,30}(pipa gas|gas pipe|kebocoran gas|gas leak)|(pipa gas|gas pipe)", "gas"),
+    (r"(tutup|tambal|lem|las|solder|weld|seal|patch|glue).{0,30}(tangki|tank|bensin|fuel).{0,40}(bocor|leak|retak|crack)|(tutup|tambal|lem|las|solder|weld|seal|patch|glue).{0,20}(kebocoran|leak\\w*).{0,15}(bensin|fuel|tangki|tank)", "hv"),
+    (r"(cabut|bongkar|tusuk|bedah|buka|pierce|puncture|open|disassemble|cut).{0,30}(baterai|battery|lithium|sel).{0,30}(gembung|menggembung|swollen|bengkak|bloated)", "fire"),
+    (r"(?<!not )(?<!n't )(?<!never )(?<!jangan )(?<!tidak )(?<!dilarang )(touch|sentuh|pegang|measure|ukur|test|tes|probe|bridge|jumper|bongkar|buka|open)\b.{0,40}(while|saat|ketika|selagi|sambil).{0,20}(plugged in|tercolok|powered on|energi[sz]ed|live|dialiri listrik)", "mains"),
+    (r"\b(mains live|live mains|live (wire|terminal)s?|kabel (yang )?(hidup|bertegangan))\b", "mains"),
+    (r"(?<!not )(?<!n't )(?<!never )(?<!jangan )(?<!tidak )(?<!dilarang )(bypass|jumper|short|bridge|lewati|jembatani|lepas)\b.{0,25}(thermal fuse|thermostat|termostat|sekring termal|safety (switch|cutoff|valve)|pengaman|saklar pengaman)", "mains"),
 ]
 
 

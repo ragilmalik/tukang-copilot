@@ -55,7 +55,7 @@ forces red when a hard-stop action appears. Owner text and text visible in photo
 Spend is capped per repair and per day.
 
 ## How we evaluate it
-- **Engineering:** 550 automated tests, 0 failed, 0 skipped (incl. real Chromium with a fake camera and jsdom), a
+- **Engineering:** 599 automated tests, 0 failed, 0 skipped (incl. real Chromium with a fake camera and jsdom), a
   66-check end-to-end HTTP smoke, mypy strict and ruff clean (docs/TEST_REPORT.md).
 - **Pipeline and safety routing:** 10/10 labelled stand-in photos and 3/3 step checks met their expectations in demo
   mode (docs/EVAL_REPORT.md). That proves routing, not accuracy.

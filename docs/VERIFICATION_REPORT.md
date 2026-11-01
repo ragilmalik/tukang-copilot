@@ -132,6 +132,8 @@ Evidence names are tests in `api/tests/` (see TEST_REPORT.md for the run) or scr
 
 **Run numbers (2026-11-01, v1.25.3):** `make_test_report.py` ALL PASSED: pytest **550 passed, 0 failed, 0 skipped** (445 s, real Chromium + jsdom), ruff, check_keys --fake, smoke; `mypy api` strict no issues in 103 files; `smoke_e2e.py` ALL PASSED on a local demo-mode server. New and covered: first-screen language by phone / `?lang=`, Back / Forward button handling, thumb-sized small links (1.25.2), refusals of a wrong file in the owner's language and an at-once refusal of a non-photo (1.25.3).
 
+**Run numbers (2026-11-01, v1.25.4):** `make_test_report.py` ALL PASSED: pytest **599 passed, 0 failed, 0 skipped** (505 s), ruff, check_keys --fake, smoke; `mypy api` strict no issues in 103 files. New and covered: street Indonesian / Javanese wording in the text gate and 8 more plan-guard rules (49 tests in `test_safety.py`).
+
 ## 6. What is NOT verified yet (honest list)
 
 1. **No live Meta model answer has been verified** (no API key yet; `scripts/set_keys.py` then `scripts/first_live_run.py` is the one-command fix). The real api.meta.ai endpoint was reached and correctly rejected a dummy key (401). Everything else uses a stand-in server built from the documented shapes, so real outputs, latency, error bodies and rate limits are unconfirmed. → `scripts/set_keys.py`, then `deploy_check.py --live`.

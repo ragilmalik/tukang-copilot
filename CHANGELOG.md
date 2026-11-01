@@ -2,6 +2,12 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.25.4 (2026-11-01 WIB)
+Audit 10 (red stop + re-plan screens in Bahasa and Basa Jawa, then a probe of the safety gate with 40 street-wording texts).
+- **Text gate speaks street Indonesian and Javanese.** 15 of 40 probes slipped through: "kulkas nyetrum", "kabel PLN putus", "trafo meledak", "listrik ngeletik percikan api di stopkontak", "aki meledak", "kompor mbledug", "kompor nyemprot api", "baterai nggembung", "bensin netes ing mesin panas", "kompresor kulkas", "anakku keracunan gas", three-phase / 380 V. All now stop with the right category and message. Words that are normal repair talk still pass: "percikan api busi", "ban meledak", "nyetrum aki" (charging a battery), "bensin netes" from a carburettor with no heat, "kabel gas / rem / charger putus", 12 V "tegangan aki".
+- **Plan guard**: 8 new rules for steps a model could write: refrigerant refill, CRT capacitors and flyback, gas pipe repair, patching a fuel leak, piercing a swollen lithium cell, touching terminals while plugged in, live mains testing, bypassing a thermal fuse or safety switch. A warning such as "do not touch the terminals while plugged in" or "never bypass the thermal fuse" is not stopped.
+- 49 new parametrised tests in `test_safety.py`. docs/EVAL.md numbers (30 dangerous, 17 safe) are unchanged: the labelled eval set was not enlarged, so nothing quoted elsewhere moved.
+
 ## 1.25.3 (2026-11-01 WIB)
 Audit 9 (capture screen with a text file, a broken JPG, a 20 px image and a 6000x4000 photo, in Bahasa / Basa Jawa / English, real Chromium 390x844).
 - **Refusals in the owner's language.** A wrong file or a broken photo showed the server's English ("Unsupported file type .txt", "Could not read that photo. Try a JPG or PNG.") on the Indonesian and Javanese pages. The app now translates every refusal a person can cause (not a photo, unreadable photo, too big, empty, text too long, missing photo or description) in all three languages, on every request path (start, answer, step check, re-plan, report).
