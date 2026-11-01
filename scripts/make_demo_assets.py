@@ -1,4 +1,4 @@
-"""Demo assets from the REAL app running in demo (mock) mode: screenshots, captions, voice-over, a 2-3 min video.
+"""Demo assets from the real app running in demo (mock) mode: screenshots, captions, voice-over, a 2-3 min video.
 
     python scripts/make_demo_assets.py shots     # Playwright drives the phone UI -> docs/demo/screenshots/*.png (+ wa)
     python scripts/make_demo_assets.py wa        # only the WhatsApp simulator shots -> docs/demo/screenshots/30_whatsapp_*.png
@@ -8,7 +8,7 @@
     python scripts/make_demo_assets.py all
 
 Everything shown is the app built during the hackathon, in demo mode, with labelled stand-in photos.
-The video says so on screen. Malik's real-phone video (docs/DEMO_SCRIPT.md) replaces it when recorded.
+The video says so on screen. My own real-phone video (docs/DEMO_SCRIPT.md) replaces it once I record it.
 Chromium: PLAYWRIGHT_CHROMIUM, system chromium, or `python -m playwright install chromium`.
 """
 from __future__ import annotations
@@ -50,7 +50,7 @@ def font(size: int, bold: bool = True) -> ImageFont.FreeTypeFont | ImageFont.Ima
     return ImageFont.load_default()
 
 
-# ---------------------------------------------------------------- scenes (the script)
+# --- scenes (the script)
 @dataclass
 class Scene:
     key: str
@@ -64,11 +64,11 @@ WA_LABELS = ["Cause on your photo", "Tap a step button", "Gas leak: red stop"]
 HACKATHON_LINE = "Built during the Meta AI Developer Hackathon, Oct 26 to Nov 4, 2026 (first commit Oct 30)"
 
 SCENES: list[Scene] = [
-    # v1.25: 3-second hook title card (silent), then the story. Captions of the voice-over are burned in (English).
+    # 3-second silent title card, then the story. The voice-over captions are burned in (English).
     Scene("title", "title:Fix it yourself, safely. In Javanese.|" + HACKATHON_LINE,
           "Tukang Copilot · Muse Spark + SAM 3.1 + Muse Image", "", 3),
     Scene("hook", "title:Motor mogok. Bengkelnya tutup.|Bike won't start. The repair shop is closed.",
-          "Indonesia runs on ~130 million motorbikes, water pumps and rice cookers.",
+          "139 million motorbikes in Indonesia (BPS 2024), plus water pumps.",
           "In Indonesia, a small fault on a motorbike or a water pump can cost a day's wage. "
           "Repair videos can't see your problem, and they're not in your language.", 7),
     Scene("intro", "01_home", "Photo + voice in Bahasa, Javanese or English. No photo? ▶ 1-tap demo.",
@@ -76,11 +76,11 @@ SCENES: list[Scene] = [
     Scene("progress", "02_progress", "Results stream in as each Meta model finishes: what it saw, SAM 3.1's outlines, the likely cause.",
           "You watch the agent work: as each stage finishes, its result appears. What Muse Spark saw, "
           "the parts SAM 3.1 outlined, then the likely cause.", 6),
-    Scene("question", "03_question", "Unsure? It asks ONE question instead of guessing.",
+    Scene("question", "03_question", "Unsure? It asks one question instead of guessing.",
           "When the evidence is ambiguous, it asks one short question instead of guessing.", 4),
     Scene("diagnosis", "04_diagnosis", "Likely causes with confidence, safety level, tools, time, cost vs bengkel price.",
           "Then the diagnosis: likely causes with confidence, a safety level, tools, time, and the parts cost against the repair-shop price.", 6),
-    Scene("parts", "05_parts", "SAM 3.1 masks the real parts on YOUR photo, numbered.",
+    Scene("parts", "05_parts", "SAM 3.1 masks the real parts on your own photo, numbered.",
           "The parts are masked and numbered on your own photo by SAM 3.1, not a generic diagram.", 5),
     Scene("preflight", "15_preflight", "Safety first: the steps stay locked until every check is ticked.",
           "Before step one, a short safety checklist. The steps stay locked until you tick every item.", 5),
@@ -100,15 +100,13 @@ SCENES: list[Scene] = [
           "When a photo can't show a step, Muse Image draws a diagram and Muse Spark checks it. This one is a demo stand-in.", 5),
     Scene("agent", "23_agent_log", "“What the AI did”: every decision, the model that made it, and why it asked.",
           "Every decision is on screen: what it saw, why it asked, each photo check, each re-plan, and which Meta model did it.", 6),
-    # v1.25: "jump" and "pdf" scenes dropped to make room for the title card and the Muse Image diagram (cut stays under 3:00)
     Scene("handoff", "18_handoff", "Hand-off to a bengkel: WhatsApp summary, nearest workshop, PDF with a mechanic brief.",
           "And when it's a job for a pro, one tap hands it off: a WhatsApp summary of what was found and tried, "
           "a search for the nearest bengkel, and a PDF with a brief for the mechanic.", 8),
-    Scene("rice", "11_rice_stop", "RED STOP: opening 220 V internals → take it to a service centre.",
+    Scene("rice", "11_rice_stop", "Red stop: opening 220 V internals → take it to a service centre.",
           "It also knows when to say no. A rice cooker that won't heat would mean opening 220 volt internals, "
           "so the safety gate stops the guidance.", 7),
-    # v1.22: the stop-PDF scene was dropped to make room for the agent log and keep the cut under 3:00
-    # v1.27: the "share" and "lang" scenes were dropped for the WhatsApp scene (Javanese is now shown in WhatsApp; cut stays under 3:00)
+    # no share, language or stop-PDF scenes: the cut has to stay under 3:00, and WhatsApp shows the Javanese
     Scene("wa", "wa:30_whatsapp_jv_diagnosis,30_whatsapp_jv_steps,30_whatsapp_jv_redstop",
           "Also works in WhatsApp, in Basa Jawa. Same agent, same safety gate.",
           "It also works in WhatsApp, in Javanese. Send a photo, and the same agent replies with the marked photo, "
@@ -125,7 +123,7 @@ SCENES: list[Scene] = [
 ]
 
 
-# ---------------------------------------------------------------- screenshots
+# --- screenshots
 def _server() -> tuple[str, Any]:
     os.environ.setdefault("MOCK", "1")
     os.environ.setdefault("NARRATION_VOICE", "0")
@@ -205,7 +203,7 @@ def shots() -> None:
         pg.evaluate("document.activeElement && document.activeElement.blur(); window.scrollTo(0, 0)")
         snap("01_home")
         pg.click("#goBtn"); pg.wait_for_selector("#progress:not(.hidden)")
-        # v1.23: partial results stream in (demo pacing MOCK_PACE holds each finished stage on screen)
+        # partial results stream in (MOCK_PACE holds each finished stage on screen)
         pg.wait_for_selector("#lf-segment img", timeout=30000)
         pg.wait_for_function("document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
         pg.evaluate("document.querySelector('#stageList').scrollIntoView({block: 'start'}); window.scrollBy(0, -110)")
@@ -226,7 +224,7 @@ def shots() -> None:
         pg.wait_for_function("!document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
         pg.locator("#checkResult").scroll_into_view_if_needed(); snap("08_check_pass")
         pg.wait_for_function("document.querySelector('#stepNo').textContent.trim() === '2'", timeout=10000)  # auto-advanced
-        pg.locator("#agent .agGo", has_text="Langkah 1 dicek").first.click()          # v1.23: tap a log line → back to that step
+        pg.locator("#agent .agGo", has_text="Langkah 1 dicek").first.click()          # tap a log line → back to that step
         pg.wait_for_selector("#stepCard.flash"); pg.wait_for_timeout(900)
         pg.evaluate("window.scrollBy(0, -40)"); snap("24_agent_jump")
         pg.check("#handsFree"); pg.wait_for_selector("#voiceBar:not(.hidden)", timeout=5000); pg.wait_for_timeout(600)
@@ -235,9 +233,9 @@ def shots() -> None:
         pg.fill("#stuckText", "Sudah dicoba, mesin tetap tidak nyala."); pg.click("#stuckBtn")
         pg.wait_for_function("document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled",
                              timeout=20000); pg.wait_for_timeout(600)
-        pg.wait_for_selector("#planBanner:not(.hidden)"); pg.evaluate("window.scrollTo(0, 0)"); snap("09_replan")  # v1.24: re-plan banner + tried cause
+        pg.wait_for_selector("#planBanner:not(.hidden)"); pg.evaluate("window.scrollTo(0, 0)"); snap("09_replan")  # re-plan banner + tried cause
         pg.evaluate("document.querySelector('#agent').scrollIntoView({block: 'start'}); window.scrollBy(0, -70)"); snap("23_agent_log")
-        # v1.25: the plan-2 step that needs a drawing (Muse Image in live mode; a labelled stand-in drawing in demo mode)
+        # the plan-2 step that needs a drawing (Muse Image in live mode; a labelled stand-in drawing in demo mode)
         tick_preflight()
         for _ in range(6):
             if "diagram" in (pg.get_attribute("#stepImg", "src") or "") and pg.is_visible("#stepImg"):
@@ -275,7 +273,7 @@ def shots() -> None:
         # safety stop with PDF + hand-off
         go_sample("rice"); pg.wait_for_selector("#stopBox:not(.hidden)", timeout=30000)
         pg.wait_for_selector("#stopHandoff:not(.hidden)", timeout=10000)
-        pg.evaluate("window.scrollTo(0, 0)"); snap("11_rice_stop")  # v1.24: the STOP card sits under the "Stopped for your safety" heading
+        pg.evaluate("window.scrollTo(0, 0)"); snap("11_rice_stop")  # the STOP card sits under the "Stopped for your safety" heading
         pg.evaluate("document.querySelector('#stopHandoff').scrollIntoView({block: 'end'}); window.scrollBy(0, 40)"); snap("22_stop_handoff")
         sid = pg.evaluate("S && S.id")
         pdf = Path(tempfile.mkdtemp()) / "stop.pdf"
@@ -291,11 +289,11 @@ def shots() -> None:
         settings.use_open_weights, settings.baseten_api_key = True, "stand-in-not-a-key"
         pg.goto(base + "/"); pg.select_option("#lang", "en"); pg.wait_for_selector("#owBadge:not(.hidden)", timeout=5000); snap("21_open_weights")
         settings.use_open_weights, settings.baseten_api_key = False, ""
-        # v1.24 recorded demo: what a judge sees when the server sleeps (forced here with ?replay=1)
+        # recorded demo: what a visitor sees when the server sleeps (forced here with ?replay=1)
         pg.goto(base + "/?replay=1"); pg.select_option("#lang", "en"); pg.click("#demoBtn")
         pg.wait_for_selector("#question:not(.hidden)", timeout=20000); pg.click('#quickAns button[data-q="qNo"]')
         pg.wait_for_selector("#result:not(.hidden)", timeout=20000); pg.evaluate("window.scrollTo(0, 0)"); snap("27_recorded_demo")
-        # v1.25 laptop view: phone frame + side panel (QR code, 1-tap demo, language switch)
+        # laptop view: phone frame + side panel (QR code, 1-tap demo, language switch)
         lap = b.new_page(viewport={"width": 1280, "height": 800})
         lap.goto(base + "/"); lap.select_option("#lang", "en"); lap.wait_for_selector("#qrBox svg", timeout=5000); lap.wait_for_timeout(400)
         lap.screenshot(path=str(SHOTS / "29_laptop.png")); print("shot 29_laptop", flush=True)
@@ -304,14 +302,14 @@ def shots() -> None:
     print("screenshots ->", SHOTS, sorted(p.name for p in SHOTS.glob("*.png")))
 
 
-# ---------------------------------------------------------------- WhatsApp simulator (v1.27)
+# --- WhatsApp simulator
 WA_SHOTS = ["30_whatsapp_jv_diagnosis", "30_whatsapp_jv_steps", "30_whatsapp_jv_redstop", "30_whatsapp_en_check", "30_whatsapp_en_pdf"]
 
 
 def wa_shots() -> None:
     """The WhatsApp simulator page (/wa, demo mode): the same handler as the real Cloud API webhook, so these show what a
     WhatsApp chat gets. Javanese: photo in, marked photo + diagnosis, step buttons, red stop; English: a step check and
-    the PDF report. Not a real WhatsApp number (that waits on Malik's Meta setup, docs/WHATSAPP.md)."""
+    the PDF report. Not a real WhatsApp number (that waits on my Meta setup, docs/WHATSAPP.md)."""
     from playwright.sync_api import sync_playwright
 
     SHOTS.mkdir(parents=True, exist_ok=True)
@@ -359,7 +357,7 @@ def wa_shots() -> None:
     srv.should_exit = True
 
 
-# ---------------------------------------------------------------- architecture diagram
+# --- architecture diagram
 def diagram() -> None:
     im = Image.new("RGB", (W, H), BG); d = ImageDraw.Draw(im)
     d.text((80, 50), "Tukang Copilot: one agent loop, five Meta models", fill=INK, font=font(52))
@@ -372,7 +370,7 @@ def diagram() -> None:
         ("Diagnose", "Muse Spark 1.3\nor Muse Spark Open*", (1440, 230), (255, 228, 204)),
         ("Safety gate", "3 layers in code\nred = STOP + pro", (1440, 560), (255, 210, 205)),
         ("Plan", "Muse Spark → steps\nwith expected state", (1100, 560), (255, 228, 204)),
-        ("Illustrate", "Muse Image edit\nof YOUR photo", (760, 560), (225, 214, 245)),
+        ("Illustrate", "Muse Image edit\nof your photo", (760, 560), (225, 214, 245)),
         ("Verify step", "new photo → Spark\n✓ pass / ⚠ correction", (420, 560), (210, 240, 220)),
         ("Report", "PDF · bengkel\nhand-off · garage", (80, 560), (230, 230, 230)),
     ]
@@ -403,7 +401,7 @@ def diagram() -> None:
     print("diagram ->", ARCH)
 
 
-# ---------------------------------------------------------------- voice-over
+# --- voice-over
 def voice() -> None:
     """edge-tts (Microsoft neural voices, free, needs internet). Set EDGE_TTS_PROXY if the network needs a proxy."""
     import edge_tts
@@ -434,7 +432,7 @@ def _dur(p: Path) -> float:
     return float(json.loads(r.stdout)["format"]["duration"])
 
 
-# ---------------------------------------------------------------- frames + video
+# --- frames + video
 def _wrap(d: ImageDraw.ImageDraw, text: str, f: Any, width: int) -> list[str]:
     lines: list[str] = []
     for para in text.split("\n"):
@@ -470,7 +468,7 @@ def _frame(sc: Scene, vertical: bool = False, subtitle: str = "") -> Image.Image
             im.paste(a.resize((aw, int(a.height * aw / a.width)), Image.Resampling.LANCZOS), ((fw - aw) // 2, 0))
         else:
             im.paste(a.resize((fw, int(a.height * fw / a.width))), (0, 0))
-    elif sc.image.startswith("wa:"):  # v1.27: three WhatsApp simulator screens side by side, each with a short label
+    elif sc.image.startswith("wa:"):  # three WhatsApp simulator screens side by side, each with a short label
         names = sc.image[3:].split(",")
         ph = 692 if vertical else 640
         pw_ = int(780 * ph / 1688)
@@ -642,15 +640,15 @@ def video() -> None:
 
 def vertical(work: Path, has_voice: bool) -> None:
     """~45 s 9:16 clip for X (silent, captions only): 3 s title card, then hook, streaming progress, parts, live camera,
-    check, rice stop, WhatsApp (v1.27, in place of the Muse Image diagram), models, close. Each card has the Indonesian line plus an English caption."""
-    keys = ["title", "hook", "progress", "parts", "live", "check_pass", "rice", "wa", "arch", "close"]  # v1.27: wa replaced diagram
-    short = {"title": "Tukang Copilot", "hook": "Motor mogok, bengkel tutup? Foto + ngomong.", "parts": "SAM 3.1 menandai part di foto KAMU.",
+    check, rice stop, WhatsApp (in place of the Muse Image diagram), models, close. Each card has the Indonesian line plus an English caption."""
+    keys = ["title", "hook", "progress", "parts", "live", "check_pass", "rice", "wa", "arch", "close"]
+    short = {"title": "Tukang Copilot", "hook": "Motor mogok, bengkel tutup? Foto + ngomong.", "parts": "SAM 3.1 menandai part di foto kamu.",
              "live": "Kamera langsung: part yang harus dipegang ditandai (demo).", "check_pass": "Tiap langkah dicek kamera ✓",
              "diagram": "Foto tidak cukup? Muse Image menggambar diagram (demo: gambar pengganti).",
              "rice": "Bahaya? Dia bilang STOP.", "wa": "Juga lewat WhatsApp, dalam Basa Jawa.", "progress": "Lihat AI bekerja: hasil muncul tiap tahap.",
              "arch": "Built with Meta Muse Spark + SAM 3.1 + Muse Image", "close": "Tukang Copilot · open source · mode demo"}
     english = {"title": "", "hook": "Bike won't start and the shop is closed? Snap it and say what's wrong.",
-               "parts": "SAM 3.1 marks the parts on YOUR photo.", "live": "Live camera: the part to touch is outlined (demo).",
+               "parts": "SAM 3.1 marks the parts on your photo.", "live": "Live camera: the part to touch is outlined (demo).",
                "check_pass": "Every step is checked by the camera.", "diagram": "Photo not enough? Muse Image draws a diagram (demo stand-in).",
                "rice": "Dangerous? It says STOP and hands you to a pro.", "wa": "Also works in WhatsApp (simulator, demo mode).", "progress": "Watch the AI work: results appear stage by stage.",
                "arch": "Voice Transcribe · Muse Spark · SAM 3.1 · Muse Image", "close": "Fix it yourself, safely. In Javanese."}

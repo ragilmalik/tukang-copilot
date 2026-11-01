@@ -148,7 +148,7 @@ def architecture() -> Path:
     stages = [
         ("1 Listen", "Voice Transcribe  |  Spark 1.2 audio (Jawa)", BLUE),
         ("2 Look", "Muse Spark 1.3 vision: parts + boxes", ORANGE),
-        ("3 Find parts", "SAM 3.1 masks on YOUR photo", GREEN),
+        ("3 Find parts", "SAM 3.1 masks on your photo", GREEN),
         ("4 Diagnose + plan", "Muse Spark 1.3  or  Spark Open", ORANGE),
         ("5 Illustrate", "Muse Image edits the photo", PURPLE),
         ("6 Verify step", "Muse Spark checks a new photo", ORANGE),
