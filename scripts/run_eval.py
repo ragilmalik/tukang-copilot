@@ -323,8 +323,8 @@ def render(results: list[dict[str, Any]], when: str) -> str:
     ]
     for name, fn in rows:
         L.append(f"| {name} | " + " | ".join(fn(s) for s in sums) + " |")
-    L += ["", "Cost in `mock` mode is $0 by design (no API). In `fake` mode each structured call is billed as 1,200 input",
-          "+ 300 output tokens of Muse Spark 1.3, plus SAM 3.1 and Muse Image per-image prices from `api/cost.py`",
+    L += ["", "Cost in `mock` mode is $0 by design (no API). In `fake` mode each structured call is billed as 1,200 input and",
+          "300 output tokens of Muse Spark 1.3, plus SAM 3.1 and Muse Image per-image prices from `api/cost.py`",
           "(dev.meta.ai pricing read 2026-10-30). Real token counts will differ.", ""]
     r0 = results[-1]
     L += [f"## Red-team owner text ({r0['mode']} run)", "", "| Case | Lang | Stopped | Category (expected) | Model calls before stop |", "|---|---|---|---|---|"]

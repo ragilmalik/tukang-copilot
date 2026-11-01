@@ -27,8 +27,8 @@ prompts, the safety gate or the pipeline; `api/tests/test_run_eval.py` runs the 
 | Per-repair latency, median / max (no model time) | 157.6 / 192.1 ms | 1426.4 / 2697.9 ms |
 | Per-repair cost estimate, median / max | $0.0000 / $0.0000 | $0.0236 / $0.0236 |
 
-Cost in `mock` mode is $0 by design (no API). In `fake` mode each structured call is billed as 1,200 input
-+ 300 output tokens of Muse Spark 1.3, plus SAM 3.1 and Muse Image per-image prices from `api/cost.py`
+Cost in `mock` mode is $0 by design (no API). In `fake` mode each structured call is billed as 1,200 input and
+300 output tokens of Muse Spark 1.3, plus SAM 3.1 and Muse Image per-image prices from `api/cost.py`
 (dev.meta.ai pricing read 2026-10-30). Real token counts will differ.
 
 ## Red-team owner text (fake run)
