@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-11-01 (v1.25.2): submission-ready, waiting on Malik's steps
+- **New since 1.25.1 (audit 8, `../work/IMPROVEMENT_BACKLOG.md` M1 to M5):** small text links are thumb-sized (shop "Compare prices" / "Shopee" 16 px to 40 px, sample links 30 to 40 px, garage entries themed and padded, summaries 44 px). 3 real-Chromium tests measure the boxes (`test_playwright_targets.py`, all fail on 1.25.1). UI otherwise unchanged, so screenshots, GIF and video were not re-shot.
+- **Checks (real runs):** `make_test_report.py` ALL PASSED: pytest **542 passed, 0 failed, 0 skipped** (499 s; fast 513 in two chunks 250 + 263, slow 29), ruff, check_keys --fake, smoke; `mypy api` strict no issues in 102 files; `smoke_e2e.py` ALL PASSED on `MOCK=1 PORT=8765 python app.py`; `run_eval.py` regenerated (app 1.25.2).
+- **Honest status:** unchanged: no live Meta answer verified yet (needs the key).
+
 ## State on 2026-11-01 14:20 WIB (v1.25.1): submission-ready, waiting on Malik's steps
 - **New since 1.25.0 (audit 7, `../work/IMPROVEMENT_BACKLOG.md` L1 to L3):** the first screen follows the phone's language (an English-speaking judge no longer lands on Bahasa; Indonesian or Javanese anywhere in the phone's language list keeps Bahasa / Basa Jawa; `?lang=id|jv|en` overrides; the saved choice wins) and the phone Back button returns to the first screen instead of leaving the site (Forward resumes the same repair; Start again / Erase step back). 9 new real-Chromium tests (`test_playwright_lang.py`, `test_playwright_back.py`). The demo-asset script pins id-ID so screenshots/video are unchanged (the UI otherwise looks the same, so no re-shoot). Details: CHANGELOG 1.25.1.
 - **Checks (real runs, 2026-11-01 ~14:15 WIB):** `make_test_report.py` ALL PASSED: pytest **539 passed, 0 failed, 0 skipped** (527 s, Chromium at /tmp/bin/chromium + jsdom at /tmp/jd), ruff, check_keys --fake, smoke; `mypy api` strict no issues in 101 files; `smoke_e2e.py` ALL PASSED on `MOCK=1 PORT=8765 python app.py`; `run_eval.py` regenerated (app 1.25.1). Fast `-m "not slow"` = 510, slow = 29.

@@ -2,6 +2,11 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.25.2 (2026-11-01 WIB)
+Audit 8 (accessibility of the small controls, English flow at 390x844 in real Chromium, a script that measures every visible control).
+- **Thumb-sized small links.** The "Compare prices" / "Shopee" links were 16 px tall, the sample links under the camera 30 px, the garage entries the browser's default blue, and the "Agent log" / "models used" summaries 24 px: hard to hit with greasy or gloved hands. Now 40 px (shop and sample links), 44 px (record-a-video), garage entries themed and 8 px padded, summaries 44 px. 3 Chromium tests measure the real boxes (`test_playwright_targets.py`; all three fail on 1.25.1).
+- Service worker cache `tukang-shell-v7`.
+
 ## 1.25.1 (2026-11-01 WIB)
 Audit 7 (garage, PDF, share card, Javanese screens at 390x844 in real Chromium) found two things a judge on a phone would hit in the first minute.
 - **First screen follows the phone.** It always opened in Bahasa Indonesia, so an English-speaking judge landed on a page they could not read. Now: an earlier choice wins, then `?lang=id|jv|en` on the link, then the phone's language list (Indonesian or Javanese anywhere in it keeps Bahasa / Basa Jawa, so an Indonesian phone set to English is not switched), else English. 5 Chromium tests (`test_playwright_lang.py`). The demo-asset script now pins the browser to id-ID so screenshots and video do not change.
