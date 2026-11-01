@@ -1,4 +1,4 @@
-"""WhatsApp simulator: the page /wa shows a WhatsApp-style chat that talks to the SAME handler as the real webhook
+"""WhatsApp simulator: the page /wa shows a WhatsApp-style chat that talks to the same handler as the real webhook
 (api/channels/whatsapp.py: same parsing, same engine, same replies), with an in-process transport instead of the
 Graph API. Each sent message is the exact Cloud API message object the real channel would POST.
 
@@ -6,8 +6,8 @@ On in demo mode (no Meta key or MOCK=1). With a live key it stays off unless WA_
 would spend real model calls (the live-mode guard limits still apply).
 
     POST /api/wa-sim/send               chat, text | photo | audio | button   (one inbound WhatsApp message)
-    GET  /api/wa-sim/poll?chat=&after=  replies with seq > after, plus busy (the bot is still working)
-    GET  /api/wa-sim/media/{chat}/{id}  a photo or PDF the bot sent
+    GET  /api/wa-sim/poll?chat=&after=  replies with seq > after, plus busy (a reply is still being worked on)
+    GET  /api/wa-sim/media/{chat}/{id}  a photo or PDF the chat sent back
     GET  /api/wa-sim/sample/{name}.jpg  the labelled stand-in sample photos, so the page can send one
 """
 from __future__ import annotations
@@ -54,7 +54,7 @@ def _media_dir(chat: str, sub: str) -> Path:
 
 
 class SimTransport:
-    """Keeps what the bot sends in memory for the page to poll; media files live in the chat's own folder,
+    """Keeps outgoing replies in memory for the page to poll; media files live in the chat's own folder,
     which goes with the chat (RETENTION_HOURS, or HAPUS)."""
 
     def __init__(self, chat: str):

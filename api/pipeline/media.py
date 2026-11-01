@@ -4,8 +4,8 @@
 
 * `to_wav`: any phone recording -> mono 16-bit PCM WAV, the format Muse Voice Transcribe accepts.
 * `speak`: step narration. Meta Model API has no text-to-speech (Muse Voice Transcribe is speech-to-text
-  only, https://dev.meta.ai/docs/models), so we use free Microsoft Edge neural voices via `edge-tts`
-  (has an Indonesian AND a Javanese voice). If that fails, the browser's own speech voice reads the step.
+  only, https://dev.meta.ai/docs/models), so narration uses the free Microsoft Edge neural voices via `edge-tts`
+  (it has both an Indonesian and a Javanese voice). If that fails, the browser's own speech voice reads the step.
 """
 from __future__ import annotations
 
@@ -65,7 +65,7 @@ def sharpness(img: Image.Image) -> float:
 
 
 def extract_frames(src: Path, out_dir: Path, n: int = 3, per_part: int = 4, max_px: int = 1536) -> list[Path]:
-    """Sample n*per_part frames evenly across the clip in ONE ffmpeg call, then keep the sharpest frame
+    """Sample n*per_part frames evenly across the clip in a single ffmpeg call, then keep the sharpest frame
     of each of the n equal parts, so the photos cover the whole clip and avoid motion blur."""
     dur = video_seconds(src)
     if dur <= 0.2:

@@ -1,4 +1,4 @@
-"""Prompt-injection hardening (v1.22): owner words reach the model fenced as data, never in a system prompt,
+"""Prompt-injection hardening: owner words reach the model fenced as data, never in a system prompt,
 instruction-like phrases are noticed and logged (without echoing them), and the code safety gates still win."""
 import io
 import json

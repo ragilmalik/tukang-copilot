@@ -45,9 +45,9 @@ _MSG = {
 }
 
 _TEXT_RULES: list[tuple[str, str]] = [
-    # v1.25 red-team fixes (scripts/run_eval.py found these slipping through): Javanese "gase", gas pipes and
-    # cylinders, LPG "tabung melon", 220/240 V panels, consumer units/RCDs, wall sockets, ceiling fan wiring,
-    # water heater elements, car brake lines and brake failure.
+    # scripts/run_eval.py caught these slipping through: Javanese "gase", gas pipes and cylinders, LPG
+    # "tabung melon", 220/240 V panels, consumer units/RCDs, wall sockets, ceiling fan wiring, water heater
+    # elements, car brake lines and brake failure.
     (r"\b(kompor|tabung|selang|pipa|regulator|katup) gas\w*|\bgas(e|nya|ne)? (bocor|ambu\w*|mambu|desis\w*|hiss\w*|leak\w*)\b|\b(tabung|gas) melon\b"
      r"|\bgas (pipe|cylinder|bottle|regulator|valve|cooker|stove|heater|tank)s?\b|\bregulator\b.{0,20}\b(elpiji|lpg|tabung)\b", "gas"),
     (r"\b(2[234]0) ?v(olt)?\b.{0,25}\b(panel|wiring|kabel|instalasi|socket|stop ?kontak|outlet|breaker)|\b(panel|breaker|wiring|kabel|instalasi)\b.{0,25}\b(2[234]0) ?v(olt)?\b"
@@ -56,8 +56,8 @@ _TEXT_RULES: list[tuple[str, str]] = [
      r"|\b(kipas (angin )?(plafon|gantung|langit-langit)|ceiling fan)\b.{0,60}\b(kabel|wir\w*|sambung\w*|pasang|install\w*|reconnect\w*|connect\w*)"
      r"|\b(kabel|wir\w*|sambung\w*|reconnect\w*)\b.{0,60}\b(kipas (angin )?(plafon|gantung)|ceiling fan|ceiling)\b"
      r"|\bwater heater\b.{0,40}\b(bongkar|buka|elemen|open|element)", "mains"),
-    # v1.26.0 judge QA: brake failure on the owner's own motorbike ("rem motorku blong", "rem ora makan",
-    # "my brakes don't work", "spongy brakes") slipped through; only "rem mobil blong" was caught.
+    # brake failure on the owner's own motorbike ("rem motorku blong", "rem ora makan", "my brakes don't work",
+    # "spongy brakes"); before 1.26.0 only "rem mobil blong" was caught.
     (r"\brem(ku|e|ne|nya)?\b( \w+){0,3} (n?g?e?blong|los|ngempos|kopong|kurang pakem|(ora|tidak|nggak|gak|ga|enggak|ndak) (makan|pakem|nyekel|ngerem|berfungsi|bekerja|jalan|mempan))\b"
      r"|\b(brakes? (don'?t|do not|doesn'?t|does not|won'?t|will not|aren'?t|are not|isn'?t|is not|stopped) (work\w*|stop\w*|hold\w*|grab\w*|bite|biting)|no brakes?(?! ?(light|lamp|pad|switch|sensor))|brakes? (feel |are |is |went |go )?(spongy|soft|mushy|weak|gone)"
      r"|spongy brakes?|brake (pedal|lever) (goes |sinks |drops |pulls )?(to the (floor|bar|grip|handlebar)|all the way))\b", "brake"),
@@ -78,12 +78,12 @@ _PLAN_RULES: list[tuple[str, str]] = [
     (r"(lepas|buka|bleed|kuras).{0,30}(minyak rem|selang rem|brake (fluid|line|caliper piston))", "hv"),
     (r"(sambung|ganti|tap|splice).{0,30}(kabel|wire).{0,30}(tembok|wall|panel|mcb|pln)", "mains"),
     (r"(selang gas|regulator gas|gas hose|gas line)", "gas"),
-    # v1.25 red-team: plans that touch LPG regulators, house panels, ceiling wiring or car brake lines
+    # plans that touch LPG regulators, house panels, ceiling wiring or car brake lines
     (r"regulator.{0,40}(tabung|elpiji|lpg|gas cylinder|cylinder)|(elpiji|lpg|tabung gas|gas cylinder).{0,40}regulator", "gas"),
     (r"(buka|bongkar|ganti|open|replace|swap|rewire).{0,30}(panel listrik|mcb|consumer unit|breaker|rcd|fuse box)", "mains"),
     (r"(sambung|splice|connect|reconnect|join).{0,40}(kabel|wire|wiring).{0,40}(plafon|ceiling|langit-langit)", "mains"),
     (r"(lepas|ganti|buka|remove|replace|disconnect).{0,30}(brake (line|hose|pipe)|selang rem|pipa rem)", "hv"),
-    # v1.25.4 audit 10: refrigerant, CRT, gas pipes, tank patching, swollen cells, live testing, bypassed safeties
+    # refrigerant, CRT, gas pipes, tank patching, swollen cells, live testing, bypassed safeties
     (r"(isi|tambah|refill|recharge|charge|ganti|bocor).{0,25}(freon|refrigerant)|\bmanifold (gauge|set)\b|\b(flyback|crt|tv tabung|anode cap)\b", "hv"),
     (r"(buang muatan|discharge|cabut|lepas|remove).{0,30}(kapasitor|capacitor).{0,30}(besar|tv|crt|microwave|tabung|high|large)", "hv"),
     (r"(perbaiki|tambal|tutup|sambung|las|repair|patch|seal|fix|lakban|tape).{0,30}(pipa gas|gas pipe|kebocoran gas|gas leak)|(pipa gas|gas pipe)", "gas"),

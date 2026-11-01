@@ -1,4 +1,4 @@
-"""v1.23: partial results stream on the progress screen (SSE `progress_view`), with demo-mode pacing."""
+"""Partial results stream on the progress screen (SSE `progress_view`), with demo-mode pacing."""
 import json
 from typing import Any
 import time

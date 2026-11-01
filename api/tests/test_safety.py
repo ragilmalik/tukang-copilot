@@ -59,7 +59,7 @@ def test_new_categories_have_all_languages():
     assert "113" in safety._msg("fire", "en") and "119" in safety._msg("shock", "id")
 
 
-# v1.25.4 audit 10: street Indonesian and Javanese wordings the first rule set missed
+# street Indonesian and Javanese wordings the first rule set missed
 @pytest.mark.parametrize("text,cat", [
     ("kulkas nyetrum kena tangan", "shock"),
     ("dispenser nyetrum pas disentuh", "shock"),

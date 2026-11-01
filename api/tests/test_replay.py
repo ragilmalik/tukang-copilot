@@ -1,4 +1,4 @@
-"""v1.24 recorded demo (J5): the fixture the front end replays when the server sleeps is complete, honest and current."""
+"""Recorded demo: the fixture the front end replays when the server sleeps is complete, honest and current."""
 import json
 import re
 import sys

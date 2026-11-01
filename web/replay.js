@@ -1,5 +1,5 @@
-/* Tukang Copilot: RECORDED demo replay (v1.24).
-   A free Render server sleeps and needs ~50 s to wake, and a judge on bad Wi-Fi may have no server at all. When the
+/* Tukang Copilot: RECORDED demo replay.
+   A free Render server sleeps and needs ~50 s to wake, and someone on bad Wi-Fi may not reach it at all. When the
    server does not answer in time (or the page is opened with ?replay=1), the 1-tap demo plays a RECORDED demo-mode run
    from /static/replay/demo.json instead: the same screens, agent log, SAM-marked photo, step checks and re-plan, with a
    "Recorded demo" badge on screen. No server, no model calls, nothing new is computed. Your own photos still need the
@@ -7,7 +7,7 @@
    This file only answers /api/* calls while the replay is switched on; otherwise it does nothing. */
 (function () {
   "use strict";
-  // Static judge build (scripts/build_static.py sets window.TC_STATIC): no server at all, so paths are relative to the
+  // Static build (scripts/build_static.py sets window.TC_STATIC): no server at all, so paths are relative to the
   // page (works under a GitHub Pages sub-path) and the recording is always on.
   const STATIC = !!window.TC_STATIC;
   const BASE = (STATIC ? "" : "/") + "static/replay/";

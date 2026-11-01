@@ -76,7 +76,7 @@ def _reference_full_image(photo, found, out):
 
 
 def test_cropped_outline_is_pixel_identical_to_full_image_filtering(samples, tmp_path):
-    """v1.22 speed-up (edge filters on the part's box, not the whole photo) must not change a single pixel,
+    """The speed-up (edge filters on the part's box, not the whole photo) must not change a single pixel,
     including a part that touches the photo border."""
     photo = samples["motor"]
     w, h = Image.open(photo).size

@@ -1,4 +1,4 @@
-/* v1.22 contrast: --o #b85200 gives 4.9:1 for white text on it and 4.5:1+ as text on the cream/white cards (WCAG AA); the bright brand #ff7a00 stays for the header theme and accents */
+/* contrast: --o #b85200 gives 4.9:1 for white text on it and 4.5:1+ as text on the cream/white cards (WCAG AA); the bright brand #ff7a00 stays for the header theme and accents */
 :root{--o:#b85200;--brand:#ff7a00;--ink:#1d232b;--mut:#5f6873;--bg:#f6f3ee;--card:#fff;--ok:#17834a;--bad:#c0392b}
 *{box-sizing:border-box}
 body{margin:0;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
@@ -70,7 +70,7 @@ h1:focus,h2:focus{outline:none}
 .btn,.chip,select{min-height:44px}
 .btn.link{min-height:0}
 #gDiff,#gTime,#gCost{min-height:0}
-/* v1.25.2 audit 8: small text links are still thumb targets (greasy hands) */
+/* small text links are still thumb targets (greasy hands) */
 .buy{display:inline-flex;align-items:center;min-height:40px;padding:0 6px}
 .btn.link.sample{min-height:40px;padding:0 6px}
 .btn.link.videoBtn{min-height:44px;display:inline-flex;align-items:center}
@@ -115,7 +115,7 @@ body.handsfree .nav .btn{min-height:64px;font-size:1.2em;flex:1}
 .hoText{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.85em;background:#fff;padding:8px;border-radius:8px;border:1px solid #e3e3e8}
 .fbNote{display:inline-block;background:#fff4d6;color:#7a5200;border:1px solid #f0b429;border-radius:999px;padding:2px 10px;font-size:.85em}
 
-/* v1.22: 1-tap demo, how-it-works strip, agent log, model chips, tour bar, quick answers, sample check photos */
+/* 1-tap demo, how-it-works strip, agent log, model chips, tour bar, quick answers, sample check photos */
 .how{display:flex;gap:6px;flex-wrap:wrap;list-style:none;padding:0;margin:8px 0 10px;font-size:.88rem}.how li{background:#f3efe8;border-radius:10px;padding:5px 9px}
 .btn.demo{width:100%;justify-content:center;background:var(--ink);color:#fff;font-weight:700;min-height:48px}
 .demoSub{margin:6px 0 4px}
@@ -141,20 +141,20 @@ details.agent{margin-top:10px}details.agent summary{cursor:pointer;font-weight:6
 body:has(#tourBar:not(.hidden)){padding-bottom:96px}body:has(#tourBar.collapsed:not(.hidden)){padding-bottom:56px}
 /* While a text field has focus (keyboard open) the tip bar moves to the top so it never sits by Send. */
 body.typing .tourBar{bottom:auto;top:calc(8px + env(safe-area-inset-top))}
-/* v1.23: partial results stream in on the progress screen */
+/* partial results stream in on the progress screen */
 .liveFind{margin:10px 0;padding:10px 12px;border:1px solid #f0ece6;border-radius:12px;background:#fffaf4}.lfTitle{margin:0 0 4px}
 .lfList{list-style:none;margin:0;padding:0}.lfList li{padding:6px 0;border-top:1px solid #f0ece6}.lfList li:first-child{border-top:0}
 .lfChips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.chip.sm{min-height:0;padding:2px 8px;font-size:.8rem}
 .lfImg{display:block;width:100%;height:auto;max-height:240px;object-fit:contain;aspect-ratio:4/3;margin-top:6px;border-radius:8px;background:#eee}
 @media (prefers-reduced-motion:no-preference){.lfList li.pop{animation:lfIn .35s ease-out}@keyframes lfIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}}
 .liveFind .level{white-space:nowrap;display:inline-block}
-/* v1.23: agent log lines are buttons that jump to the stage, photo or step they describe */
+/* agent log lines are buttons that jump to the stage, photo or step they describe */
 .agGo{all:unset;box-sizing:border-box;display:block;width:100%;cursor:pointer;border-radius:8px;padding:2px 22px 2px 2px;position:relative;min-height:32px}
 .agGo:hover{background:rgba(0,0,0,.035)}.agGo:focus-visible{outline:3px solid #b45309;outline-offset:1px}
 .agArrow{position:absolute;right:6px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:1.1rem}
 .flash{outline:3px solid #d97706;outline-offset:3px;border-radius:8px;background-color:#fff4e0}
 @media (prefers-reduced-motion:no-preference){.flash{animation:tcFlash 1.8s ease-out}@keyframes tcFlash{0%{background-color:#ffd9a0}100%{background-color:#fff4e0}}}
-/* v1.24 recorded demo: honest label while the replay plays, note while the server wakes */
+/* recorded demo: honest label while the replay plays, note while the server wakes */
 .badge.replay{background:#ede7ff;color:#3d2a8a;font-weight:600}
 .wakeNote{margin:4px 0;padding:6px 10px;border-radius:10px;background:#ede7ff;color:#3d2a8a}
 .planBanner{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:#e7f6ec;color:#14532d;font-weight:600}
@@ -164,7 +164,7 @@ body.typing .tourBar{bottom:auto;top:calc(8px + env(safe-area-inset-top))}
 .demoFig figcaption{margin-top:4px}
 .deskNote{display:none}
 @media (min-width:1000px){.deskNote{display:block;max-width:640px;margin:8px auto 0;padding:6px 12px;border-radius:999px;background:#e8f3ff;color:#0b4f8a;text-align:center}}
-/* v1.25 laptop view: >= 1024 px shows the app inside a phone frame (it scrolls inside #screen) with a side panel. Phones never see .side. */
+/* laptop view: >= 1024 px shows the app inside a phone frame (it scrolls inside #screen) with a side panel. Phones never see .side. */
 .side{display:none}
 @media (min-width:1024px) and (max-height:720px){.side{font-size:.9rem}.sideWhat{display:none}}
 @media (min-width:1024px){

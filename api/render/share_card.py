@@ -92,7 +92,7 @@ def _rupiah(n: Any) -> str:
 
 def check_line(s: dict[str, Any], lang: str) -> tuple[str, bool]:
     """The camera-check line: a real count ("2 of 4 steps passed a camera check"), never "every step checked" for a
-    plan nobody has checked yet (judge QA 2026-11-02). Returns (text, any step passed)."""
+    plan nobody has checked yet. Returns (text, any step passed)."""
     tx = TXT[lang if lang in TXT else "id"]
     steps = [st for st in ((s.get("plan") or {}).get("steps") or []) if isinstance(st, dict)]
     if not steps:

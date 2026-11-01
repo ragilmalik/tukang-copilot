@@ -1,7 +1,6 @@
 """The test count quoted in the submission docs must be the one the last real run reported.
 
-A judge who reads "620 automated tests" in the README and "550" in the testing guide
-trusts neither. docs/TEST_REPORT.md is rewritten by scripts/make_test_report.py from
+Nobody trusts "620 automated tests" in the README next to "550" in the testing guide. docs/TEST_REPORT.md is rewritten by scripts/make_test_report.py from
 a real run; every doc that quotes a number must match it.
 """
 import re

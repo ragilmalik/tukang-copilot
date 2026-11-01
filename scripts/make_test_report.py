@@ -1,4 +1,4 @@
-"""Regenerates docs/TEST_REPORT.md from REAL runs (nothing in the report is typed by hand).
+"""Regenerates docs/TEST_REPORT.md from real runs (nothing in the report is typed by hand).
 
     python scripts/make_test_report.py
 

@@ -31,7 +31,7 @@ MODELS = ["muse-wonder-1.0", "muse-spark-1.3", "muse-spark-1.2", "muse-spark-1.1
           "muse-voice-transcribe-1.0", "sam-3.1"]
 app = FastAPI(title="Fake Meta Model API (tests only)")
 CALLS: list[dict[str, Any]] = []  # tests inspect what the client sent
-# Fault injection for robustness tests: path suffix -> {"status": int, "times": int | None (None = always)}
+# Fault injection for the resilience tests: path suffix -> {"status": int, "times": int | None (None = always)}
 FAULTS: dict[str, dict[str, Any]] = {}
 
 
@@ -200,17 +200,17 @@ async def responses(req: Request) -> Any:
             if box:
                 recs.append(_sam_record(0, int(box[0] * w), int(box[1] * h), int(box[2] * w), int(box[3] * h), w, h))
     text = ("<0f>" + ",".join(recs)) if recs else ""
-    lane: dict[str, Any] = {"item_id": "msg_fake", "output_index": 0, "content_index": 0}
+    ids: dict[str, Any] = {"item_id": "msg_fake", "output_index": 0, "content_index": 0}
 
     def gen() -> Iterator[str]:
         events: list[dict[str, Any]] = [{"type": "response.created", "response": {"id": "resp_fake", "status": "in_progress"}}]
         if text:
             half = len(text) // 2
-            events += [{"type": "response.output_text.delta", "delta": text[:half], **lane},
-                       {"type": "response.output_text.delta", "delta": text[half:], **lane}]
+            events += [{"type": "response.output_text.delta", "delta": text[:half], **ids},
+                       {"type": "response.output_text.delta", "delta": text[half:], **ids}]
         else:
-            events += [{"type": "response.output_text.delta", "delta": "", **lane}]
-        events += [{"type": "response.output_text.done", "text": text, **lane},
+            events += [{"type": "response.output_text.delta", "delta": "", **ids}]
+        events += [{"type": "response.output_text.done", "text": text, **ids},
                    {"type": "response.completed", "response": {"id": "resp_fake", "status": "completed"}}]
         for ev in events:
             yield f"event: {ev['type']}\ndata: {json.dumps(ev)}\n\n"

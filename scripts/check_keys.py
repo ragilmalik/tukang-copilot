@@ -190,7 +190,7 @@ def main() -> int:
         return f"structured output OK: {out.observation[:60]}"
 
     check(f"Muse Spark vision + structured output ({settings.vision_model})", spark_vision,
-          "If it mentions response_format, tell Malik. If the model id is unknown, check dev.meta.ai/docs/models and set VISION_MODEL in .env.")
+          "If it mentions response_format, open an issue with the error text. If the model id is unknown, check dev.meta.ai/docs/models and set VISION_MODEL in .env.")
 
     def sam() -> str:
         recs = meta_client.segment(photos["faucet"], "faucet handle")

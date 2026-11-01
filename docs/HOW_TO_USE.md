@@ -4,11 +4,11 @@
 
 ## English
 
-**Just looking?** Tap **▶ Try the 1-tap demo** on the home screen. No photo or account needed: it runs a whole bike repair with small tips in the corner (tap 💡 to open one again, × to close). Open **🤖 What the AI did** on the result to see every decision the AI made. The same list is in the PDF report.
+If you only want to look around, tap **▶ Try the 1-tap demo** on the home screen. You don't need a photo or an account. It runs a whole bike repair with small tips in the corner (tap 💡 to open one again, × to close). Open **🤖 What the AI did** on the result to see every decision the AI made; the PDF report has the same list.
 
 1. **Open the app** on your phone (the link from your friend, or the Render link). Pick your language at the top right: Bahasa Indonesia, Basa Jawa or English.
 2. **Take a photo** of the broken thing. Tap the big dashed box. You can pick up to 3 photos: one wide, one close-up of the problem area works best. Good light, hold still.
-3. **Tap a category** if you like (Motor, Water pump, Home appliance, Pipes/taps, Other). It helps a little.
+3. **Tap a category** if you like (Motor, Water pump, Home appliance, Pipes/taps, Other). It helps a bit.
 4. **Say what's wrong.** Tap *Tap to talk*, speak (up to 60 seconds), tap again to stop. Say what it does, since when, and what you already tried. Or type it.
 5. **Tap "Check it now".** You'll see each stage tick: listening, looking, finding the parts, diagnosing, planning, safety check.
 6. **Answer the question** if it asks one (only when it's unsure).
@@ -23,7 +23,7 @@
 11. **Tell it how it went.** Under the steps, tap *It works now* (or *Took it to a mechanic*). The PDF report records it, and *My garage* on the home page adds up what you saved compared with typical bengkel prices (estimates only).
 12. **Share** the guide with *Share report* (a read-only link).
 
-**Tips:** photograph the part, not the whole room. Use your phone torch in dark engine bays. If voice fails, type. Photos are deleted after 24 hours, and there's no account.
+A few tips: photograph the part rather than the whole room, and use your phone torch in dark engine bays. If voice fails, type. Photos are deleted after 24 hours, and there's no account.
 
 ## Bahasa Indonesia
 

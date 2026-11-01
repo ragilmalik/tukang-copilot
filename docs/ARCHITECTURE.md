@@ -37,13 +37,14 @@ flowchart TB
   Engine --> Store
 ```
 
-Design rules:
-- **Two front doors, one engine.** The phone app and the WhatsApp channel (`api/channels/whatsapp.py`) both call `engine.create` / `engine.run` and go through the same safety gate; WhatsApp only changes how messages come in and go out (docs/WHATSAPP.md). The `/wa` simulator feeds the same handler with Cloud-API-shaped messages in demo mode; tests use a fake Graph API (`api/testing/fake_graph.py`).
-- **Owner token.** `POST /api/sessions` returns an `owner_token` once; the owner's browser keeps it in localStorage and sends it as `X-Owner-Token` to set the outcome or erase the repair. A shared guide link (`/guide/{id}`) does not carry it, so a viewer gets 403. It is never returned by any GET.
-- **One file talks to Meta** (`api/meta_client.py`): auth header, retries with backoff on 429/5xx, timeouts, cost charging. Nothing else imports `httpx` for Meta.
-- **Every model output is validated** by a pydantic schema (`api/schemas.py`) and retried once with the validation error.
-- **Every stage writes its status** into `session.json`, so the UI and SSE never need a database or queue.
-- **Demo mode is the same code path** with `mock.py` returning the model answers, so tests exercise the real engine.
+How it hangs together:
+
+- The phone app and the WhatsApp channel (`api/channels/whatsapp.py`) share one engine. Both call `engine.create` / `engine.run` and go through the same safety gate; WhatsApp only changes how messages come in and go out (docs/WHATSAPP.md). The `/wa` simulator feeds the same handler with Cloud-API-shaped messages in demo mode, and the tests use a fake Graph API (`api/testing/fake_graph.py`).
+- `POST /api/sessions` returns an `owner_token` once. The owner's browser keeps it in localStorage and sends it as `X-Owner-Token` to set the outcome or erase the repair. A shared guide link (`/guide/{id}`) doesn't carry it, so a viewer gets 403, and no GET ever returns it.
+- Only `api/meta_client.py` talks to Meta: auth header, retries with backoff on 429/5xx, timeouts, cost charging. Nothing else imports `httpx` for Meta.
+- A pydantic schema (`api/schemas.py`) validates every model output, and a failed validation is retried once with the error attached.
+- Every stage writes its status into `session.json`, so the UI and SSE need no database or queue.
+- Demo mode runs the same code path, with `mock.py` returning the model answers, so the tests exercise the real engine.
 
 ## Sequence of one repair
 
@@ -117,7 +118,7 @@ flowchart LR
 - `Dockerfile`: python:3.12-slim + ffmpeg + DejaVu font, runs `uvicorn api.main:app`.
 - `render.yaml`: Blueprint with `MODEL_API_KEY`/`BASETEN_API_KEY` (and the optional `IMPACT_TOKEN`, `PUBLIC_BASE_URL` and four WhatsApp values `WA_TOKEN`, `WA_PHONE_NUMBER_ID`, `WA_VERIFY_TOKEN`, `WA_APP_SECRET`) as secret env vars, health check `/health`.
 - `docker-compose.yml`: same container locally.
-- Storage is the container disk: fine for a demo (sessions are temporary by design). For scale, see ROADMAP (R2).
+- Storage is the container disk. That's fine for a demo, since sessions are temporary anyway. For scale, see ROADMAP (R2).
 
-## Why not Next.js + separate backend (as the first spec said)?
-See [DECISIONS.md](DECISIONS.md#d1). Short version: one process, no build step, nothing for a non-developer to break, and judges get one URL.
+## Next.js and a separate backend
+The first spec asked for them. I went with one process instead: no build step, less for someone who doesn't code to break, and judges get one URL. Details in [DECISIONS.md](DECISIONS.md#d1).

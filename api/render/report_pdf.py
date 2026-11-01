@@ -214,7 +214,7 @@ def brief_lines(session: dict[str, Any], lang: str) -> list[tuple[str, str]]:
     B = BRIEF.get(lang, BRIEF["id"])
     rep, dx = session.get("object_report") or {}, session.get("diagnosis") or {}
     why = handoff.reason(session)
-    # judge QA 2026-11-02: after "It works now" the status must not claim the owner asked for a mechanic
+    # after "It works now" the status must not say the owner asked for a mechanic
     status = "fixed" if why == "requested" and (session.get("outcome") or {}).get("result") == "fixed" else why
     rows: list[tuple[str, str]] = [("m", B["sub"]), ("h", B["status"]), ("t", B[status])]
     if why == "red" and session.get("stop_reason"):

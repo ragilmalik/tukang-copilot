@@ -1,4 +1,4 @@
-"""v1.25.1: the phone Back button returns to the first screen instead of leaving the site (real Chromium, 390x844)."""
+"""The phone Back button returns to the first screen instead of leaving the site (real Chromium, 390x844)."""
 import pytest
 
 pytest.importorskip("playwright.sync_api")

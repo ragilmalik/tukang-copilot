@@ -1,4 +1,4 @@
-"""scripts/build_static.py: the static judge build is self-contained, relative and honest (fast checks)."""
+"""scripts/build_static.py: the static build is self-contained, relative and honest (fast checks)."""
 import json
 import sys
 from pathlib import Path

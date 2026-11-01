@@ -1,4 +1,4 @@
-"""Build the static judge build: the recorded 1-tap demo as plain files, no server needed.
+"""Build the static demo: the recorded 1-tap demo as plain files, no server needed.
 
 Run `python scripts/build_static.py --help` for the instructions (they are the user-facing docs for this build).
 """
@@ -17,7 +17,7 @@ WEB = ROOT / "web"
 DEFAULT_OUT = ROOT / "dist-static"
 
 HELP = """\
-Static judge build of Tukang Copilot (recorded demo, no server).
+Static build of Tukang Copilot (recorded demo, no server).
 
 What it makes
   A folder (default: dist-static/, which git ignores) with index.html and static/.
@@ -30,8 +30,8 @@ What it makes
 
 Why
   The free Render server sleeps and takes about a minute to wake. A static
-  host answers at once, so a judge who opens this link sees the demo straight
-  away. Put the live server link next to it for the real AI.
+  host answers at once, so whoever opens this link sees the demo right away.
+  Put the live server link next to it for the real AI.
 
 Build
   python scripts/build_static.py              # writes dist-static/
@@ -42,7 +42,7 @@ Try it on your computer
   python -m http.server 8080 --directory dist-static
   then open http://localhost:8080 and tap "Try the 1-tap demo".
 
-Host it (needs Malik's approval: this publishes a public page)
+Host it (this publishes a public page, so only with my approval)
   GitHub Pages: push the CONTENTS of dist-static/ to a gh-pages branch (or its
     own repo), then Settings > Pages > Deploy from branch. Works under a
     sub-path such as https://ragilmalik.github.io/tukang-copilot/ because every
@@ -63,7 +63,7 @@ def _index_html(version: str) -> str:
     html = re.sub(r'\s*<p [^>]*id="waSim"[^>]*>.*?</p>', "", html, flags=re.S)  # no /wa simulator without a server
     html = html.replace('href="/static/', 'href="static/').replace('src="/static/', 'src="static/')
     flag = (
-        '\n  <!-- Static judge build (scripts/build_static.py): plays a RECORDED demo-mode run, never calls the API. -->\n'
+        '\n  <!-- Static build (scripts/build_static.py): plays a RECORDED demo-mode run, never calls the API. -->\n'
         f'  <script>window.TC_STATIC = {{ build: "{version}" }};</script>\n'
         '  <style>#garage{display:none!important}</style>\n'
         '  <meta name="robots" content="noindex">\n'
@@ -137,7 +137,7 @@ def main(argv: list[str] | None = None) -> int:
         out = a.out.resolve()
         info = build(out)
         probs = verify(out)
-        print(f"Built the static judge build (app {info['app_version']}, recording from {info['recorded_with']}) in {out}")
+        print(f"Built the static demo (app {info['app_version']}, recording from {info['recorded_with']}) in {out}")
     if probs:
         print("PROBLEMS:\n  " + "\n  ".join(probs))
         return 1

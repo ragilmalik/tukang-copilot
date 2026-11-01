@@ -1,4 +1,4 @@
-"""v1.24 recorded demo (J5) in real Chromium: with the server unreachable, the 1-tap demo still runs end to end from
+"""Recorded demo in real Chromium: with the server unreachable, the 1-tap demo still runs end to end from
 web/replay/demo.json, clearly labelled, and never fakes an answer for the visitor's own photo."""
 from pathlib import Path
 

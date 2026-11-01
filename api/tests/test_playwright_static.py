@@ -1,4 +1,4 @@
-"""Static judge build in real Chromium, served by a plain file server under a sub-path (like GitHub Pages).
+"""Static build in real Chromium, served by a plain file server under a sub-path (like GitHub Pages).
 
 No backend runs: the test fails if the page asks the network for any /api/ URL or anything outside its folder.
 """

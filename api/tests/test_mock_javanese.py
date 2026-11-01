@@ -1,4 +1,4 @@
-"""Demo answers in Basa Jawa (v1.22): before, the jv demo fell back to Indonesian content under Javanese buttons."""
+"""Demo answers in Basa Jawa, so the jv demo never shows Indonesian content under Javanese buttons."""
 import time
 
 import pytest

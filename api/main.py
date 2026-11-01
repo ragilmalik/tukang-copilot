@@ -160,8 +160,8 @@ def _require_owner(s: dict[str, Any], request: Request) -> None:
 
 
 def public(s: dict[str, Any]) -> dict[str, Any]:
-    # never on the wire: the owner's own words (text, history, phrases the injection guard caught) and raw errors
-    # and the owner token: whoever holds the guide link must not be able to answer or erase for the owner (backlog Q14)
+    # never on the wire: the owner's own words (text, history, phrases the injection guard caught), raw errors,
+    # and the owner token, so whoever holds the guide link cannot answer or erase for the owner
     out = {k: v for k, v in s.items() if k not in {"text", "history", "error_detail", "input_flags", "owner_token"}}
     out["input_guard"] = len(s.get("input_flags") or [])
     out["files_base"] = f"/files/{s['id']}/"
@@ -531,7 +531,7 @@ def post_outcome(sid: str, request: Request, result: str = Form(...), minutes: i
                  tester: str = Form(default="")) -> dict[str, Any]:
     """The owner closes the loop: result is "fixed" (it works now) or "pro" (a mechanic took over).
     Optional for trials: minutes the fix took, and a tester label (e.g. "T1"). Each call is appended to the impact log.
-    Owner only (X-Owner-Token header): a shared guide viewer gets 403 (backlog Q14)."""
+    Owner only (X-Owner-Token header): a shared guide viewer gets 403."""
     _require_owner(_load(sid), request)
     try:
         return public(engine.set_outcome(sid, result.strip().lower(), minutes, tester))

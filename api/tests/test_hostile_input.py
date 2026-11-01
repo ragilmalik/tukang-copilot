@@ -1,5 +1,5 @@
-"""Hostile and clumsy input: whatever a person (or a curious judge) sends, the server answers with a 2xx/4xx, never a 5xx,
-and never echoes a path outside the data folder. Found by a fuzz pass in audit 17 (no 5xx then; this keeps it that way)."""
+"""Hostile and clumsy input: whatever someone sends, the server answers with a 2xx/4xx, never a 5xx, and never
+echoes a path outside the data folder. A fuzz pass found no 5xx; these tests keep it that way."""
 import io
 import time
 from typing import Any

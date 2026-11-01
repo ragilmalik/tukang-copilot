@@ -1,4 +1,4 @@
-"""v1.25.6: names read by a screen reader (aria-label, alt) follow the chosen language (real Chromium, 390x844)."""
+"""Names read by a screen reader (aria-label, alt) follow the chosen language (real Chromium, 390x844)."""
 import pytest
 
 pytest.importorskip("playwright.sync_api")

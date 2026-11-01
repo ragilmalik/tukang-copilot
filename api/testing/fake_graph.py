@@ -187,7 +187,7 @@ def serve_in_thread(port: int = 0) -> str:
     return base_url
 
 
-# --------------------------------------------------------------------------- webhook payloads (for tests)
+# --- webhook payloads (for tests)
 def webhook(messages: list[dict[str, Any]], phone_number_id: str = PHONE_ID) -> dict[str, Any]:
     return {"object": "whatsapp_business_account", "entry": [{"id": WABA_ID, "changes": [{"value": {
         "messaging_product": "whatsapp", "metadata": {"display_phone_number": "15550783881", "phone_number_id": phone_number_id},

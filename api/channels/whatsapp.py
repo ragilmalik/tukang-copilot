@@ -67,7 +67,7 @@ AUDIO_EXT = {"audio/ogg": ".ogg", "audio/mpeg": ".mp3", "audio/mp4": ".m4a", "au
              "audio/opus": ".opus", "audio/webm": ".webm", "audio/wav": ".wav", "audio/x-wav": ".wav"}
 
 
-# =========================================================================== small helpers
+# --- small helpers
 def enabled() -> bool:
     return all((settings.wa_token, settings.wa_phone_number_id, settings.wa_verify_token, settings.wa_app_secret))
 
@@ -98,7 +98,7 @@ def _base_mime(mime: str) -> str:
     return (mime or "").split(";")[0].strip().lower()
 
 
-# =========================================================================== inbound
+# --- inbound
 @dataclass
 class Inbound:
     sender: str          # WhatsApp user id / phone ("sim:<chat>" for the simulator)
@@ -158,7 +158,7 @@ def parse_message(m: dict[str, Any]) -> Inbound | None:
     return ev
 
 
-# =========================================================================== transports
+# --- transports
 class MediaTooBig(Exception):
     pass
 
@@ -246,7 +246,7 @@ class GraphTransport:
         return dest
 
 
-# =========================================================================== conversation state
+# --- conversation state
 @dataclass
 class Conv:
     key: str
@@ -384,7 +384,7 @@ def dispatch(events: list[Inbound], transport_for: Callable[[str], Transport]) -
     return n
 
 
-# =========================================================================== sending
+# --- sending
 def _footer(tr: Transport) -> str:
     return t("footer_demo" if tr.demo else "footer", "en")[:FOOTER_MAX]
 
@@ -428,7 +428,7 @@ def send_buttons(tr: Transport, body: str, buttons: list[tuple[str, str]], heade
     tr.post({"type": "interactive", "interactive": inter})
 
 
-# =========================================================================== the chat
+# --- the chat
 def handle(conv: Conv, ev: Inbound, tr: Transport) -> None:
     conv.last = time.time()
     conv.transport = tr
@@ -911,7 +911,7 @@ def erase(conv: Conv, tr: Transport) -> None:
     send_text(tr, t("erased", conv.lang))
 
 
-# =========================================================================== plumbing
+# --- plumbing
 def _blocked(conv: Conv, tr: Transport, bucket: str) -> bool:
     """Live mode: the web app's abuse guard, keyed on the phone number (hashed) instead of the IP."""
     if not guard.active():
@@ -963,7 +963,7 @@ def _readable_image(p: Path) -> bool:
         return False
 
 
-# =========================================================================== HTTP
+# --- HTTP
 @router.get("/webhooks/whatsapp")
 def verify(request: Request) -> PlainTextResponse:
     """Meta calls this once when the Callback URL is saved: echo hub.challenge when the verify token matches."""

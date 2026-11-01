@@ -45,7 +45,7 @@ _save_lock = threading.Lock()
 _deleted: set[str] = set()  # sessions the user erased; a still-running worker must not write them back
 
 
-# =========================================================================== storage
+# --- storage
 def session_dir(sid: str) -> Path:
     if not sid or not sid.isalnum() or len(sid) > 32:
         raise ValueError("bad session id")
@@ -142,7 +142,7 @@ def create(photos: list[Path], lang: str, text: str = "", audio: Path | None = N
     return s
 
 
-# =========================================================================== model calls (live or mock)
+# --- model calls (live or mock)
 def _photo_part(path: Path) -> dict[str, Any]:
     if settings.offline:
         return {"type": "text", "text": f"[photo {path.name}]"}
@@ -228,7 +228,7 @@ def _scenario(s: dict[str, Any]) -> str:
     return mock.scenario(description(s), s.get("category", ""))
 
 
-# =========================================================================== stages
+# --- stages
 def stage_listen(s: dict[str, Any]) -> None:
     if not s["has_audio"]:
         _stage(s, "listen", "skipped", "typed")
@@ -323,7 +323,7 @@ def stage_segment(s: dict[str, Any], rep: ObjectReport) -> None:
 
 
 def box_prompt(size: tuple[int, int], rep: ObjectReport) -> tuple[str, dict[int, str]]:
-    """Build ONE SAM box-prompt for every component Look located (Meta's grammar via meta_sam_parser).
+    """Build one SAM box-prompt for every component Look located (Meta's grammar via meta_sam_parser).
     Returns (prompt text, {object id -> component id}); empty text if no component has a box."""
     from meta_sam_parser import FramePrompt, PromptBox, PromptObject, build_object_prompt
 
@@ -502,7 +502,7 @@ def _stop(s: dict[str, Any], reason: str, at: str) -> None:
     save(s)
 
 
-# =========================================================================== orchestration
+# --- orchestration
 def run(sid: str) -> dict[str, Any]:
     """Run (or resume after a follow-up answer) the full analysis."""
     lock = _locks.setdefault(sid, threading.Lock())

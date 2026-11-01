@@ -1,4 +1,4 @@
-"""v1.25.10: the shared guide page leads with the repair, the "What the AI did" log sits after the steps (real Chromium, 390x844)."""
+"""The shared guide page leads with the repair, the "What the AI did" log sits after the steps (real Chromium, 390x844)."""
 import time
 
 import httpx

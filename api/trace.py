@@ -1,7 +1,7 @@
 """Pipeline trace: which tool did each stage use, and how long did it take.
 
-Shown on the phone ("Under the hood") and printed in the PDF report so judges and users can see exactly
-where Meta models are used and where plain code (safety gates) or other tools (edge-tts) take over.
+Shown on the phone ("Under the hood") and printed in the PDF report, so anyone can see where Meta models are
+used and where plain code (safety gates) or other tools (edge-tts) take over.
 Pure function of the session dict, no I/O.
 """
 from __future__ import annotations

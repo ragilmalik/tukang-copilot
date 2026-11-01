@@ -25,7 +25,7 @@ def test_javanese_is_not_just_indonesian():
         assert word in jv_block
 
 
-def test_v122_extra_strings_exist_in_all_three_languages_and_differ():
+def test_extra_strings_exist_in_all_three_languages_and_differ():
     block = JS[JS.index("/* I18N_EXTRA:start"):JS.index("/* I18N_EXTRA:end */")]
     parts = {k: block[block.index(f"  {k}: {{"):] for k in ("id", "jv", "en")}
     keys = {}

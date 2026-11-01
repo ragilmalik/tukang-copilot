@@ -1,4 +1,4 @@
-"""Robustness of the public endpoints against bad input (no crash, no leftovers, friendly 4xx)."""
+"""How the public endpoints handle bad input (no crash, no leftovers, friendly 4xx)."""
 import io
 
 import pytest

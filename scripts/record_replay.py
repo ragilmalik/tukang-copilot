@@ -1,6 +1,6 @@
-"""Record the 1-tap judge demo (motorbike, demo mode) into a static fixture the front end can replay.
+"""Record the 1-tap demo (motorbike, demo mode) into a static fixture the front end can replay.
 
-Why: a free Render service sleeps and needs ~50 s to wake. When the server is slow or unreachable, web/replay.js plays
+A free Render service sleeps and needs ~50 s to wake. When the server is slow or unreachable, web/replay.js plays
 this RECORDED run instead (clearly labelled "Recorded demo" on screen): same screens, same agent log, same marked photo,
 no server and no model calls. Nothing here is a live answer; it is the demo-mode (MOCK) pipeline, recorded once.
 

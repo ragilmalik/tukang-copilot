@@ -125,8 +125,8 @@ def _done_block(doc: _Doc, done: str, disclaimer: str, T: dict[str, str]) -> Non
 
 
 def done_fits(doc: _Doc, done: str, disclaimer: str) -> bool:
-    """Judge QA 2026-11-02: the "Done when" check sat alone on a near-empty last page. It now goes at the foot of
-    the last step page whenever it fits above the tick box (with a little air), and gets its own page only if not."""
+    """True when the "Done when" check fits at the foot of the last step page, above the tick box with a little
+    air. Otherwise it gets its own page (it used to sit alone on a near-empty one every time)."""
     return doc.y + 40 + _done_height(doc, done, disclaimer) <= TICK_Y - 30
 
 

@@ -1,4 +1,4 @@
-"""Health version and CHANGELOG must not drift apart (audit 5: /api/health said 1.23.0 while the repo was 1.23.8)."""
+"""Health version and CHANGELOG must not drift apart (once /api/health said 1.23.0 while the repo was at 1.23.8)."""
 import re
 from pathlib import Path
 

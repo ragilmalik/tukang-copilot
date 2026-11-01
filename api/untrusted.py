@@ -1,4 +1,4 @@
-"""Owner input is data, never instructions (prompt-injection hardening, v1.22).
+"""Owner input is data, never instructions (prompt-injection hardening).
 
 Everything the owner types or says (description, voice transcript, follow-up answer, "still broken" report)
 reaches the model only through `fence()`: control, zero-width and bidi characters are stripped, angle brackets

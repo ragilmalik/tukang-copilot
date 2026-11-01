@@ -42,7 +42,7 @@ def _L(lang: str, id_: str, en: str) -> str:
     return en if lang == "en" else jv(id_) if lang == "jv" else id_
 
 
-# ------------------------------------------------------------------ Look
+# --- Look
 def object_report(sc: str, lang: str) -> dict[str, Any]:
     rep = _object_report(sc, lang)
     for c in rep["components"]:
@@ -81,7 +81,7 @@ def _object_report(sc: str, lang: str) -> dict[str, Any]:
             "visible_issues": [_L(lang, "Cop busi tidak menempel rapat", "Plug cap not fully seated")]}
 
 
-# ------------------------------------------------------------------ Diagnose
+# --- Diagnose
 _YES = re.compile(r"^\s*(ya|iya|iyo|yo|he'?e|nggih|inggih|yes|yeah|yep|ada|wonten|ana)\b", re.I)
 
 
@@ -149,7 +149,7 @@ def _diagnosis(sc: str, lang: str) -> dict[str, Any]:
             "follow_up_question": _L(lang, "Apakah tercium bau bensin saat distarter?", "Do you smell fuel when you crank it?")}
 
 
-# ------------------------------------------------------------------ Plan
+# --- Plan
 def plan(sc: str, lang: str, cause_index: int = 0) -> dict[str, Any]:
     if sc == "tire" and cause_index >= 1:
         s = [("c3", "Naikkan motor ke standar tengah di tempat datar dan jauh dari jalan ramai.", "Put the bike on its centre stand on level ground, away from traffic.", "Motor berdiri stabil di standar tengah.", "The bike stands steady on its centre stand.", False),
@@ -225,7 +225,7 @@ def plan(sc: str, lang: str, cause_index: int = 0) -> dict[str, Any]:
     return {"cause_title": cause, "steps": steps, "done_check": done, "when_to_call_pro": pro}
 
 
-# ------------------------------------------------------------------ SAM, verify, image
+# --- SAM, verify, image
 _BOXES = {"spark plug cap": (0.40, 0.35, 0.62, 0.58), "ignition cable": (0.55, 0.20, 0.85, 0.40), "air filter box": (0.10, 0.55, 0.40, 0.85),
           "faucet handle": (0.38, 0.12, 0.62, 0.24), "faucet spout": (0.55, 0.30, 0.85, 0.42), "shut-off valve": (0.42, 0.70, 0.58, 0.88),
           "priming plug": (0.44, 0.18, 0.58, 0.32), "suction pipe": (0.02, 0.50, 0.30, 0.66), "power plug": (0.72, 0.72, 0.94, 0.94),

@@ -1,4 +1,4 @@
-"""meta_client: the ONE module that talks to Meta models (SPEC §6). Auth, retries, timeouts, logging, cost.
+"""meta_client: the only module that talks to Meta models (SPEC §6). Auth, retries, timeouts, logging, cost.
 
 Every endpoint and model id below was checked against Meta's public docs on 2026-10-30:
   * Muse Voice Transcribe  POST /v1/asr/transcribe (multipart)   https://dev.meta.ai/docs/speech-to-text
@@ -81,7 +81,7 @@ def image_part(path: Path, max_side: int = 1024) -> dict[str, Any]:
     return {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()}}
 
 
-# --------------------------------------------------------------------------- 1. Listen
+# --- 1. Listen
 def transcribe(wav_path: Path, seconds: float, language_bias: list[str] | None = None,
                keywords: list[str] | None = None) -> str:
     """Muse Voice Transcribe file endpoint. WAV must be mono 16-bit PCM, 16 or 24 kHz, <= 10 min."""
@@ -118,7 +118,7 @@ def transcribe_with_spark_audio(wav_path: Path, language_name: str) -> str:
     return (j["choices"][0]["message"].get("content") or "").strip()
 
 
-# --------------------------------------------------------------------------- 2. Text models, structured output
+# --- 2. Text models, structured output
 def _extract_json(text: str) -> Any:
     from .coerce import extract_json
     return extract_json(text)
@@ -155,7 +155,7 @@ def chat_json(messages: list[dict[str, Any]], schema: dict[str, Any], schema_nam
     return _extract_json(j["choices"][0]["message"].get("content") or "")
 
 
-# --------------------------------------------------------------------------- 3/5. Muse Image
+# --- 3/5. Muse Image
 def _image_bytes(r: httpx.Response) -> bytes:
     data = r.json().get("data") or []
     if not data:
@@ -196,7 +196,7 @@ def edit_image(prompt: str, refs: list[Path], out: Path, fast: bool = False) -> 
     return out
 
 
-# --------------------------------------------------------------------------- 4. SAM 3.1
+# --- 4. SAM 3.1
 def segment(image_path: Path, prompt: str) -> list[dict[str, Any]]:
     """SAM 3.1 on one image. `prompt` is either a short noun phrase ("spark plug cap") or box/point
     object-prompt text built with meta_sam_parser.build_object_prompt (never both, per the docs).

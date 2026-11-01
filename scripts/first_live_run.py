@@ -44,8 +44,8 @@ FIXES = {
     "busy": "Meta is busy or rate-limiting. Wait a minute and run this again.",
     "network": "Could not reach Meta. Check the internet connection (and any proxy), then run this again.",
     "budget": "The per-repair cost cap was hit. Raise MAX_COST_USD in .env a little, or try the faucet sample.",
-    "invalid": "The model answered in a shape the app could not use. Run once more; if it repeats, send Malik docs/LIVE_RUN.md.",
-    "generic": "Something unexpected failed. Send Malik docs/LIVE_RUN.md (it has no key in it).",
+    "invalid": "The model answered in a shape the app could not use. Run once more; if it repeats, open an issue and attach docs/LIVE_RUN.md.",
+    "generic": "Something unexpected failed. Open an issue and attach docs/LIVE_RUN.md (it has no key in it).",
 }
 
 
@@ -153,7 +153,7 @@ def render(r: dict[str, Any], sample: str, lang: str, fake: bool, missing: list[
         L.append(f"| {k} | {v.get('status')} | {v.get('ms', '-')} |")
     L += ["", "## Next", "",
           "- If everything above is fine: `python scripts/run_eval.py` and `python scripts/smoke_e2e.py http://127.0.0.1:8000` in live mode.",
-          "- Copy the total time and cost into the write-up once checked (the docs lane updates WRITEUP / SUBMISSION).", ""]
+          "- Once checked, copy the total time and cost into WRITEUP and SUBMISSION.", ""]
     return "\n".join(L)
 
 

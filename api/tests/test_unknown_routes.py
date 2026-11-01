@@ -1,4 +1,4 @@
-"""Audit 18: unknown routes and wrong methods never 5xx."""
+"""Unknown routes and wrong methods never 5xx."""
 from fastapi.testclient import TestClient
 
 from api.main import app

@@ -1,13 +1,12 @@
 # Deploy on Render (click by click, no coding)
 
-Result: a public `https://tukang-copilot.onrender.com` link that works on any phone (camera and microphone need https).
-Time: about 15 minutes, most of it waiting for the first build. Cost: $0 on the free plan.
+This gets you a public `https://tukang-copilot.onrender.com` link that works on any phone (camera and microphone need https). It takes about 15 minutes, mostly waiting for the first build, and costs $0 on the free plan.
 
-Everything Render needs is already in the repo: `render.yaml` (the "Blueprint": what to build and which settings) and `Dockerfile` (how to build). You only click and paste your keys.
+Render needs two files, and both are in the repo: `render.yaml` (the "Blueprint": what to build, with which settings) and `Dockerfile` (how to build it). The rest is clicking and pasting keys.
 
 ## Before you start
 
-- The code must be on GitHub as **`ragilmalik/tukang-copilot`** (Malik can push it once you say yes).
+- The code has to be on GitHub as `ragilmalik/tukang-copilot`.
 - Your Meta key (dev.meta.ai → API keys). Optional: your Baseten key. No key yet? You can still deploy: the app runs in free demo mode, and you add the key later (step 11).
 - Copy keys straight from the provider's page into Render. Never paste them into GitHub, a chat, or a screenshot.
 
@@ -20,11 +19,11 @@ Everything Render needs is already in the repo: `render.yaml` (the "Blueprint": 
 | Photos and shared guide links kept | Until it falls asleep or redeploys (temporary disk; deleted after 24 h anyway) | Until the next redeploy or restart (max 24 h) |
 | Good for | Testing, sharing the link, the video | Judging days, so the first judge never waits |
 
-Start on Free. Switching later is one click (step 14) and needs no redeploy of code.
+Start on Free. Switching later is one click (step 14) and doesn't need a code redeploy.
 
 ## Deploy (first time)
 
-1. Open **https://dashboard.render.com** and sign in. Easiest: **Sign in with GitHub** using the account that owns `ragilmalik/tukang-copilot`.
+1. Open https://dashboard.render.com and sign in. The easiest way is **Sign in with GitHub**, with the account that owns `ragilmalik/tukang-copilot`.
 2. Top right, click **+ New** → **Blueprint**.
 3. Under *Connect a repository*: if `tukang-copilot` is not in the list, click **Configure account** (or **Connect GitHub**) → GitHub opens → choose *Only select repositories* → pick **tukang-copilot** → **Install / Save**. You come back to Render.
 4. Next to **ragilmalik/tukang-copilot** click **Connect**.
@@ -36,7 +35,7 @@ Start on Free. Switching later is one click (step 14) and needs no redeploy of c
    - **PUBLIC_BASE_URL**: leave empty for now (you get the address in step 9), then fill it in (step 11).
    - **WA_TOKEN**, **WA_PHONE_NUMBER_ID**, **WA_VERIFY_TOKEN**, **WA_APP_SECRET**: optional, for the WhatsApp channel. Leave all four empty to skip it; to turn it on later, follow `docs/WHATSAPP.md`.
 7. Click **Deploy Blueprint** (older screens call it **Apply**).
-8. Click the **tukang-copilot** service, then **Logs**. The first build takes 5–8 minutes (it installs Python packages and ffmpeg). Wait until the top shows a green **Live** and the log says `Uvicorn running on http://0.0.0.0:10000`.
+8. Click the **tukang-copilot** service, then **Logs**. The first build takes 5-8 minutes (it installs Python packages and ffmpeg). Wait until the top shows a green **Live** and the log says `Uvicorn running on http://0.0.0.0:10000`.
 9. Your link is at the top of the service page, like `https://tukang-copilot.onrender.com` (Render may add a few letters if the name is taken). Open it on your phone over 4G: you should see the app, and no orange *Demo mode* line if you pasted a key.
 
 ## Check it (2 minutes)
@@ -45,7 +44,7 @@ Start on Free. Switching later is one click (step 14) and needs no redeploy of c
     ```
     python scripts/deploy_check.py https://tukang-copilot.onrender.com
     ```
-    You want **READY** at the end. Each line is PASS / WARN / FAIL; every FAIL has a `fix:` line in plain English. It checks https, `/api/health`, live vs demo mode, open weights, the home page, install-to-home-screen files, security headers (camera allowed), a PDF report, and all five demo repairs end to end.
+    You want READY at the end. Each line is PASS / WARN / FAIL; every FAIL has a `fix:` line in plain English. It checks https, `/api/health`, live vs demo mode, open weights, the home page, install-to-home-screen files, security headers (camera allowed), a PDF report, and all five demo repairs end to end.
     - In LIVE mode the PDF and the five repairs make real model calls, so they only run when you add `--live` (well under $1). Do that once after the first deploy.
     - A *"server took 50s to answer (it was asleep)"* WARN is normal on the free plan.
     - A *"LIVE repair silently used demo answers"* FAIL means `DEMO_FALLBACK` covered for a failing live call (almost always a wrong key or no credit). Fix the key; while testing you can set `DEMO_FALLBACK` to `0` so errors show instead.
@@ -76,13 +75,13 @@ Start on Free. Switching later is one click (step 14) and needs no redeploy of c
 
 | What you see | What to do |
 |---|---|
-| Build failed in Logs | Click **Manual Deploy → Deploy latest commit** once (network hiccups happen). Still red: roll back (step 13) and tell Malik the last 20 log lines. |
+| Build failed in Logs | Click **Manual Deploy → Deploy latest commit** once (network hiccups happen). Still red: roll back (step 13) and read the last 20 log lines for the error. |
 | App says *Demo mode* | `MODEL_API_KEY` is empty or `MOCK` is `1`: step 11. |
-| *Too many repairs / daily budget* message | The public spend guard worked. Raise `RATE_LIMIT_PER_HOUR` or `DAILY_BUDGET_USD` in Environment if you want. |
+| *Too many repairs / daily budget* message | The public spend guard did its job. Raise `RATE_LIMIT_PER_HOUR` or `DAILY_BUDGET_USD` in Environment if you want. |
 | Camera does not open on the phone | Use the `https://` link, and allow camera in the browser's site settings. |
 | Shared guide link says *not found* | Render's disk is temporary: photos and guides vanish on every redeploy, restart, and (free plan) every time it falls asleep. Start a new repair. Starter keeps them until the next redeploy. |
 | First visit is slow | Free plan was asleep; it wakes in about a minute (or switch to Starter, step 14). |
 
 ## Run the same container on your own computer (optional)
 
-With Docker Desktop installed: `docker compose up --build` in the project folder → http://localhost:8000. It uses your `.env` if there is one (demo mode if not). This is exactly what Render runs.
+With Docker Desktop installed: `docker compose up --build` in the project folder → http://localhost:8000. It uses your `.env` if there is one (demo mode if not). It's the same container Render runs.

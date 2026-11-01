@@ -1,23 +1,24 @@
 # YouTube upload kit
 
-Upload: the real-phone recording if it exists, otherwise `docs/demo/tukang-copilot-demo.mp4` (2:55, demo mode).
-Visibility: **Unlisted** is fine for judging; **Public** helps Most Viral and Community Vote. Open the link in a private
-window before pasting it into the form. Captions: upload `docs/demo/tukang-copilot-demo.en.srt` as English subtitles.
-Thumbnail: `docs/launch/thumbnail.png` (1280x720; custom thumbnails need a phone-verified YouTube account).
+Upload the real-phone recording if I have one by then, otherwise `docs/demo/tukang-copilot-demo.mp4` (2:55, demo mode).
+Unlisted is fine for judging, but Public helps with Most Viral and Community Vote. Open the link in a private window
+before pasting it into the form. For captions, upload `docs/demo/tukang-copilot-demo.en.srt` as English subtitles.
+The thumbnail is `docs/launch/thumbnail.png` (1280x720); custom thumbnails need a phone-verified YouTube account.
 
 ## Title options
-1. **Tukang Copilot: AI finds the broken part and checks every repair step (Muse Spark + SAM 3.1)**
+1. Tukang Copilot: AI finds the broken part and checks every repair step (Muse Spark + SAM 3.1)
 2. Motor mogok? This AI outlines the exact part and checks your repair with the camera
 3. Every phone becomes a mechanic's apprentice: Tukang Copilot (Bahasa, Jawa, English)
 4. Plan, act, verify, re-plan: an AI repair agent for Indonesian homes
 
-**Pick: option 1.** It says what it does, names the Meta models judges are scoring, and fits YouTube's 100-character limit (92).
+I'm going with option 1. It says what the app does, names the Meta models the judges score, and at 92 characters it
+fits YouTube's 100-character limit.
 
 ## Description (paste as is, then fill the placeholders)
 ```
-Point your phone at something broken, say what's wrong in Bahasa Indonesia, Javanese or English, and Tukang Copilot outlines the exact part on your own photo, walks you through the fix, checks every step with your camera, and says STOP when the job is dangerous.
+Point your phone at something broken and say what's wrong in Bahasa Indonesia, Javanese or English. Tukang Copilot outlines the exact part on your own photo, walks you through the fix, checks each step with your camera, and says STOP when the job is dangerous.
 
-Built solo for the Meta Global AI Developer Hackathon (Indie track, Push the Frontier). Everything shown was built during the event, Oct 26 to Nov 4, 2026.
+I built it solo for the Meta Global AI Developer Hackathon (Indie track, Push the Frontier). Everything in this video was built during the event, Oct 26 to Nov 4, 2026.
 
 This recording runs in clearly labelled demo mode: stand-in photos and recorded model answers, no API cost.
 
@@ -28,22 +29,22 @@ Chapters
 [paste the chapter block for the cut you upload, from below]
 
 How it works
-- Muse Spark 1.3: sees the object, diagnoses, plans, verifies each step from a new photo, re-plans
-- SAM 3.1: pixel masks of the real parts on your photo, and tracking on the live camera
-- Muse Voice Transcribe + Muse Spark 1.2 audio: Indonesian, English and Javanese voice
-- Muse Image: turns your photo into a diagram for hidden steps
-- Muse Spark Open (open weights) on Baseten: one switch for diagnosis and planning
-- Safety stops (gas, house wiring, 220 V internals, brakes, fuel) are enforced in code, not prompts
-- WhatsApp Cloud API: the same agent answers a WhatsApp chat (shown in the simulator; a real number is not connected yet)
+- Muse Spark 1.3 looks at the object, diagnoses, plans, checks each step from a new photo and re-plans
+- SAM 3.1 draws pixel masks of the real parts on your photo and tracks them on the live camera
+- Muse Voice Transcribe and Muse Spark 1.2 audio handle Indonesian, English and Javanese voice
+- Muse Image turns your photo into a diagram for hidden steps
+- Muse Spark Open (open weights) on Baseten can take over diagnosis and planning with one switch
+- The safety stops (gas, house wiring, 220 V internals, brakes, fuel) are plain code that runs before any model call
+- On the WhatsApp Cloud API the same agent answers a WhatsApp chat (shown in the simulator; a real number is not connected yet)
 
-Why: Indonesia has 139 million motorbikes (BPS 2024) and millions of homes on an electric water pump. A light pump service costs about two days of Central Java's minimum wage before parts. Repair videos can't see your problem and aren't in your language.
+Why I built it: Indonesia has 139 million motorbikes (BPS 2024) and millions of homes on an electric water pump. A light pump service costs about two days of Central Java's minimum wage before parts. Repair videos can't see your problem and usually aren't in your language.
 
 #MetaAI #MuseSpark #SAM3 #AIagents #Indonesia #BahasaJawa #DIY #hackathon
 ```
 
 ## Chapters
 
-YouTube rules: the first chapter must be 0:00, at least 3 chapters, each at least 10 seconds.
+YouTube's rules: the first chapter starts at 0:00, there are at least 3 chapters, and each one lasts at least 10 seconds.
 
 ### A. Current backup cut (`tukang-copilot-demo.mp4`, 2:55 v1.27 cut with the 3 s hook title card and the WhatsApp scene, timings from `docs/demo/TIMESTAMPS.txt`)
 ```
@@ -57,8 +58,8 @@ YouTube rules: the first chapter must be 0:00, at least 3 chapters, each at leas
 2:07 Safety STOP, then WhatsApp in Basa Jawa
 2:28 Open weights and how it works
 ```
-Every chapter is at least 10 s (checked against the scene starts in `docs/demo/TIMESTAMPS.txt`). If the video is
-re-cut again, re-read that file and move the chapters with it.
+I checked each chapter against the scene starts in `docs/demo/TIMESTAMPS.txt`, and all of them are at least 10 s long.
+If the video gets re-cut, re-read that file and move the chapters with it.
 
 ### B. Real-phone recording (timings from docs/DEMO_SCRIPT.md)
 ```
@@ -74,7 +75,7 @@ re-cut again, re-read that file and move the chapters with it.
 2:15 Five Meta models, one agent loop
 2:45 Every phone becomes a mechanic's apprentice
 ```
-Adjust to the real edit. Keep the total under 3:00 (the form field is "3-Minute Demo Video").
+Adjust these to the real edit, and keep the total under 3:00 (the form field is "3-Minute Demo Video").
 
 ## Tags (YouTube tags box, comma separated, under 500 characters)
 ```
@@ -87,4 +88,4 @@ Tukang Copilot, Meta AI, Muse Spark, SAM 3.1, Segment Anything, Meta Model API, 
 - [ ] English subtitles from the `.srt`
 - [ ] Thumbnail `docs/launch/thumbnail.png`
 - [ ] "Not made for kids", category Science & Technology
-- [ ] Opens logged out; the link goes into form field 8 and README
+- [ ] Opens logged out; the link goes into form field 8 and the README

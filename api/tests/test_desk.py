@@ -1,4 +1,4 @@
-"""v1.25 laptop view: phone frame + side panel (what it is, QR code, 1-tap demo, language switch). Static checks."""
+"""Laptop view: phone frame + side panel (what it is, QR code, 1-tap demo, language switch). Static checks."""
 import re
 from pathlib import Path
 

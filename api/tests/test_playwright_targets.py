@@ -1,4 +1,4 @@
-"""v1.25.2: small text links and summaries are still thumb-sized targets (real Chromium, 390x844)."""
+"""Small text links and summaries are still thumb-sized targets (real Chromium, 390x844)."""
 import pytest
 
 pytest.importorskip("playwright.sync_api")

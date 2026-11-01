@@ -1,4 +1,4 @@
-"""v1.25.3: the capture screen speaks the owner's language when a file is refused (real Chromium, 390x844)."""
+"""The capture screen speaks the owner's language when a file is refused (real Chromium, 390x844)."""
 import pytest
 
 pytest.importorskip("playwright.sync_api")

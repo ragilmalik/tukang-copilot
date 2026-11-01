@@ -71,7 +71,7 @@ T.jv = Object.assign({}, T.id, {
   exhausted: "Wis kabeh dijajal", newPlan: "Rencana anyar wis siap.", photos: "foto", videoBtn: "🎥 Utawa rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar paling cetha dijupuk otomatis)", videoBig: "Videone kegedhen. Rekam 5–10 detik wae.", videoBad: "Videone ora bisa diwaca. Rekam maneh 5–10 detik utawa jupuk foto wae.", videoShort: "Videone cendhak banget. Rekam 5–10 detik.", videoLong: "Videone dawa banget. Rekam 5–10 detik wae.", recBad: "Rekaman swarane ora bisa diwaca. Rekam maneh utawa ketik masalahe.", badFile: "Berkas iku dudu foto. Pilih foto JPG, PNG, utawa HEIC.", unreadPhoto: "Foto iku ora bisa diwaca. Jajal foto JPG utawa PNG.", bigFile: "Berkase kegedhen. Jajal foto sing luwih cilik.", emptyFile: "Berkase kosong. Jupuk maneh.", tooLong: "Tulisane kepanjangen. Cekak-ana dhisik.",
 });
 
-/* I18N_EXTRA:start (v1.22: 1-tap demo, agent log, progress, quick answers). api/tests/test_i18n.py checks all three. */
+/* I18N_EXTRA:start (1-tap demo, agent log, progress, quick answers). api/tests/test_i18n.py checks all three. */
 const T_EXTRA = {
   id: { demoBtn: "▶ Coba demo 1 ketuk", demoSub: "Tanpa foto, tanpa akun: lihat AI memperbaiki motor mogok dari awal sampai cek kamera.",
         how1: "📷 Foto + cerita", how2: "🎯 AI tandai bagiannya", how3: "✅ Tiap langkah dicek kamera",
@@ -152,7 +152,7 @@ const T_EXTRA = {
 /* I18N_EXTRA:end */
 ["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_EXTRA[k]));
 
-/* I18N_REPLAY:start (v1.24: recorded demo when the server sleeps). api/tests/test_replay.py checks all three. */
+/* I18N_REPLAY:start (recorded demo when the server sleeps). api/tests/test_replay.py checks all three. */
 const T_REPLAY = {
   id: { rpBadge: "▶ Demo rekaman: putaran mode demo yang disimpan, tanpa server", rpWake: "Server sedang bangun (hosting gratis, bisa sampai 1 menit). Tombol demo langsung memutar demo rekaman.",
         rpOwnPhoto: "Demo rekaman hanya bisa memutar dua foto contoh. Foto kamu sendiri perlu server live: muat ulang halaman sebentar lagi.",
@@ -176,7 +176,7 @@ const T_REPLAY = {
 /* I18N_REPLAY:end */
 ["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_REPLAY[k]));
 
-/* I18N_DESK:start (v1.25: laptop view side panel). api/tests/test_desk.py checks all three. */
+/* I18N_DESK:start (laptop view side panel). api/tests/test_desk.py checks all three. */
 const T_DESK = {
   id: { deskKicker: "Dibuat dengan Muse Spark + SAM 3.1", deskTag: "Perbaiki sendiri, dengan aman. Dalam Bahasa Jawa.",
         deskWhat: "Foto barang yang rusak dan ceritakan masalahnya. Muse Spark mencari penyebabnya, SAM 3.1 menandai bagiannya di foto, dan kamera mengecek tiap langkah perbaikan.",
@@ -234,7 +234,7 @@ function applyLang() {
 }
 
 // WhatsApp simulator link (docs/WHATSAPP.md): only when the server says /wa is on (demo mode or WA_SIM=1).
-// The static judge build has no server and no /wa (scripts/build_static.py also removes the element).
+// The static build has no server and no /wa (scripts/build_static.py also removes the element).
 if (!window.TC_STATIC && !(window.TCReplay && window.TCReplay.forced()) && $("waSim")) {  // ?replay=1 sends nothing to the server
   fetch("/api/wa-sim/info").then((r) => (r.ok ? r.json() : null)).then((i) => { if (i && i.enabled) $("waSim").classList.remove("hidden"); }).catch(() => {});
 }
@@ -258,7 +258,7 @@ function wakeNote(v) {
   n.textContent = v ? "⏳ " + t("rpWake") : ""; n.classList.toggle("hidden", !v || replayOn());
 }
 function health() {
-  if (window.TCReplay && window.TCReplay.forced() && !replayOn()) {  // ?replay=1: always the recording (judges, tests)
+  if (window.TCReplay && window.TCReplay.forced() && !replayOn()) {  // ?replay=1: always the recording (static links, tests)
     healthP = window.TCReplay.start(lang).then((ok) => (ok ? fetch("/api/health") : Promise.reject(new Error("no replay"))))
       .then((r) => r.json()).then((h) => { HEALTH = h; badges(); return false; }).catch(() => false);
     return healthP;
@@ -404,7 +404,7 @@ async function submit(sample) {
     if (r.status >= 502) throw new TypeError("server unavailable");  // a sleeping host's gateway page, not our API
     const j = await r.json();
     if (!r.ok) throw new Error(j.detail || r.statusText);
-    ownerSet(j.id, j.owner_token);  // only this phone can answer "Does it work again?" or erase (backlog Q14)
+    ownerSet(j.id, j.owner_token);  // only this phone can answer "Does it work again?" or erase
     history.pushState({ tc: 1 }, "", "#" + j.id);  // Back returns to the first screen instead of leaving the site
     show("progress"); startElapsed(); follow(j.id);
     return "ok";
@@ -644,7 +644,7 @@ function stepImage(st) {
   return S.files_base + (S.parts_image || S.photos[0]);
 }
 
-let advT = 0;  // the 1.5 s auto-advance after a passed check; any other move to a step cancels it (v1.25.7)
+let advT = 0;  // the 1.5 s auto-advance after a passed check; any other move to a step cancels it
 function renderStep() {
   clearTimeout(advT);
   const st = S.plan.steps[stepIdx];
@@ -716,7 +716,7 @@ function renderOutcome() {
   const box = $("outcome"); if (!box || !S) return;
   const oc = S.outcome || {}, r = oc.result || "";
   if (sharedView()) {
-    // judge QA 2026-11-02: the shared guide is read-only; a viewer sees the owner's answer but cannot change it
+    // the shared guide is read-only: a viewer sees the owner's answer but cannot change it
     box.classList.toggle("hidden", !S.plan || !r);
     box.querySelectorAll(".row, b[data-t='outcomeAsk']").forEach((el) => el.classList.add("hidden"));
     if ($("trialBox")) $("trialBox").classList.add("hidden");
@@ -728,7 +728,7 @@ function renderOutcome() {
   $("fixedBtn").setAttribute("aria-pressed", String(r === "fixed")); $("proBtn").setAttribute("aria-pressed", String(r === "pro"));
   $("outcomeMsg").textContent = r === "fixed" ? t("fixedThanks") + (oc.saved_idr ? " " + t("savedYou").replace("{x}", rupiah(oc.saved_idr)) : "") : r === "pro" ? t("proThanks") : "";
 }
-// v1.25.7: the last step passed and every step is camera-verified: bring "Does it work again?" on screen (it sat far
+// The last step passed and every step is camera-verified: bring "Does it work again?" on screen (it sat far
 // below the step card, so the repair seemed to just stop) and say so for screen readers.
 function askOutcome() {
   const box = $("outcome"); if (!box || !S || sharedView() || box.classList.contains("hidden") || (S.outcome || {}).result) return;
@@ -1101,7 +1101,7 @@ function renderGarage() {
   }).join("");
 }
 
-/* ---------------- agent log: "What the AI did" (v1.22) ----------------
+/* ---------------- agent log: "What the AI did" ----------------
    One line per agent decision from s.agent_log (api/pipeline/engine.py _event): what it perceived, decided,
    checked or handed off, and which tool did it. Every value is escaped; the log never holds the owner's words. */
 const fillT = (key, d) => t(key).replace(/\{(\w+)\}/g, (_, k) => esc(d[k] ?? ""));
@@ -1145,7 +1145,7 @@ function renderAgentLog(s, boxId) {
   box.querySelector(".agList").innerHTML = rows;
 }
 
-/* ---------------- agent log lines link to what they are about (v1.23) ---------------- */
+/* ---------------- agent log lines link to what they are about ---------------- */
 // Progress screen: the stage row (or the streamed result row). Result and guide pages: the photo, the causes, the
 // safety list, or the exact step that was camera-checked (the step card jumps to it).
 const AG_STAGE = { listen: "listen", gate: "gate", input_guard: "gate", look: "look", segment: "segment", diagnose: "diagnose",
@@ -1193,7 +1193,7 @@ function agGo(e, boxId) {
   flash(el);
 }
 
-/* ---------------- progress: partial results stream in (v1.23) ---------------- */
+/* ---------------- progress: partial results stream in ---------------- */
 // Each stage's result shows up the moment it is saved (SSE, or the polling fallback): what the AI saw, the photo
 // with SAM 3.1's outlines, the top cause, the step count. Rows are only appended or updated, never rebuilt, so a
 // row animates once and the screen does not jump.
@@ -1253,7 +1253,7 @@ function tickElapsed() {
 }
 function startElapsed() { progT0 = Date.now(); if (progTimer) clearInterval(progTimer); progTimer = setInterval(tickElapsed, 1000); tickElapsed(); }
 
-/* ---------------- 1-tap guided demo (v1.22) ---------------- */
+/* ---------------- 1-tap guided demo ---------------- */
 // The tip bar is a small pill in the corner, never a full-width sheet over the main button. It opens wide for the
 // first tips, collapses to a 💡 chip by itself once the first step has been checked, and the owner can fold or
 // close it at any time. A new tip after a manual fold stays folded until tapped.
@@ -1305,7 +1305,7 @@ function setupDemo() {
     if (await useReplay()) { await window.TCReplay.start(lang); wakeNote(false); await health(); }
     const res = await submit("motor");
     // The page loaded but the server stopped answering (it fell asleep, the connection dropped): play the
-    // recorded demo instead of leaving a judge on "No connection".
+    // recorded demo instead of leaving the visitor on "No connection".
     if (res === "net" && window.TCReplay && !replayOn() && await window.TCReplay.start(lang)) {
       $("formErr").textContent = ""; wakeNote(false); await health(); submit("motor");
     }
@@ -1320,12 +1320,12 @@ function setupDemo() {
   if ($("preList")) $("preList").addEventListener("change", () => setTimeout(updateTour, 0));
 }
 
-// "/" on the server; the page's own path in the static judge build (it may live under a GitHub Pages sub-path).
+// "/" on the server; the page's own path in the static build (it may live under a GitHub Pages sub-path).
 function homePath() { return window.TC_STATIC ? location.pathname : "/"; }
 
-/* ---------------- laptop view (v1.25) ---------------- */
+/* ---------------- laptop view ---------------- */
 // At >= 1024 px the page shows the app in a phone frame plus a side panel (web/style.css). The QR code encodes the
-// page's own address so a judge on a laptop can carry on with a phone; the encoder (web/vendor/qrcode.js, MIT,
+// page's own address so someone on a laptop can carry on with a phone; the encoder (web/vendor/qrcode.js, MIT,
 // Kazuhiko Arase) is fetched only on wide screens, so phones never download it.
 const DESK_MQ = "(min-width: 1024px)";
 const isDesk = () => typeof window.matchMedia === "function" && window.matchMedia(DESK_MQ).matches;
@@ -1370,7 +1370,7 @@ function setupDesk() {
 }
 function markLang() { document.querySelectorAll("[data-setlang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.setlang === lang))); }
 
-/* ---------------- phone Back button (v1.25.1) ---------------- */
+/* ---------------- phone Back button ---------------- */
 // Starting a repair pushes "#<id>" so Back goes to the first screen (not out of the site, which lost the place) and
 // Forward comes back to the same repair. Anything running for the repair (stream, timers, camera, voice) is stopped.
 // A clean first screen: step back past the pushed "#<id>" entry when there is one (no duplicate history entry), then reload.
@@ -1407,7 +1407,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // PWA: install to home screen. The worker only caches the app shell; it fails quietly when sw.js is absent.
-if ("serviceWorker" in navigator && location.protocol !== "file:" && !window.TC_STATIC) {  // the static judge build has no worker
+if ("serviceWorker" in navigator && location.protocol !== "file:" && !window.TC_STATIC) {  // the static build has no worker
   window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));
 }
 

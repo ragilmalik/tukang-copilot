@@ -1,18 +1,22 @@
 # Community Vote kit ($10K)
 
 ## How the vote works (checked 2026-11-01)
-- Participant Guide: "The project that receives the most votes in the public gallery. ... The winner is determined by the
-  total number of votes received through the hackathon platform, limited to one vote per verified account."
-- Schedule: the vote **opens at the closing ceremony, Mon Nov 9, 12:00 PM ET = Tue Nov 10, 00:00 WIB**. Winner announced
-  **Mon Nov 16** on Discord.
-- The gallery URL is **not public yet** (`/gallery` and `/projects` on the event page returned nothing on 2026-11-01).
-  Watch https://cerebralvalley.ai/e/meta-ai-developer-hackathon and Discord #announcements from Nov 9.
-- Voters need an account on the hackathon platform (cerebralvalley.ai). The rules say "verified account" without saying
-  what verification means; tell people to sign up and finish any email or phone check the site asks for.
-- Fair play: one person, one vote. Never ask anyone to make extra accounts and never buy votes. That can disqualify the
-  entry.
+The Participant Guide says: "The project that receives the most votes in the public gallery. ... The winner is
+determined by the total number of votes received through the hackathon platform, limited to one vote per verified
+account."
 
-**Send nothing before the vote opens.** Before Nov 10 you can share the X post and the free demo, which also helps Most Viral.
+The vote opens at the closing ceremony, **Mon Nov 9, 12:00 PM ET = Tue Nov 10, 00:00 WIB**, and the winner is announced
+on Discord on **Mon Nov 16**. The gallery URL isn't public yet: `/gallery` and `/projects` on the event page returned
+nothing on 2026-11-01. From Nov 9, watch https://cerebralvalley.ai/e/meta-ai-developer-hackathon and Discord
+#announcements.
+
+Voters need an account on the hackathon platform (cerebralvalley.ai). The rules say "verified account" but don't say
+what verification means, so I'll tell people to sign up and finish whatever email or phone check the site asks for.
+
+One person, one vote. I won't ask anyone to make extra accounts and I won't buy votes; either one can get the entry
+disqualified.
+
+**Send nothing before the vote opens.** Before Nov 10 I can share the X post and the free demo, which also helps Most Viral.
 
 Placeholders: `[VOTE_URL]` (the gallery page for Tukang Copilot), `[LIVE_URL]`, `[X_POST_URL]`.
 
@@ -57,7 +61,7 @@ Matur nuwun sanget 🙏
 ```
 Hi! I built *Tukang Copilot* solo for Meta's Global AI Developer Hackathon: point your phone at something broken, say what's wrong in Bahasa, Javanese or English, and it outlines the exact part, checks every repair step with the camera, and says STOP when it's dangerous.
 
-The public vote is open. One vote would mean a lot:
+The public vote is open, and one vote from you would help a lot:
 👉 [VOTE_URL]
 (Sign up or log in to Cerebral Valley, free, then click Vote. One vote per account, until Nov 16.)
 
@@ -96,11 +100,11 @@ EN: I built an AI repair agent for Indonesian homes for Meta's Global AI Develop
 ```
 I spent the last ten days building Tukang Copilot, my solo entry to the Meta Global AI Developer Hackathon (Indie track, "Push the Frontier").
 
-The problem: Indonesia has 139 million motorbikes and millions of homes on an electric water pump. When something small breaks, a technician visit for a light pump service costs about two days of Central Java's minimum wage, and repair videos can't see your problem or speak Javanese.
+Indonesia has 139 million motorbikes and millions of homes on an electric water pump. When something small breaks, a light pump service from a technician costs about two days of Central Java's minimum wage, and repair videos can't see your problem or speak Javanese.
 
-What I built: a phone web app where you snap a photo and say what's wrong. An agent loop on Meta's models (Muse Spark for vision, planning and step verification, SAM 3.1 for pixel masks of the real parts, Voice Transcribe and Spark audio for Indonesian and Javanese) walks you through the fix and checks each step with a new photo. If the fix fails it re-plans; if the job is dangerous (gas, mains wiring, brakes) a code-level safety gate stops it and hands off to a workshop.
+So I made a phone web app where you snap a photo and say what's wrong. An agent loop on Meta's models walks you through the fix and checks each step with a new photo. Muse Spark handles vision, planning and step checks, SAM 3.1 draws pixel masks of the real parts, and Voice Transcribe plus Spark audio cover Indonesian and Javanese. If the fix fails it re-plans. If the job is dangerous (gas, mains wiring, brakes), a safety gate written in plain code stops it and hands off to a workshop.
 
-Engineering: 768 automated tests, strict typing, prompt-injection hardening, and an open-weights path (Muse Spark Open) for self-hosting.
+Under the hood: 768 automated tests, strict typing, prompt-injection hardening, and an open-weights path (Muse Spark Open) for self-hosting.
 
 The public Community Vote is open until Nov 16 and takes one click with a free Cerebral Valley account: [VOTE_URL]
 Try the 1-minute demo, no sign-up: [LIVE_URL]
@@ -112,8 +116,8 @@ Try the 1-minute demo, no sign-up: [LIVE_URL]
 
 ## Facebook groups
 
-Pick groups where repair talk is welcome (motor communities, warga Semarang, DIY/pertukangan, Kota Semarang info groups).
-Read each group's rules first; many ban promotion, so ask the admin. Post once per group, no spamming.
+Pick groups where repair talk is welcome: motor communities, warga Semarang, DIY/pertukangan, Kota Semarang info groups.
+Read each group's rules first. Many ban promotion, so ask the admin, and post once per group.
 
 ### Bahasa Indonesia (grup motor / warga / DIY)
 ```
@@ -162,5 +166,5 @@ Feedback from people who actually fix things is very welcome.
 | Wed Nov 11 to Sat Nov 14 | Facebook groups (with admin permission), one reminder in personal WhatsApp groups. |
 | Mon Nov 16 | Winner announced on Discord. Thank everyone either way. |
 
-Note for Malik: the Javanese texts are written in a friendly ngoko alus register. Have a native speaker in the family
-read them once before sending, and adjust to Semarang usage.
+Note to self: the Javanese texts are in a friendly ngoko alus register. Ask someone in the family to read them once
+before sending, and adjust them to how people talk in Semarang.

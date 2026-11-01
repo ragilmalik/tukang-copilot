@@ -1,4 +1,4 @@
-"""Cost guards inside a repair (v1.22): step checks are capped per repair and their spend counts toward the
+"""Cost guards inside a repair: step checks are capped per repair and their spend counts toward the
 session cost (so DAILY_BUDGET_USD sees it); follow-up model calls are rate limited per visitor in live mode."""
 import time
 

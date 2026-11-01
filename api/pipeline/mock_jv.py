@@ -1,14 +1,14 @@
 """Basa Jawa (ngoko, as spoken around Semarang) for every demo answer in mock.py, keyed by the Indonesian text.
 
-Before v1.22 the demo answers fell back to Bahasa Indonesia when the UI was set to Basa Jawa, so the Javanese
-screenshots showed Indonesian content under Javanese buttons. Live mode is unaffected (the model writes Javanese
-itself). Brand names, part numbers and loanwords bengkels use as-is (busi, foot valve, seal tape, tubeless) stay.
+Without this table the demo answers fall back to Bahasa Indonesia when the UI is set to Basa Jawa (Indonesian content
+under Javanese buttons). Live mode does not need it: the model writes Javanese itself. Brand names, part numbers
+and loanwords bengkels use as-is (busi, foot valve, seal tape, tubeless) stay.
 api/tests/test_mock_javanese.py checks that every Indonesian demo string has an entry here.
 """
 from __future__ import annotations
 
 JV: dict[str, str] = {
-    # ---------------------------------------------------------------- motor (Honda Beat, spark plug cap)
+    # --- motor (Honda Beat, spark plug cap)
     "Honda Beat, area busi": "Honda Beat, bagean busi",
     "Cop busi": "Cop busi",
     "terlihat agak longgar": "katon rada longgar",
@@ -54,7 +54,7 @@ JV: dict[str, str] = {
     "Ujung busi bersih, tidak hitam pekat.": "Pucuk busi resik, ora ireng pekat.",
     "Pasang busi dengan tangan dulu, kencangkan 1/4 putaran, lalu pasang cop sampai bunyi klik.":
         "Pasang busi nganggo tangan dhisik, kencengna 1/4 puteran, banjur pasang cop nganti muni klik.",
-    # ---------------------------------------------------------------- water pump (Shimizu, lost prime / foot valve)
+    # --- water pump (Shimizu, lost prime / foot valve)
     "Pompa air sumur dangkal (Shimizu)": "Pompa banyu sumur cethek (Shimizu)",
     "Baut pancingan": "Baut pancingan",
     "Pipa hisap": "Pipa sedhot",
@@ -101,7 +101,7 @@ JV: dict[str, str] = {
     "Saringan bersih dan klep bergerak lancar.": "Saringan resik lan klepe obah lancar.",
     "Turunkan lagi pipanya, isi air pancingan sampai meluap, pasang baut, lalu colok steker.":
         "Mudhunna maneh pipane, isenana banyu pancingan nganti luber, pasang baut, banjur colok steker.",
-    # ---------------------------------------------------------------- faucet (worn washer / valve seat)
+    # --- faucet (worn washer / valve seat)
     "Kran air wastafel dapur": "Kran banyu wastafel pawon",
     "Tuas kran": "Gagang kran",
     "Mulut kran": "Cangkem kran",
@@ -138,7 +138,7 @@ JV: dict[str, str] = {
     "Permukaan dudukan rata dan mengkilap.": "Lumahe lungguhan rata lan mengkilap.",
     "Pasang kembali dengan seal baru, buka kran stop, lalu tutup kran.": "Pasang maneh nganggo seal anyar, bukak kran stop, banjur tutup kran.",
     "Mulut kran kering.": "Cangkem kran garing.",
-    # ---------------------------------------------------------------- rice cooker (red stop)
+    # --- rice cooker (red stop)
     "Rice cooker (magic com)": "Rice cooker (magic com)",
     "Tombol cook": "Tombol cook",
     "Kabel power": "Kabel listrik",
@@ -147,7 +147,7 @@ JV: dict[str, str] = {
     "Sekring termal di dalam putus": "Sekring termal ing jero pedhot",
     "Kabel power rusak": "Kabel listrik rusak",
     "Perlu membuka bagian dalam alat 220V.": "Kudu mbukak jeroan piranti 220V.",
-    # ---------------------------------------------------------------- flat scooter tyre (nail / valve stem)
+    # --- flat scooter tyre (nail / valve stem)
     "Ban belakang motor skutik (tubeless)": "Ban mburi motor matic (tubeless)",
     "Tapak ban": "Tapak ban",
     "ada benda logam menancap": "ana barang wesi nancep",
@@ -196,7 +196,7 @@ JV: dict[str, str] = {
     "Pompa ban sesuai angka di stiker motor, pasang tutup pentil, lalu cek lagi dengan air sabun.":
         "Pompanen ban miturut angka ing stiker motor, pasang tutup pentil, banjur priksa maneh nganggo banyu sabun.",
     "Tidak ada gelembung baru di pentil.": "Ora ana umpluk anyar ing pentil.",
-    # ---------------------------------------------------------------- step check
+    # --- step check
     "Foto terlalu gelap, bagiannya tidak terlihat.": "Fotone kepetengen, perangane ora katon.",
     "Nyalakan senter HP dan foto lebih dekat ke bagian yang ditandai.": "Urubna senter HP lan foto luwih cedhak menyang perangan sing ditandhani.",
     "Foto kosong atau buram.": "Fotone kosong utawa burem.",

@@ -1,6 +1,6 @@
-"""1.27.0: owner token (backlog Q14), WhatsApp simulator link on the first screen, render.yaml WhatsApp settings.
+"""Owner token, WhatsApp simulator link on the first screen, render.yaml WhatsApp settings.
 
-Q14: anyone holding a shared guide link could still POST an outcome (and erase the repair) even though the guide page
+Before 1.27.0, anyone holding a shared guide link could still POST an outcome (and erase the repair) even though the guide page
 no longer offered it. A repair made through the web API now returns an owner token once; the owner's phone keeps it
 in localStorage and sends it as X-Owner-Token. Without it the outcome and erase calls answer 403.
 """
@@ -102,7 +102,7 @@ def test_app_keeps_the_token_on_the_phone_and_sends_it():
     assert "localStorage.removeItem(OWNER_KEY)" in js       # "Clear history" forgets the tokens too
 
 
-# ---------------------------------------------------------------- WhatsApp simulator link on the first screen
+# --- WhatsApp simulator link on the first screen
 def test_index_links_the_simulator_hidden_until_the_server_says_it_is_on():
     html = (WEB / "index.html").read_text(encoding="utf-8")
     m = re.search(r'<p class="small center hidden" id="waSim"><a id="waSimLink" class="waSimLink" href="/wa" data-t="waSim">', html)
@@ -129,7 +129,7 @@ def test_sim_info_reports_enabled_in_demo_mode():
     assert j["enabled"] is True and j["channel_live"] is False
 
 
-# ---------------------------------------------------------------- render.yaml
+# --- render.yaml
 def test_render_lists_the_whatsapp_secrets_without_values():
     env = yaml.safe_load((ROOT / "render.yaml").read_text(encoding="utf-8"))["services"][0]["envVars"]
     by = {e["key"]: e for e in env}

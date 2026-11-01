@@ -15,7 +15,7 @@ curl localhost:8000/health
 ## `POST /api/sessions` (multipart)
 | Field | Required | Notes |
 |---|---|---|
-| `photos` | yes (1–3), unless `video` is sent | jpg/png/webp, plus iPhone HEIC/HEIF (converted to JPEG on the server) ≤ 15 MB each |
+| `photos` | yes (1-3), unless `video` is sent | jpg/png/webp, plus iPhone HEIC/HEIF (converted to JPEG on the server) ≤ 15 MB each |
 | `video` | no | mp4/mov/webm/3gp/mkv/m4v ≤ 40 MB, ≤ 30 s. The server keeps the sharpest frame from each third of the clip (3 frames; photos first, max 3 in total). If there is no `audio` and no `text`, the clip's own sound is used as the voice description. |
 | `audio` | text or audio | webm/ogg/wav/mp3/m4a/mp4/aac/opus ≤ 20 MB |
 | `text` | text or audio | ≤ 2000 chars |
@@ -61,7 +61,7 @@ Re-runs a session whose `status` is `error` (busy AI service, dropped signal). F
 Moves to the next likely cause and returns the updated session (`status` `ready`), or `exhausted` with `stop_reason`, or `stopped` if the report trips the safety gate.
 
 ## `POST /api/sessions/{id}/outcome` (form: `result`)
-Closes the loop. `result` is `fixed` (it works now) or `pro` (a mechanic took over). Stores `outcome: {result, at, saved_idr}` on the session (`saved_idr` is the diagnosis `diy_saving_idr` for `fixed`, else 0) and returns the session. `422` for any other value, `409` when there is no plan (red stop), `404` unknown session, `403` without the right `X-Owner-Token` header (owner only, since 1.27.0: someone holding the shared guide link cannot answer for the owner; repairs saved before 1.27.0 have no token and stay open). A re-plan removes the outcome. The PDF report gets a Result line.
+Records how the repair ended. `result` is `fixed` (it works now) or `pro` (a mechanic took over). Stores `outcome: {result, at, saved_idr}` on the session (`saved_idr` is the diagnosis `diy_saving_idr` for `fixed`, else 0) and returns the session. `422` for any other value, `409` when there is no plan (red stop), `404` unknown session, `403` without the right `X-Owner-Token` header (owner only, since 1.27.0: someone holding the shared guide link cannot answer for the owner; repairs saved before 1.27.0 have no token and stay open). A re-plan removes the outcome. The PDF report gets a Result line.
 
 ## Session JSON: `trace`
 Every session object carries `trace`: nine rows in pipeline order, each `{stage, tool, kind, status, ms}`. `kind` is `meta` (a Meta model), `open` (Muse Spark Open on Baseten), `tts` (edge-tts) or `code` (rule-based safety gates). Used by the "Under the hood" panel and the PDF report.

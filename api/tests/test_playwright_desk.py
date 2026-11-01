@@ -1,4 +1,4 @@
-"""v1.25 laptop view in real Chromium: phone frame + side panel at 1280x800 and 1440x900, none on a phone."""
+"""Laptop view in real Chromium: phone frame + side panel at 1280x800 and 1440x900, none on a phone."""
 import pytest
 
 pw = pytest.importorskip("playwright.sync_api")

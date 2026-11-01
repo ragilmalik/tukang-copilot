@@ -1,4 +1,4 @@
-"""Agent log ("What the AI did", v1.22): every decision is recorded with the tool that made it, the owner's own
+"""Agent log ("What the AI did"): every decision is recorded with the tool that made it, the owner's own
 words never appear in it, and the 1-tap demo's stand-in check photos drive a real fail -> pass -> re-plan loop."""
 import io
 import json
@@ -123,7 +123,7 @@ def test_agent_log_is_capped():
 
 
 def test_check_event_records_which_plan_it_belonged_to():
-    """v1.23: the UI links a step-check log line to the step card only while that plan is current."""
+    """The UI links a step-check log line to the step card only while that plan is current."""
     from fastapi.testclient import TestClient
 
     from api.main import app

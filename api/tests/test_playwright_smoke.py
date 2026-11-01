@@ -134,7 +134,7 @@ def test_video_capture_flow(page, tmp_path):
 
 
 def test_tip_bar_is_compact_and_collapses_after_first_check(page):
-    """v1.22.0: the demo tip bar is a corner pill (not a full-width sheet), folds to a 💡 chip after the first step
+    """The demo tip bar is a corner pill (not a full-width sheet), folds to a 💡 chip after the first step
     check, can be reopened and closed, and never blocks the buttons the tips point at (clicks would fail if it did)."""
     page.goto(page.base + "/")
     page.select_option("#lang", "en")
@@ -167,7 +167,7 @@ def test_tip_bar_is_compact_and_collapses_after_first_check(page):
 
 
 def test_one_tap_demo_runs_the_whole_agent_loop(page):
-    """v1.22 judge path: one tap, a quick answer, stand-in check photos (fail then pass), re-plan, agent log."""
+    """The 1-tap demo path: one tap, a quick answer, stand-in check photos (fail then pass), re-plan, agent log."""
     page.goto(page.base + "/")
     page.select_option("#lang", "en")
     box = page.locator("#demoBtn").bounding_box()
@@ -217,7 +217,7 @@ def test_tip_bar_moves_to_top_while_typing(page):
 
 
 def test_progress_screen_streams_partial_results(page, monkeypatch):
-    """v1.23: while the agent works, what it saw, the SAM-outlined photo and the top cause appear one by one."""
+    """While the agent works, what it saw, the SAM-outlined photo and the top cause appear one by one."""
     from api.settings import settings
     monkeypatch.setattr(settings, "mock_pace_s", 0.6)
     page.goto(page.base + "/")
@@ -246,7 +246,7 @@ def _in_view(page, sel, timeout=20000):
 
 
 def test_agent_log_lines_jump_to_what_they_describe(page):
-    """v1.23: tap a line of the agent log and the stage, photo or checked step it is about scrolls into view and
+    """Tap a line of the agent log and the stage, photo or checked step it is about scrolls into view and
     lights up. On the result page a step-check line brings that exact step back on the step card."""
     page.goto(page.base + "/")
     page.select_option("#lang", "en")
@@ -276,7 +276,7 @@ def test_agent_log_lines_jump_to_what_they_describe(page):
 
 
 def test_follow_up_question_is_brought_on_screen(page, monkeypatch):
-    """v1.23 audit fix: the stage list plus streamed results push the question below the fold on a 390x844 phone,
+    """The stage list plus streamed results push the question below the fold on a 390x844 phone,
     so the page scrolls it into view when it appears (the owner must not have to hunt for it)."""
     from api.settings import settings
     monkeypatch.setattr(settings, "mock_pace_s", 0.3)

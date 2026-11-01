@@ -1,4 +1,4 @@
-"""1.27.0 in real Chromium at 390x844: the owner token (backlog Q14) and the WhatsApp simulator link.
+"""Real Chromium at 390x844: the owner token and the WhatsApp simulator link.
 
 - The phone that started a repair can still answer "Does it work again?" and erase it; a second phone that only has
   the guide link gets 403 from the server even when it calls the API directly.

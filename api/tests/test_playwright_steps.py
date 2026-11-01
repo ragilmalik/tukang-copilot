@@ -1,4 +1,4 @@
-"""v1.25.7: the 1.5 s auto-advance after a passed camera check never skips a step the owner chose, and never runs
+"""The 1.5 s auto-advance after a passed camera check never skips a step the owner chose, and never runs
 past the last step (real Chromium, 390x844)."""
 import pytest
 

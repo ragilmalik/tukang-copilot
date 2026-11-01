@@ -1,6 +1,6 @@
 """Draw ~10 clearly labelled STAND-IN photos for tests (spec §8): synthetic drawings, NOT real photos.
 Every image carries a visible red "STAND-IN" banner and an EXIF ImageDescription, so nobody mistakes
-them for evidence. Replace with Malik's real Semarang photos (same file names) when available.
+them for evidence. I will swap in my own Semarang photos (same file names) when I have them.
 Run: python scripts/make_fixtures.py   -> api/tests/fixtures/*.jpg + manifest.json"""
 from __future__ import annotations
 

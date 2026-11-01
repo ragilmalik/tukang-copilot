@@ -1,4 +1,4 @@
-"""v1.23: link previews (Open Graph card) for shared guides and the front page, gzip, favicon."""
+"""Link previews (Open Graph card) for shared guides and the front page, gzip, favicon."""
 import io
 import time
 

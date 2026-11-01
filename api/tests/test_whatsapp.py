@@ -91,7 +91,7 @@ def tap(prefix):
     return deliver(fg.button_msg(PHONE, bid, prefix))
 
 
-# ------------------------------------------------------------------ webhook basics
+# --- webhook basics
 def test_verify_handshake():
     r = client.get("/webhooks/whatsapp", params={"hub.mode": "subscribe", "hub.verify_token": VERIFY, "hub.challenge": "1158201444"})
     assert r.status_code == 200 and r.text == "1158201444"
@@ -133,7 +133,7 @@ def test_duplicate_delivery_is_handled_once():
     assert len(fg.sent) == 1
 
 
-# ------------------------------------------------------------------ the chat
+# --- the chat
 def test_text_only_asks_for_a_photo_and_starts_nothing(tmp_path):
     deliver(fg.text_msg(PHONE, "Motor saya susah hidup dari pagi"))
     assert len(fg.sent) == 1
@@ -322,7 +322,7 @@ def test_expired_chats_are_dropped(samples):
     assert key not in wa._convs and not wa.conv_dir(key).exists()
 
 
-# ------------------------------------------------------------------ language guess
+# --- language guess
 @pytest.mark.parametrize("text,lang", [
     ("Motorku Honda Beat angel urip wiwit esuk, mung muni nanging mesine ora urip.", "jv"),
     ("Motor saya Honda Beat susah hidup dari pagi, tapi mesin nggak nyala.", "id"),
@@ -336,7 +336,7 @@ def test_language_guess(text, lang):
     assert wa_text.detect(text) == lang
 
 
-# ------------------------------------------------------------------ simulator
+# --- simulator
 CHAT = "0123456789abcdef0123"
 
 

@@ -91,7 +91,7 @@ def test_workshop_endpoint_red_stop_has_no_plan():
     assert client.get(f"/api/sessions/{sid}/workshop.pdf").status_code == 409
 
 
-# --- v1.22: agent log ("What the AI did") in the PDF ---
+# --- agent log ("What the AI did") in the PDF
 
 def _js_agent_strings():
     import re

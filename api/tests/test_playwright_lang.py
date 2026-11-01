@@ -1,4 +1,4 @@
-"""v1.25.1: the first-visit language follows ?lang= and the phone's language list (real Chromium)."""
+"""The first-visit language follows ?lang= and the phone's language list (real Chromium)."""
 import pytest
 
 pytest.importorskip("playwright.sync_api")

@@ -1,4 +1,4 @@
-"""v1.25 demo video: under the 3:00 limit, opens on the hook title card with the hackathon line, shows the Muse Image
+"""Demo video: under the 3:00 limit, opens on the hook title card with the hackathon line, shows the Muse Image
 diagram step, and the scene timestamps are written for the docs."""
 import json
 import shutil
@@ -47,7 +47,7 @@ def test_videos_fit_the_limits_and_timestamps_match():
 
 
 def test_whatsapp_scene_in_javanese_with_its_screenshots():
-    """v1.27: a ~12 s WhatsApp scene (simulator, Basa Jawa): marked photo + diagnosis, step buttons, red stop."""
+    """A ~12 s WhatsApp scene (simulator, Basa Jawa): marked photo + diagnosis, step buttons, red stop."""
     sc = next(s for s in mda.SCENES if s.key == "wa")
     names = sc.image[3:].split(",")
     assert sc.image.startswith("wa:") and names == ["30_whatsapp_jv_diagnosis", "30_whatsapp_jv_steps", "30_whatsapp_jv_redstop"]
