@@ -2,6 +2,13 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.25.7 (2026-11-01 WIB)
+Audit 13 (result + steps: walked all four steps of the demo repair in Bahasa Jawa and English, fast like a real owner).
+- **A passed camera check no longer skips a step.** After "Step looks right" the app moves on by itself after 1.5 s. An owner who tapped Next (or Back) in the meantime was moved a second time: step 2 jumped to step 4, and on the last step the stale timer ran past the end and threw "Cannot read properties of undefined". Any other move to a step now cancels the timer.
+- **The repair no longer just stops after the last step.** When the last step passes and all steps are camera-verified, "Does it work again?" scrolls into view with a line in the owner's language (id/jv/en) that screen readers announce, and focus moves to the "It works now" button (nothing is forced when steps were skipped or an answer already exists).
+- Service-worker shell cache bumped to `tukang-shell-v10`.
+- 8 new real-Chromium tests in `test_playwright_steps.py` (the skip, back, crash and prompt tests fail on 1.25.6).
+
 ## 1.25.6 (2026-11-01 WIB)
 Audit 12 (what a screen reader says, in each language; laptop view).
 - **The back button has a name.** The "previous step" control was only "◀"; it now says "Langkah sebelumnya" / "Langkah sadurunge" / "Previous step" (app and shared guide page).

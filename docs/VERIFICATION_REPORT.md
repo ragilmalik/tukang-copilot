@@ -132,7 +132,7 @@ Evidence names are tests in `api/tests/` (see TEST_REPORT.md for the run) or scr
 
 **Run numbers (2026-11-01, v1.25.3):** `make_test_report.py` ALL PASSED: pytest **550 passed, 0 failed, 0 skipped** (445 s, real Chromium + jsdom), ruff, check_keys --fake, smoke; `mypy api` strict no issues in 103 files; `smoke_e2e.py` ALL PASSED on a local demo-mode server. New and covered: first-screen language by phone / `?lang=`, Back / Forward button handling, thumb-sized small links (1.25.2), refusals of a wrong file in the owner's language and an at-once refusal of a non-photo (1.25.3).
 
-**Run numbers (2026-11-01, v1.25.6):** `make_test_report.py` ALL PASSED: pytest **612 passed, 0 failed, 0 skipped** (462 s on a 2-CPU sandbox), ruff, check_keys --fake, smoke; `mypy api` strict no issues in 104 files. New and covered: street Indonesian / Javanese wording in the text gate and 8 more plan-guard rules (49 tests in `test_safety.py`); screen-reader names in id/jv/en (7 Chromium tests).
+**Run numbers (2026-11-01, v1.25.7):** `make_test_report.py` ALL PASSED: pytest **620 passed, 0 failed, 0 skipped** (about 584 s on a 2-CPU sandbox), ruff, check_keys --fake, smoke; `mypy api` strict no issues in 105 files. New and covered: street Indonesian / Javanese wording in the text gate and 8 more plan-guard rules (49 tests in `test_safety.py`); screen-reader names in id/jv/en (7 Chromium tests).
 
 ## 6. What is NOT verified yet (honest list)
 

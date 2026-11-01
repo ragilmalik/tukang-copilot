@@ -13,3 +13,4 @@ ignore = ["E701", "E702", "E741"]
 "api/tests/test_playwright_audit5.py" = ["E501", "F811"]  # re-uses the smoke test fixtures by import
 "api/tests/test_playwright_back.py" = ["E501", "F811"]  # re-uses the smoke test fixtures by import
 "api/tests/test_playwright_lang.py" = ["E501", "F811"]  # re-uses the smoke test fixtures by import
+"api/tests/test_playwright_steps.py" = ["E501", "F811"]  # re-uses the smoke test fixtures by import

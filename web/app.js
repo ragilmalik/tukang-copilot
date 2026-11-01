@@ -18,7 +18,7 @@ const T = {
         stopNowTried: ["Biarkan dalam keadaan mati dan aman.", "Unduh laporan PDF: berisi apa saja yang sudah dicoba.", "Tunjukkan ke bengkel/servis supaya tidak mengulang dari nol."],
         findService: "Cari servis terdekat", emergency: "Darurat (api, asap, bau gas kuat): telepon 112.", copied: "Tautan disalin", openW: "Penalaran: Muse Spark Open (open weights)", demo: "Mode demo: jawaban contoh, tanpa biaya API.",
         green: "AMAN", amber: "HATI-HATI", red: "STOP", pass: "✅ Langkah ini beres", fail: "⚠️ Belum pas", checking: "Memeriksa foto…",
-        verified: "langkah terverifikasi kamera", recording: "Merekam…", recorded: "Suara terekam ✓", micErr: "Mikrofon tidak bisa dipakai. Ketik saja masalahnya.",
+        verified: "langkah terverifikasi kamera", allChecked: "Semua langkah sudah dicek kamera. Sudah jalan lagi?", recording: "Merekam…", recorded: "Suara terekam ✓", micErr: "Mikrofon tidak bisa dipakai. Ketik saja masalahnya.",
         netErr: "Koneksi terputus. Cek sinyal lalu coba lagi.", offline: "Tidak ada internet. Diagnosis butuh sinyal; foto kamu tetap aman di HP.",
         exhausted: "Sudah semua", newPlan: "Rencana baru siap.", photos: "foto", videoBtn: "🎥 Atau rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar terbaik diambil otomatis)", videoBig: "Videonya terlalu besar. Rekam 5–10 detik saja.", videoBad: "Videonya tidak bisa dibaca. Coba rekam ulang 5–10 detik atau ambil foto saja.", videoShort: "Videonya terlalu pendek. Rekam 5–10 detik.", videoLong: "Videonya terlalu panjang. Rekam 5–10 detik saja.", recBad: "Rekaman suaranya tidak bisa dibaca. Rekam ulang atau ketik masalahnya.", badFile: "Berkas itu bukan foto. Pilih foto JPG, PNG, atau HEIC.", unreadPhoto: "Foto itu tidak bisa dibaca. Coba foto JPG atau PNG.", bigFile: "Berkasnya terlalu besar. Coba foto yang lebih kecil.", emptyFile: "Berkasnya kosong. Coba ambil lagi.", tooLong: "Teksnya terlalu panjang. Persingkat dulu." },
   en: { hero: "What's broken?", heroSub: "Snap it, say what's wrong, get a step-by-step repair guide.", takePhoto: "Take photos (1–3)",
@@ -38,7 +38,7 @@ const T = {
         stopNowTried: ["Leave it switched off and safe.", "Download the PDF report: it lists everything already tried.", "Show it to the shop so they don't start from zero."],
         findService: "Find a service centre nearby", emergency: "Emergency (fire, smoke, strong gas smell): call 112.", copied: "Link copied", openW: "Reasoning: Muse Spark Open (open weights)", demo: "Demo mode: sample answers, no API cost.",
         green: "SAFE", amber: "CAUTION", red: "STOP", pass: "✅ Step looks right", fail: "⚠️ Not quite", checking: "Checking photo…",
-        verified: "steps verified by camera", recording: "Recording…", recorded: "Voice recorded ✓", micErr: "Microphone unavailable. Please type the problem.",
+        verified: "steps verified by camera", allChecked: "All steps checked by the camera. Does it work again?", recording: "Recording…", recorded: "Voice recorded ✓", micErr: "Microphone unavailable. Please type the problem.",
         netErr: "Connection lost. Check your signal and try again.", offline: "You are offline. Diagnosis needs a signal; your photos stay on your phone.",
         exhausted: "All tried", newPlan: "New plan ready.", photos: "photos", videoBtn: "🎥 Or record a 5–10 s video", videoOk: "Video ready ✓ (the 3 sharpest frames are picked for you)", videoBig: "That video is too big. Record 5–10 seconds.", videoBad: "That video could not be read. Record 5–10 seconds again, or take photos instead.", videoShort: "That video is too short. Record 5–10 seconds.", videoLong: "That video is too long. Record 5–10 seconds only.", recBad: "That voice recording could not be read. Record again or type the problem.", badFile: "That file is not a photo. Pick a JPG, PNG or HEIC picture.", unreadPhoto: "That photo could not be read. Try a JPG or PNG.", bigFile: "That file is too big. Try a smaller photo.", emptyFile: "That file is empty. Take it again.", tooLong: "That text is too long. Shorten it a little." },
 };
@@ -63,7 +63,7 @@ T.jv = Object.assign({}, T.id, {
   findService: "Golek servis paling cedhak", emergency: "Darurat (geni, kebul, ambu gas banget): telpon 112.", copied: "Tautan wis disalin", openW: "Nalar: Muse Spark Open (open weights)",
   demo: "Mode demo: wangsulan conto, tanpa biaya API.",
   green: "AMAN", amber: "ATI-ATI", red: "MANDHEG", pass: "✅ Langkah iki wis bener", fail: "⚠️ Durung pas", checking: "Mriksa foto…",
-  verified: "langkah wis dicek kamera", recording: "Ngrekam…", recorded: "Swara kerekam ✓", micErr: "Mikrofon ora bisa dienggo. Ketik wae masalahe.",
+  verified: "langkah wis dicek kamera", allChecked: "Kabeh langkah wis dicek kamera. Wis urip maneh?", recording: "Ngrekam…", recorded: "Swara kerekam ✓", micErr: "Mikrofon ora bisa dienggo. Ketik wae masalahe.",
   netErr: "Sambungan megat. Priksa sinyal banjur coba maneh.", offline: "Ora ana internet. Diagnosis butuh sinyal; foto sampeyan tetep aman ing HP.",
   exhausted: "Wis kabeh dijajal", newPlan: "Rencana anyar wis siap.", photos: "foto", videoBtn: "🎥 Utawa rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar paling cetha dijupuk otomatis)", videoBig: "Videone kegedhen. Rekam 5–10 detik wae.", videoBad: "Videone ora bisa diwaca. Rekam maneh 5–10 detik utawa jupuk foto wae.", videoShort: "Videone cendhak banget. Rekam 5–10 detik.", videoLong: "Videone dawa banget. Rekam 5–10 detik wae.", recBad: "Rekaman swarane ora bisa diwaca. Rekam maneh utawa ketik masalahe.", badFile: "Berkas iku dudu foto. Pilih foto JPG, PNG, utawa HEIC.", unreadPhoto: "Foto iku ora bisa diwaca. Jajal foto JPG utawa PNG.", bigFile: "Berkase kegedhen. Jajal foto sing luwih cilik.", emptyFile: "Berkase kosong. Jupuk maneh.", tooLong: "Tulisane kepanjangen. Cekak-ana dhisik.",
 });
@@ -626,7 +626,9 @@ function stepImage(st) {
   return S.files_base + (S.parts_image || S.photos[0]);
 }
 
+let advT = 0;  // the 1.5 s auto-advance after a passed check; any other move to a step cancels it (v1.25.7)
 function renderStep() {
+  clearTimeout(advT);
   const st = S.plan.steps[stepIdx];
   $("stepNo").textContent = st.n; $("stepTitle").textContent = `${st.n} / ${S.plan.steps.length}`;
   $("stepText").textContent = st.instruction; $("stepWhy").textContent = st.why || "";
@@ -698,6 +700,15 @@ function renderOutcome() {
   $("fixedBtn").setAttribute("aria-pressed", String(r === "fixed")); $("proBtn").setAttribute("aria-pressed", String(r === "pro"));
   $("outcomeMsg").textContent = r === "fixed" ? t("fixedThanks") + (oc.saved_idr ? ` ${t("save")} ${rupiah(oc.saved_idr)}.` : "") : r === "pro" ? t("proThanks") : "";
 }
+// v1.25.7: the last step passed and every step is camera-verified: bring "Does it work again?" on screen (it sat far
+// below the step card, so the repair seemed to just stop) and say so for screen readers.
+function askOutcome() {
+  const box = $("outcome"); if (!box || !S || box.classList.contains("hidden") || (S.outcome || {}).result) return;
+  $("outcomeMsg").textContent = t("allChecked");
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (box.scrollIntoView) box.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
+  try { $("fixedBtn").focus({ preventScroll: true }); } catch (_) { /* old browsers */ }
+}
 // Trial mode for the impact study: open the app once with ?trial=T1 (kept on this phone); outcomes then carry
 // the tester label and the minutes the owner reports (scripts/impact_report.py aggregates them).
 function trialLabel() {
@@ -734,7 +745,8 @@ async function checkPhoto(f) {
     const j = await r.json();
     if (!r.ok) { $("checkResult").textContent = j.detail; return null; }
     S = await fetchSession(S.id); showCheck(j); renderVerified(); renderAgentLog(S, "agent");
-    if (j.passed && stepIdx < S.plan.steps.length - 1) setTimeout(() => { stepIdx++; renderStep(); }, 1500);
+    if (j.passed && stepIdx < S.plan.steps.length - 1) advT = setTimeout(() => { if (S && S.plan && stepIdx < S.plan.steps.length - 1) { stepIdx++; renderStep(); } }, 1500);
+    else if (j.passed && S.plan.steps.every((x) => ((S.checks || {})[String(x.n)] || {}).passed) && !(S.outcome || {}).result) advT = setTimeout(askOutcome, 1500);
     return j;
   } catch (err) { $("checkResult").textContent = "⚠️ " + netMsg(err); return null; }
 }
