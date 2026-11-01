@@ -30,7 +30,7 @@ motorbike, with the same steps.
 6. **Still broken? Re-plan.** The agent moves to the next likely cause, and the banner says "Plan 2 of 3".
 7. **Knows when to say no.** A rice cooker that won't heat means opening 220 V internals: a red STOP, a PDF for the
    technician, and a one-tap bengkel hand-off (WhatsApp summary, nearest workshop, brief of everything tried).
-8. **Shows its work.** "What the AI did" lists every decision and the Meta model that made it. Tap a line to jump to it.
+8. **Shows its work.** "What the AI did" lists every decision and the Meta model that made it.
 
 ## How it works
 A FastAPI backend and a no-build vanilla-JS PWA. One agent loop, five Meta models, one client file
@@ -65,8 +65,7 @@ Spend is capped per repair and per day.
 
 ## Honest status
 The video and the 1-tap demo run in clearly labelled demo mode: stand-in photos, recorded model answers, Chromium's fake
-camera. The live Meta path is tested end to end against a stand-in server built from the official API docs, and the
-real endpoint correctly rejected a dummy key. **A live Meta model answer is not yet verified.** Everything here was
+camera. The live Meta path is tested end to end against a stand-in server built from the official API docs. **A live Meta model answer is not yet verified.** Everything here was
 built during the event, Oct 26 to Nov 4, 2026, by one person.
 
 ## What's next
@@ -74,6 +73,5 @@ built during the event, Oct 26 to Nov 4, 2026, by one person.
 2. Five trials with Semarang households and a bengkel, published as they are.
 3. A WhatsApp entry point, because that is where people already ask for help.
 4. A self-hosted Muse Spark Open deployment for an SMK (vocational school) workshop or a bengkel co-op.
-5. More machines: scooter CVT belts, ceiling fans, washing-machine drains.
 
 Repo: [GITHUB_URL] · Live: [LIVE_URL] · Video: [YOUTUBE_URL]
