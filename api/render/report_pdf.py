@@ -30,7 +30,7 @@ LABELS: dict[str, dict[str, str]] = {
            "hood": "Di balik layar: model yang dipakai", "before": "Sebelum mulai, pastikan",
            "st_listen": "Dengar suara", "st_gate": "Cek keselamatan teks", "st_look": "Lihat foto", "st_segment": "Tandai bagian",
            "st_diagnose": "Diagnosa", "st_plan": "Susun langkah", "st_safety": "Cek keselamatan rencana", "st_illustrate": "Gambar bantu",
-           "st_narrate": "Suara pemandu"},
+           "st_narrate": "Suara pemandu", "code_tool": "aturan di kode"},
     "en": {"title": "Repair Report", "object": "Item", "problem": "Problem", "fix": "Cause worked on", "safety": "Safety",
            "steps": "Steps", "verified": "verified by camera", "tools": "Tools", "parts": "Parts", "total": "Estimated parts cost",
            "shop": "Typical shop price (labour + parts)", "save": "Saved by doing it yourself (parts only)",
@@ -43,11 +43,23 @@ LABELS: dict[str, dict[str, str]] = {
            "hood": "Under the hood: models used", "before": "Before you start, make sure",
            "st_listen": "Listen", "st_gate": "Text safety gate", "st_look": "Look at photo", "st_segment": "Mark parts",
            "st_diagnose": "Diagnose", "st_plan": "Plan steps", "st_safety": "Plan safety gate", "st_illustrate": "Helper diagram",
-           "st_narrate": "Voice guide"},
+           "st_narrate": "Voice guide", "code_tool": "rules in code"},
 }
-LABELS["jv"] = dict(LABELS["id"], title="Laporan Ndandani", object="Barang", problem="Masalah", fix="Sabab sing ditangani", safety="Keslametan",
-                    steps="Langkah", tools="Piranti", made="Digawe nganggo Tukang Copilot (Meta Muse Spark + SAM 3.1)",
-                    outcome="Asil", o_fixed="Rampung: wis urip maneh (jarene sing duwe)", o_pro="Digawa menyang bengkel/teknisi")
+# Basa Jawa: every label a Javanese owner reads in the PDF (the app screen already speaks Javanese; the rest of the
+# PDF used to fall back to Indonesian). Wording follows web/app.js. api/tests/test_report_pdf_jv.py guards it.
+LABELS["jv"] = dict(
+    LABELS["id"], title="Laporan Ndandani", object="Barang", problem="Masalah", fix="Sabab sing ditangani", safety="Keslametan",
+    steps="Langkah", verified="wis dicek kamera", tools="Piranti", parts="Suku cadang", total="Kira-kira rega suku cadang",
+    shop="Rega bengkel biasane (jasa + suku cadang)", save="Irit yen digarap dhewe (suku cadang thok)",
+    attempts="Sing wis dijajal", minutes="menit", outcome="Asil", o_fixed="Rampung: wis urip maneh (jarene sing duwe)",
+    o_pro="Digawa menyang bengkel/teknisi", photo="Foto karo bagean sing ditandhani (SAM 3.1)",
+    disclaimer="Pandhuan iki mung kanggo ndandani sing entheng. Rega mung kira-kira. Yen ana gas, listrik omah, utawa tegangan dhuwur, celuk teknisi.",
+    made="Digawe nganggo Tukang Copilot (Meta Muse Spark + SAM 3.1)", page="Kaca", demo="Mode demo: wangsulan conto",
+    fallback="Wangsulan conto (API live ora kasedhiya) kanggo", green="AMAN", amber="ATI-ATI", red="MANDHEG",
+    hood="Ing mburi layar: model sing dipakai", before="Sadurunge miwiti, priksa dhisik",
+    st_listen="Rungokake swara", st_gate="Priksa slamet teks", st_look="Delok foto", st_segment="Tandhani bagean",
+    st_diagnose="Diagnosa", st_plan="Nyusun langkah", st_safety="Priksa slamet rencana", st_illustrate="Gambar bantu",
+    st_narrate="Swara panuntun", code_tool="aturan ing kode")
 
 
 BRIEF: dict[str, dict[str, str]] = {
@@ -477,7 +489,8 @@ def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: 
         doc.text(L["hood"], 26, bold=True)
         for r in rows:
             secs = f"  {r['ms'] / 1000:.1f}s" if (r.get("ms") or 0) >= 100 else ""
-            doc.text(f"- {L.get('st_' + r['stage'], r['stage'])}: {r['tool']}{secs}", 20, color=MUTED, indent=10)
+            tool = L["code_tool"] if r["kind"] == "code" else r["tool"]  # "rules in code" follows the report's language
+            doc.text(f"- {L.get('st_' + r['stage'], r['stage'])}: {tool}{secs}", 20, color=MUTED, indent=10)
     doc.rule()
     doc.text(L["disclaimer"], 22, color=MUTED)
     _draw_brief(doc, session, session_dir, lang)
