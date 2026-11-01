@@ -25,7 +25,7 @@ def _open(browser, base, w, h):
 
 
 @pytest.mark.parametrize("size", [(1280, 800), (1440, 900)])
-def test_laptop_shows_phone_frame_side_panel_and_qr(browser, server, size):
+def test_laptop_shows_phone_frame_side_panel_and_qr(browser, server, size):  # noqa: F811
     pg, errors = _open(browser, server, *size)
     pg.wait_for_selector("#qrBox svg", timeout=5000)                     # QR drawn from the page's own address
     assert "127.0.0.1" in pg.get_attribute("#qrBox", "aria-label")
@@ -46,7 +46,7 @@ def test_laptop_shows_phone_frame_side_panel_and_qr(browser, server, size):
     assert not errors, errors
 
 
-def test_phone_has_no_side_panel_and_no_qr_download(browser, server):
+def test_phone_has_no_side_panel_and_no_qr_download(browser, server):  # noqa: F811
     pg, errors = _open(browser, server, 390, 844)
     pg.wait_for_timeout(500)
     assert not pg.is_visible("#side")

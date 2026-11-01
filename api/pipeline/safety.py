@@ -41,6 +41,18 @@ _MSG = {
 }
 
 _TEXT_RULES: list[tuple[str, str]] = [
+    # v1.25 red-team fixes (scripts/run_eval.py found these slipping through): Javanese "gase", gas pipes and
+    # cylinders, LPG "tabung melon", 220/240 V panels, consumer units/RCDs, wall sockets, ceiling fan wiring,
+    # water heater elements, car brake lines and brake failure.
+    (r"\b(kompor|tabung|selang|pipa|regulator|katup) gas\w*|\bgas(e|nya|ne)? (bocor|ambu\w*|mambu|desis\w*|hiss\w*|leak\w*)\b|\b(tabung|gas) melon\b"
+     r"|\bgas (pipe|cylinder|bottle|regulator|valve|cooker|stove|heater|tank)s?\b|\bregulator\b.{0,20}\b(elpiji|lpg|tabung)\b", "gas"),
+    (r"\b(2[234]0) ?v(olt)?\b.{0,25}\b(panel|wiring|kabel|instalasi|socket|stop ?kontak|outlet|breaker)|\b(panel|breaker|wiring|kabel|instalasi)\b.{0,25}\b(2[234]0) ?v(olt)?\b"
+     r"|\b(consumer unit|rcd|rcbo|elcb|breaker panel|electrical panel|circuit breaker|rewir\w*|house wiring|mains wiring|wall socket|wall outlet)\b"
+     r"|\bstop ?kontak\b.{0,25}\b(tembok|dinding|panas|meleleh|gosong|percik\w*)\b|\bkabel\b.{0,20}\b(plafon|langit-langit|ceiling)\b"
+     r"|\b(kipas (angin )?(plafon|gantung|langit-langit)|ceiling fan)\b.{0,60}\b(kabel|wir\w*|sambung\w*|pasang|install\w*|reconnect\w*|connect\w*)"
+     r"|\b(kabel|wir\w*|sambung\w*|reconnect\w*)\b.{0,60}\b(kipas (angin )?(plafon|gantung)|ceiling fan|ceiling)\b"
+     r"|\bwater heater\b.{0,40}\b(bongkar|buka|elemen|open|element)", "mains"),
+    (r"\b(brake (line|hose|pipe)s?|selang rem|pipa rem|minyak rem\w*|rem (mobil(ku)? )?blong|brakes? (failed|failure|gone))\b", "hv"),
     # "gas" alone also means the throttle on a motorbike ("tarik gas"), so only cooking/LPG gas contexts stop
     (r"\b(elpiji|lpg|tabung gas|selang gas|regulator gas|bau gas|gas bocor|bocor gas|kompor gas|gas leak|gas smell|smell gas|gas line|gas hose)\b", "gas"),
     (r"\b(mcb|panel listrik|sekring utama|meteran pln|kwh meter|fuse box|breaker box|kabel (di )?dalam tembok|instalasi listrik|stop ?kontak (terbakar|meleleh)|korsleting|konsleting|konslet|korslet|short circuit)\b", "mains"),
@@ -57,6 +69,11 @@ _PLAN_RULES: list[tuple[str, str]] = [
     (r"(lepas|buka|bleed|kuras).{0,30}(minyak rem|selang rem|brake (fluid|line|caliper piston))", "hv"),
     (r"(sambung|ganti|tap|splice).{0,30}(kabel|wire).{0,30}(tembok|wall|panel|mcb|pln)", "mains"),
     (r"(selang gas|regulator gas|gas hose|gas line)", "gas"),
+    # v1.25 red-team: plans that touch LPG regulators, house panels, ceiling wiring or car brake lines
+    (r"regulator.{0,40}(tabung|elpiji|lpg|gas cylinder|cylinder)|(elpiji|lpg|tabung gas|gas cylinder).{0,40}regulator", "gas"),
+    (r"(buka|bongkar|ganti|open|replace|swap|rewire).{0,30}(panel listrik|mcb|consumer unit|breaker|rcd|fuse box)", "mains"),
+    (r"(sambung|splice|connect|reconnect|join).{0,40}(kabel|wire|wiring).{0,40}(plafon|ceiling|langit-langit)", "mains"),
+    (r"(lepas|ganti|buka|remove|replace|disconnect).{0,30}(brake (line|hose|pipe)|selang rem|pipa rem)", "hv"),
 ]
 
 

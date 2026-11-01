@@ -15,5 +15,5 @@ Rules:
   part). Then write `diagram_prompt` in ENGLISH for an illustrator.
 - First step always makes it safe (unplug, engine off, valve closed, let it cool).
 - `done_check`: how the owner knows the whole fix worked. `when_to_call_pro`: one sentence.
-- Never plan gas, mains wiring, opening mains-powered internals, brake hydraulics or airbags.
+- Never plan gas (including LPG cylinders and regulators), mains wiring, panels or breakers, ceiling or wall wiring, opening mains-powered internals, car brake lines or brake hydraulics, or airbags.
 All user-facing text in {lang_name}. Return JSON only, matching the schema.
