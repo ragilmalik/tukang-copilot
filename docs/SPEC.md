@@ -1,46 +1,44 @@
-# Tukang Copilot, Full Product, Technical & Documentation Spec
-Meta Global AI Developer Hackathon (Meta × Cerebral Valley) · Indie Developer track (solo) · Theme: **Push the Frontier** ("give a machine a new capability / understand and control a physical system"), secondary fit: Build for Your World
+# Tukang Copilot: product, technical and documentation spec
+Meta Global AI Developer Hackathon (Meta × Cerebral Valley), Indie Developer track (solo). Theme: Push the Frontier ("give a machine a new capability / understand and control a physical system"), with Build for Your World as a second fit.
 Owner: Ragil Artza Rozaksyah ("Malik"), Semarang, Indonesia. Cerebral Valley account: ragilmalika.
-Malik is NOT a developer. The project agent writes 100% of the code and docs, from zero to a finished, deployed, submitted-ready project. Explain any manual step in plain words with exact clicks.
-**Deadline: Wed Nov 4, 2026, 9:00 PM ET = Thu Nov 5, 2026, 09:00 WIB.** Internal target: feature-complete by Nov 3 23:59 WIB.
-
----
+The setup docs should explain every manual step in plain words with exact clicks, so someone who doesn't code can deploy it.
+Deadline: Wed Nov 4, 2026, 9:00 PM ET, which is Thu Nov 5, 2026, 09:00 WIB. My own target: feature-complete by Nov 3 23:59 WIB.
 
 ## 1. One-liner
 Point your phone camera at something broken, say what's wrong in Bahasa, Javanese or English, and Tukang Copilot finds the exact part, figures out the fault, and walks you through the fix with annotated pictures and voice, checking each step with your camera.
 
 ## 2. Problem & impact (Impact = 30%)
 - Indonesia runs on motorbikes (~130M), water pumps, rice cookers, fans, and household plumbing. A small fault costs a day's wage at a bengkel or days without water.
-- Repair knowledge lives in scattered YouTube videos, mostly not for your exact model, not in your language, and can't see your problem.
+- Repair knowledge is spread across YouTube videos that are rarely about your exact model or in your language, and none of them can see your problem.
 - Tukang Copilot sees the actual object, segments the actual parts, and adapts each step to what the camera shows. It also says clearly when a job is unsafe and needs a professional.
 - Users: motorbike owners, households, small repair shops (training apprentices), ojol drivers.
 - Measurable claims for the pitch: time-to-diagnosis, % of steps verified by camera, money saved vs. shop visit (show as estimates, labelled).
 
-## 3. Hard hackathon requirements → how we satisfy each
+## 3. Hackathon requirements and how I meet each
 | Requirement (from official details page) | Implementation |
 |---|---|
 | Must incorporate Meta models (Stage 1 pass/fail) | Core pipeline uses Muse Spark (vision + reasoning), SAM 3.1, Muse Image, Muse Voice Transcribe; optional Muse Spark Open (open weights) |
 | Fit a problem statement | Push the Frontier: new capability for understanding and repairing physical systems |
-| New work only (built Oct 26 – Nov 4) | New public repo; dated commits; README "Built during the hackathon" section |
+| New work only (built Oct 26 to Nov 4) | New public repo; dated commits; README "Built during the hackathon" section |
 | Repo must be public | Public GitHub repo, MIT license |
 | 3-minute demo video showing only work built during the event | Script in §13 |
 | Max team 4, solo allowed | Solo |
-| No code/data/assets without rights | Only model output, our own photos, CC0 icons; list sources in docs/ATTRIBUTIONS.md |
+| No code/data/assets without rights | Only model output, my own photos, CC0 icons; list sources in docs/ATTRIBUTIONS.md |
 | Avoid anti-projects (medical advice, basic RAG, simple image analyzers, education chatbots, political/war) | Physical repair only; it's an interactive multi-step agent with verification, not a single-shot image analyzer; no medical content |
 
 ## 4. Judging rubric mapping
 - **Impact 30%**: §2 story, real Semarang objects in the demo.
-- **Use of Meta AI tooling 25%**: 4–5 Meta models orchestrated; SAM 3.1 part masks driving annotated step cards; Spark verifying each step from a new photo; open-weights mode.
+- **Use of Meta AI tooling 25%**: 4-5 Meta models orchestrated; SAM 3.1 part masks driving annotated step cards; Spark verifying each step from a new photo; open-weights mode.
 - **Technical depth 20%**: typed pipeline, structured outputs, retries, caching, safety gate, tests, clean architecture.
 - **Demo 25%**: live phone demo on a real motorbike/pump; before/after; verification checkmarks.
 
 ## 5. Core user flow (must work end to end, on a phone browser)
 1. **Start**: big camera button + mic button. Language picker: Bahasa Indonesia (default), Basa Jawa, English. Category chips: Motor, Pompa air, Elektronik rumah, Pipa/keran, Lainnya.
-2. **Capture**: take 1–3 photos (or a 5–10 s video; extract 3 frames) + hold-to-talk voice description (≤60 s). Text fallback.
+2. **Capture**: take 1-3 photos (or a 5-10 s video; extract 3 frames) + hold-to-talk voice description (≤60 s). Text fallback.
 3. **Understand** (progress UI with named stages): Listening → Looking → Finding the parts → Diagnosing.
-4. **Diagnosis card**: object identified (e.g., "Honda Beat 2019 carburetor area"), top 3 likely causes with confidence and why, parts highlighted on the user's own photo (SAM masks, labelled), tools needed, difficulty (1–5), time estimate, estimated cost of parts (labelled as estimate), **Safety level** (green: DIY ok / amber: caution / red: stop, call a professional, e.g., gas, mains wiring inside walls, brakes hydraulics, airbags).
+4. **Diagnosis card**: object identified (e.g., "Honda Beat 2019 carburetor area"), top 3 likely causes with confidence and why, parts highlighted on the user's own photo (SAM masks, labelled), tools needed, difficulty (1-5), time estimate, estimated cost of parts (labelled as estimate), **Safety level** (green: DIY ok / amber: caution / red: stop, call a professional, e.g., gas, mains wiring inside walls, brakes hydraulics, airbags).
 5. **Guided repair mode**: one step per screen: annotated image (user's photo with SAM mask + arrows/numbers rendered), short instruction, voice readout, "why" expandable, warning icons. Button "Check my step" → user snaps a photo → Spark compares against expected state → ✅ next / ⚠️ correction ("the clamp is still on the left hose, loosen it first").
-6. **Stuck / didn't work**: user says what happened; agent re-plans (branches to next likely cause).
+6. **Stuck / didn't work**: user says what happened; the app re-plans (branches to next likely cause).
 7. **Finish**: summary report (problem, fix, parts used, time) shareable as a link/PDF; "Save to my garage" history (local storage, no account).
 8. **Workshop mode (stretch)**: generate a clean illustrated guide from a session (Muse Image renders a tidy diagram version) to share with others.
 
@@ -74,18 +72,18 @@ Validate every model response; on invalid JSON retry once with the validation er
 ## 7. Tech stack & architecture
 - **Frontend**: Next.js 14+ (App Router, TypeScript), Tailwind, mobile-first PWA (installable), camera via `<input capture>` + MediaRecorder for audio. i18n (id, jv, en) with all UI strings in `/web/locales`.
 - **Backend**: Python 3.11 FastAPI. Endpoints: `POST /sessions`, `POST /sessions/{id}/analyze`, `GET /sessions/{id}/events` (SSE progress), `POST /sessions/{id}/steps/{n}/check`, `POST /sessions/{id}/replan`, `GET /sessions/{id}/report`.
-- **Storage**: SQLite (SQLModel) for sessions; images/audio on disk or Cloudflare R2 (Malik has Cloudflare). Auto-delete uploads after 24 h.
-- **Deploy**: Frontend on Vercel; backend on Render or Modal (Malik has Render credits; Modal $100 if granted). Single `docker-compose.yml` for local run. Public HTTPS URL for judges.
+- **Storage**: SQLite (SQLModel) for sessions; images/audio on disk or Cloudflare R2 (I have a Cloudflare account). Auto-delete uploads after 24 h.
+- **Deploy**: Frontend on Vercel; backend on Render or Modal (I have Render credits; Modal $100 if granted). Single `docker-compose.yml` for local run. Public HTTPS URL for judges.
 - **Config**: `.env` → META_API_KEY, META_API_BASE, BASETEN_API_KEY, USE_OPEN_WEIGHTS, STORAGE_BACKEND, R2_*, PUBLIC_BASE_URL, MAX_COST_PER_SESSION_USD.
 - **Cost control**: per-session budget, image downscaling (max 1536 px), cache by image hash, `DEMO_MODE=true` replays 2 recorded sessions if APIs are down during judging.
 - **Observability**: structured logs per stage with latency and cost; `/health` endpoint.
 
-## 8. Demo scenarios to build and test against (use real photos Malik can take in Semarang)
+## 8. Demo scenarios to build and test against (with real photos I can take in Semarang)
 1. Motorbike won't start: spark plug fouled / loose plug cap (Honda Beat or Yamaha Mio). Green.
 2. Water pump (Shimizu/Sanyo) runs but no water: loss of prime / clogged foot valve. Green/amber.
 3. Leaking kitchen faucet / hose clamp. Green.
 4. Rice cooker not heating: show RED safety stop when the plan would require opening mains-powered internals → recommends service center. (Demonstrates safety gate.)
-Include ~10 test images in `tests/fixtures` (Malik's own photos or self-generated; no copyrighted images).
+Include ~10 test images in `tests/fixtures` (my own photos or self-generated; no copyrighted images).
 
 ## 9. Quality bar
 - Lint/format: ruff + black (Python), ESLint + Prettier (TS). Type checks: mypy (strict on pipeline), tsc.
@@ -115,9 +113,9 @@ tukang-copilot/
   scripts/        seed_demo.py, record_fixture.py
 ```
 
-## 11. Documentation requirements (all mandatory, written for a non-developer AND for judges)
-1. **README.md**: pitch, demo GIF, live URL, 3-min video link, screenshots, features, Meta models used and how, architecture diagram, quick start (local + cloud), "Built during the hackathon" (dated list of what was built Oct 26 – Nov 4), team, license.
-2. **docs/SETUP_FOR_MALIK.md**: zero-knowledge, click-by-click guide: create accounts/keys (Meta Model API, Baseten, Vercel, Render/Modal, Cloudflare R2), where to paste each key, how to deploy, how to update, how to check it's working, common errors and fixes. Screens described in plain words.
+## 11. Documentation (all required, written for non-developers and for judges)
+1. **README.md**: pitch, demo GIF, live URL, 3-min video link, screenshots, features, Meta models used and how, architecture diagram, quick start (local + cloud), "Built during the hackathon" (dated list of what was built Oct 26 to Nov 4), team, license.
+2. **docs/SETUP.md**: click-by-click guide: create accounts/keys (Meta Model API, Baseten, Vercel, Render/Modal, Cloudflare R2), where to paste each key, how to deploy, how to update, how to check it's working, common errors and fixes. Screens described in plain words.
 3. **docs/ARCHITECTURE.md**: component diagram (Mermaid), sequence diagram of a full session, data flow, storage, deployment.
 4. **docs/AI_PIPELINE.md**: each stage, model, prompt file, input/output schema, retries, failure modes, why each Meta model was chosen; open-weights mode explanation.
 5. **docs/META_API_NOTES.md**: verified endpoints, model ids, request/response examples, rate limits, pricing notes, links to the official docs pages used.
@@ -125,37 +123,37 @@ tukang-copilot/
 7. **docs/SAFETY.md**: safety levels, hard-stop categories, how the gate works, disclaimers shown in the UI, privacy (data retention 24 h, no accounts, no PII).
 8. **docs/TESTING.md**: how to run tests, fixtures, manual QA checklist per demo scenario with expected results.
 9. **docs/DEMO_SCRIPT.md**: 3-minute video script with timestamps and shot list (§13), plus a backup plan.
-10. **docs/SUBMISSION.md**: final submission text: title, tagline (≤100 chars), description (problem, solution, how it works, Meta models, impact, what's next), "what we built during the hackathon", links; plus X post drafts (§14).
-11. **docs/ROADMAP.md**: after-hackathon plan (offline mode, more object types, bengkel marketplace, WhatsApp bot).
+10. **docs/SUBMISSION.md**: final submission text: title, tagline (≤100 chars), description (problem, solution, how it works, Meta models, impact, what's next), "what I built during the hackathon", links; plus X post drafts (§14).
+11. **docs/ROADMAP.md**: after-hackathon plan (offline mode, more object types, bengkel marketplace, WhatsApp chat).
 12. **docs/ATTRIBUTIONS.md**: every third-party asset/library and license.
 13. **CHANGELOG.md**: dated entries per day of the build.
 14. Inline code docs: docstrings on every public function; comments on non-obvious logic.
-Deliver a PDF bundle of README + SETUP_FOR_MALIK + SUBMISSION to Malik in the project chat at the end.
+Also make a PDF bundle of README + SETUP + SUBMISSION at the end.
 
-## 12. Build plan (fit around Malik's shifts; read his work-schedule memory first. He works nights: e.g., Fri Oct 30 21:00–06:00, Sat Oct 31 22:00–07:00, Sun Nov 1 off; check Nov 2–4)
-- **Day 1 (Oct 30)**: verify Meta API docs + write META_API_NOTES; scaffold repo, CI, settings; meta_client with one working call per model; Malik claims $150 credits and creates API key (guide him).
+## 12. Build plan (fit around my night shifts: Fri Oct 30 21:00 to 06:00, Sat Oct 31 22:00 to 07:00, Sun Nov 1 off; Nov 2 to 4 still to check)
+- **Day 1 (Oct 30)**: verify Meta API docs + write META_API_NOTES; scaffold repo, CI, settings; meta_client with one working call per model; claim the $150 credits and create the API key.
 - **Day 2 (Oct 31)**: Listen + Look + SAM segmentation + overlay rendering working from CLI on fixtures.
 - **Day 3 (Nov 1)**: Diagnose + Plan + Safety gate + Verify loop (CLI end to end). Tests.
 - **Day 4 (Nov 2)**: Web UI (capture, progress SSE, diagnosis card, guided steps, check-my-step), i18n, deploy staging.
 - **Day 5 (Nov 3)**: Muse Image diagrams, narration, report/share, open-weights toggle, polish, DEMO_MODE, all docs.
-- **Day 6 (Nov 4)**: Malik records demo with real objects (guided by DEMO_SCRIPT), edit video, publish X post, submit on Cerebral Valley. Done well before Nov 5 09:00 WIB.
+- **Day 6 (Nov 4)**: record the demo with real objects (guided by DEMO_SCRIPT), edit video, publish X post, submit on Cerebral Valley. Done well before Nov 5 09:00 WIB.
 - **Cut list if behind** (in this order): workshop mode, narration audio, Muse Image diagrams (keep at least one), PWA install, Javanese UI strings (keep Javanese voice input).
 
 ## 13. 3-minute demo video (script outline)
-- 0:00–0:15 Hook: Malik's motorbike won't start in a Semarang alley; "Bengkelnya tutup."
-- 0:15–0:30 Problem stats + one line on Tukang Copilot.
-- 0:30–1:45 Live phone capture: photo + voice in Bahasa → parts highlighted on his own bike → diagnosis → 3 guided steps with "Check my step" ✅ and one ⚠️ correction → engine starts.
-- 1:45–2:15 Second quick case: water pump prime, or the rice cooker RED safety stop.
-- 2:15–2:45 Under the hood: diagram of Meta models (Voice Transcribe → Spark vision → SAM 3.1 masks → Spark plan → Muse Image → Spark verify), open-weights toggle on Muse Spark Open.
-- 2:45–3:00 Impact + close: "Tukang Copilot, every phone becomes a mechanic's apprentice." Repo + live link.
+- 0:00-0:15 Hook: my motorbike won't start in a Semarang alley; "Bengkelnya tutup."
+- 0:15-0:30 Problem stats + one line on Tukang Copilot.
+- 0:30-1:45 Live phone capture: photo + voice in Bahasa → parts highlighted on my own bike → diagnosis → 3 guided steps with "Check my step" ✅ and one ⚠️ correction → engine starts.
+- 1:45-2:15 Second quick case: water pump prime, or the rice cooker RED safety stop.
+- 2:15-2:45 Under the hood: diagram of Meta models (Voice Transcribe → Spark vision → SAM 3.1 masks → Spark plan → Muse Image → Spark verify), open-weights toggle on Muse Spark Open.
+- 2:45-3:00 Impact + close: "Tukang Copilot, every phone becomes a mechanic's apprentice." Repo + live link.
 Only show work built during the hackathon.
 
 ## 14. Prizes targeted & promotion
 - Indie track (1st $150K … 5th $25K).
 - Best Agentic Use-Case ($5K): plan → act → verify → re-plan loop.
 - Best Build on Meta Open Weight Models ($10K): Muse Spark Open via Baseten mode, documented and shown in demo.
-- Most Viral Project on X ($20K, engagement until Nov 8 EOD): 30–45 s vertical clip of the bike fix; 3 X post drafts (EN + ID), tag @AIatMeta and @cerebral_valley (verify handles), submit the post link on the platform.
-- Community Vote ($10K): share gallery link in Indonesian dev communities (drafts only; Malik posts).
+- Most Viral Project on X ($20K, engagement until Nov 8 EOD): 30-45 s vertical clip of the bike fix; 3 X post drafts (EN + ID), tag @AIatMeta and @cerebral_valley (verify handles), submit the post link on the platform.
+- Community Vote ($10K): share the gallery link in Indonesian dev communities (I write and post them myself).
 
 ## 15. Submission checklist
 - [ ] $150 Meta Model API credits claimed (Team ID on form), card on Meta billing, spend limit set
@@ -165,13 +163,12 @@ Only show work built during the hackathon.
 - [ ] X post live, link ready
 - [ ] Submitted on Cerebral Valley (account ragilmalika) with all fields from docs/SUBMISSION.md, before Nov 5 09:00 WIB
 
-## 16. Ground rules for the project agent
-- Ask Malik before: creating the GitHub repo, creating accounts, spending money, posting anything publicly, submitting the hackathon entry.
-- Never put API keys in code or chat; use .env and the platform's secret settings.
-- Keep Malik's instructions short, numbered, and in plain English (offer Bahasa if he prefers).
-- Report progress at the end of each build day with what's done, what's next, and anything he must do.
+## 16. Ground rules
+- Creating the GitHub repo, creating accounts, spending money, posting anything public and submitting the entry are deliberate steps I take myself, never automatic.
+- API keys never go in code or chat; they live in .env and the platform's secret settings.
+- Setup instructions stay short, numbered and in plain English (Bahasa where it helps).
+- At the end of each build day, write down what's done, what's next and what still needs my accounts.
 
----
 
 ## 17. v2 Winning Improvements (added 2026-10-30 18:50 WIB, from official sources)
 
@@ -183,17 +180,17 @@ Sources: official page https://dev.meta.ai/events/global-hackathon (fetched 2026
 - **Technical depth & execution 20%**.
 - Indie track lens (official page): "creativity, technical ambition, and **whether it works**".
 - Prizes: Indie $150K / $100K / $75K / $50K / $25K. **Bonus prizes up to $50K total** "for standout projects or community achievements, such as a public vote or the most viral project", announced ~Nov 10. ✅ Verified 2026-11-01 from the Participant Guide (cerebralvalley.ai/e/meta-ai-developer-hackathon/details) and the kickoff slide: Most Viral $20K, Best Build on Meta Open Weights $10K, Community Vote $10K, Best Agentic Use-Case $5K, Best Creative Build (Muse Image or Muse Wonder) $5K. Exact judging rules per prize: docs/JUDGING_MAP.md.
-- Timeline: submissions due Nov 4 9:00 PM ET (= Nov 5 09:00 WIB); judging Nov 4–8; live finals Nov 9.
+- Timeline: submissions due Nov 4 9:00 PM ET (= Nov 5 09:00 WIB); judging Nov 4-8; live finals Nov 9.
 
 ### Criterion → concrete features
 | Criterion | Feature (status) |
 |---|---|
 | Impact 30% | 4 Indonesian scenarios incl. **water pump no-flow** (spec §8 #2); **PDF repair report** + **"My garage" history** (proves real reuse); money-saved estimate vs bengkel visit; Bahasa/Jawa strings everywhere |
 | Meta tools 25% | Spark vision → SAM 3.1 masks → Spark plan → Muse Image diagram → Spark verify loop; **open-weights badge** (visible "Muse Spark Open" chip when `USE_OPEN_WEIGHTS=true`); per-stage model chips in the UI and report |
-| Demo 25% | **Flawless mock/demo mode** end to end (no key needed); scripted 2–3 min **video with captions + voiceover** generated from the real UI; screenshots; vertical 30–45 s clip for X |
+| Demo 25% | **Mock/demo mode that works** end to end (no key needed); scripted 2-3 min **video with captions + voiceover** generated from the real UI; screenshots; vertical 30-45 s clip for X |
 | Technical depth 20% | mypy strict clean, ruff, pytest, **Playwright smoke** of the main flow, CI, one-step real-key swap with `scripts/set_keys.py` + `scripts/check_keys.py`, safety gate in code (3 layers) |
 | "Whether it works" | Safety escalation polish (red stop screen with service-centre advice), PWA installable, **video capture → 3 frames**, ~10 clearly labelled stand-in photo fixtures for tests |
 
 ### Build order (top items first)
 1. Checks green incl. mypy strict (CI enforces). 2. Water pump flow. 3. PDF report + garage. 4. Open-weights badge. 5. Fixtures + Playwright smoke. 6. Demo assets (video, captions, voiceover, screenshots, diagram), write-up, setup guide, submission checklist. 7. PWA, video capture, id/jv strings, safety polish.
-Details and status: tukang-copilot/docs/WINNING_PLAN.md.
+Evidence per criterion: docs/JUDGING_MAP.md.

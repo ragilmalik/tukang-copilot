@@ -1,4 +1,4 @@
-"""Check a deployed Tukang Copilot (Render, or any URL) the way a judge's phone would see it.
+"""Check a deployed Tukang Copilot (Render, or any URL) the way a visitor's phone sees it.
 
     python scripts/deploy_check.py https://tukang-copilot.onrender.com
     python scripts/deploy_check.py https://tukang-copilot.onrender.com --live   # also run real-model checks (costs cents)
@@ -131,7 +131,7 @@ def main() -> int:
         if h.get("open_weights"):
             line("PASS", "open weights ON: diagnosis and plan run on Muse Spark Open (badge shows in the app)")
         else:
-            line("PASS", "open weights off (optional; see docs/SETUP_FOR_MALIK.md to turn it on)")
+            line("PASS", "open weights off (optional; see docs/SETUP.md to turn it on)")
 
         # 3. home page + PWA
         r = c.get("/")
