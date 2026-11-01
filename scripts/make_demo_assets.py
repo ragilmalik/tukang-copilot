@@ -59,7 +59,12 @@ class Scene:
     min_s: float = 5.0
 
 
+HACKATHON_LINE = "Built during the Meta AI Developer Hackathon, Oct 26 to Nov 4, 2026 (first commit Oct 30)"
+
 SCENES: list[Scene] = [
+    # v1.25: 3-second hook title card (silent), then the story. Captions of the voice-over are burned in (English).
+    Scene("title", "title:Fix it yourself, safely. In Javanese.|" + HACKATHON_LINE,
+          "Tukang Copilot · Muse Spark + SAM 3.1 + Muse Image", "", 3),
     Scene("hook", "title:Motor mogok. Bengkelnya tutup.|Bike won't start. The repair shop is closed.",
           "Indonesia runs on ~130 million motorbikes, water pumps and rice cookers.",
           "In Indonesia, a small fault on a motorbike or a water pump can cost a day's wage. "
@@ -89,15 +94,14 @@ SCENES: list[Scene] = [
           "Hands dirty? Go hands-free: each step is read aloud, and the phone listens for lanjut, ulang or cek.", 6),
     Scene("replan", "09_replan", "Still broken? The agent re-plans to the next likely cause.",
           "Still broken? Say what happened, and the agent re-plans to the next most likely cause. Plan, act, verify, re-plan.", 6),
+    Scene("diagram", "28_diagram_step", "No photo can show it? Muse Image draws a diagram for the step, reviewed by Muse Spark (demo: stand-in drawing).",
+          "When a photo can't show a step, Muse Image draws a diagram and Muse Spark checks it. This one is a demo stand-in.", 5),
     Scene("agent", "23_agent_log", "“What the AI did”: every decision, the model that made it, and why it asked.",
           "Every decision is on screen: what it saw, why it asked, each photo check, each re-plan, and which Meta model did it.", 6),
-    Scene("jump", "24_agent_jump", "Tap any log line: it jumps to the step it checked, highlighted.",
-          "Tap a line, and it jumps to the exact step that was checked.", 4),
+    # v1.25: "jump" and "pdf" scenes dropped to make room for the title card and the Muse Image diagram (cut stays under 3:00)
     Scene("handoff", "18_handoff", "Hand-off to a bengkel: WhatsApp summary, nearest workshop, PDF with a mechanic brief.",
           "And when it's a job for a pro, one tap hands it off: a WhatsApp summary of what was found and tried, "
           "a search for the nearest bengkel, and a PDF with a brief for the mechanic.", 8),
-    Scene("pdf", "25_pdf_agent", "The PDF report carries the same agent log, for the mechanic or the judges.",
-          "The PDF report carries the same log, so a mechanic can see what was already tried.", 5),
     Scene("share", "26_share_card", "Share a guide link: WhatsApp and X show this card (marked photo, cause, safety level).",
           "Share the guide, and WhatsApp or X shows a card with your marked photo, the likely cause and the safety level.", 6),
     Scene("rice", "11_rice_stop", "RED STOP: opening 220 V internals → take it to a service centre.",
@@ -113,7 +117,7 @@ SCENES: list[Scene] = [
           "Under the hood: Voice Transcribe, Muse Spark to see, reason and check, SAM 3.1 for masks and live tracking, "
           "and Muse Image for diagrams. Safety is enforced in code.", 9),
     Scene("close", "title:Tukang Copilot|Every phone becomes a mechanic's apprentice.",
-          "Open source, MIT licence, built during the Meta Global AI Developer Hackathon.",
+          "Open source, MIT licence, built during the Meta AI Developer Hackathon.",
           "Tukang Copilot. Every phone becomes a mechanic's apprentice.", 5),
 ]
 
@@ -230,6 +234,17 @@ def shots() -> None:
                              timeout=20000); pg.wait_for_timeout(600)
         pg.wait_for_selector("#planBanner:not(.hidden)"); pg.evaluate("window.scrollTo(0, 0)"); snap("09_replan")  # v1.24: re-plan banner + tried cause
         pg.evaluate("document.querySelector('#agent').scrollIntoView({block: 'start'}); window.scrollBy(0, -70)"); snap("23_agent_log")
+        # v1.25: the plan-2 step that needs a drawing (Muse Image in live mode; a labelled stand-in drawing in demo mode)
+        tick_preflight()
+        for _ in range(6):
+            if "diagram" in (pg.get_attribute("#stepImg", "src") or "") and pg.is_visible("#stepImg"):
+                break
+            pg.click("#nextBtn"); pg.wait_for_timeout(300)
+        pg.evaluate("document.querySelector('#stepCard').scrollIntoView({block: 'start'}); window.scrollBy(0, -70)"); snap("28_diagram_step")
+        for _ in range(6):  # back to step 1 so the hand-off and PDF shots below match earlier takes
+            if pg.is_disabled("#prevBtn"):
+                break
+            pg.click("#prevBtn"); pg.wait_for_timeout(150)
         msid = pg.evaluate("S && S.id")
         mpdf = Path(tempfile.mkdtemp()) / "motor.pdf"
         mpdf.write_bytes(pg.request.get(f"{base}/api/sessions/{msid}/report.pdf").body())
@@ -277,6 +292,10 @@ def shots() -> None:
         pg.goto(base + "/?replay=1"); pg.select_option("#lang", "en"); pg.click("#demoBtn")
         pg.wait_for_selector("#question:not(.hidden)", timeout=20000); pg.click('#quickAns button[data-q="qNo"]')
         pg.wait_for_selector("#result:not(.hidden)", timeout=20000); pg.evaluate("window.scrollTo(0, 0)"); snap("27_recorded_demo")
+        # v1.25 laptop view: phone frame + side panel (QR code, 1-tap demo, language switch)
+        lap = b.new_page(viewport={"width": 1280, "height": 800})
+        lap.goto(base + "/"); lap.select_option("#lang", "en"); lap.wait_for_selector("#qrBox svg", timeout=5000); lap.wait_for_timeout(400)
+        lap.screenshot(path=str(SHOTS / "29_laptop.png")); print("shot 29_laptop", flush=True)
         b.close()
     srv.should_exit = True
     print("screenshots ->", SHOTS, sorted(p.name for p in SHOTS.glob("*.png")))
@@ -342,6 +361,10 @@ def voice() -> None:
             out = VOICE / f"{sc.key}.mp3"
             if out.exists() and out.stat().st_size > 1000:
                 continue
+            if not sc.say:  # silent card (the title): a quiet track keeps every segment's audio the same shape
+                subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-t", f"{sc.min_s - 0.7:.2f}", "-i",
+                                "anullsrc=r=24000:cl=mono", "-c:a", "libmp3lame", "-b:a", "48k", str(out)], check=True)
+                continue
             await edge_tts.Communicate(sc.say, VOICE_NAME, rate="+4%", proxy=proxy).save(str(out))
             print("voice", sc.key, out.stat().st_size)
 
@@ -368,7 +391,7 @@ def _wrap(d: ImageDraw.ImageDraw, text: str, f: Any, width: int) -> list[str]:
     return lines
 
 
-def _frame(sc: Scene, vertical: bool = False) -> Image.Image:
+def _frame(sc: Scene, vertical: bool = False, subtitle: str = "") -> Image.Image:
     fw, fh = (1080, 1920) if vertical else (W, H)
     im = Image.new("RGB", (fw, fh), BG); d = ImageDraw.Draw(im)
     cap_x = 900  # caption column for screenshot scenes; moved right for the wide share card
@@ -384,6 +407,9 @@ def _frame(sc: Scene, vertical: bool = False) -> Image.Image:
         a = Image.open(ARCH).convert("RGB")
         if vertical:
             a = a.resize((fw, int(a.height * fw / a.width))); im.paste(a, (0, 420))
+        elif subtitle:  # leave room under the diagram for the caption bar and the burned-in subtitle
+            aw = int(fw * 0.68)
+            im.paste(a.resize((aw, int(a.height * aw / a.width)), Image.Resampling.LANCZOS), ((fw - aw) // 2, 0))
         else:
             im.paste(a.resize((fw, int(a.height * fw / a.width))), (0, 0))
     else:
@@ -423,9 +449,49 @@ def _frame(sc: Scene, vertical: bool = False) -> Image.Image:
             cy = fh - 200
         else:
             cy = 420
+        if subtitle and sc.image == "arch" and not vertical:  # lift the caption bar above the subtitle box
+            shift = 170
+            d.rectangle([0, cy - 20 - shift, fw, fh], fill=INK); cy -= shift
         for ln in lines:
             d.text((cx, cy), ln, fill=("white" if sc.image == "arch" or sc.image.startswith("title:") else INK), font=f); cy += lh
+    if subtitle:
+        _subtitle(d, subtitle, fw, fh, vertical, cap_x if not (vertical or sc.image.startswith(("title:", "arch"))) else None)
     return im
+
+
+def _subtitle(d: ImageDraw.ImageDraw, text: str, fw: int, fh: int, vertical: bool, col_x: int | None) -> None:
+    """Burned-in caption of what the voice is saying right now: white on a dark box, bottom of the frame
+    (bottom of the right-hand column next to a phone screenshot)."""
+    f = font(40 if vertical else 36, False)
+    x0, x1 = (col_x - 30, fw - 50) if col_x is not None else (60, fw - 60)
+    lines = _wrap(d, text, f, x1 - x0 - 60)
+    lh = 52 if vertical else 48
+    y1 = fh - (90 if vertical else 50)
+    y0 = y1 - lh * len(lines) - 36
+    d.rounded_rectangle([x0, y0, x1, y1], radius=18, fill=(15, 18, 23))
+    y = y0 + 18
+    for ln in lines:
+        w = d.textlength(ln, font=f)
+        d.text((x0 + (x1 - x0 - w) / 2, y), ln, fill="white", font=f); y += lh
+
+
+def _sentences(text: str) -> list[str]:
+    import re
+
+    parts = [p.strip() for p in re.split(r"(?<=[.!?])\s+", text.strip()) if p.strip()]
+    out: list[str] = []
+    for p in parts:  # very long sentences are split at a comma so a caption never runs past 3 lines
+        if len(p) > 120 and ", " in p:
+            mid = p.find(", ", len(p) // 3)
+            if mid > 0:
+                out += [p[:mid + 1], p[mid + 2:]]
+                continue
+        out.append(p)
+    return out
+
+
+def _mmss(t: float) -> str:
+    return f"{int(t) // 60}:{int(t) % 60:02}"
 
 
 def _srt_time(t: float) -> str:
@@ -441,19 +507,40 @@ def video() -> None:
     srt: list[str] = []
     t = 0.0
     has_voice = all((VOICE / f"{s.key}.mp3").exists() for s in SCENES)
+    stamps: list[str] = []
+    n_sub = 0
     for i, sc in enumerate(SCENES):
-        png = work / f"{i:02}.png"; _frame(sc).save(png)
         mp3 = VOICE / f"{sc.key}.mp3"
-        dur = max(sc.min_s, (_dur(mp3) + 0.7) if has_voice else sc.min_s)
+        spoken = _dur(mp3) if (has_voice and sc.say) else 0.0
+        dur = max(sc.min_s, (spoken + 0.7) if spoken else sc.min_s)
         seg = work / f"{i:02}_{sc.key}.mp4"
         parts.append(seg)
-        srt.append(f"{i + 1}\n{_srt_time(t)} --> {_srt_time(t + dur)}\n{sc.say}\n")
+        # burned-in captions: one frame per spoken sentence, timed by its share of the characters
+        sents = _sentences(sc.say) if sc.say else [""]
+        total_chars = sum(len(x) for x in sents) or 1
+        span = spoken or dur
+        frames: list[tuple[Path, float]] = []
+        acc = 0.0
+        for j, sent in enumerate(sents):
+            sd = span * len(sent) / total_chars if sent else dur
+            if j == len(sents) - 1:
+                sd = dur - acc  # the last caption stays up through the pause
+            png = work / f"{i:02}_{j}.png"; _frame(sc, subtitle=sent).save(png)
+            frames.append((png, sd))
+            if sent:
+                n_sub += 1
+                srt.append(f"{n_sub}\n{_srt_time(t + acc)} --> {_srt_time(t + acc + sd)}\n{sent}\n")
+            acc += sd
+        stamps.append(f"{_mmss(t)}  {sc.key:<11} {sc.caption}")
         t += dur
         if seg.exists() and seg.stat().st_size > 0:
             continue
+        ilist = work / f"{i:02}_frames.txt"
+        ilist.write_text("".join(f"file '{fp}'\nduration {fd:.3f}\n" for fp, fd in frames) + f"file '{frames[-1][0]}'\n")
         audio = ["-i", str(mp3)] if has_voice else ["-f", "lavfi", "-t", f"{dur:.2f}", "-i", "anullsrc=r=44100:cl=stereo"]
-        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", "30", "-t", f"{dur:.2f}", "-i", str(png), *audio,
-                        "-filter_complex", f"[1:a]apad=whole_dur={dur:.2f},aresample=44100[a]", "-map", "0:v", "-map", "[a]",
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(ilist), *audio,
+                        "-filter_complex", f"[0:v]fps=30,format=yuv420p[v];[1:a]apad=whole_dur={dur:.2f},aresample=44100[a]",
+                        "-map", "[v]", "-map", "[a]",
                         "-t", f"{dur:.2f}", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-preset", "veryfast", "-crf", "22",
                         "-c:a", "aac", "-b:a", "128k", "-ar", "44100", "-ac", "2", "-tune", "stillimage", str(seg) + ".part.mp4"], check=True)
         os.replace(str(seg) + ".part.mp4", seg)
@@ -462,37 +549,51 @@ def video() -> None:
     out = DEMO / "tukang-copilot-demo.mp4"
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", "-movflags", "+faststart", str(out)], check=True)
     (DEMO / "tukang-copilot-demo.en.srt").write_text("\n".join(srt))
-    print(f"video -> {out} ({t:.1f}s, voice={'yes' if has_voice else 'no'})")
+    real = _dur(out)
+    (DEMO / "TIMESTAMPS.txt").write_text(
+        "Tukang Copilot demo video: scene start times (mm:ss), made by scripts/make_demo_assets.py video\n"
+        f"File: docs/demo/tukang-copilot-demo.mp4, length {_mmss(real)} ({real:.1f} s, ffprobe). Demo mode, labelled stand-in photos.\n"
+        "English captions of the voice-over are burned in; the same text is in tukang-copilot-demo.en.srt.\n\n"
+        + "\n".join(stamps) + "\n", encoding="utf-8")
+    if real >= 180:
+        raise SystemExit(f"video is {real:.1f} s: the hackathon limit is 3:00")
+    print(f"video -> {out} ({real:.1f}s by ffprobe, voice={'yes' if has_voice else 'no'})")
     vertical(work, has_voice)
 
 
 def vertical(work: Path, has_voice: bool) -> None:
-    """~45 s 9:16 clip for X: hook, streaming progress, parts, live camera, check, share card, rice stop, models, close."""
-    keys = ["hook", "progress", "parts", "live", "check_pass", "share", "rice", "arch", "close"]
-    short = {"hook": "Motor mogok, bengkel tutup? Foto + ngomong.", "parts": "SAM 3.1 menandai part di foto KAMU.",
+    """~45 s 9:16 clip for X (silent, captions only): 3 s title card, then hook, streaming progress, parts, live camera,
+    check, Muse Image diagram, rice stop, models, close. Each card has the Indonesian line plus an English caption."""
+    keys = ["title", "hook", "progress", "parts", "live", "check_pass", "diagram", "rice", "arch", "close"]
+    short = {"title": "Tukang Copilot", "hook": "Motor mogok, bengkel tutup? Foto + ngomong.", "parts": "SAM 3.1 menandai part di foto KAMU.",
              "live": "Kamera langsung: part yang harus dipegang ditandai (demo).", "check_pass": "Tiap langkah dicek kamera ✓",
-             "handsfree": "Tangan kotor? Bilang “lanjut”.", "handoff": "Kerjaan ahli? Kirim ringkasan ke bengkel via WhatsApp.",
+             "diagram": "Foto tidak cukup? Muse Image menggambar diagram (demo: gambar pengganti).",
              "rice": "Bahaya? Dia bilang STOP.", "progress": "Lihat AI bekerja: hasil muncul tiap tahap.",
-             "share": "Bagikan: WhatsApp & X tampilkan kartu ini (demo).",
              "arch": "Built with Meta Muse Spark + SAM 3.1 + Muse Image", "close": "Tukang Copilot · open source · mode demo"}
+    english = {"title": "", "hook": "Bike won't start and the shop is closed? Snap it and say what's wrong.",
+               "parts": "SAM 3.1 marks the parts on YOUR photo.", "live": "Live camera: the part to touch is outlined (demo).",
+               "check_pass": "Every step is checked by the camera.", "diagram": "Photo not enough? Muse Image draws a diagram (demo stand-in).",
+               "rice": "Dangerous? It says STOP and hands you to a pro.", "progress": "Watch the AI work: results appear stage by stage.",
+               "arch": "Voice Transcribe · Muse Spark · SAM 3.1 · Muse Image", "close": "Fix it yourself, safely. In Javanese."}
     parts: list[Path] = []
     for k in keys:
         sc = next(s for s in SCENES if s.key == k)
-        v = Scene(sc.key, sc.image, short[k], sc.say, 5.5)
-        png = work / f"v_{k}.png"; _frame(v, vertical=True).save(png)
+        secs = 3.0 if k == "title" else 4.5
+        v = Scene(sc.key, sc.image, short[k], sc.say, secs)
+        png = work / f"v_{k}.png"; _frame(v, vertical=True, subtitle=english[k]).save(png)
         seg = work / f"v_{k}.mp4"
-        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", "30", "-t", "5", "-i", str(png),
-                        "-f", "lavfi", "-t", "5", "-i", "anullsrc=r=44100:cl=stereo", "-t", "5",
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", "30", "-t", f"{secs}", "-i", str(png),
+                        "-f", "lavfi", "-t", f"{secs}", "-i", "anullsrc=r=44100:cl=stereo", "-t", f"{secs}",
                         "-c:v", "libx264", "-pix_fmt", "yuv420p", "-preset", "veryfast", "-crf", "23", "-c:a", "aac", "-ar", "44100", "-ac", "2", str(seg)], check=True)
         parts.append(seg)
     lst = work / "vlist.txt"; lst.write_text("".join(f"file '{p}'\n" for p in parts))
     out = DEMO / "tukang-copilot-x-vertical.mp4"
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", "-movflags", "+faststart", str(out)], check=True)
-    print("vertical ->", out)
+    print("vertical ->", out, f"{_dur(out):.1f}s")
 
 
 GIF_SHOTS = ["01_home", "02_progress", "03_question", "05_parts", "23_agent_log", "24_agent_jump", "15_preflight", "07_check_fail", "08_check_pass",
-             "16_live_guide", "09_replan", "11_rice_stop", "20_javanese_result"]
+             "16_live_guide", "09_replan", "28_diagram_step", "11_rice_stop", "20_javanese_result"]
 
 
 def gif() -> None:
