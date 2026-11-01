@@ -173,6 +173,27 @@ const T_REPLAY = {
 /* I18N_REPLAY:end */
 ["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_REPLAY[k]));
 
+/* I18N_DESK:start (v1.25: laptop view side panel). api/tests/test_desk.py checks all three. */
+const T_DESK = {
+  id: { deskKicker: "Dibuat dengan Muse Spark + SAM 3.1", deskTag: "Perbaiki sendiri, dengan aman. Dalam Bahasa Jawa.",
+        deskWhat: "Foto barang yang rusak dan ceritakan masalahnya. Muse Spark mencari penyebabnya, SAM 3.1 menandai bagiannya di foto, dan kamera mengecek tiap langkah perbaikan.",
+        deskB1: "📷 Foto + suara, Bahasa Jawa, Indonesia, atau Inggris", deskB2: "🎯 Bagian yang perlu disentuh ditandai di fotomu", deskB3: "✅ Tiap langkah dicek kamera sebelum lanjut",
+        deskB4: "⛔ Gas, listrik rumah, rem: berhenti dan arahkan ke teknisi", deskDemo: "▶ Putar demo 1 ketuk di sini",
+        deskQr: "Pindai untuk membuka di HP", deskQrSub: "Kamera, suara, dan cek langkah paling enak di HP.", deskQrLocal: "Alamat ini hanya jalan di komputer ini." },
+  jv: { deskKicker: "Digawe nganggo Muse Spark + SAM 3.1", deskTag: "Dandani dhewe, kanthi slamet. Nganggo Basa Jawa.",
+        deskWhat: "Foto barang sing rusak lan critakna masalahe. Muse Spark nggoleki sababe, SAM 3.1 menehi tandha bagean ing foto, lan kamera mriksa saben langkah.",
+        deskB1: "📷 Foto + swara, Basa Jawa, Indonesia, utawa Inggris", deskB2: "🎯 Bagean sing kudu didandani ditandhani ing fotomu", deskB3: "✅ Saben langkah dicek kamera sadurunge lanjut",
+        deskB4: "⛔ Gas, listrik omah, rem: mandheg lan diarahke menyang teknisi", deskDemo: "▶ Puter demo sak tutulan ing kene",
+        deskQr: "Pindai kanggo mbukak ing HP", deskQrSub: "Kamera, swara, lan cek langkah paling kepenak ing HP.", deskQrLocal: "Alamat iki mung mlaku ing komputer iki." },
+  en: { deskKicker: "Built with Muse Spark + SAM 3.1", deskTag: "Fix it yourself, safely. In Javanese.",
+        deskWhat: "Photograph something broken and say what's wrong. Muse Spark finds the likely cause, SAM 3.1 marks the parts on your photo, and the camera checks each repair step.",
+        deskB1: "📷 Photo + voice in Javanese, Indonesian or English", deskB2: "🎯 The parts to touch are marked on your photo", deskB3: "✅ Each step is checked by the camera before you go on",
+        deskB4: "⛔ Gas, mains power, brakes: it stops and hands you to a pro", deskDemo: "▶ Play the 1-tap demo here",
+        deskQr: "Scan to open on your phone", deskQrSub: "Camera, voice and step checks work best on a phone.", deskQrLocal: "This address only works on this computer." },
+};
+/* I18N_DESK:end */
+["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_DESK[k]));
+
 let lang = localStorage.getItem("tc_lang") || "id";
 let videoFile = null;
 let photoFiles = [], audioBlob = null, rec = null, chunks = [], S = null, stepIdx = 0, category = "", es = null;
@@ -191,7 +212,7 @@ function applyLang() {
   if ($("lang")) $("lang").value = lang;
   if (S) { renderProgress(S); if (S.plan) render(S); }
   if ($("garage") && !$("capture").classList.contains("hidden")) renderGarage();
-  badges();
+  badges(); markLang();
   if (window.__offlineRefresh) window.__offlineRefresh();
 }
 
@@ -354,6 +375,11 @@ function setupKeyboardPickers() {
 }
 
 let firstShow = true;
+// Laptop view: the app scrolls inside the phone frame (#screen), so a "back to the top" moves both.
+function toTop() {
+  if (typeof window.scrollTo === "function") window.scrollTo(0, 0);
+  const sc = $("screen"); if (sc && sc.scrollHeight > sc.clientHeight) sc.scrollTop = 0;
+}
 function show(which) {
   ["capture", "progress", "result"].forEach((s) => $(s) && $(s).classList.toggle("hidden", s !== which));
   // Move focus to the new section's heading so screen-reader and keyboard users land on it (not on first load).
@@ -361,7 +387,7 @@ function show(which) {
     const h = $(which) && $(which).querySelector("h1, h2");
     if (h) { h.tabIndex = -1; try { h.focus({ preventScroll: true }); } catch (_) { /* old browsers */ } }
   }
-  if (!firstShow && typeof window.scrollTo === "function") window.scrollTo(0, 0);  // a new screen starts at its top (the result opened half-way down)
+  if (!firstShow) toTop();  // a new screen starts at its top (the result opened half-way down)
   firstShow = false;
   if ($("garage")) $("garage").classList.toggle("hidden", which !== "capture" || !loadGarage().length);
 }
@@ -420,7 +446,7 @@ function renderProgress(s) {
   if (stopped) {
     const fresh = $("stopBox").classList.contains("hidden") || !$("stopBox").innerHTML;
     renderStop(s); saveGarage(s);
-    if (fresh && typeof window.scrollTo === "function") window.scrollTo(0, 0);  // the STOP card sits right under the heading
+    if (fresh) toTop();  // the STOP card sits right under the heading
   }
   $("jobErr").textContent = s.status === "error" ? s.error : "";
   if ($("retryBtn")) $("retryBtn").classList.toggle("hidden", !(s.status === "error" && s.error_kind !== "budget"));
@@ -799,7 +825,7 @@ function setupResult() {
       const j = await r.json();
       if (!r.ok) { $("stuckMsg").textContent = "⚠️ " + (j.detail || r.statusText); return; }
       S = j;
-      if (S.status === "ready") { stepIdx = 0; render(S); $("stuckMsg").textContent = t("newPlan"); $("stuckText").value = ""; window.scrollTo(0, 0); }
+      if (S.status === "ready") { stepIdx = 0; render(S); $("stuckMsg").textContent = t("newPlan"); $("stuckText").value = ""; toTop(); }
       else { $("stuckMsg").textContent = "⛔ " + (S.stop_reason || S.error || ""); showHandoff("handoff"); }
     } catch (err) { $("stuckMsg").textContent = "⚠️ " + netMsg(err);
     } finally { $("stuckBtn").disabled = false; }
@@ -1195,9 +1221,53 @@ function setupDemo() {
   if ($("preList")) $("preList").addEventListener("change", () => setTimeout(updateTour, 0));
 }
 
+/* ---------------- laptop view (v1.25) ---------------- */
+// At >= 1024 px the page shows the app in a phone frame plus a side panel (web/style.css). The QR code encodes the
+// page's own address so a judge on a laptop can carry on with a phone; the encoder (web/vendor/qrcode.js, MIT,
+// Kazuhiko Arase) is fetched only on wide screens, so phones never download it.
+const DESK_MQ = "(min-width: 1024px)";
+const isDesk = () => typeof window.matchMedia === "function" && window.matchMedia(DESK_MQ).matches;
+function qrTarget() {
+  const u = new URL(location.href); u.hash = "";
+  return u.toString();
+}
+function drawQr() {
+  const box = $("qrBox"); if (!box || box.dataset.done || typeof window.qrcode !== "function") return;
+  const url = qrTarget();
+  try {
+    const q = window.qrcode(0, "M"); q.addData(url); q.make();
+    box.innerHTML = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+    box.dataset.done = "1"; box.setAttribute("aria-label", "QR: " + url);
+  } catch (_) { box.classList.add("hidden"); }
+  if ($("qrUrl")) $("qrUrl").textContent = url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  const local = location.protocol === "file:" || /^(localhost|127\.|0\.0\.0\.0|\[::1\])/.test(location.hostname);
+  if ($("qrLocal")) $("qrLocal").classList.toggle("hidden", !local);
+}
+function loadQr() {
+  if (!$("qrBox") || !isDesk()) return;
+  if (typeof window.qrcode === "function") { drawQr(); return; }
+  if (document.getElementById("qrLib")) return;
+  const sc = document.createElement("script"); sc.id = "qrLib"; sc.src = "/static/vendor/qrcode.js"; sc.onload = drawQr;
+  document.head.appendChild(sc);
+}
+function setupDesk() {
+  if (!$("side")) return;
+  on("sideDemo", "click", () => { const b = $("demoBtn"); if (b && !$("capture").classList.contains("hidden")) b.click(); else location.href = location.pathname + location.search; });
+  document.querySelectorAll("[data-setlang]").forEach((b) => b.addEventListener("click", () => {
+    const sel = $("lang"); if (!sel) return;
+    sel.value = b.dataset.setlang; sel.dispatchEvent(new Event("change"));
+  }));
+  loadQr();
+  if (typeof window.matchMedia === "function") {
+    const mq = window.matchMedia(DESK_MQ);
+    if (mq.addEventListener) mq.addEventListener("change", loadQr);
+  }
+}
+function markLang() { document.querySelectorAll("[data-setlang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.setlang === lang))); }
+
 /* ---------------- boot ---------------- */
 document.addEventListener("DOMContentLoaded", () => {
-  setupOffline(); applyLang(); health(); setupResult(); setupDemo();
+  setupOffline(); applyLang(); health(); setupResult(); setupDemo(); setupDesk();
   const shared = document.body.dataset.sid;
   if (shared && !shared.startsWith("{{")) { // read-only /guide/<id> page
     on("lang", "change", (e) => { lang = e.target.value; applyLang(); });

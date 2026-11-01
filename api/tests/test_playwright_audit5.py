@@ -59,5 +59,5 @@ def test_landing_thumbnail_and_desktop_note(page):
     assert page.evaluate("document.querySelector('.demoThumb').naturalWidth") > 0
     assert "Stand-in sample photo" in page.inner_text(".demoFig figcaption")
     assert not page.is_visible("#deskNote")                                # a phone needs no "use a phone" note
-    page.set_viewport_size({"width": 1280, "height": 800})
+    page.set_viewport_size({"width": 1010, "height": 800})               # >= 1024 px gets the phone frame + side panel instead (test_desk.py)
     assert page.is_visible("#deskNote") and "Made for phones" in page.inner_text("#deskNote")

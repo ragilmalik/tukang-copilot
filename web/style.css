@@ -158,3 +158,38 @@ body.typing .tourBar{bottom:auto;top:calc(8px + env(safe-area-inset-top))}
 .demoFig figcaption{margin-top:4px}
 .deskNote{display:none}
 @media (min-width:1000px){.deskNote{display:block;max-width:640px;margin:8px auto 0;padding:6px 12px;border-radius:999px;background:#e8f3ff;color:#0b4f8a;text-align:center}}
+/* v1.25 laptop view: >= 1024 px shows the app inside a phone frame (it scrolls inside #screen) with a side panel. Phones never see .side. */
+.side{display:none}
+@media (min-width:1024px) and (max-height:720px){.side{font-size:.9rem}.sideWhat{display:none}}
+@media (min-width:1024px){
+  body{min-height:100vh;background:radial-gradient(1200px 600px at 20% 0%,#fff1df 0%,transparent 60%),linear-gradient(160deg,#f6f3ee 0%,#e9e3da 100%)}
+  body:has(#tourBar:not(.hidden)),body:has(#tourBar.collapsed:not(.hidden)){padding-bottom:0}
+  .desk{display:flex;justify-content:center;align-items:center;gap:56px;min-height:100vh;padding:24px}
+  .phone{position:relative;flex:0 0 auto;width:414px;height:min(868px,calc(100vh - 48px));border:12px solid #15191f;border-radius:48px;background:var(--bg);box-shadow:0 0 0 2px #3a414b,0 30px 60px rgba(29,35,43,.28),0 8px 20px rgba(29,35,43,.18);overflow:hidden;transform:translateZ(0)}
+  .phone::before{content:"";position:absolute;top:8px;left:50%;width:96px;height:24px;margin-left:-48px;border-radius:999px;background:#15191f;z-index:20;pointer-events:none}
+  .screen{height:100%;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;border-radius:36px}
+  .screen .top{padding-top:38px}
+  .screen main{max-width:none}
+  .screen .badge{margin-left:12px;margin-right:12px}
+  .screen:has(#tourBar:not(.hidden)),.phone:has(#tourBar:not(.hidden)) .screen{padding-bottom:96px}
+  .deskNote{display:none!important}
+  .phone .tourBar{right:10px;left:10px;bottom:14px;max-width:none}
+  body.typing .phone .tourBar{top:44px;bottom:auto}
+  .side{display:block;flex:0 1 420px;max-width:420px;color:var(--ink);font-size:.95rem}
+  .sideKicker{margin:0;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--o);font-weight:700}
+  .sideTitle{font-size:1.9rem;margin:.1em 0 .05em;line-height:1.15}
+  .sideTag{font-size:1.15rem;font-weight:600;margin:0 0 .4em}
+  .sideWhat{color:#3b434d;margin:0 0 .4em;line-height:1.45}
+  .sideList{list-style:none;padding:0;margin:0 0 12px}
+  .sideList li{padding:3px 0;border-bottom:1px solid rgba(29,35,43,.08);line-height:1.4}
+  .side .btn.demo{width:100%;background:var(--o)}
+  .sideLang .chip{min-height:40px;padding:6px 14px;font-size:.95rem}
+  .sideQr{display:flex;gap:14px;align-items:center;margin:12px 0;padding:12px;background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .qrBox{flex:0 0 120px;width:120px;height:120px;background:#fff}
+  .qrBox svg{width:100%;height:100%;display:block}
+  .sideQr p{margin:0 0 4px}
+  .qrUrl{word-break:break-all;font-family:ui-monospace,Menlo,Consolas,monospace;color:#3b434d}
+  .qrLocal{color:#8a4500}
+  .sideLang{display:flex;flex-wrap:wrap;gap:6px}
+  .sideLang .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+}

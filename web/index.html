@@ -11,6 +11,8 @@
   <meta name="theme-color" content="#ff7a00">
 </head>
 <body>
+<div class="desk" id="desk">
+<div class="phone" id="phone"><div class="screen" id="screen">
 <header class="top">
   <div class="brand">🔧 <b>Tukang Copilot</b></div>
   <select id="lang" aria-label="Language">
@@ -192,7 +194,33 @@
 </main>
 <p class="muted small center" id="disclaimer"></p>
 <footer class="muted small" data-t="footer">Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.</footer>
+</div><!-- /screen -->
 <div id="tourBar" class="tourBar hidden" data-testid="tour-bar"><button id="tourToggle" class="tourToggle" type="button" aria-expanded="true" aria-controls="tourText" aria-label="Kecilkan tip">💡</button><p id="tourText" role="status" aria-live="polite"></p><button id="tourClose" class="tourX" type="button" aria-label="Tutup">×</button></div>
+</div><!-- /phone -->
+<!-- v1.25 laptop view (>= 1024 px): the app sits in a phone frame; this panel explains it, offers a QR code to open the same page on a phone, the 1-tap demo and the language switch. Hidden on phones. -->
+<aside id="side" class="side" aria-label="Tukang Copilot" data-testid="side-panel">
+  <p class="sideKicker" data-t="deskKicker">Dibuat dengan Muse Spark + SAM 3.1</p>
+  <h2 class="sideTitle">🔧 Tukang Copilot</h2>
+  <p class="sideTag" data-t="deskTag">Perbaiki sendiri, dengan aman. Dalam Bahasa Jawa.</p>
+  <p class="sideWhat" data-t="deskWhat">Foto barang yang rusak dan ceritakan masalahnya.</p>
+  <ul class="sideList">
+    <li data-t="deskB1">📷 Foto + suara</li>
+    <li data-t="deskB2">🎯 Bagian ditandai di foto</li>
+    <li data-t="deskB3">✅ Tiap langkah dicek kamera</li>
+    <li data-t="deskB4">⛔ Berhenti untuk pekerjaan berbahaya</li>
+  </ul>
+  <button id="sideDemo" class="btn demo big" type="button" data-testid="side-demo" data-t="deskDemo">▶ Putar demo 1 ketuk di sini</button>
+  <div class="sideQr">
+    <div id="qrBox" class="qrBox" role="img" data-testid="side-qr" aria-label="QR"></div>
+    <div><p class="sideQrHead"><b data-t="deskQr">Pindai untuk membuka di HP</b></p><p class="small muted" data-t="deskQrSub">Kamera, suara, dan cek langkah paling enak di HP.</p><p id="qrUrl" class="small qrUrl"></p><p id="qrLocal" class="small qrLocal hidden" data-t="deskQrLocal">Alamat ini hanya jalan di komputer ini.</p></div>
+  </div>
+  <div class="sideLang" role="group" aria-label="Language">
+    <button type="button" class="chip" data-setlang="id">Bahasa Indonesia</button>
+    <button type="button" class="chip" data-setlang="jv">Basa Jawa</button>
+    <button type="button" class="chip" data-setlang="en">English</button>
+  </div>
+</aside>
+</div><!-- /desk -->
 <audio id="player"></audio>
 <script src="/static/replay.js"></script>
 <script src="/static/app.js"></script>
