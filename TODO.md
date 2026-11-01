@@ -4,10 +4,11 @@ Deadline: **Thu Nov 5, 2026, 09:00 WIB** (Nov 4, 9 PM ET). Internal target: feat
 Owner: **M** = Malik, **H** = Malik.
 
 ## Must (to submit): see HANDOFF.md "Malik-only" list
-- [ ] **M** Meta key → `python scripts/set_keys.py` → ALL GOOD (claim credits + set a spend limit on dev.meta.ai first)
+- [ ] **M** Meta key → `python scripts/set_keys.py` → ALL GOOD (claim credits + set a spend limit on dev.meta.ai first), then `python scripts/first_live_run.py` → DONE (writes docs/LIVE_RUN.md)
 - [ ] **H** First live run on the 5 samples (no FALLBACK lines); fix real-API differences; update META_API_NOTES ⚠️ items and the "Honest status" lines in WRITEUP/SUBMISSION
 - [ ] **M** Real photos + 5 user trials (docs/USER_TRIAL_KIT.md) → **H** `scripts/impact_report.py`, replace MOCK impact numbers, tune prompts
 - [ ] **M** Approve GitHub push (`ragilmalik/tukang-copilot`) + Render deploy (docs/DEPLOY.md, free plan); set `PUBLIC_BASE_URL`
+- [ ] **M** Approve hosting the static judge build (`python scripts/build_static.py`, then GitHub Pages or Netlify drop; see `--help`): no cold start for judges
 - [ ] **H** `deploy_check.py <url> --live` → READY
 - [ ] **M** Phone test over 4G: camera, live guide, hands-free (Android Chrome jv-ID), WhatsApp hand-off, PDF
 - [ ] **M** Upload the video to YouTube (real recording per DEMO_SCRIPT.md, or the 2:57 backup cut), post the X clip
@@ -26,6 +27,12 @@ Owner: **M** = Malik, **H** = Malik.
 - [x] **H** Recorded 1-tap demo that plays when the free server sleeps or the phone is offline, labelled "Recorded demo" (v1.24, backlog J5)
 - [x] **H** Skeptical-judge audit 5 fixes: red stop on screen, result opens at top, re-plan banner, keyboard focus, PDF wording, neutral landing picture (v1.24)
 - [x] **H** Demo kit re-shot for v1.24 (27 shots incl. recorded demo, 2:57 video, 45 s X clip, GIF)
+- [x] **H** Laptop view: phone frame + side panel with QR code, 1-tap demo, language switch (v1.25)
+- [x] **H** Static judge build `scripts/build_static.py` (recorded demo, no server; not deployed) (v1.25)
+- [x] **H** Offline eval `scripts/run_eval.py` → docs/EVAL.md (fixtures, 20 red-team, 7 injection; mock/fake labelled); safety gate fixed for 12 text + 7 plan misses (v1.25)
+- [x] **H** `scripts/first_live_run.py` one-command first live repair → docs/LIVE_RUN.md (v1.25)
+- [x] **H** Video: 3 s hook title card with hackathon dates, burned-in English captions, Muse Image diagram scene, TIMESTAMPS.txt; 2:57 cut, 43.5 s X clip (v1.25)
+- [ ] **H** After the live run: `python scripts/run_eval.py` stays green; add live numbers to docs (docs lane)
 - [ ] **M** Open the live link once a few minutes before judging/recording so the free server is awake (a brand-new visitor can't get the recording until the page itself loads)
 
 ## Could

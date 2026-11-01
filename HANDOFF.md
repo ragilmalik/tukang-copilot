@@ -2,6 +2,11 @@
 
 Read this first if you are picking up Tukang Copilot (human or AI).
 
+## State on 2026-11-01 12:30 WIB (v1.25.0): submission-ready, waiting on Malik's steps
+- **New since 1.24 (code lane C1 to C5):** laptop view (>= 1024 px: phone frame + side panel with QR code of the current URL, 1-tap demo, id/jv/en switch); static judge build `scripts/build_static.py` → `dist-static/` (gitignored, recorded demo, no server, relative paths, NOT deployed; instructions in `--help`); offline eval `scripts/run_eval.py` → `docs/EVAL.md` (mock + fake-model, labelled, live pending) which found 12 of 20 red-team texts and 7 of 10 dangerous plan steps slipping past the v1.24 safety gate, now fixed (100 % recall, 0 false stops on 17 safe cases, 7/7 injection cases); `scripts/first_live_run.py` (one command after set_keys.py, writes `docs/LIVE_RUN.md`, `--fake` rehearsal); video re-cut with a 3 s hook title card (hackathon dates), burned-in English captions and a Muse Image diagram scene (**2:57**, X clip 43.5 s, scene times in `docs/demo/TIMESTAMPS.txt`, new shots 28/29). Details: CHANGELOG 1.25.0.
+- **Checks (real runs, 2026-11-01):** pytest **530 passed, 0 failed** in chunks under the 120 s tool limit: `-m "not slow"` over two file groups (224 + 277), `test_playwright_smoke.py` alone (12, ~108 s), `test_dom_jsdom.py` + `test_playwright_live.py` + `test_playwright_replay.py` (5), `test_playwright_audit5.py` + `test_playwright_desk.py` (7), `test_playwright_static.py` (2), `test_run_eval.py` (3, ~66 s); `ruff check api scripts` clean; `mypy api` strict no issues in 99 files; `record_replay.py --check` up to date; `smoke_e2e.py` ALL PASSED (66 checks) on `MOCK=1 PORT=8765 python app.py` with `NO_PROXY=127.0.0.1,localhost`. TEST_REPORT: see docs/TEST_REPORT.md.
+- **Honest status:** unchanged: no live Meta answer verified yet (needs the key); demo assets, the recording and the static build are demo mode; eval numbers are mock / fake-model; impact numbers are MOCK.
+
 ## State on 2026-11-01 WIB (v1.24.0): submission-ready, waiting on Malik's steps
 - **New since 1.23:** recorded 1-tap demo (backlog J5): when the free Render server is asleep (no `/api/health` answer within 4 s), offline, or with `?replay=1`, the demo plays a recorded demo-mode run from `web/replay/` (made by `scripts/record_replay.py`; `--check` and `test_replay.py` catch drift), labelled "▶ Recorded demo" on screen; own photos are refused, never faked; the service worker pre-caches it and shows the cached shell after 3.5 s. Skeptical-judge audit 5 (screens in id/jv/en at 390x844, a 1280x800 laptop, keyboard-only, slow 3G; 14 scored findings in `../work/IMPROVEMENT_BACKLOG.md`): red stop now on screen under a "Stopped for your safety" heading, result opens at the top, "🔁 Plan 2 of 3" banner after a re-plan, focus to the quick answers, PDF says "Cause worked on", language-neutral landing picture, demo check names what it confirmed, laptop note, one PDF button on the stop card, `/api/health` shows the full version. Demo kit re-made: 27 screenshots (new `27_recorded_demo.png`), **2:57** video, 45 s X clip, GIF. Details: CHANGELOG 1.24.0.
 - **Checks (real runs, 2026-11-01):** see docs/TEST_REPORT.md (`make_test_report.py`, one run: pytest **496 passed, 0 failed, 0 skipped** in 241 s with Chromium + jsdom, ruff, check_keys --fake, smoke ALL PASSED); `ruff check api scripts` clean; `mypy api` strict no issues in 84 files; `smoke_e2e.py` ALL PASSED (66 checks, new: recorded demo served) on `MOCK=1 PORT=8765 python app.py` with `NO_PROXY=127.0.0.1,localhost`. Pytest in chunks under the 120 s tool limit: `-m "not slow"` (475, ~105 s, split by file if needed), then `test_playwright_smoke.py` (12, ~70 s) and the other 4 browser files (9, ~100 s) with Chromium on PATH.
@@ -182,7 +187,8 @@ python scripts/make_test_report.py   # regenerate docs/TEST_REPORT.md from real 
 | `prompts/*.md` | One versioned prompt per stage |
 | `api/testing/fake_meta.py` | Fake Meta API for tests and dry runs |
 | `api/tests/` | All tests |
-| `scripts/` | set_keys, check_keys, smoke_e2e, make_test_report |
+| `scripts/` | set_keys, check_keys, first_live_run, smoke_e2e, run_eval (docs/EVAL.md), build_static (dist-static/), make_test_report |
+| `web/vendor/qrcode.js` | MIT QR encoder for the laptop side panel (loaded only at >= 1024 px) |
 | `web/` | index.html, guide.html, app.js, style.css |
 | `docs/` | Everything else (see README map) |
 | `docs/SPEC.md` | The original spec |
@@ -198,15 +204,16 @@ See docs/DECISIONS.md. Most important: single FastAPI process + plain JS (no Nex
 - Check his shift schedule before asking him to do anything (he works nights).
 
 ## Next up (Malik, once Malik's steps unblock it)
-1. After the key: `set_keys.py` ALL GOOD → `smoke_e2e.py` in LIVE mode with no FALLBACK lines → `eval_fixtures.py` live → tune prompts → update META_API_NOTES ⚠️ items and the "Honest status" lines in WRITEUP/SUBMISSION/VERIFICATION_REPORT.
+1. After the key: `set_keys.py` ALL GOOD → `first_live_run.py` (docs/LIVE_RUN.md) → `smoke_e2e.py` in LIVE mode with no FALLBACK lines → `eval_fixtures.py` live → tune prompts → update META_API_NOTES ⚠️ items and the "Honest status" lines in WRITEUP/SUBMISSION/VERIFICATION_REPORT.
 2. After real photos/trials: replace stand-in fixtures, `scripts/impact_report.py` (real rows), re-shoot screenshots with real photos.
 3. After deploy: `deploy_check.py <url> --live`, fill the live/video/X links in README + SUBMISSION, rebuild docs-out/.
 4. Resume the paused "Keep building Tukang Copilot" scheduled task only if Malik wants more polish.
 
 ## Malik-only (nothing else blocks the submission)
-1. Meta key: claim credits + set a spend limit on dev.meta.ai, create a key, run `python scripts/set_keys.py` (paste, Enter) → ALL GOOD.
+1. Meta key: claim credits + set a spend limit on dev.meta.ai, create a key, run `python scripts/set_keys.py` (paste, Enter) → ALL GOOD, then `python scripts/first_live_run.py` → DONE (one sample repair, a few US cents; writes docs/LIVE_RUN.md).
 2. Optional: Baseten key for open weights (run `set_keys.py` again, set `USE_OPEN_WEIGHTS=1`).
 3. Real photos + 5 user trials (docs/USER_TRIAL_KIT.md).
 4. Approve the GitHub push (`ragilmalik/tukang-copilot`) and the Render deploy (docs/DEPLOY.md, free plan). The free server sleeps: open the live link once a few minutes before judging or recording.
+   - Host static judge build: approve putting `dist-static/` (made by `python scripts/build_static.py`; recorded demo, no server, no cold start) on GitHub Pages or a Netlify drop, and list that link next to the live one. `python scripts/build_static.py --help` has the steps.
 5. Upload the video to YouTube (Unlisted is fine; the real recording or the 2:57 docs/demo/tukang-copilot-demo.mp4) and post the X clip (docs/demo/tukang-copilot-x-vertical.mp4, draft post in docs/SUBMISSION.md).
 6. Paste the docs/SUBMISSION.md fields into Cerebral Valley (account ragilmalika) and submit before **Thu Nov 5, 09:00 WIB**.
