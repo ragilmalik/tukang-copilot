@@ -182,7 +182,7 @@ Sources: official page https://dev.meta.ai/events/global-hackathon (fetched 2026
 - **Demo, including the video 25%**.
 - **Technical depth & execution 20%**.
 - Indie track lens (official page): "creativity, technical ambition, and **whether it works**".
-- Prizes: Indie $150K / $100K / $75K / $50K / $25K. **Bonus prizes up to $50K total** "for standout projects or community achievements, such as a public vote or the most viral project", announced ~Nov 10. ⚠️ The per-bonus amounts in §14 (Agentic $5K, Open Weight $10K, Viral $20K, Community $10K) are NOT confirmed by any source fetched today; treat them as unverified until seen on the Cerebral Valley page.
+- Prizes: Indie $150K / $100K / $75K / $50K / $25K. **Bonus prizes up to $50K total** "for standout projects or community achievements, such as a public vote or the most viral project", announced ~Nov 10. ✅ Verified 2026-11-01 from the Participant Guide (cerebralvalley.ai/e/meta-ai-developer-hackathon/details) and the kickoff slide: Most Viral $20K, Best Build on Meta Open Weights $10K, Community Vote $10K, Best Agentic Use-Case $5K, Best Creative Build (Muse Image or Muse Wonder) $5K. Exact judging rules per prize: docs/JUDGING_MAP.md.
 - Timeline: submissions due Nov 4 9:00 PM ET (= Nov 5 09:00 WIB); judging Nov 4–8; live finals Nov 9.
 
 ### Criterion → concrete features

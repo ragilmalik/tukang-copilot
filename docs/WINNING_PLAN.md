@@ -13,7 +13,7 @@ Valley rules/waiver page needs sign-in). Spec section: SPEC.md §17.
 | Indie lens: "creativity, technical ambition, and whether it works" | | Plan → act → verify → re-plan → escalate loop that checks the physical world with the camera | ✅ |
 
 Prizes: Indie $150K/$100K/$75K/$50K/$25K. Bonus prizes up to $50K total (examples given: public vote, most viral), announced ~Nov 10.
-⚠️ Specific bonus categories/amounts in SPEC §14 (Agentic $5K, Open Weight $10K, Viral $20K, Community $10K) were NOT found in any source we could open; confirm on the Cerebral Valley event page before relying on them.
+✅ Verified 2026-11-01 from the Participant Guide (cerebralvalley.ai/e/meta-ai-developer-hackathon/details) and the kickoff slide: Most Viral $20K, Best Build on Meta Open Weights $10K, Community Vote $10K, Best Agentic Use-Case $5K, Best Creative Build (Muse Image or Muse Wonder) $5K. Exact judging rules per prize: docs/JUDGING_MAP.md.
 
 ## Backlog status (v2)
 | Item | Status | Where |
