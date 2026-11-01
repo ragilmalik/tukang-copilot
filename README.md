@@ -43,7 +43,7 @@ built solo in Semarang, Oct 26 to Nov 4, 2026.
 
 <sub>**Honest status.** The video, screenshots and 1-tap demo run in clearly labelled demo mode: stand-in photos and recorded
 model answers, no API calls; the live guide uses Chromium's fake camera. The live Meta path is tested end to end against
-a stand-in server built from the official API docs (622 automated tests pass; red-team eval in docs/EVAL.md, mock and fake-model). A live Meta model answer is not yet
+a stand-in server built from the official API docs (630 automated tests pass; red-team eval in docs/EVAL.md, mock and fake-model). A live Meta model answer is not yet
 verified (needs the API key). Impact numbers in docs/IMPACT.md are mock data until real trials run.</sub>
 
 ### How Meta models are used (and where in the code)

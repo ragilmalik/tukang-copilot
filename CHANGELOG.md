@@ -2,6 +2,18 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.25.10 (2026-11-01 WIB)
+Audit 16 (the shared guide page /guide/{id} and the large-print workshop sheet, read in Bahasa, Basa Jawa and English in Chromium 390x844 and as PDFs).
+- **The shared guide page now leads with the repair.** Whoever opens a shared link (the friend, the mechanic, a judge) used to land on the diagnosis followed by a nine-row "What the AI did" log, with the checklist and the steps two screens down. The log now sits after the steps and the outcome question, still complete and still tappable. The phone app's own result screen is unchanged (it is in the demo assets). Workshop sheet read in all three languages: nothing to fix.
+- Audit 17 (server robustness): `test_hostile_input.py`, 11 tests that fuzzed input (odd text, category, language, uploads, every session endpoint, traversal paths) never gives a 5xx. No app change.
+- 4 new real-Chromium tests (`test_playwright_guide.py`: steps and outcome come before the log in id/jv/en, the log keeps its rows, main screen order unchanged; the three guide tests fail on 1.25.9).
+
+## 1.25.9 (2026-11-01 WIB)
+Audit 15 (garage + PDF report + share card: a real session rendered in Bahasa, Basa Jawa and English and read page by page).
+- **The Javanese PDF report is Javanese.** Only the title, a few headings and the footer were; the cost lines ("Perkiraan biaya suku cadang", "Hemat sendiri"), the disclaimer, "Sebelum mulai, pastikan", the safety badge ("HATI-HATI" where the app and the share card say "ATI-ATI"), "Mode demo", the page word and every under-the-hood stage name were Indonesian. A full Javanese label set now follows the app's wording.
+- **No English "rules in code" in the Bahasa and Javanese PDF.** The under-the-hood list printed the English tag for the two safety gates; it now reads "aturan di kode" / "aturan ing kode".
+- 4 new tests (`test_report_pdf_jv.py`: same label keys in all three languages, no Indonesian leftovers in the Javanese set, badge words match the app, localized tag). Share card in Javanese checked: nothing clipped. UI unchanged, so screenshots, GIF and video were not re-shot.
+
 ## 1.25.8 (2026-11-01 WIB)
 Audit 14 (recorded demo in Bahasa, Basa Jawa and English with no server, then a read of every number the docs quote).
 - **No stale test count in the docs.** `docs/TESTING.md` still said "all 550 tests" while the README, SUBMISSION and WRITEUP said 620. It now points to docs/TEST_REPORT.md, and a new test (`test_doc_counts.py`) fails if any submission doc quotes a test count different from the last real run, so a judge never sees two numbers.
