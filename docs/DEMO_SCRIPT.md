@@ -34,5 +34,5 @@ Record: phone screen (Android: built-in screen recorder) + a second phone or fri
 - Bike won't cooperate: use the faucet scenario as the main case.
 
 ## ~45 s vertical clip for X
-Made: docs/demo/tukang-copilot-x-vertical.mp4 (45 s, 1080×1920, silent, Bahasa captions, labelled demo mode): hook · parts on your photo · live camera · step check ✓ · hands-free "lanjut" · bengkel hand-off · STOP · Meta models · close.
+Made: docs/demo/tukang-copilot-x-vertical.mp4 (43.5 s, 1080×1920, silent, Bahasa captions, labelled demo mode): hook · parts on your photo · live camera · step check ✓ · hands-free "lanjut" · bengkel hand-off · STOP · Meta models · close.
 Real-phone version: 0:00 bike won't start · 0:05 snap + speak · 0:10 parts light up live · 0:18 "lanjut" hands-free · 0:24 step check ✅ · 0:30 engine starts · 0:36 "Built with Meta's Muse Spark + SAM 3.1" + link.

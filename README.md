@@ -15,9 +15,9 @@ built solo in Semarang, Oct 26 to Nov 4, 2026.
 | | |
 |---|---|
 | **Live app** | [LIVE_URL] |
-| **3-min video** | [YOUTUBE_URL] · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:57, demo mode, captions + voice-over) |
+| **3-min video** | [YOUTUBE_URL] · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:57, demo mode, 3 s hook title card, captions + voice-over; chapters in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt)) |
 | **Code** | [GITHUB_URL] (MIT) |
-| **For judges** | [Judging map](docs/JUDGING_MAP.md) (every criterion to evidence) · [Judge FAQ](docs/launch/JUDGE_FAQ.md) · [One-pager PDF](docs/launch/one-pager.pdf) |
+| **For judges** | [Judging map](docs/JUDGING_MAP.md) (every criterion to evidence) · [Judge FAQ](docs/launch/JUDGE_FAQ.md) · [Eval](docs/EVAL.md) (red-team safety + injection) · [One-pager PDF](docs/launch/one-pager.pdf) |
 | **Write-up** | [docs/WRITEUP.md](docs/WRITEUP.md) · form copy: [docs/SUBMISSION.md](docs/SUBMISSION.md) |
 | **Launch kit** | [YouTube](docs/launch/YOUTUBE.md) · [X thread](docs/launch/X_THREAD.md) · [Community vote](docs/launch/COMMUNITY_VOTE_KIT.md) |
 
@@ -39,7 +39,7 @@ built solo in Semarang, Oct 26 to Nov 4, 2026.
 
 <sub>**Honest status.** The video, screenshots and 1-tap demo run in clearly labelled demo mode: stand-in photos and recorded
 model answers, no API calls; the live guide uses Chromium's fake camera. The live Meta path is tested end to end against
-a stand-in server built from the official API docs (496 automated tests pass). A live Meta model answer is not yet
+a stand-in server built from the official API docs (530 automated tests pass; red-team eval in docs/EVAL.md, mock and fake-model). A live Meta model answer is not yet
 verified (needs the API key). Impact numbers in docs/IMPACT.md are mock data until real trials run.</sub>
 
 ### How Meta models are used (and where in the code)
@@ -63,7 +63,7 @@ All Meta calls go through one file, [`api/meta_client.py`](api/meta_client.py) (
 | **Live camera guide** | **Bengkel hand-off** | **Safety stop** | **Basa Jawa** |
 | ![live](docs/demo/screenshots/16_live_guide.png) | ![hand-off](docs/demo/screenshots/18_handoff.png) | ![stop](docs/demo/screenshots/11_rice_stop.png) | ![jawa](docs/demo/screenshots/20_javanese_result.png) |
 
-<sub>All 27 screenshots in [docs/demo/screenshots](docs/demo/screenshots) (demo mode, labelled stand-in photos).</sub>
+<sub>All 29 screenshots in [docs/demo/screenshots](docs/demo/screenshots) (demo mode, labelled stand-in photos), incl. `28_diagram_step.png` (Muse Image diagram step, stand-in drawing) and `29_laptop.png` (laptop phone-frame view with QR code). The video's 22 scenes and their start times are in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt).</sub>
 
 ---
 

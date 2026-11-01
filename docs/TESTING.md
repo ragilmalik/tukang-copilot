@@ -4,7 +4,7 @@
 ```bash
 pip install -r requirements-dev.txt
 python -m playwright install chromium  # optional: browser tests skip cleanly without a Chromium
-scripts/check_all.sh                   # ruff + mypy strict (mypy.ini) + all 496 tests (fast and slow chunks: 475 fast, 21 browser)
+scripts/check_all.sh                   # ruff + mypy strict (mypy.ini) + all 530 tests (fast and slow chunks: 501 fast, 29 slow incl. browser)
 ```
 CI (`.github/workflows/ci.yml`) runs the same on every push. Browser tests also find a system Chromium (`/usr/bin/chromium`) or `PLAYWRIGHT_CHROMIUM=/path`.
 

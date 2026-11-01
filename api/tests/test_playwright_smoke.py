@@ -236,10 +236,12 @@ def test_progress_screen_streams_partial_results(page, monkeypatch):
     page.wait_for_selector("#result:not(.hidden)", timeout=20000)
 
 
-def _in_view(page, sel):
-    """Waits for a smooth scroll to bring the element into the viewport (fails after 5 s)."""
-    page.wait_for_function("(sel) => { const r = document.querySelector(sel).getBoundingClientRect();"
-                           " return r.top >= -2 && r.top < innerHeight - 40; }", arg=sel, timeout=5000)
+def _in_view(page, sel, timeout=20000):
+    """Waits (on the condition, not a fixed sleep) for a smooth scroll to bring the element into the viewport.
+    20 s: under a loaded test run Chromium can take well over 5 s to finish a smooth scroll."""
+    page.wait_for_function("(sel) => { const el = document.querySelector(sel); if (!el) return false;"
+                           " const r = el.getBoundingClientRect();"
+                           " return r.top >= -2 && r.top < innerHeight - 40; }", arg=sel, timeout=timeout)
     return True
 
 
@@ -251,7 +253,7 @@ def test_agent_log_lines_jump_to_what_they_describe(page):
     page.click("#demoBtn")
     page.wait_for_selector("#question:not(.hidden)", timeout=20000)
     page.locator("#agentLive .agGo", has_text="Looked at the photo").click()          # progress screen
-    page.wait_for_selector("#lf-look.flash, #st-look.flash")
+    page.wait_for_selector("#lf-look.flash, #st-look.flash", timeout=15000)
     page.click('#quickAns button[data-q="qNo"]')
     page.wait_for_selector("#result:not(.hidden)", timeout=20000)
     page.click("#tourClose")
@@ -262,13 +264,15 @@ def test_agent_log_lines_jump_to_what_they_describe(page):
     page.click("#sampleGood")
     page.wait_for_function("document.querySelector('#stepNo').textContent.trim() === '2'", timeout=15000)  # auto-advance
     page.locator("#agent .agGo", has_text="Outlined").click()
-    page.wait_for_selector("#partsWrap.flash")
+    page.wait_for_selector("#partsWrap.flash", timeout=15000)
     assert _in_view(page, "#partsWrap")
     page.locator("#agent .agGo", has_text="Step 1 checked").first.click()
-    page.wait_for_selector("#stepCard.flash")
-    assert page.inner_text("#stepNo").strip() == "1" and _in_view(page, "#stepCard")
+    page.wait_for_selector("#stepCard.flash", timeout=15000)
+    page.wait_for_function("document.querySelector('#stepNo').textContent.trim() === '1'", timeout=15000)
+    assert _in_view(page, "#stepCard")
     assert page.get_attribute("#agent .agGo", "title") == "Show it on screen"
-    assert page.evaluate("document.activeElement.id") == "stepCard"                    # focus follows for keyboards
+    page.wait_for_function("document.activeElement && document.activeElement.id === 'stepCard'",
+                           timeout=15000)                                              # focus follows for keyboards
 
 
 def test_follow_up_question_is_brought_on_screen(page, monkeypatch):

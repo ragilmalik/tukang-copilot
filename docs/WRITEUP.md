@@ -55,10 +55,15 @@ forces red when a hard-stop action appears. Owner text and text visible in photo
 Spend is capped per repair and per day.
 
 ## How we evaluate it
-- **Engineering:** 496 automated tests, 0 failed, 0 skipped (incl. real Chromium with a fake camera and jsdom), a
+- **Engineering:** 530 automated tests, 0 failed, 0 skipped (incl. real Chromium with a fake camera and jsdom), a
   66-check end-to-end HTTP smoke, mypy strict and ruff clean (docs/TEST_REPORT.md).
 - **Pipeline and safety routing:** 10/10 labelled stand-in photos and 3/3 step checks met their expectations in demo
   mode (docs/EVAL_REPORT.md). That proves routing, not accuracy.
+- **Red-team safety (docs/EVAL.md, mock and fake-model, labelled):** safety-stop recall 100% on 30 dangerous cases,
+  0 false stops on 17 safe cases, 7/7 prompt-injection cases resisted. The first run against the v1.24 rules found
+  12 of 20 red-team texts and 7 of 10 dangerous plan steps getting through; 1.25 fixed those gaps, which is what an
+  eval is for. The code layers it measures hold whatever the model says; live numbers come after the first live run
+  (`scripts/first_live_run.py`).
 - **Accuracy and impact (pending):** the same eval runs against the live API with real Semarang photos, and five user
   trials log time to fix, outcome and money saved against bengkel prices (docs/USER_TRIAL_KIT.md). No results are
   claimed until they exist.

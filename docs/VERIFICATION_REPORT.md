@@ -1,6 +1,6 @@
 # Verification report
 
-Checked on **2026-10-31 11:40 WIB (v1.22.0)** against SPEC.md and the hackathon rules (first version 2026-10-30). Legend: ✅ verified by a test or run · 🟡 built, verified only offline (needs a real-key or real-phone check) · ⬜ not done yet (in TODO.md) · ↔️ done differently (see DECISIONS.md).
+Checked on **2026-11-01 WIB (v1.25.0)**; section 5d covers 1.24 and 1.25 (earlier sections date from v1.22.0) against SPEC.md and the hackathon rules (first version 2026-10-30). Legend: ✅ verified by a test or run · 🟡 built, verified only offline (needs a real-key or real-phone check) · ⬜ not done yet (in TODO.md) · ↔️ done differently (see DECISIONS.md).
 
 Evidence names are tests in `api/tests/` (see TEST_REPORT.md for the run) or scripts.
 
@@ -117,9 +117,22 @@ Evidence names are tests in `api/tests/` (see TEST_REPORT.md for the run) or scr
 
 **Run numbers (2026-10-31 14:08 WIB, v1.23.0):** pytest **470 passed, 0 failed** (`make_test_report.py` one run, 202 s); `ruff check .` clean; `mypy api` strict no issues in 76 files; `smoke_e2e.py` ALL PASSED (65 checks, incl. share card PNG and link-preview tags) on a local demo-mode server. New in v1.23 and covered by tests: streaming progress (`progress_view`, no owner words), tappable agent-log lines, share card `card.png` (404 after erase), Open Graph tags, gzip (SSE uncompressed), favicon.
 
+## 5d. v1.24.0 and v1.25.0 features
+
+| Feature | Status | Evidence |
+|---|---|---|
+| Recorded 1-tap demo when the server sleeps or the phone is offline (v1.24) | ✅ | `test_replay.py`, `test_playwright_replay.py`, `record_replay.py --check`; `27_recorded_demo.png` |
+| Laptop view: phone frame + side panel with QR code, 1-tap demo, language switch (v1.25) | ✅ / 🟡 | `test_desk.py`, `test_playwright_desk.py` (1280x800, 1440x900); `29_laptop.png`. Real laptop browsers other than Chromium unverified |
+| Static judge build `scripts/build_static.py` → `dist-static/` (v1.25) | ✅ / ⬜ | `test_build_static.py`, `test_playwright_static.py` (served under a sub-path, fails on any `/api/` request). Not hosted yet (needs Malik's yes) |
+| Red-team eval `scripts/run_eval.py` → docs/EVAL.md (v1.25) | ✅ (mock / fake-model) | `test_run_eval.py`. Safety-stop recall 100% on 30 cases, 0 false stops on 17 safe cases, 7/7 injection cases. Found 12 text-gate and 7 plan-guard misses in the v1.24 rules, fixed in `api/pipeline/safety.py`. Live run pending |
+| First live run `scripts/first_live_run.py` → docs/LIVE_RUN.md (v1.25) | ✅ (fake) / ⬜ (live) | `test_first_live_run.py` against the fake Meta server (wrong key, no key, report has no key). Real run needs the key |
+| Video re-cut: 3 s hook title card, burned-in captions, Muse Image diagram scene (v1.25) | ✅ | 2:57 (177.8 s, ffprobe), X clip 43.5 s, `docs/demo/TIMESTAMPS.txt`, `28_diagram_step.png` (diagram is a demo-mode stand-in drawing) |
+
+**Run numbers (2026-11-01, v1.25.0 final):** `make_test_report.py` ALL PASSED: pytest **530 passed, 0 failed, 0 skipped** (550 s, real Chromium + jsdom), ruff, check_keys --fake, smoke; `ruff check api scripts` clean; `mypy api` strict no issues in 99 files; `smoke_e2e.py` ALL PASSED (66 checks) on a local demo-mode server.
+
 ## 6. What is NOT verified yet (honest list)
 
-1. **No live Meta model answer has been verified** (no API key yet). The real api.meta.ai endpoint was reached and correctly rejected a dummy key (401). Everything else uses a stand-in server built from the documented shapes, so real outputs, latency, error bodies and rate limits are unconfirmed. → `scripts/set_keys.py`, then `deploy_check.py --live`.
+1. **No live Meta model answer has been verified** (no API key yet; `scripts/set_keys.py` then `scripts/first_live_run.py` is the one-command fix). The real api.meta.ai endpoint was reached and correctly rejected a dummy key (401). Everything else uses a stand-in server built from the documented shapes, so real outputs, latency, error bodies and rate limits are unconfirmed. → `scripts/set_keys.py`, then `deploy_check.py --live`.
 2. **Real-photo quality**: SAM hit rate on real bikes/pumps, diagnosis accuracy, step-check judgement, live-tracking quality. → real photos + 5 user trials (docs/USER_TRIAL_KIT.md).
 3. **Real phones**: rear camera over https (iOS needs playsinline + https), SpeechRecognition with jv-ID, WhatsApp deep link, HEIC upload, TalkBack, airplane mode. Only headless Chromium and jsdom were used here.
 4. **Deployment** (Render) and **GitHub CI** have not run. The container was only emulated (no Docker in the sandbox).

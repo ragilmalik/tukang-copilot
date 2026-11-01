@@ -64,14 +64,14 @@ The public vote is open. One vote would mean a lot:
 Try it free, no sign-up: [LIVE_URL]
 ```
 
-### WhatsApp Status (short, with the 45 s clip)
+### WhatsApp Status (short, with the 43.5 s clip)
 - ID: `Motor mogok, bengkel tutup? Aplikasi AI buatan saya masuk lomba Meta. Bantu 1 vote ya 🙏 [VOTE_URL]`
 - JV: `Motor mogok, bengkel tutup? Aplikasi AI gaweanku melu lomba Meta. Tulung siji vote nggih 🙏 [VOTE_URL]`
 - EN: `My AI repair app is in Meta's hackathon public vote. One vote helps 🙏 [VOTE_URL]`
 
 ---
 
-## Instagram (feed post or Reel with the 45 s clip; link in bio, IG captions don't make links clickable)
+## Instagram (feed post or Reel with the 43.5 s clip; link in bio, IG captions don't make links clickable)
 
 ### Caption: Bahasa Indonesia + English
 ```
@@ -100,7 +100,7 @@ The problem: Indonesia has 139 million motorbikes and millions of homes on an el
 
 What I built: a phone web app where you snap a photo and say what's wrong. An agent loop on Meta's models (Muse Spark for vision, planning and step verification, SAM 3.1 for pixel masks of the real parts, Voice Transcribe and Spark audio for Indonesian and Javanese) walks you through the fix and checks each step with a new photo. If the fix fails it re-plans; if the job is dangerous (gas, mains wiring, brakes) a code-level safety gate stops it and hands off to a workshop.
 
-Engineering: 496 automated tests, strict typing, prompt-injection hardening, and an open-weights path (Muse Spark Open) for self-hosting.
+Engineering: 530 automated tests, strict typing, prompt-injection hardening, and an open-weights path (Muse Spark Open) for self-hosting.
 
 The public Community Vote is open until Nov 16 and takes one click with a free Cerebral Valley account: [VOTE_URL]
 Try the 1-minute demo, no sign-up: [LIVE_URL]

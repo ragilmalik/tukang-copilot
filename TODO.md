@@ -3,7 +3,7 @@
 Deadline: **Thu Nov 5, 2026, 09:00 WIB** (Nov 4, 9 PM ET). Internal target: feature-complete Nov 3, 23:59 WIB.
 Owner: **M** = Malik, **H** = Malik.
 
-## Must (to submit): see HANDOFF.md "Malik-only" list
+## Must (to submit): see HANDOFF.md "Malik-only" list (order there: live run first, Baseten optional, real clip + trials, approvals, YouTube + X, submit)
 - [ ] **M** Meta key → `python scripts/set_keys.py` → ALL GOOD (claim credits + set a spend limit on dev.meta.ai first), then `python scripts/first_live_run.py` → DONE (writes docs/LIVE_RUN.md)
 - [ ] **H** First live run on the 5 samples (no FALLBACK lines); fix real-API differences; update META_API_NOTES ⚠️ items and the "Honest status" lines in WRITEUP/SUBMISSION
 - [ ] **M** Real photos + 5 user trials (docs/USER_TRIAL_KIT.md) → **H** `scripts/impact_report.py`, replace MOCK impact numbers, tune prompts
@@ -14,13 +14,14 @@ Owner: **M** = Malik, **H** = Malik.
 - [ ] **M** Upload the video to YouTube (real recording per DEMO_SCRIPT.md, or the 2:57 backup cut), post the X clip
 - [ ] **H** Fill links in README + SUBMISSION
 - [ ] **M** Paste docs/SUBMISSION.md fields into Cerebral Valley (account ragilmalika) and submit before Nov 5 09:00 WIB
+- [ ] **M** Share docs/launch/COMMUNITY_VOTE_KIT.md when voting opens Tue Nov 10, 00:00 WIB
 
 ## Should (scores better)
 - [x] **H** Water pump mock scenario + fixtures (spec §8 case 2)
 - [x] **H** Video capture (5–10 s → 3 sharpest frames)
 - [x] **H** PDF export of the report + local "My garage" history (localStorage)
 - [ ] **H** Open-weights run on Baseten (needs BASETEN_API_KEY); badge is built and shows when active
-- [ ] **M** Post the X clip (draft in SUBMISSION.md, 45 s clip ready); engagement counts until Nov 8
+- [ ] **M** Post the X thread (docs/launch/X_THREAD.md, 43.5 s clip ready) before submitting; engagement counts until Nov 8 11:59 PM ET (Nov 9 11:59 WIB)
 - [x] **H** Screenshots + demo video + vertical clip (docs/demo/), regenerated for v1.23 (26 shots, 2:57 video, GIF)
 - [x] **H** Re-shoot shots/video for the compact tip bar + PDF agent-log page (v1.23)
 - [x] **H** Streamed partial results on the progress screen (object, SAM overlay, top cause as each stage finishes) (v1.23)
@@ -32,6 +33,8 @@ Owner: **M** = Malik, **H** = Malik.
 - [x] **H** Offline eval `scripts/run_eval.py` → docs/EVAL.md (fixtures, 20 red-team, 7 injection; mock/fake labelled); safety gate fixed for 12 text + 7 plan misses (v1.25)
 - [x] **H** `scripts/first_live_run.py` one-command first live repair → docs/LIVE_RUN.md (v1.25)
 - [x] **H** Video: 3 s hook title card with hackathon dates, burned-in English captions, Muse Image diagram scene, TIMESTAMPS.txt; 2:57 cut, 43.5 s X clip (v1.25)
+- [x] **H** Docs reconciled with the 1.25 re-cut (chapters, timestamps, 29 shots, 43.5 s clip) and the new evidence (EVAL, laptop view, static build, first_live_run) in SUBMISSION / JUDGING_MAP / JUDGE_FAQ; one-pager re-made (v1.25)
+- [x] **H** Flaky agent-log scroll test made condition-based (v1.25)
 - [ ] **H** After the live run: `python scripts/run_eval.py` stays green; add live numbers to docs (docs lane)
 - [ ] **M** Open the live link once a few minutes before judging/recording so the free server is awake (a brand-new visitor can't get the recording until the page itself loads)
 

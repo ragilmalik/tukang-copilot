@@ -44,21 +44,20 @@ Why: Indonesia has 139 million motorbikes (BPS 2024) and millions of homes on an
 
 YouTube rules: the first chapter must be 0:00, at least 3 chapters, each at least 10 seconds.
 
-### A. Current backup cut (`tukang-copilot-demo.mp4`, 2:57, timings from `tukang-copilot-demo.en.srt`)
+### A. Current backup cut (`tukang-copilot-demo.mp4`, 2:57 re-cut with the 3 s hook title card, timings from `docs/demo/TIMESTAMPS.txt`)
 ```
 0:00 A small fault costs a day's wage
-0:16 Watch the agent work, one question when unsure
-0:32 Diagnosis and SAM 3.1 parts on your photo
-0:47 Safety tick list and live camera guide
-1:07 Check my step: the camera verifies
-1:20 Hands-free and re-plan
-1:37 What the AI did: the agent log
-1:50 Bengkel hand-off, PDF and share card
+0:12 Photo, voice or 1-tap demo: results stream in
+0:29 One question, diagnosis and SAM 3.1 parts
+0:50 Safety tick list and live camera guide
+1:10 Check my step: the camera verifies
+1:23 Hands-free, re-plan and a Muse Image diagram
+1:48 What the AI did, bengkel hand-off, share card
 2:14 Safety STOP and Basa Jawa
 2:30 Open weights and how it works
 ```
-If the code lane re-cuts the video (planned: a 3 second hook title card), every time after 0:00 moves. Re-read the
-`.srt` and shift each chapter by the same amount before uploading.
+Every chapter is at least 10 s (checked against the scene starts in `docs/demo/TIMESTAMPS.txt`). If the video is
+re-cut again, re-read that file and move the chapters with it.
 
 ### B. Real-phone recording (timings from docs/DEMO_SCRIPT.md)
 ```

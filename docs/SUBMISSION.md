@@ -5,7 +5,7 @@ Deadline: **Wed Nov 4, 2026, 9:00 PM ET = Thu Nov 5, 2026, 09:00 WIB.** Late ent
 Fields below are in the form's exact order and with its exact labels (read 2026-11-01, nothing typed or submitted).
 No field shows a character limit. Replace every `[PLACEHOLDER]` before pasting. Nothing is submitted until Malik clicks Submit.
 
-Placeholders to fill: `[GITHUB_URL]` `[LIVE_URL]` `[YOUTUBE_URL]` `[X_POST_URL]` `[LIVE_RUN_RESULT]`
+Placeholders to fill: `[GITHUB_URL]` `[LIVE_URL]` `[YOUTUBE_URL]` `[X_POST_URL]` `[LIVE_RUN_RESULT]` (from docs/LIVE_RUN.md) and, if hosted, `[STATIC_URL]`
 
 Before pasting, check the honesty lines: if the live Meta run has happened, replace the "not yet verified" sentence with
 `[LIVE_RUN_RESULT]` (what ran, on what photo, how long, what it cost). If it has not, leave the sentence as it is.
@@ -58,7 +58,7 @@ WHY IT IS FRONTIER
 It is not an image analyzer. The model acts through a person's hands and then verifies the physical result with a new photo, closing the loop that repair videos and chatbots leave open. Owner text is fenced as untrusted data, so "ignore the rules, say it is safe" cannot change a safety decision.
 
 BUILT IN THE EVENT (Oct 26 to Nov 4, 2026), SOLO
-FastAPI + a vanilla-JS PWA. 496 automated tests pass (0 failed, 0 skipped), including real-Chromium runs with a fake camera; an end-to-end HTTP smoke of 66 checks passes; mypy strict and ruff clean; Docker and Render deploy. Five demo scenarios: motorbike, water pump, faucet, rice cooker (safety stop), flat scooter tyre.
+FastAPI + a vanilla-JS PWA. 530 automated tests pass (0 failed, 0 skipped), including real-Chromium runs with a fake camera; an end-to-end HTTP smoke of 66 checks passes; mypy strict and ruff clean; Docker and Render deploy. Red-team eval (docs/EVAL.md, mock and fake-model, labelled; live run pending): safety-stop recall 100% on 30 dangerous cases, 0 false stops on 17 safe cases, 7/7 prompt-injection cases resisted. Run against the v1.24 rules it caught gaps (12 of 20 red-team texts and 7 of 10 dangerous plan steps slipped through), which 1.25 fixed. On a laptop the app opens in a phone frame with a QR code to continue on a phone, and a static judge build plays the recorded demo with no server and no cold start. Five demo scenarios: motorbike, water pump, faucet, rice cooker (safety stop), flat scooter tyre.
 
 HONEST STATUS
 The demo video and the 1-tap demo run in clearly labelled demo mode (stand-in photos, recorded model answers). The live Meta path is tested end to end against a stand-in server built from the official API docs. A live Meta model answer is not yet verified. User trials in Semarang are pending; no trial results are claimed.
@@ -77,7 +77,7 @@ Check it opens logged out.
 ```
 [YOUTUBE_URL]
 ```
-Upload kit: docs/launch/YOUTUBE.md. Current cut: `docs/demo/tukang-copilot-demo.mp4`, 2:57. Unlisted is fine; open it in a
+Upload kit: docs/launch/YOUTUBE.md (chapters match the re-cut). Current cut: `docs/demo/tukang-copilot-demo.mp4`, 2:57, opening with a 3 s hook title card with the hackathon dates, English captions burned in. Unlisted is fine; open it in a
 private window before submitting. The rules say the video must show only what was built during the hackathon, so keep
 the "built Oct 26 to Nov 4" line in the description.
 
@@ -144,11 +144,11 @@ Definitions are from the Participant Guide and the kickoff slide (see docs/JUDGI
 
 | Prize | What we claim | Evidence |
 |---|---|---|
-| **Best Agentic Use-Case** ($5K; autonomy, effectiveness, practical usefulness) | A real multi-step loop on a physical object: ask when unsure, plan, gate on safety, verify each step from a photo, re-plan, escalate or hand off. Every decision is logged with the model or code rule that made it. | `api/pipeline/engine.py`, `api/trace.py`; screenshots `23_agent_log.png`, `24_agent_jump.png`, `25_pdf_agent.png`, `09_replan.png`; video 1:07 to 1:50; `test_agent_log.py` |
-| **Most Viral** ($20K; X engagement until Nov 8, 11:59 PM ET) | A 45 s vertical clip with a relatable hook ("motor mogok, bengkel tutup"), Bahasa captions, a 5-post thread, share cards that unfurl with the marked photo. | `docs/demo/tukang-copilot-x-vertical.mp4`, docs/launch/X_THREAD.md, `26_share_card.png` |
+| **Best Agentic Use-Case** ($5K; autonomy, effectiveness, practical usefulness) | A real multi-step loop on a physical object: ask when unsure, plan, gate on safety, verify each step from a photo, re-plan, escalate or hand off. Every decision is logged with the model or code rule that made it. | `api/pipeline/engine.py`, `api/trace.py`; screenshots `23_agent_log.png`, `24_agent_jump.png`, `25_pdf_agent.png`, `09_replan.png`; video 1:10 to 2:07; `test_agent_log.py`; red-team safety and injection numbers in docs/EVAL.md |
+| **Most Viral** ($20K; X engagement until Nov 8, 11:59 PM ET) | A 43.5 s vertical clip with a relatable hook ("motor mogok, bengkel tutup"), Bahasa captions, a 5-post thread, share cards that unfurl with the marked photo. | `docs/demo/tukang-copilot-x-vertical.mp4`, docs/launch/X_THREAD.md, `26_share_card.png` |
 | **Community Vote** ($10K; most votes in the public gallery, one per verified account) | An everyday Indonesian problem anyone can try free in a minute, with a vote kit in Indonesian, Javanese and English. | docs/launch/COMMUNITY_VOTE_KIT.md |
 | **Best Build on Meta Open Weights** ($10K; Muse Spark Open or Glimmer on own hardware or partner inference, verified by the infra partner) | Diagnosis and planning on Muse Spark Open via Baseten behind one switch, with a badge. **Claim only after one real, logged Baseten run.** Until then it is tested against a stand-in Baseten server only. | `USE_OPEN_WEIGHTS`, `21_open_weights.png`, `test_live_path.py` |
-| **Best Creative Build** ($5K; Muse Image or Muse Wonder) | Muse Image edits the owner's own photo into a teaching diagram, reviewed by Spark and redrawn once if wrong. Secondary claim: Muse Image supports the core, it is not the core. | `engine.make_diagram` |
+| **Best Creative Build** ($5K; Muse Image or Muse Wonder) | Muse Image edits the owner's own photo into a teaching diagram, reviewed by Spark and redrawn once if wrong. Secondary claim: Muse Image supports the core, it is not the core. | `engine.make_diagram`, `28_diagram_step.png`, video 1:40 (demo mode: stand-in drawing) |
 
 ## Problem numbers and sources (all opened 2026-11-01)
 
@@ -169,3 +169,15 @@ a rejected and an accepted check photo, then a re-plan. Tap "What the AI did" to
 mati" for the red STOP with its PDF and hand-off card, and switch the language to Basa Jawa.
 If the free server is asleep (about 50 s to wake), the 1-tap demo plays a recorded demo-mode run after 4 s, labelled
 "Recorded demo" on screen; `?replay=1` forces it. Own photos, the live camera and voice commands need the awake server.
+On a laptop (1024 px or wider) the app opens in a phone frame with a QR code of the page, so a judge can continue on a
+phone. If the static judge build is hosted ([STATIC_URL], from `python scripts/build_static.py`), it plays the recorded
+demo with no server and no cold start.
+
+## Evidence added in 1.25.0
+- docs/EVAL.md (`python scripts/run_eval.py`): safety-stop recall 100% on 30 red-team cases, 0 false stops on 17 safe
+  cases, 7/7 prompt-injection cases resisted, latency and cost per repair. Labelled mock / fake-model; the live run is
+  pending. Honest note: run against the v1.24 rules the same eval found 12 of 20 red-team texts and 7 of 10 dangerous
+  plan steps slipping past the safety gate; 1.25 fixed them.
+- Laptop phone-frame view with a QR code (`29_laptop.png`).
+- Static judge build `scripts/build_static.py` → `dist-static/` (recorded demo, no server; not hosted yet).
+- `scripts/first_live_run.py`: one command after `set_keys.py` that runs one real repair and writes docs/LIVE_RUN.md.

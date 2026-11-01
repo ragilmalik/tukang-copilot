@@ -43,8 +43,9 @@ step with your camera, and says STOP when the job is dangerous.
 - **Safety in code, not prompts:** gas, mains, 220 V internals, brakes, fuel = red STOP before any model call; untrusted-text fence against prompt injection.
 
 ## Evidence
-**496** automated tests pass (0 failed, 0 skipped; real Chromium + jsdom) · **66-check** HTTP smoke passes · mypy strict, ruff clean ·
-5 scenarios · 3 languages in every screen · 2:57 captioned demo video.
+**530** automated tests pass (0 failed, 0 skipped; real Chromium + jsdom) · **66-check** HTTP smoke passes · mypy strict, ruff clean ·
+red-team eval: **100%** safety-stop recall on 30 cases, **0** false stops on 17 safe, **7/7** injections resisted (mock/fake-model) ·
+5 scenarios · 3 languages · 2:57 captioned demo video.
 **Honest status:** demo assets run in labelled demo mode; a live Meta answer is not yet verified; Semarang user trials pending.
 
 <div class="links">Try it: [LIVE_URL] · Code (MIT): [GITHUB_URL] · Video: [YOUTUBE_URL]</div>
