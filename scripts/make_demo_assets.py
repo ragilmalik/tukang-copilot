@@ -207,7 +207,7 @@ def shots() -> None:
         pg.wait_for_function("document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
         pg.evaluate("document.querySelector('#stageList').scrollIntoView({block: 'start'}); window.scrollBy(0, -110)")
         snap("02_progress")
-        pg.wait_for_selector("#question:not(.hidden)", timeout=30000); pg.fill("#answerText", "Tidak bau bensin")
+        pg.wait_for_selector("#question:not(.hidden)", timeout=30000); pg.fill("#answerText", "Ya, ada bau bensin")  # fuel arrives: the demo diagnosis moves to 70%
         snap("03_question")
         pg.click("#answerBtn"); pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
         pg.evaluate("window.scrollTo(0,0)"); snap("04_diagnosis")
