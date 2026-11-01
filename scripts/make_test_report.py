@@ -23,7 +23,7 @@ OUT = ROOT / "docs" / "TEST_REPORT.md"
 ENV = os.environ | {"NO_PROXY": "127.0.0.1,localhost", "no_proxy": "127.0.0.1,localhost", "PYTHONIOENCODING": "utf-8"}
 
 
-def run(cmd: list[str], env: dict | None = None, timeout: int = 600) -> tuple[int, str, float]:
+def run(cmd: list[str], env: dict | None = None, timeout: int = 1100) -> tuple[int, str, float]:
     t0 = time.time()
     p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, env=env or ENV, timeout=timeout)
     return p.returncode, (p.stdout + p.stderr), time.time() - t0

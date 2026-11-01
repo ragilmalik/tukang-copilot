@@ -2,6 +2,11 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.25.5 (2026-11-01 WIB)
+Audit 11 (video and voice-recording refusals, landing in Basa Jawa).
+- **A too-long video no longer says your text is too long.** The server's "That video is too long" matched the long-text rule, so a 40 s clip got a message about the owner's text. Video rules now come first: unreadable video, too short, too long and unreadable voice recording each show a message in Bahasa, Basa Jawa or English (`videoBad`, `videoShort`, `videoLong`, `recBad`).
+- 6 new real-Chromium tests in `test_playwright_capture.py` (a garbage .mp4 in 3 languages; a real 40 s ffmpeg clip in 3 languages that fails on 1.25.4).
+
 ## 1.25.4 (2026-11-01 WIB)
 Audit 10 (red stop + re-plan screens in Bahasa and Basa Jawa, then a probe of the safety gate with 40 street-wording texts).
 - **Text gate speaks street Indonesian and Javanese.** 15 of 40 probes slipped through: "kulkas nyetrum", "kabel PLN putus", "trafo meledak", "listrik ngeletik percikan api di stopkontak", "aki meledak", "kompor mbledug", "kompor nyemprot api", "baterai nggembung", "bensin netes ing mesin panas", "kompresor kulkas", "anakku keracunan gas", three-phase / 380 V. All now stop with the right category and message. Words that are normal repair talk still pass: "percikan api busi", "ban meledak", "nyetrum aki" (charging a battery), "bensin netes" from a carburettor with no heat, "kabel gas / rem / charger putus", 12 V "tegangan aki".

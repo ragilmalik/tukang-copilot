@@ -20,6 +20,7 @@ def _first_screen(server, langs, query="", saved=None):
         pg = ctx.new_page()
         pg.goto(server + "/" + query)
         pg.wait_for_selector("#demoBtn")
+        pg.wait_for_load_state("load")   # app.js sets the language on DOMContentLoaded; the button exists before that (flaked under load)
         out = (pg.input_value("#lang"), pg.inner_text("#demoBtn"), pg.evaluate("document.documentElement.lang"))
         b.close()
         return out

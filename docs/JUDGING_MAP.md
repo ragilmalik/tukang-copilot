@@ -54,7 +54,7 @@ starts in `docs/demo/TIMESTAMPS.txt`; re-sync from that file if the video is re-
 
 | Evidence | Where |
 |---|---|
-| 599 automated tests, 0 failed, 0 skipped (incl. real Chromium with a fake camera, and jsdom) | docs/TEST_REPORT.md (v1.25.4, 2026-11-01) |
+| 605 automated tests, 0 failed, 0 skipped (incl. real Chromium with a fake camera, and jsdom) | docs/TEST_REPORT.md (v1.25.5, 2026-11-01) |
 | HTTP smoke of a running server: ALL PASSED, 66 checks | `scripts/smoke_e2e.py`, HANDOFF.md |
 | mypy strict, no issues in 99 files; ruff clean; CI | `mypy.ini`, `.github/workflows/` |
 | Strict JSON schemas with tolerant repair and one retry; per-repair and per-day cost caps; rate limits | `api/schemas.py`, `api/coerce.py`, `api/cost.py`, `api/guard.py` |
