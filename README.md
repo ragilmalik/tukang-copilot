@@ -69,7 +69,7 @@ All Meta calls go through one file, [`api/meta_client.py`](api/meta_client.py) (
 
 ## Why
 
-Indonesia runs on ~130 million motorbikes, water pumps, rice cookers, fans and household plumbing. A small fault costs a day's wage at a bengkel, or days without water. Repair videos are rarely for your exact model, rarely in your language, and they can't see *your* problem.
+Indonesia runs on 139 million motorbikes (BPS 2024), electric water pumps (17% of households drink pumped water, BPS 2023), rice cookers, fans and household plumbing. A small fault costs a day's wage at a bengkel, or days without water. Repair videos are rarely for your exact model, rarely in your language, and they can't see *your* problem.
 
 Tukang Copilot looks at the actual object, marks the actual parts on your own photo, and checks every step you do. It also says clearly, in your language, when a job is dangerous and needs a professional.
 
@@ -167,8 +167,10 @@ Step-by-step for non-developers (accounts, keys, deploy to Render, phone testing
 | [docs/VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md) | Every requirement → evidence, and what is still unverified |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Errors and fixes |
 | [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) | 3-minute video script + shot list + backup plan |
-| [docs/SUBMISSION.md](docs/SUBMISSION.md) | Field-by-field copy-paste block for the Cerebral Valley form + X post |
-| [docs/WRITEUP.md](docs/WRITEUP.md) | ~400-word write-up: problem, how it works, models, safety, impact, honest status |
+| [docs/SUBMISSION.md](docs/SUBMISSION.md) | Field-by-field copy-paste block matching the live Cerebral Valley form, sourced problem numbers, bonus prize claims |
+| [docs/WRITEUP.md](docs/WRITEUP.md) | Write-up (~850 words): problem, user, demo, how it works, safety, eval, honest status, what's next |
+| [docs/JUDGING_MAP.md](docs/JUDGING_MAP.md) | Official criteria and bonus prize rules → evidence in the repo, and the open gaps |
+| [docs/launch/](docs/launch/) | Launch kit: YouTube (title, chapters, thumbnail), X thread, community vote kit (id/jv/en), judge FAQ, one-pager PDF, architecture diagram |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Render deploy click by click, settings, roll back |
 | [docs/USER_TRIAL_KIT.md](docs/USER_TRIAL_KIT.md) | 5-person user trial kit → impact report |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | After the hackathon |
