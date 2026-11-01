@@ -35,17 +35,18 @@ step with your camera, and says STOP when the job is dangerous.
 </div>
 </div>
 
-![](architecture.png){width=74%}
+![](architecture.png){width=62%}
 
 ## Why it is frontier, and safe
 - **Verification closes the loop:** the model judges whether a human's physical action worked, then changes plan.
 - **Five Meta models, one client file:** Muse Spark 1.3 and 1.2 audio, SAM 3.1 (photos and live camera), Voice Transcribe, Muse Image, **Muse Spark Open** on Baseten (open weights, one switch).
+- **Also works in WhatsApp:** the same agent and safety gate on Meta's WhatsApp Cloud API: photo and voice note in, marked photo, step buttons and red STOP out.
 - **Safety in code, not prompts:** gas, mains, 220 V internals, brakes, fuel = red STOP before any model call; untrusted-text fence against prompt injection.
 
 ## Evidence
-**710** automated tests pass (0 failed, 0 skipped; real Chromium + jsdom) · **65-check** HTTP smoke passes · mypy strict, ruff clean ·
+**768** automated tests pass (0 failed, 0 skipped; real Chromium + jsdom) · **70-check** HTTP smoke passes · mypy strict, ruff clean ·
 red-team eval: **100%** safety-stop recall on 33 cases, **0** false stops on 17 safe, **7/7** injections resisted (mock/fake-model) ·
-5 scenarios · 3 languages · 2:57 captioned demo video.
-**Honest status:** demo assets run in labelled demo mode; a live Meta answer is not yet verified; Semarang user trials pending.
+5 scenarios · 3 languages · 2:55 captioned demo video.
+**Honest status:** demo assets run in labelled demo mode; a live Meta answer is not yet verified; WhatsApp tested with a fake Graph API (real number pending); Semarang user trials pending.
 
 <div class="links">Try it: [LIVE_URL] · Code (MIT): [GITHUB_URL] · Video: [YOUTUBE_URL]</div>

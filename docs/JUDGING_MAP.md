@@ -1,7 +1,7 @@
 # Judging map: every criterion to evidence in this repo
 
 Checked 2026-11-01 (WIB) against the official sources below. Video timestamps refer to the current backup cut
-`docs/demo/tukang-copilot-demo.mp4` (2:57, v1.25 re-cut with a 3 s hook title card, demo mode). Times are the scene
+`docs/demo/tukang-copilot-demo.mp4` (2:55, v1.27 cut: 3 s hook title card, WhatsApp scene at 2:16, demo mode). Times are the scene
 starts in `docs/demo/TIMESTAMPS.txt`; re-sync from that file if the video is re-cut again.
 
 ## Official sources (opened, not summarised from memory)
@@ -28,10 +28,11 @@ starts in `docs/demo/TIMESTAMPS.txt`; re-sync from that file if the video is re-
 | Evidence | Where |
 |---|---|
 | Real Indonesian problem with sourced numbers: 139.45 million motorbikes (BPS 2024), 68 million native Javanese speakers, a pump repair visit Rp180k to Rp450k vs a Semarang minimum wage of Rp3.70 million a month | docs/SUBMISSION.md "Problem", docs/launch/ONE_PAGER.md |
-| Five everyday scenarios: motorbike, water pump, faucet, rice cooker (safety stop), flat scooter tyre | `api/pipeline/mock.py`, video 0:03 to 2:23, screenshots `10_pump.png`, `11_rice_stop.png` |
-| Three languages, every UI string, incl. Basa Jawa | `web/app.js` (T.jv), `api/tests/test_i18n.py`, video 2:23, `20_javanese_result.png`, `14_garage_jv.png` |
+| Five everyday scenarios: motorbike, water pump, faucet, rice cooker (safety stop), flat scooter tyre | `api/pipeline/mock.py`, video 0:03 to 2:16, screenshots `10_pump.png`, `11_rice_stop.png` |
+| Three languages, every UI string, incl. Basa Jawa | `web/app.js` (T.jv), `api/tests/test_i18n.py`, video 2:16 (WhatsApp chat in Basa Jawa), `20_javanese_result.png`, `14_garage_jv.png`, `30_whatsapp_jv_*.png` |
 | Money: parts cost vs bengkel price, "My garage" total saved | `04_diagnosis.png`, video 0:35 |
 | Hand-off to a real mechanic (WhatsApp summary, Maps search, PDF brief) | `api/main.py` `/handoff`, `18_handoff.png`, video 1:56 |
+| Reaches people where they already are: the same agent runs in WhatsApp (photo and voice note in; marked photo, diagnosis, step buttons, camera checks, red stop and PDF out), no install and no website to trust. Tested with a fake Graph API and the `/wa` simulator; a real number waits on Malik's Meta setup | `api/channels/whatsapp.py`, docs/WHATSAPP.md, `30_whatsapp_*.png`, video 2:16 |
 | Product path: PWA, no account, open-weights self-host option for a co-op or vocational school | `web/manifest.webmanifest`, docs/ROADMAP.md |
 | Theme fit "Push the Frontier": gives a phone a new physical-world capability (see, act, verify, re-plan) | docs/SUBMISSION.md field 4 |
 | **GAP (Malik):** real user trials. `docs/IMPACT.md` is MOCK DATA. Even 3 real Semarang repairs with photos would beat every number we have. | docs/USER_TRIAL_KIT.md |
@@ -40,13 +41,14 @@ starts in `docs/demo/TIMESTAMPS.txt`; re-sync from that file if the video is re-
 
 | Evidence | Where |
 |---|---|
-| Five Meta models in one loop, one client file | `api/meta_client.py`, README table, video 2:40 |
+| Five Meta models in one loop, one client file | `api/meta_client.py`, README table, video 2:38 |
 | SAM 3.1 masks on the user's *own* photo from boxes the vision model found (one box-prompt call for all parts) | `api/pipeline/engine.py` `stage_segment`, `05_parts.png`, video 0:44 |
 | SAM 3.1 on live camera frames (live guide), about 1 frame a second, capped per repair | `api/pipeline/track.py`, `16_live_guide.png`, video 0:56 |
 | Muse Spark as a *verifier*: compares a new photo with the expected state and returns pass or a specific correction | `engine.check_step`, `07_check_fail.png`, `08_check_pass.png`, video 1:10 |
 | Unexpected capability: Muse Spark 1.2 audio transcribes Javanese, which Voice Transcribe does not list | `meta_client.transcribe_with_spark_audio` |
 | Muse Image edits the user's photo into a diagram; Spark reviews it and a bad one is redrawn once | `engine.make_diagram`, `28_diagram_step.png`, video 1:40 (demo: stand-in drawing) |
-| Muse Spark Open (open weights) on Baseten behind one switch, with a visible badge | `USE_OPEN_WEIGHTS`, `21_open_weights.png`, video 2:30 |
+| Muse Spark Open (open weights) on Baseten behind one switch, with a visible badge | `USE_OPEN_WEIGHTS`, `21_open_weights.png`, video 2:28 |
+| Meta's WhatsApp Cloud API (Graph v26.0) as a second channel into the same agent loop: signed webhook (`X-Hub-Signature-256`), two-step media download, reply buttons per step, PDF as a document. Tested against a fake Graph API (`api/testing/fake_graph.py`), not yet a real number | `api/channels/whatsapp.py`, `test_whatsapp.py`, `test_playwright_wa.py`, docs/WHATSAPP.md, video 2:16 |
 | One-command first live run: `scripts/first_live_run.py` (after `set_keys.py`) runs one sample repair on the real API and writes `docs/LIVE_RUN.md` with models, timings and cost; `--fake` rehearses it against the stand-in server | `scripts/first_live_run.py`, `test_first_live_run.py` |
 | **GAP (Malik), top priority:** no live Meta answer verified yet. Stage 1 is pass/fail on whether we "reasonably used Meta Model API". `python scripts/set_keys.py` then `python scripts/first_live_run.py` closes it; one live clip in the video helps. | docs/VERIFICATION_REPORT.md |
 
@@ -54,9 +56,9 @@ starts in `docs/demo/TIMESTAMPS.txt`; re-sync from that file if the video is re-
 
 | Evidence | Where |
 |---|---|
-| 710 automated tests, 0 failed, 0 skipped (incl. real Chromium with a fake camera, and jsdom) | docs/TEST_REPORT.md (v1.26.0, 2026-11-02) |
-| HTTP smoke of a running server: ALL PASSED, 65 checks | `scripts/smoke_e2e.py`, HANDOFF.md |
-| mypy strict, no issues in 99 files; ruff clean; CI | `mypy.ini`, `.github/workflows/` |
+| 768 automated tests, 0 failed, 0 skipped (incl. real Chromium with a fake camera, and jsdom) | docs/TEST_REPORT.md (v1.27.0, 2026-11-02) |
+| HTTP smoke of a running server: ALL PASSED, 70 checks | `scripts/smoke_e2e.py`, HANDOFF.md |
+| mypy strict, no issues in 129 files; ruff clean; CI | `mypy.ini`, `.github/workflows/` |
 | Strict JSON schemas with tolerant repair and one retry; per-repair and per-day cost caps; rate limits | `api/schemas.py`, `api/coerce.py`, `api/cost.py`, `api/guard.py` |
 | Safety in code (3 layers) and prompt-injection fencing | `api/pipeline/safety.py`, `api/untrusted.py`, `test_security.py`, `test_injection.py` |
 | Resilience: retries, friendly errors, labelled demo fallback, recorded demo when the server sleeps | `api/errors.py`, `test_demo_fallback.py`, `test_replay.py`, `27_recorded_demo.png` |
@@ -68,11 +70,11 @@ starts in `docs/demo/TIMESTAMPS.txt`; re-sync from that file if the video is re-
 
 | Evidence | Where |
 |---|---|
-| 2:57 video, captions, voice-over, under the 3-minute limit | `docs/demo/tukang-copilot-demo.mp4`, `.en.srt` |
+| 2:55 video, captions, voice-over, under the 3-minute limit | `docs/demo/tukang-copilot-demo.mp4`, `.en.srt` |
 | 1-tap demo with no photo needed; recorded demo plays if the free server is asleep | README "Try it in 60 seconds", `27_recorded_demo.png` |
 | Laptop view: on a screen 1024 px or wider the app sits in a phone frame with a side panel (QR code of the current URL, 1-tap demo, id/jv/en switch) | `29_laptop.png`, `test_playwright_desk.py` |
 | Static judge build with no server and no cold start: `scripts/build_static.py` writes `dist-static/` (recorded demo, relative paths; not hosted yet) | `scripts/build_static.py --help`, `test_playwright_static.py` |
-| 29 screenshots and a hero GIF | `docs/demo/screenshots/`, `docs/demo/hero.gif` |
+| 34 screenshots (incl. 5 of the WhatsApp simulator) and a hero GIF | `docs/demo/screenshots/`, `docs/demo/hero.gif` |
 | Every frame says demo mode and stand-in photos (honesty) | docs/demo/README.md |
 | **GAP (Malik):** the live URL ([LIVE_URL]) and YouTube link ([YOUTUBE_URL]) are not filled. Final judges watch the video live, so the first 10 seconds must hook. | docs/launch/YOUTUBE.md |
 | **GAP (Malik):** a real-phone, real-object clip (even 20 seconds of a real faucet or pump) inside the video. All current footage is demo mode. | docs/DEMO_SCRIPT.md |
@@ -84,7 +86,7 @@ starts in `docs/demo/TIMESTAMPS.txt`; re-sync from that file if the video is re-
 | **Most Viral Project, $20K** | "Post your project demo on X and submit the post link through the hackathon platform. ... total engagement (likes, reposts, and comments) up until November 8 EOD" (slide: Nov 8, 11:59 PM ET). | 43.5 s vertical clip `docs/demo/tukang-copilot-x-vertical.mp4`; thread in docs/launch/X_THREAD.md; share cards (`26_share_card.png`) | Malik posts before submitting so the link goes in form field 5. Engagement window closes Nov 8 11:59 PM ET = **Nov 9, 11:59 WIB**. |
 | **Best Build on Meta Open Weights, $10K** | "best project built using Muse Glimmer or Muse Spark Open, served on participants' own hardware or through partner-provided inference. Projects are flagged during the first judging round. The infrastructure partner verifies that the project runs on an eligible Meta open-weight model." | `USE_OPEN_WEIGHTS=1` moves diagnosis + planning to Muse Spark Open via Baseten; badge in UI; tested against a stand-in Baseten server | **GAP (Malik):** needs a real Baseten deployment and one logged run, otherwise the partner cannot verify it. If no Baseten credits, do not claim this prize. |
 | **Community Vote, $10K** | "most votes in the public gallery ... total number of votes received through the hackathon platform, limited to one vote per verified account." Vote opens at the Nov 9 closing ceremony (12:00 PM ET = Nov 10, 00:00 WIB); winner announced Nov 16 on Discord. | Kit in docs/launch/COMMUNITY_VOTE_KIT.md (id, jv, en) | The gallery URL is not public yet (checked 2026-11-01). Voters need a verified Cerebral Valley account. Send the kit only when the vote opens. |
-| **Best Agentic Use-Case, $5K** | "strongest use of AI agents to complete meaningful tasks, make decisions, or coordinate multi-step workflows. Judges evaluate the project's level of autonomy, effectiveness in completing its intended task, and practical usefulness." | Loop: ask when unsure, plan, gate on safety, verify each step from a photo, re-plan, escalate or hand off. Agent log "What the AI did" with the model per decision (`23_agent_log.png`, `24_agent_jump.png`, `25_pdf_agent.png`, video 1:10 to 2:07) | Strongest bonus claim. Effectiveness numbers wait on the live run and trials. |
+| **Best Agentic Use-Case, $5K** | "strongest use of AI agents to complete meaningful tasks, make decisions, or coordinate multi-step workflows. Judges evaluate the project's level of autonomy, effectiveness in completing its intended task, and practical usefulness." | Loop: ask when unsure, plan, gate on safety, verify each step from a photo, re-plan, escalate or hand off. Agent log "What the AI did" with the model per decision (`23_agent_log.png`, `24_agent_jump.png`, `25_pdf_agent.png`, video 1:10 to 2:07); the same loop over WhatsApp (`30_whatsapp_*.png`, video 2:16) | Strongest bonus claim. Effectiveness numbers wait on the live run and trials. |
 | **Best Creative Build, $5K** | "most original and compelling creative project built using Muse Image or Muse Wonder. Projects are flagged during the first judging round and evaluated on creative originality, execution, and how effectively the model is used in the final experience." | Muse Image turns the user's own photo into an instructional diagram, reviewed by Spark | Weak: Muse Image is a supporting feature, not the core. The video now shows a diagram step at 1:40, but it is a demo-mode stand-in drawing, not a live Muse Image output. Mention it, do not lead with it. |
 
 ## Gaps, ranked by expected score gain

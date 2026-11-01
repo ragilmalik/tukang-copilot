@@ -9,9 +9,10 @@ Owner: **M** = Malik, **H** = Malik.
 - [ ] **M** Real photos + 5 user trials (docs/USER_TRIAL_KIT.md) → **H** `scripts/impact_report.py`, replace MOCK impact numbers, tune prompts
 - [ ] **M** Approve GitHub push (`ragilmalik/tukang-copilot`) + Render deploy (docs/DEPLOY.md, free plan); set `PUBLIC_BASE_URL`
 - [ ] **M** Approve hosting the static judge build (`python scripts/build_static.py`, then GitHub Pages or Netlify drop; see `--help`): no cold start for judges
+- [ ] **M** Optional, with the deploy: WhatsApp channel (docs/WHATSAPP.md: Meta app + test number, fill `WA_TOKEN`, `WA_PHONE_NUMBER_ID`, `WA_VERIFY_TOKEN`, `WA_APP_SECRET` in Render, paste the webhook URL); then **H** one real chat test and update the "Honest status" lines
 - [ ] **H** `deploy_check.py <url> --live` → READY
 - [ ] **M** Phone test over 4G: camera, live guide, hands-free (Android Chrome jv-ID), WhatsApp hand-off, PDF
-- [ ] **M** Upload the video to YouTube (real recording per DEMO_SCRIPT.md, or the 2:57 backup cut), post the X clip
+- [ ] **M** Upload the video to YouTube (real recording per DEMO_SCRIPT.md, or the 2:55 backup cut), post the X clip
 - [ ] **H** Fill links in README + SUBMISSION
 - [ ] **M** Paste docs/SUBMISSION.md fields into Cerebral Valley (account ragilmalika) and submit before Nov 5 09:00 WIB
 - [ ] **M** Share docs/launch/COMMUNITY_VOTE_KIT.md when voting opens Tue Nov 10, 00:00 WIB

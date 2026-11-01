@@ -25,8 +25,10 @@ curl localhost:8000/health
 ```bash
 curl -F photos=@bike.jpg -F text="Motor susah hidup" -F language=id -F category=motor localhost:8000/api/sessions
 curl -F video=@pump.mp4 -F language=id -F category=pump localhost:8000/api/sessions   # video only: frames + its sound
-# {"id":"d2b5d598d8c6"}
+# {"id":"d2b5d598d8c6","owner_token":"Qk2…"}
 ```
+`owner_token` (since 1.27.0) is returned only here, once. Keep it on the owner's device: the outcome and erase calls
+need it as the `X-Owner-Token` header. No GET returns it, and the shared guide link does not carry it.
 Errors: 400 (missing photo/description, bad type, bad language/category, unreadable image), 413 (too large), 429 (too many new repairs from one visitor, live mode only, `Retry-After` set), 503 (rolling 24 h spend cap reached, live mode only).
 
 ## `GET /api/sessions/{id}`
@@ -50,7 +52,7 @@ Answers the follow-up question and resumes. 409 if the session isn't waiting.
 After `MAX_CHECK_FAILS` fails: `"escalate":true` + `escalate_hint`. 409 for an unknown step or no plan.
 
 ## `DELETE /api/sessions/{id}`
-Erases the repair (photos, voice leftovers, diagrams, PDFs, session JSON) from the server right now: `{"id":"…","deleted":true}`, `404` if it does not exist. A worker still running for that session cannot write it back. The "Delete my photos now" button calls it; "Clear history" in My garage calls it for every saved repair, best effort. The server also purges anything older than `RETENTION_HOURS` at startup and then every hour.
+Erases the repair (photos, voice leftovers, diagrams, PDFs, session JSON) from the server right now: `{"id":"…","deleted":true}`, `404` if it does not exist, `403` without the right `X-Owner-Token` header (owner only, since 1.27.0). A worker still running for that session cannot write it back. The "Delete my photos now" button calls it; "Clear history" in My garage calls it for every saved repair, best effort. The server also purges anything older than `RETENTION_HOURS` at startup and then every hour.
 
 ## `POST /api/sessions/{id}/retry`
 Re-runs a session whose `status` is `error` (busy AI service, dropped signal). Finished stages and the cost so far are kept. `{"ok":true}`; `409` if the session did not fail. Failed sessions carry a friendly `error` in the session language and an `error_kind` (`busy`, `network`, `auth`, `budget`, `invalid`, `generic`); the technical detail is never sent to the browser. Step-check and replan outages answer `503` with the same friendly text and `Retry-After`.
@@ -59,7 +61,7 @@ Re-runs a session whose `status` is `error` (busy AI service, dropped signal). F
 Moves to the next likely cause and returns the updated session (`status` `ready`), or `exhausted` with `stop_reason`, or `stopped` if the report trips the safety gate.
 
 ## `POST /api/sessions/{id}/outcome` (form: `result`)
-Closes the loop. `result` is `fixed` (it works now) or `pro` (a mechanic took over). Stores `outcome: {result, at, saved_idr}` on the session (`saved_idr` is the diagnosis `diy_saving_idr` for `fixed`, else 0) and returns the session. `422` for any other value, `409` when there is no plan (red stop), `404` unknown session. A re-plan removes the outcome. The PDF report gets a Result line.
+Closes the loop. `result` is `fixed` (it works now) or `pro` (a mechanic took over). Stores `outcome: {result, at, saved_idr}` on the session (`saved_idr` is the diagnosis `diy_saving_idr` for `fixed`, else 0) and returns the session. `422` for any other value, `409` when there is no plan (red stop), `404` unknown session, `403` without the right `X-Owner-Token` header (owner only, since 1.27.0: someone holding the shared guide link cannot answer for the owner; repairs saved before 1.27.0 have no token and stay open). A re-plan removes the outcome. The PDF report gets a Result line.
 
 ## Session JSON: `trace`
 Every session object carries `trace`: nine rows in pipeline order, each `{stage, tool, kind, status, ms}`. `kind` is `meta` (a Meta model), `open` (Muse Spark Open on Baseten), `tts` (edge-tts) or `code` (rule-based safety gates). Used by the "Under the hood" panel and the PDF report.

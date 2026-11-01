@@ -1,4 +1,4 @@
-# Judge FAQ: eleven hard questions, straight answers
+# Judge FAQ: twelve hard questions, straight answers
 
 Short answers first; the evidence is a file or screenshot in this repo. Update the starred answers (*) after the
 first live Meta run.
@@ -72,6 +72,16 @@ On a screen 1024 px or wider the app opens in a phone frame with a QR code of th
 phone (`29_laptop.png`). If the server has not answered within 4 s, the 1-tap demo plays a labelled recorded demo-mode
 run. A static judge build (`scripts/build_static.py` → `dist-static/`) plays the same recording with no server at all;
 it is linked next to the live app once hosted.
+
+**12. Why WhatsApp? Isn't the web app enough?**
+WhatsApp is the app almost every Indonesian already has open, and a photo plus a voice note is how people already ask a
+neighbour or a bengkel for help. A web link from a stranger is one more thing to trust; a chat is not. So the same agent
+also runs as a WhatsApp Cloud API webhook (`api/channels/whatsapp.py`, Graph API v26.0): photos and a Javanese voice note
+in, the SAM-marked photo, the diagnosis and reply buttons per step (Done / Problem / Stop) out, with the same camera
+checks, re-plan, red stop and PDF. It is not a second app: it calls the same engine and the same code safety gate, and
+every webhook POST is signature-checked. Honest status: tested end to end against a fake Graph API
+(`api/testing/fake_graph.py`) and in the `/wa` simulator (`30_whatsapp_*.png`, video 2:16); a real WhatsApp number is
+not connected yet (it needs a Meta app setup, docs/WHATSAPP.md).
 
 ---
 

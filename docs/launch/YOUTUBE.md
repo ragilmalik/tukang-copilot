@@ -1,6 +1,6 @@
 # YouTube upload kit
 
-Upload: the real-phone recording if it exists, otherwise `docs/demo/tukang-copilot-demo.mp4` (2:57, demo mode).
+Upload: the real-phone recording if it exists, otherwise `docs/demo/tukang-copilot-demo.mp4` (2:55, demo mode).
 Visibility: **Unlisted** is fine for judging; **Public** helps Most Viral and Community Vote. Open the link in a private
 window before pasting it into the form. Captions: upload `docs/demo/tukang-copilot-demo.en.srt` as English subtitles.
 Thumbnail: `docs/launch/thumbnail.png` (1280x720; custom thumbnails need a phone-verified YouTube account).
@@ -34,6 +34,7 @@ How it works
 - Muse Image: turns your photo into a diagram for hidden steps
 - Muse Spark Open (open weights) on Baseten: one switch for diagnosis and planning
 - Safety stops (gas, house wiring, 220 V internals, brakes, fuel) are enforced in code, not prompts
+- WhatsApp Cloud API: the same agent answers a WhatsApp chat (shown in the simulator; a real number is not connected yet)
 
 Why: Indonesia has 139 million motorbikes (BPS 2024) and millions of homes on an electric water pump. A light pump service costs about two days of Central Java's minimum wage before parts. Repair videos can't see your problem and aren't in your language.
 
@@ -44,7 +45,7 @@ Why: Indonesia has 139 million motorbikes (BPS 2024) and millions of homes on an
 
 YouTube rules: the first chapter must be 0:00, at least 3 chapters, each at least 10 seconds.
 
-### A. Current backup cut (`tukang-copilot-demo.mp4`, 2:57 re-cut with the 3 s hook title card, timings from `docs/demo/TIMESTAMPS.txt`)
+### A. Current backup cut (`tukang-copilot-demo.mp4`, 2:55 v1.27 cut with the 3 s hook title card and the WhatsApp scene, timings from `docs/demo/TIMESTAMPS.txt`)
 ```
 0:00 A small fault costs a day's wage
 0:12 Photo, voice or 1-tap demo: results stream in
@@ -52,9 +53,9 @@ YouTube rules: the first chapter must be 0:00, at least 3 chapters, each at leas
 0:50 Safety tick list and live camera guide
 1:10 Check my step: the camera verifies
 1:23 Hands-free, re-plan and a Muse Image diagram
-1:48 What the AI did, bengkel hand-off, share card
-2:14 Safety STOP and Basa Jawa
-2:30 Open weights and how it works
+1:48 What the AI did and the bengkel hand-off
+2:07 Safety STOP, then WhatsApp in Basa Jawa
+2:28 Open weights and how it works
 ```
 Every chapter is at least 10 s (checked against the scene starts in `docs/demo/TIMESTAMPS.txt`). If the video is
 re-cut again, re-read that file and move the chapters with it.

@@ -7,9 +7,12 @@ flowchart TB
   subgraph Phone["Phone browser (web/)"]
     UI["index.html + app.js<br/>camera input, MediaRecorder, SSE, i18n id/jv/en"]
     Guide["guide.html<br/>read-only shared report"]
+    Sim["wa.html (/wa)<br/>WhatsApp simulator, demo mode"]
   end
+  WAUser["Owner's WhatsApp"] --> WACloud["WhatsApp Cloud API<br/>Graph v26.0"]
   subgraph Server["One Python process (FastAPI, api/main.py)"]
     HTTP["HTTP API<br/>/api/sessions…"]
+    WAH["channels/whatsapp.py<br/>signed webhook, chat state, buttons"]
     Engine["engine.py<br/>stages + session state"]
     Safety["safety.py<br/>text gate + plan gate"]
     Overlay["render/overlay.py<br/>masks → numbered overlay"]
@@ -23,6 +26,10 @@ flowchart TB
   Baseten["Baseten<br/>Muse Spark Open"]
   UI --> HTTP --> Engine
   Guide --> HTTP
+  WACloud -->|"POST /webhooks/whatsapp (X-Hub-Signature-256)"| WAH
+  WAH -->|"send / media upload + download"| WACloud
+  Sim -->|"/api/wa-sim/* (same handler)"| WAH
+  WAH --> Engine
   Engine --> Safety & Overlay & Media & Prompts
   Engine -->|MOCK / no key| Mock
   Engine -->|live| MC --> Meta
@@ -31,6 +38,8 @@ flowchart TB
 ```
 
 Design rules:
+- **Two front doors, one engine.** The phone app and the WhatsApp channel (`api/channels/whatsapp.py`) both call `engine.create` / `engine.run` and go through the same safety gate; WhatsApp only changes how messages come in and go out (docs/WHATSAPP.md). The `/wa` simulator feeds the same handler with Cloud-API-shaped messages in demo mode; tests use a fake Graph API (`api/testing/fake_graph.py`).
+- **Owner token.** `POST /api/sessions` returns an `owner_token` once; the owner's browser keeps it in localStorage and sends it as `X-Owner-Token` to set the outcome or erase the repair. A shared guide link (`/guide/{id}`) does not carry it, so a viewer gets 403. It is never returned by any GET.
 - **One file talks to Meta** (`api/meta_client.py`): auth header, retries with backoff on 429/5xx, timeouts, cost charging. Nothing else imports `httpx` for Meta.
 - **Every model output is validated** by a pydantic schema (`api/schemas.py`) and retried once with the validation error.
 - **Every stage writes its status** into `session.json`, so the UI and SSE never need a database or queue.
@@ -46,7 +55,7 @@ sequenceDiagram
   participant M as Meta models
   P->>A: POST /api/sessions (photos, voice, text, lang, category)
   A->>E: create + start (background thread)
-  A-->>P: {id}
+  A-->>P: {id, owner_token}
   P->>A: GET /events (SSE)
   E->>M: Voice Transcribe (or Spark 1.2 audio for Javanese)
   E->>E: safety text gate
@@ -106,7 +115,7 @@ flowchart LR
 ```
 
 - `Dockerfile`: python:3.12-slim + ffmpeg + DejaVu font, runs `uvicorn api.main:app`.
-- `render.yaml`: Blueprint with `MODEL_API_KEY`/`BASETEN_API_KEY` as secret env vars, health check `/health`.
+- `render.yaml`: Blueprint with `MODEL_API_KEY`/`BASETEN_API_KEY` (and the optional `IMPACT_TOKEN`, `PUBLIC_BASE_URL` and four WhatsApp values `WA_TOKEN`, `WA_PHONE_NUMBER_ID`, `WA_VERIFY_TOKEN`, `WA_APP_SECRET`) as secret env vars, health check `/health`.
 - `docker-compose.yml`: same container locally.
 - Storage is the container disk: fine for a demo (sessions are temporary by design). For scale, see ROADMAP (R2).
 

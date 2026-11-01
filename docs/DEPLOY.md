@@ -34,6 +34,7 @@ Start on Free. Switching later is one click (step 14) and needs no redeploy of c
    - **BASETEN_API_KEY**: paste your Baseten key, or leave empty.
    - **IMPACT_TOKEN**: optional. Any long random word; it lets you download the trial outcome log later. Empty is fine.
    - **PUBLIC_BASE_URL**: leave empty for now (you get the address in step 9), then fill it in (step 11).
+   - **WA_TOKEN**, **WA_PHONE_NUMBER_ID**, **WA_VERIFY_TOKEN**, **WA_APP_SECRET**: optional, for the WhatsApp channel. Leave all four empty to skip it; to turn it on later, follow `docs/WHATSAPP.md`.
 7. Click **Deploy Blueprint** (older screens call it **Apply**).
 8. Click the **tukang-copilot** service, then **Logs**. The first build takes 5–8 minutes (it installs Python packages and ffmpeg). Wait until the top shows a green **Live** and the log says `Uvicorn running on http://0.0.0.0:10000`.
 9. Your link is at the top of the service page, like `https://tukang-copilot.onrender.com` (Render may add a few letters if the name is taken). Open it on your phone over 4G: you should see the app, and no orange *Demo mode* line if you pasted a key.

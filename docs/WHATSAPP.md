@@ -51,7 +51,7 @@ mode only (`WA_SIM=1` also allows it with a live key, which then spends real mod
 6. Click **Generate access token** and copy it. This is `WA_TOKEN`. It expires after about a day; for the judging week make a permanent one: Business Settings > System users > Add > Generate token with `whatsapp_business_messaging` and `whatsapp_business_management`.
 7. Open **App settings > Basic**, click **Show** next to **App secret**, and copy it. This is `WA_APP_SECRET`.
 8. Make up a verify word (for example `tukang-semarang-2026`). This is `WA_VERIFY_TOKEN`.
-9. In Render, open the tukang-copilot service > **Environment**, add the four values (`WA_TOKEN`, `WA_PHONE_NUMBER_ID`, `WA_VERIFY_TOKEN`, `WA_APP_SECRET`) and save. Render restarts the app.
+9. In Render, open the tukang-copilot service > **Environment**, fill in the four values `WA_TOKEN`, `WA_PHONE_NUMBER_ID`, `WA_VERIFY_TOKEN`, `WA_APP_SECRET` (render.yaml already lists them as empty secrets) and save. Render restarts the app.
 10. Back in the Meta app, open **Configuration > Webhook**, paste the Callback URL `https://<your-render-app>.onrender.com/webhooks/whatsapp` and your verify word, click **Verify and save**, then click **Manage** and subscribe to **messages**. Send "Halo" from your phone to the test number: Tukang Copilot answers.
 
 Tip: open the Render link in a browser a minute before you test. The free server sleeps, and Meta gives up on

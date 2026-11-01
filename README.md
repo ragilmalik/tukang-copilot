@@ -5,6 +5,10 @@ Indonesia, Javanese or English. Tukang Copilot outlines the exact part on *your*
 plans the fix (Muse Spark), checks every step you do with the camera, re-plans when it is still broken, and says
 **STOP** when the job is dangerous.
 
+**Also works in WhatsApp:** send a photo and a voice note to the bot and get the marked photo, the diagnosis, a button
+per step and the same red stop back, from the same agent and safety gate ([docs/WHATSAPP.md](docs/WHATSAPP.md); try the
+simulator at `/wa`; tested against a fake Graph API, a real WhatsApp number is pending setup).
+
 Meta Global AI Developer Hackathon 2026 (Meta x Cerebral Valley) · Indie Developer track · **Push the Frontier** ·
 built solo in Semarang, Oct 26 to Nov 4, 2026.
 
@@ -15,7 +19,7 @@ built solo in Semarang, Oct 26 to Nov 4, 2026.
 | | |
 |---|---|
 | **Live app** | [LIVE_URL] |
-| **3-min video** | [YOUTUBE_URL] · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:57, demo mode, 3 s hook title card, captions + voice-over; chapters in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt)) |
+| **3-min video** | [YOUTUBE_URL] · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:55, demo mode, 3 s hook title card, captions + voice-over; chapters in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt)) |
 | **Code** | [GITHUB_URL] (MIT) |
 | **For judges** | [Judging map](docs/JUDGING_MAP.md) (every criterion to evidence) · [Judge FAQ](docs/launch/JUDGE_FAQ.md) · [Eval](docs/EVAL.md) (red-team safety + injection) · [One-pager PDF](docs/launch/one-pager.pdf) |
 | **Write-up** | [docs/WRITEUP.md](docs/WRITEUP.md) · form copy: [docs/SUBMISSION.md](docs/SUBMISSION.md) |
@@ -32,6 +36,7 @@ built solo in Semarang, Oct 26 to Nov 4, 2026.
 5. **Tap Still broken.** It re-plans for the next cause ("Plan 2 of 3").
 6. **Open 🤖 What the AI did.** Every decision with the Meta model or code rule that made it; tap a line to jump to it.
 7. **Try the "dead rice cooker" sample** ("rice cooker mati" in Bahasa) for a red STOP with a technician PDF and bengkel hand-off, then **switch to Basa Jawa** at the top.
+8. **Open `/wa`** (link "💬 Also works in WhatsApp" under the first screen): the WhatsApp simulator. Tap a sample chip and the same agent answers as a WhatsApp chat: marked photo, diagnosis, step buttons; try "gas smell" for the red stop. Demo mode only; it runs the real webhook handler, not a real WhatsApp number.
 
 > **Recorded demo note.** The free server sleeps (about 50 s to wake). If it has not answered within 4 s, the 1-tap demo
 > plays a **recorded demo-mode run**, labelled "▶ Recorded demo" on screen (`?replay=1` forces it). Your own photos, the
@@ -43,7 +48,7 @@ built solo in Semarang, Oct 26 to Nov 4, 2026.
 
 <sub>**Honest status.** The video, screenshots and 1-tap demo run in clearly labelled demo mode: stand-in photos and recorded
 model answers, no API calls; the live guide uses Chromium's fake camera. The live Meta path is tested end to end against
-a stand-in server built from the official API docs (710 automated tests pass; red-team eval in docs/EVAL.md, mock and fake-model). A live Meta model answer is not yet
+a stand-in server built from the official API docs (768 automated tests pass; red-team eval in docs/EVAL.md, mock and fake-model). A live Meta model answer is not yet
 verified (needs the API key). Impact numbers in docs/IMPACT.md are mock data until real trials run.</sub>
 
 ### How Meta models are used (and where in the code)
@@ -61,13 +66,15 @@ verified (needs the API key). Impact numbers in docs/IMPACT.md are mock data unt
 
 All Meta calls go through one file, [`api/meta_client.py`](api/meta_client.py) (retries, timeouts, JSON-schema validation, per-repair cost cap). Safety gates are plain code in [`api/pipeline/safety.py`](api/pipeline/safety.py); owner text is fenced as untrusted data by [`api/untrusted.py`](api/untrusted.py).
 
+**WhatsApp channel (Meta's WhatsApp Cloud API, Graph API v26.0).** [`api/channels/whatsapp.py`](api/channels/whatsapp.py) is a webhook: photos, a text or a voice note in, the same `engine.create` / `engine.run` out (same models, same safety gate), answers as WhatsApp messages with reply buttons per step, the marked photo and the PDF report. Every webhook POST is checked against `X-Hub-Signature-256`. Tested against a fake Graph API ([`api/testing/fake_graph.py`](api/testing/fake_graph.py)); `/wa` is a simulator page that runs the same handler in demo mode. Setup: [docs/WHATSAPP.md](docs/WHATSAPP.md).
+
 | Snap + speak | Parts found (SAM 3.1) | What the AI did | Check my step |
 |---|---|---|---|
 | ![home](docs/demo/screenshots/01_home.png) | ![parts](docs/demo/screenshots/05_parts.png) | ![agent log](docs/demo/screenshots/23_agent_log.png) | ![check](docs/demo/screenshots/07_check_fail.png) |
 | **Live camera guide** | **Bengkel hand-off** | **Safety stop** | **Basa Jawa** |
 | ![live](docs/demo/screenshots/16_live_guide.png) | ![hand-off](docs/demo/screenshots/18_handoff.png) | ![stop](docs/demo/screenshots/11_rice_stop.png) | ![jawa](docs/demo/screenshots/20_javanese_result.png) |
 
-<sub>All 29 screenshots in [docs/demo/screenshots](docs/demo/screenshots) (demo mode, labelled stand-in photos), incl. `28_diagram_step.png` (Muse Image diagram step, stand-in drawing) and `29_laptop.png` (laptop phone-frame view with QR code). The video's 22 scenes and their start times are in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt).</sub>
+<sub>All 34 screenshots in [docs/demo/screenshots](docs/demo/screenshots) (demo mode, labelled stand-in photos), incl. `28_diagram_step.png` (Muse Image diagram step, stand-in drawing), `29_laptop.png` (laptop phone-frame view with QR code) and `30_whatsapp_*.png` (the WhatsApp simulator: Javanese diagnosis, step buttons, red stop; English step check and PDF). The video's 21 scenes and their start times are in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt).</sub>
 
 ---
 
@@ -176,6 +183,7 @@ Step-by-step for non-developers (accounts, keys, deploy to Render, phone testing
 | [docs/JUDGING_MAP.md](docs/JUDGING_MAP.md) | Official criteria and bonus prize rules → evidence in the repo, and the open gaps |
 | [docs/launch/](docs/launch/) | Launch kit: YouTube (title, chapters, thumbnail), X thread, community vote kit (id/jv/en), judge FAQ, one-pager PDF, architecture diagram |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Render deploy click by click, settings, roll back |
+| [docs/WHATSAPP.md](docs/WHATSAPP.md) | Optional WhatsApp channel: Meta app setup click by click, settings, simulator, how it is tested |
 | [docs/USER_TRIAL_KIT.md](docs/USER_TRIAL_KIT.md) | 5-person user trial kit → impact report |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | After the hackathon |
 | [docs/ATTRIBUTIONS.md](docs/ATTRIBUTIONS.md) | Third-party libraries and assets |
@@ -188,6 +196,7 @@ Step-by-step for non-developers (accounts, keys, deploy to Render, phone testing
 
 Everything in this repository was written from scratch during the event window (Oct 26 – Nov 4, 2026). Dated list in [CHANGELOG.md](CHANGELOG.md); the git history shows the commit dates.
 
+- 2026-11-02 (v1.27): WhatsApp channel (Cloud API webhook, same engine and safety gate, simulator at `/wa`, fake Graph API tests), owner token so a shared guide link cannot answer or erase for the owner.
 - 2026-10-31 (v1.22): agent log "What the AI did", 1-tap guided demo, prompt-injection hardening, follow-up rate limit + photo-check cap, Javanese demo answers, WCAG AA contrast, model chips + elapsed time on progress, 8× faster overlay rendering.
 - 2026-10-31: live camera guide (SAM 3.1 on camera frames), hands-free voice commands, bengkel hand-off (WhatsApp + Maps + mechanic brief PDF), demo fallback, impact trial kit, Render free-plan deploy readiness + `deploy_check.py`, safety tick list, outcome buttons, timers, bengkel price vs DIY, HEIC photos, offline handling, accessibility, privacy erase, regenerated demo video/screenshots (v1.8 → v1.21).
 - 2026-10-30 (evening): water pump scenario, PDF report, My garage, PWA, video capture (sharpest frames), full Basa Jawa strings, open-weights badge, safety escalation card, mypy strict, 10 labelled stand-in fixtures, Playwright browser smoke tests, generated demo video/screenshots/architecture diagram, one-step key swap (`set_keys.py --stdin`).

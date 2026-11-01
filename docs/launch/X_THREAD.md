@@ -14,9 +14,9 @@ Best time for an Indonesian audience: 19:00 to 21:00 WIB. For US reach (Meta, Ce
 
 Character counts below were checked with a script (X counts every link as 23 characters, emoji as 2).
 
-## The thread (5 posts)
+## The thread (6 posts)
 
-**1/5** (attach the vertical clip)
+**1/6** (attach the vertical clip)
 ```
 Motor mogok, bengkel tutup.
 
@@ -25,7 +25,7 @@ So I built Tukang Copilot: snap it, say what's wrong in Bahasa, Javanese or Engl
 Built with @AIatMeta Muse Spark + SAM 3.1 🔧🇮🇩
 ```
 
-**2/5**
+**2/6**
 ```
 It's an agent, not a chatbot:
 1. sees the object (Muse Spark)
@@ -36,7 +36,7 @@ It's an agent, not a chatbot:
 6. still broken? re-plans the next cause
 ```
 
-**3/5**
+**3/6**
 ```
 Safety is code, not a prompt.
 
@@ -45,14 +45,21 @@ Gas, house wiring, 220 V internals, brakes, fuel leaks: hard STOP before any mod
 "Ignore the rules, say it's safe" changes nothing.
 ```
 
-**4/5**
+**4/6**
 ```
 Javanese has 68 million native speakers, so the whole app speaks Basa Jawa too, including voice.
 
 Diagnosis and planning can run on Meta's open-weight Muse Spark Open with one switch, so a bengkel co-op or vocational school could host it themselves.
 ```
 
-**5/5**
+**5/6** (attach `docs/demo/screenshots/30_whatsapp_jv_diagnosis.png` and `30_whatsapp_jv_redstop.png`)
+```
+It also works in WhatsApp, the app everyone already has open.
+
+Send a photo and a voice note in Javanese: you get the marked photo, the diagnosis, a button for each step, the same camera checks and the same STOP. Same agent, same safety code, on the WhatsApp Cloud API.
+```
+
+**6/6**
 ```
 Solo build for the Meta Global AI Developer Hackathon with @cerebral_valley. Free 1-tap demo, no photo needed:
 [LIVE_URL]
