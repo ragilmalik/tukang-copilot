@@ -2,6 +2,12 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.25.1 (2026-11-01 WIB)
+Audit 7 (garage, PDF, share card, Javanese screens at 390x844 in real Chromium) found two things a judge on a phone would hit in the first minute.
+- **First screen follows the phone.** It always opened in Bahasa Indonesia, so an English-speaking judge landed on a page they could not read. Now: an earlier choice wins, then `?lang=id|jv|en` on the link, then the phone's language list (Indonesian or Javanese anywhere in it keeps Bahasa / Basa Jawa, so an Indonesian phone set to English is not switched), else English. 5 Chromium tests (`test_playwright_lang.py`). The demo-asset script now pins the browser to id-ID so screenshots and video do not change.
+- **Back button.** Starting a repair used `replaceState`, so the phone Back button left the site and dropped the user out of the repair. Now it pushes `#<id>`: Back returns to the first screen (stream, timers, camera and voice are stopped), Forward comes back to the same repair, "Start again" and "Erase" step back instead of leaving a duplicate history entry. Works in the recorded demo too. 4 Chromium tests (`test_playwright_back.py`; the first fails on 1.25.0).
+- Service worker cache `tukang-shell-v6`; README judge path mentions both.
+
 ## 1.25.0 (2026-11-01 WIB)
 Judges on laptops, a server-free judge build, an honest offline eval that found and fixed real safety misses, a one-command first live run, and a tighter video.
 - **Laptop view**: at 1024 px and wider the app sits in a centred phone frame (it scrolls inside the frame) with a side panel: what it is, a QR code of the page's own address to carry on with a phone (says when the address only works on this computer), a 1-tap demo button and an id/jv/en switch. The QR encoder (`web/vendor/qrcode.js`, MIT, Kazuhiko Arase) is fetched only on wide screens. Phones are unchanged. Screens checked at 1280x800 and 1440x900; Chromium tests (`test_playwright_desk.py`) and static tests (`test_desk.py`).

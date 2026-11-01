@@ -36,10 +36,14 @@ built solo in Semarang, Oct 26 to Nov 4, 2026.
 > **Recorded demo note.** The free server sleeps (about 50 s to wake). If it has not answered within 4 s, the 1-tap demo
 > plays a **recorded demo-mode run**, labelled "▶ Recorded demo" on screen (`?replay=1` forces it). Your own photos, the
 > live camera and voice commands need the awake server.
+>
+> **Language.** The first screen follows the phone: English for an English phone, Bahasa Indonesia when Indonesian is in the
+> phone's language list. `?lang=en`, `?lang=id` or `?lang=jv` on the link overrides it; the switch at the top is remembered.
+> The Back button returns to the first screen and Forward comes back to the same repair.
 
 <sub>**Honest status.** The video, screenshots and 1-tap demo run in clearly labelled demo mode: stand-in photos and recorded
 model answers, no API calls; the live guide uses Chromium's fake camera. The live Meta path is tested end to end against
-a stand-in server built from the official API docs (530 automated tests pass; red-team eval in docs/EVAL.md, mock and fake-model). A live Meta model answer is not yet
+a stand-in server built from the official API docs (539 automated tests pass; red-team eval in docs/EVAL.md, mock and fake-model). A live Meta model answer is not yet
 verified (needs the API key). Impact numbers in docs/IMPACT.md are mock data until real trials run.</sub>
 
 ### How Meta models are used (and where in the code)

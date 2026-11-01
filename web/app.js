@@ -194,7 +194,18 @@ const T_DESK = {
 /* I18N_DESK:end */
 ["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_DESK[k]));
 
-let lang = localStorage.getItem("tc_lang") || "id";
+// First visit: ?lang=id|jv|en, else the phone's language list (Indonesian or Javanese anywhere in it means that language,
+// so an Indonesian phone set to English still opens in Bahasa), else English for a visitor from anywhere else.
+function pickLang() {
+  let saved = ""; try { saved = localStorage.getItem("tc_lang") || ""; } catch (_) { /* storage blocked */ }
+  if (["id", "jv", "en"].includes(saved)) return saved;
+  try { const q = new URLSearchParams(location.search).get("lang"); if (["id", "jv", "en"].includes(q)) return q; } catch (_) { /* odd URL */ }
+  const prefs = (navigator.languages && navigator.languages.length ? Array.from(navigator.languages) : [navigator.language]).map((x) => String(x || "").toLowerCase());
+  if (!prefs[0]) return "id";
+  const local = prefs.find((x) => /^(id|in|jv)(-|$)/.test(x));
+  return local ? (/^jv/.test(local) ? "jv" : "id") : "en";
+}
+let lang = pickLang();
 let videoFile = null;
 let photoFiles = [], audioBlob = null, rec = null, chunks = [], S = null, stepIdx = 0, category = "", es = null;
 const t = (k) => (T[lang] && T[lang][k] !== undefined ? T[lang][k] : T.id[k] !== undefined ? T.id[k] : k);
@@ -357,7 +368,7 @@ async function submit(sample) {
     const r = await fetch("/api/sessions", { method: "POST", body: fd });
     const j = await r.json();
     if (!r.ok) throw new Error(j.detail || r.statusText);
-    history.replaceState(null, "", "#" + j.id);
+    history.pushState({ tc: 1 }, "", "#" + j.id);  // Back returns to the first screen instead of leaving the site
     show("progress"); startElapsed(); follow(j.id);
   } catch (e) { $("formErr").textContent = netMsg(e); }
   finally { $("goBtn").disabled = false; }
@@ -851,10 +862,10 @@ function setupResult() {
     const id = S.id;
     fetch(`/api/sessions/${encodeURIComponent(id)}`, { method: "DELETE" }).catch(() => null).then(() => {
       try { localStorage.setItem(GARAGE_KEY, JSON.stringify(loadGarage().filter((e) => e && e.id !== id))); } catch (_) {}
-      alert(t("erased")); history.replaceState(null, "", homePath()); location.reload();
+      alert(t("erased")); freshStart();
     });
   });
-  on("againBtn", "click", () => { history.replaceState(null, "", homePath()); location.reload(); });
+  on("againBtn", "click", freshStart);
 }
 
 window.SAFETY_BASE = {
@@ -1267,6 +1278,24 @@ function setupDesk() {
   }
 }
 function markLang() { document.querySelectorAll("[data-setlang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.setlang === lang))); }
+
+/* ---------------- phone Back button (v1.25.1) ---------------- */
+// Starting a repair pushes "#<id>" so Back goes to the first screen (not out of the site, which lost the place) and
+// Forward comes back to the same repair. Anything running for the repair (stream, timers, camera, voice) is stopped.
+// A clean first screen: step back past the pushed "#<id>" entry when there is one (no duplicate history entry), then reload.
+function freshStart() {
+  if (history.state && history.state.tc) { window.addEventListener("popstate", () => location.reload(), { once: true }); history.back(); }
+  else { history.replaceState(null, "", homePath()); location.reload(); }
+}
+function onBack() {
+  const id = location.hash.length > 1 ? location.hash.slice(1) : "";
+  if (es) { es.close(); es = null; }
+  if (progTimer) { clearInterval(progTimer); progTimer = null; }
+  try { stopTimer(); closeLive(); if (window.speechSynthesis) speechSynthesis.cancel(); } catch (_) { /* nothing was running */ }
+  if (!id) { show("capture"); return; }
+  show("progress"); startElapsed(); follow(id);
+}
+window.addEventListener("popstate", () => { if (!document.body.dataset.sid || document.body.dataset.sid.startsWith("{{")) onBack(); });
 
 /* ---------------- boot ---------------- */
 document.addEventListener("DOMContentLoaded", () => {

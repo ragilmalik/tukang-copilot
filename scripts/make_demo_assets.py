@@ -177,7 +177,7 @@ def shots() -> None:
         b = p.chromium.launch(executable_path=_chromium(), args=[
             "--no-proxy-server", "--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream",
             f"--use-file-for-fake-video-capture={cam}"])
-        ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True)
+        ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, locale="id-ID")
         ctx.grant_permissions(["camera", "microphone"], origin=base)
         ctx.add_init_script(SR_STUB)
         pg = ctx.new_page()
