@@ -67,17 +67,20 @@ BRIEF: dict[str, dict[str, str]] = {
            "found": "Yang ditemukan", "issues": "Terlihat di foto", "causes": "Kemungkinan penyebab", "marked": "Bagian yang ditandai",
            "tried": "Yang sudah dicoba", "nothing": "Belum ada: dihentikan sebelum mulai demi keselamatan.", "checks": "Cek kamera per langkah",
            "pass": "OK", "fail": "BELUM", "status": "Status", "red": "STOP keselamatan", "exhausted": "Semua penyebab aman sudah dicoba",
-           "requested": "Pemilik minta bantuan mekanik", "photos": "Foto dari pemilik", "photo": "Foto", "check": "Cek langkah"},
+           "requested": "Pemilik minta bantuan mekanik", "photos": "Foto dari pemilik", "photo": "Foto", "check": "Cek langkah",
+           "fixed": "Pemilik bilang sudah jalan lagi"},
     "jv": {"title": "Ringkesan kanggo mekanik", "sub": "Kaca iki bisa dicithak utawa dituduhake menyang bengkel supaya ora miwiti saka nol.",
            "found": "Sing ditemokake", "issues": "Katon ing foto", "causes": "Sebab sing mungkin", "marked": "Perangan sing ditandhani",
            "tried": "Sing wis dijajal", "nothing": "Durung ana: dimandhegake sadurunge miwiti kanggo keslametan.", "checks": "Cek kamera saben langkah",
            "pass": "OK", "fail": "DURUNG", "status": "Status", "red": "MANDHEG keslametan", "exhausted": "Kabeh sebab sing aman wis dijajal",
-           "requested": "Sing duwe njaluk bantuan mekanik", "photos": "Foto saka sing duwe", "photo": "Foto", "check": "Cek langkah"},
+           "requested": "Sing duwe njaluk bantuan mekanik", "photos": "Foto saka sing duwe", "photo": "Foto", "check": "Cek langkah",
+           "fixed": "Sing duwe kandha wis urip maneh"},
     "en": {"title": "Mechanic brief", "sub": "Print this page or show it to the workshop so they don't start from zero.",
            "found": "What was found", "issues": "Seen in the photo", "causes": "Likely causes", "marked": "Parts marked",
            "tried": "What was tried", "nothing": "Nothing: stopped before starting, for safety.", "checks": "Camera check per step",
            "pass": "OK", "fail": "NOT YET", "status": "Status", "red": "Safety STOP", "exhausted": "Every safe cause was tried",
-           "requested": "Owner asked for a mechanic", "photos": "Owner's photos", "photo": "Photo", "check": "Step check"},
+           "requested": "Owner asked for a mechanic", "photos": "Owner's photos", "photo": "Photo", "check": "Step check",
+           "fixed": "Owner says it works again"},
 }
 
 
@@ -211,7 +214,9 @@ def brief_lines(session: dict[str, Any], lang: str) -> list[tuple[str, str]]:
     B = BRIEF.get(lang, BRIEF["id"])
     rep, dx = session.get("object_report") or {}, session.get("diagnosis") or {}
     why = handoff.reason(session)
-    rows: list[tuple[str, str]] = [("m", B["sub"]), ("h", B["status"]), ("t", B[why])]
+    # judge QA 2026-11-02: after "It works now" the status must not claim the owner asked for a mechanic
+    status = "fixed" if why == "requested" and (session.get("outcome") or {}).get("result") == "fixed" else why
+    rows: list[tuple[str, str]] = [("m", B["sub"]), ("h", B["status"]), ("t", B[status])]
     if why == "red" and session.get("stop_reason"):
         rows.append(("t", str(session["stop_reason"])))
     rows.append(("h", B["found"]))

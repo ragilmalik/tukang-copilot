@@ -19,6 +19,8 @@ JV: dict[str, str] = {
         "Starter muter nanging mesine ora urip: kemungkinan ora ana pletikan geni.",
     "Cop busi longgar": "Cop busi longgar",
     "Cop terlihat tidak rapat di foto": "Cop katon ora rapet ing foto",
+    "Tercium bensin saat distarter: bensin sampai, yang hilang percikan api": "Ambu bensin pas distarter: bensine tekan, sing ilang pletikan geni",
+    "Tidak tercium bensin: cek juga aliran bensin bila busi sudah beres": "Ora ana ambu bensin: priksa uga aliran bensin yen busi wis beres",
     "Busi kotor / berkerak": "Busi reged / akeh kerake",
     "Susah hidup di pagi hari": "Angel urip yen esuk",
     "Filter udara tersumbat": "Saringan hawa buntu",

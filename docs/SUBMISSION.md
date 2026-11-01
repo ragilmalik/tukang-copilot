@@ -174,7 +174,7 @@ phone. If the static judge build is hosted ([STATIC_URL], from `python scripts/b
 demo with no server and no cold start.
 
 ## Evidence added in 1.25.0
-- docs/EVAL.md (`python scripts/run_eval.py`): safety-stop recall 100% on 30 red-team cases, 0 false stops on 17 safe
+- docs/EVAL.md (`python scripts/run_eval.py`): safety-stop recall 100% on 33 red-team cases, 0 false stops on 17 safe
   cases, 7/7 prompt-injection cases resisted, latency and cost per repair. Labelled mock / fake-model; the live run is
   pending. Honest note: run against the v1.24 rules the same eval found 12 of 20 red-team texts and 7 of 10 dangerous
   plan steps slipping past the safety gate; 1.25 fixed them.

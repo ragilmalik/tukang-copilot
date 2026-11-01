@@ -62,7 +62,7 @@ starts in `docs/demo/TIMESTAMPS.txt`; re-sync from that file if the video is re-
 | Resilience: retries, friendly errors, labelled demo fallback, recorded demo when the server sleeps | `api/errors.py`, `test_demo_fallback.py`, `test_replay.py`, `27_recorded_demo.png` |
 | Live path tested against a stand-in server built from the official API docs | `api/testing/fake_meta.py`, `test_live_path.py` |
 | Fixture eval: 10/10 photos and 3/3 step checks met expectations (mock mode, labelled stand-ins) | docs/EVAL_REPORT.md |
-| Red-team eval: safety-stop recall **100%** on 30 dangerous cases (20 owner texts, 10 plan steps), **0** false stops on 17 safe cases, **7/7** prompt-injection cases resisted, plus latency and cost per repair. Labelled mock / fake-model; the live run is pending. Honest note: run against the v1.24 rules it found 12 of 20 red-team texts and 7 of 10 dangerous plan steps slipping through; those gaps were fixed in 1.25 | docs/EVAL.md, `scripts/run_eval.py`, `test_run_eval.py` |
+| Red-team eval: safety-stop recall **100%** on 33 dangerous cases (23 owner texts, 10 plan steps), **0** false stops on 17 safe cases, **7/7** prompt-injection cases resisted, plus latency and cost per repair. Labelled mock / fake-model; the live run is pending. Honest note: run against the v1.24 rules it found 12 of 20 red-team texts and 7 of 10 dangerous plan steps slipping through; those gaps were fixed in 1.25 | docs/EVAL.md, `scripts/run_eval.py`, `test_run_eval.py` |
 
 ### Demo 25%: "working, impressive demo, whether the product holds up live, and the quality of the demo video"
 

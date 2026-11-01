@@ -1,10 +1,11 @@
 """Offline stand-ins for every Meta call (MOCK=1 or no MODEL_API_KEY). The app, the tests and the demo
-fallback all run on these for free. Four scenarios from SPEC §8, picked by keywords:
+fallback all run on these for free. Five scenarios (SPEC §8 plus the flat tyre), picked by keywords:
 
-  * motor  - Honda Beat won't start: loose / fouled spark plug cap        (green)
+  * motor  - Honda Beat won't start: loose / fouled spark plug cap        (amber; asks one question)
   * pump   - Shimizu water pump runs but no water: lost prime / foot valve   (amber)
   * faucet - dripping kitchen tap: worn washer                               (green)
   * rice   - rice cooker not heating: opening mains internals -> RED stop    (red)
+  * tire   - scooter tyre going flat: nail in the tubeless tread             (amber)
 """
 from __future__ import annotations
 
@@ -81,7 +82,26 @@ def _object_report(sc: str, lang: str) -> dict[str, Any]:
 
 
 # ------------------------------------------------------------------ Diagnose
-def diagnosis(sc: str, lang: str) -> dict[str, Any]:
+_YES = re.compile(r"^\s*(ya|iya|iyo|yo|he'?e|nggih|inggih|yes|yeah|yep|ada|wonten|ana)\b", re.I)
+
+
+def diagnosis(sc: str, lang: str, answer: str = "") -> dict[str, Any]:
+    """The demo diagnosis. For the motor case the follow-up answer changes it, so the 1-tap demo shows the
+    question doing something: a fuel smell (fuel arrives) makes the loose cap more likely; no smell lowers it."""
+    d = _diagnosis(sc, lang)
+    if sc == "motor" and answer.strip():
+        yes = bool(_YES.match(answer))
+        confs = (70, 22, 8) if yes else (58, 32, 10)
+        ev = (_L(lang, "Tercium bensin saat distarter: bensin sampai, yang hilang percikan api", "Fuel smell when cranking: fuel arrives, the spark is missing") if yes
+              else _L(lang, "Tidak tercium bensin: cek juga aliran bensin bila busi sudah beres", "No fuel smell: check the fuel flow too if the plug is fine"))
+        for c, conf in zip(d["causes"], confs):
+            c["confidence"] = conf
+        d["causes"][0]["evidence"] = [ev, *d["causes"][0]["evidence"]]
+        d["follow_up_question"] = ""
+    return d
+
+
+def _diagnosis(sc: str, lang: str) -> dict[str, Any]:
     if sc == "pump":
         return {"problem_summary": _L(lang, "Pompa menyala dan berputar, tapi air tidak keluar: pompa kehilangan pancingan.", "The pump runs but no water comes out: it has lost its prime."),
                 "causes": [{"title": _L(lang, "Pompa kehilangan air pancingan", "Pump lost its prime"), "confidence": 60, "evidence": [_L(lang, "Motor berputar, pipa keluar kering", "Motor spins, outlet dry")], "component_ids": ["c1"]},

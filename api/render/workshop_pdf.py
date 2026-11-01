@@ -2,7 +2,8 @@
 
 Pure Pillow, same look as the repair report. Page 1 is the cover (safety banner, marked photo, tools and
 parts as a tick list). Then one page per step with a giant number, the instruction in big type, the
-warnings in a red box, what the camera should see, and the step diagram when there is one.
+warnings in a red box, what the camera should see, and the step diagram when there is one. The "Done when"
+check closes the last step page when it fits there.
 """
 from __future__ import annotations
 
@@ -101,9 +102,32 @@ def _step_page(doc: _Doc, st: dict[str, Any], total: int, session: dict[str, Any
     if pic and (session_dir / pic).exists():  # the step diagram, else the marked photo so the page is never empty
         doc.space(10)
         doc.image(session_dir / pic, 560)
-    y = 1754 - M - 120
+    y = TICK_Y
     _box(doc, M, y, 60)
     doc.d.text((M + 84, y + 10), T["tick"], font=_font(32, True), fill=INK)
+
+
+TICK_Y = 1754 - M - 120  # the "tick when finished" box at the foot of every step page
+
+
+def _done_height(doc: _Doc, done: str, disclaimer: str) -> int:
+    """Height of the "Done when" block as _done_block draws it (heading, check, disclaimer)."""
+    width = W - 2 * M
+    return (44 + 8 + len(_wrap(doc.d, done, _font(50, True), width)) * (50 + 14) + 30
+            + len(_wrap(doc.d, disclaimer, _font(26), width)) * (26 + 8))
+
+
+def _done_block(doc: _Doc, done: str, disclaimer: str, T: dict[str, str]) -> None:
+    doc.text(T["done"], 44, bold=True, color=ORANGE)
+    doc.text(done, 50, bold=True, gap=14)
+    doc.space(30)
+    doc.text(disclaimer, 26, color=MUTED)
+
+
+def done_fits(doc: _Doc, done: str, disclaimer: str) -> bool:
+    """Judge QA 2026-11-02: the "Done when" check sat alone on a near-empty last page. It now goes at the foot of
+    the last step page whenever it fits above the tick box (with a little air), and gets its own page only if not."""
+    return doc.y + 40 + _done_height(doc, done, disclaimer) <= TICK_Y - 30
 
 
 def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: Path) -> Path:
@@ -119,12 +143,14 @@ def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: 
     for st in steps:
         _step_page(doc, st, len(steps), session, session_dir, T)
     if plan.get("done_check"):
-        doc._new_page()
-        doc.d.rectangle([0, 0, W, 18], fill=ORANGE)
-        doc.text(T["done"], 44, bold=True, color=ORANGE)
-        doc.text(str(plan["done_check"]), 50, bold=True, gap=14)
-        doc.space(30)
-        doc.text(L["disclaimer"], 26, color=MUTED)
+        done, disc = str(plan["done_check"]), str(L["disclaimer"])
+        if steps and done_fits(doc, done, disc):
+            doc.space(40)
+            doc.d.line([M, doc.y - 20, W - M, doc.y - 20], fill=(225, 225, 230), width=2)
+        else:
+            doc._new_page()
+            doc.d.rectangle([0, 0, W, 18], fill=ORANGE)
+        _done_block(doc, done, disc, T)
     elif not steps:
         doc.text(T["empty"], 32, color=MUTED)
     pages = doc.finish()

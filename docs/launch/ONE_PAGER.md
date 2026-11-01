@@ -44,7 +44,7 @@ step with your camera, and says STOP when the job is dangerous.
 
 ## Evidence
 **630** automated tests pass (0 failed, 0 skipped; real Chromium + jsdom) · **66-check** HTTP smoke passes · mypy strict, ruff clean ·
-red-team eval: **100%** safety-stop recall on 30 cases, **0** false stops on 17 safe, **7/7** injections resisted (mock/fake-model) ·
+red-team eval: **100%** safety-stop recall on 33 cases, **0** false stops on 17 safe, **7/7** injections resisted (mock/fake-model) ·
 5 scenarios · 3 languages · 2:57 captioned demo video.
 **Honest status:** demo assets run in labelled demo mode; a live Meta answer is not yet verified; Semarang user trials pending.
 

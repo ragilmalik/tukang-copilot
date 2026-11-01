@@ -371,7 +371,7 @@ def stage_diagnose(s: dict[str, Any], rep: ObjectReport) -> Diagnosis:
     content = [_photo_part(session_dir(s["id"]) / s["photos"][0]),
                {"type": "text", "text": "Object report:\n" + json.dumps(rep.model_dump(), ensure_ascii=False) + f"\n\nOwner's description:\n{description(s)}"}]
     dx = _chat_json(Diagnosis, prompts.get("diagnose", lang_name=prompts.LANG_NAME[s["lang"]]), content, "diagnosis",
-                    mock.diagnosis(_scenario(s), s["lang"]), model=settings.reason_model, effort="high", allow_open=True,
+                    mock.diagnosis(_scenario(s), s["lang"], str(s.get("answer") or "")), model=settings.reason_model, effort="high", allow_open=True,
                     fallback_into=s)
     s["diagnosis"] = dx.model_dump() | {"cost_estimate_idr": dx.cost_estimate_idr, "diy_saving_idr": dx.diy_saving_idr}
     s["safety"]["level"], s["safety"]["reason"] = dx.safety_level, dx.safety_reason

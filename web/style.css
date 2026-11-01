@@ -199,3 +199,4 @@ body.typing .tourBar{bottom:auto;top:calc(8px + env(safe-area-inset-top))}
   .sideLang{display:flex;flex-wrap:wrap;gap:6px}
   .sideLang .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
 }
+.stopAgain{margin:10px 0 0}

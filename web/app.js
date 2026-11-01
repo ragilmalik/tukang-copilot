@@ -7,13 +7,14 @@ const T = {
         samples: "Coba contoh:", sMotor: "motor mogok", sPump: "pompa tidak keluar air", sFaucet: "kran menetes", sRice: "rice cooker mati", sTire: "ban kempes",
         working: "Sedang memeriksa…", retry: "Coba lagi", answerHere: "Jawaban kamu", send: "Kirim", diagnosis: "Diagnosa", safetyFirst: "Keselamatan dulu",
         tools: "Alat", materials: "Suku cadang", listen: "Dengarkan", prevStep: "Langkah sebelumnya", next: "Lanjut", handsFree: "Mode tangan bebas (dibacakan + perintah suara)", vListening: "Mendengarkan… ucapkan lanjut, kembali, ulang, cek, masih rusak, atau berhenti.", vHelp: "Perintah suara: lanjut · kembali · ulang · cek · masih rusak · berhenti", vNoSR: "HP ini tidak bisa mendengar terus. Ketuk tombol mikrofon untuk setiap perintah.", ptt: "🎙️ Ketuk, lalu ucapkan perintah", pttRec: "⏹️ Bicara sekarang… (ketuk untuk kirim)", vHeard: "Terdengar «{text}»", vUnknown: "Belum paham «{text}». Coba lanjut, kembali, ulang, cek.", vOff: "Mode tangan bebas mati.",
-        done: "Selesai kalau:", outcomeAsk: "Sudah jalan lagi?", fixedBtn: "Sudah beres 🎉", proBtn: "Dibawa ke bengkel", fixedThanks: "Mantap! Perbaikan selesai.", proThanks: "Tidak apa-apa, membawa ke ahli itu pilihan yang aman. Laporan PDF bisa ditunjukkan ke mekanik.", savedTotal: "Total hemat", savedFrom: "dari", savedUnit: "perbaikan", preTitle: "Sebelum mulai, pastikan:", preLocked: "Centang semua dulu, baru langkah 1 terbuka.", preReady: "✅ Siap. Langkah 1 terbuka.", waitFor: "Tunggu {n} menit", timerStart: "Mulai pengatur waktu", timerStop: "Hentikan", timerDone: "Waktu tunggu selesai. Lanjut ke langkah berikutnya.", checkStep: "Cek langkah ini", trialMin: "Uji coba: berapa menit perbaikannya?", fbNote: "🧪 Jawaban contoh (API live sedang tidak tersedia)", mech: "🧑‍🔧 Panggil mekanik / bengkel", hoSub: "Kirim ringkasan ini ke bengkel, lalu cari yang terdekat. Laporan PDF berisi ringkasan untuk mekanik.", hoWa: "Kirim lewat WhatsApp", hoMaps: "Bengkel/servis terdekat", hoPdf: "Laporan PDF untuk mekanik", hoMsg: "Pesan yang dikirim", liveGuide: "Panduan kamera langsung", liveCheck: "📸 Cek sekarang", liveClose: "Tutup kamera", liveStart: "Menyalakan kamera…", liveAim: "Arahkan kamera ke {name}", liveFound: "🎯 Ketemu {name}", liveLost: "Belum ketemu {name}. Gerakkan HP pelan-pelan.", liveNoPart: "Langkah ini tidak menunjuk bagian tertentu. Pakai Cek sekarang.", liveNoCam: "Kamera langsung tidak bisa dipakai di HP ini. Pakai tombol foto untuk cek langkah.", liveLimit: "Batas kamera langsung untuk perbaikan ini sudah habis. Pakai foto untuk cek langkah.", share: "Bagikan laporan", pdf: "Unduh laporan PDF", workshop: "Lembar bengkel (cetak besar)", hood: "Di balik layar: model yang dipakai", hs_listen: "Dengar suara", hs_gate: "Cek keselamatan teks", hs_look: "Lihat foto", hs_segment: "Tandai bagian", hs_diagnose: "Diagnosa", hs_plan: "Susun langkah", hs_safety: "Cek keselamatan rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Suara pemandu", wa: "Kirim daftar belanja ke WhatsApp", buy: "Cari harga", garage: "Garasi saya", garageNote: "Riwayat perbaikan hanya disimpan di HP ini. Panduan bisa dibuka 24 jam.", garageClear: "Hapus riwayat", again: "Perbaiki barang lain", erase: "Hapus foto saya sekarang", eraseAsk: "Hapus foto, suara, dan panduan ini dari server sekarang?", erased: "Sudah dihapus dari server.",
+        done: "Selesai kalau:", outcomeAsk: "Sudah jalan lagi?", fixedBtn: "Sudah beres 🎉", proBtn: "Dibawa ke bengkel", fixedThanks: "Mantap! Perbaikan selesai.", proThanks: "Tidak apa-apa, membawa ke ahli itu pilihan yang aman. Laporan PDF bisa ditunjukkan ke mekanik.", savedTotal: "Total hemat", savedFrom: "dari", savedUnit: "perbaikan", savedYou: "Kamu hemat sekitar {x} dibanding ke bengkel.", ocFixed: "Hasil: pemiliknya bilang sudah jalan lagi.", ocPro: "Hasil: pemiliknya membawa ke bengkel.", linkLabel: "Tautan", preTitle: "Sebelum mulai, pastikan:", preLocked: "Centang semua dulu, baru langkah 1 terbuka.", preReady: "✅ Siap. Langkah 1 terbuka.", waitFor: "Tunggu {n} menit", timerStart: "Mulai pengatur waktu", timerStop: "Hentikan", timerDone: "Waktu tunggu selesai. Lanjut ke langkah berikutnya.", checkStep: "Cek langkah ini", trialMin: "Uji coba: berapa menit perbaikannya?", fbNote: "🧪 Jawaban contoh (API live sedang tidak tersedia)", mech: "🧑‍🔧 Panggil mekanik / bengkel", hoSub: "Kirim ringkasan ini ke bengkel, lalu cari yang terdekat. Laporan PDF berisi ringkasan untuk mekanik.", hoWa: "Kirim lewat WhatsApp", hoMaps: "Bengkel/servis terdekat", hoPdf: "Laporan PDF untuk mekanik", hoMsg: "Pesan yang dikirim", liveGuide: "Panduan kamera langsung", liveCheck: "📸 Cek sekarang", liveClose: "Tutup kamera", liveStart: "Menyalakan kamera…", liveAim: "Arahkan kamera ke {name}", liveFound: "🎯 Ketemu {name}", liveLost: "Belum ketemu {name}. Gerakkan HP pelan-pelan.", liveNoPart: "Langkah ini tidak menunjuk bagian tertentu. Pakai Cek sekarang.", liveNoCam: "Kamera langsung tidak bisa dipakai di HP ini. Pakai tombol foto untuk cek langkah.", liveLimit: "Batas kamera langsung untuk perbaikan ini sudah habis. Pakai foto untuk cek langkah.", share: "Bagikan laporan", pdf: "Unduh laporan PDF", workshop: "Lembar bengkel (cetak besar)", hood: "Di balik layar: model yang dipakai", hs_listen: "Dengar suara", hs_gate: "Cek keselamatan teks", hs_look: "Lihat foto", hs_segment: "Tandai bagian", hs_diagnose: "Diagnosa", hs_plan: "Susun langkah", hs_safety: "Cek keselamatan rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Suara pemandu", wa: "Kirim daftar belanja ke WhatsApp", buy: "Cari harga", garage: "Garasi saya", garageNote: "Riwayat perbaikan hanya disimpan di HP ini. Panduan bisa dibuka 24 jam.", garageClear: "Hapus riwayat", again: "Perbaiki barang lain", erase: "Hapus foto saya sekarang", eraseAsk: "Hapus foto, suara, dan panduan ini dari server sekarang?", erased: "Sudah dihapus dari server.",
         stuck: "Masih rusak, coba rencana lain", stuckHere: "Apa yang terjadi? (mis. sudah dicoba, tetap mati)",
         needPhoto: "Ambil atau unggah foto dulu.", needDesc: "Ceritakan masalahnya (suara atau ketik).",
         footer: "Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.",
         stages: { listen: "Mendengarkan", gate: "Cek keselamatan awal", look: "Melihat foto", segment: "Menandai bagian (SAM 3.1)", diagnose: "Mendiagnosa",
                   plan: "Menyusun langkah", safety: "Cek keselamatan rencana", illustrate: "Menggambar diagram", narrate: "Menyiapkan suara" },
-        diff: "Kesulitan", min: "menit", est: "perkiraan", shopCost: "bengkel", save: "hemat",  stopTitle: "STOP: jangan lanjutkan sendiri", triedTitle: "Saatnya ke bengkel/servis", stopNow: "Lakukan sekarang:",
+        diff: "Kesulitan", min: "menit", est: "sparepart", shopCost: "bengkel", save: "hemat",  stopTitle: "STOP: jangan lanjutkan sendiri", triedTitle: "Saatnya ke bengkel/servis", stopNow: "Lakukan sekarang:",
+        stopNow_gas: ["Tutup regulator / katup tabung gas, jangan nyalakan api atau saklar.", "Buka pintu dan jendela, keluar dari ruangan bila baunya kuat.", "Hubungi agen resmi elpiji atau teknisi gas, tunjukkan laporan ini."], stopNow_mains: ["Matikan MCB bila aman dijangkau; jangan sentuh kabel yang terbuka.", "Jangan buka casing, stop kontak, atau panel.", "Panggil teknisi listrik bersertifikat atau servis resmi, tunjukkan laporan ini."], stopNow_brake: ["Jangan dikendarai, walau dekat.", "Dorong atau derek ke bengkel.", "Tunjukkan laporan ini ke mekanik."],
         stopNowRed: ["Matikan dan cabut dari listrik / tutup gas / matikan mesin.", "Jangan buka casing atau bagian dalamnya.", "Bawa ke servis resmi atau panggil teknisi, tunjukkan laporan ini."],
         stopNowTried: ["Biarkan dalam keadaan mati dan aman.", "Unduh laporan PDF: berisi apa saja yang sudah dicoba.", "Tunjukkan ke bengkel/servis supaya tidak mengulang dari nol."],
         findService: "Cari servis terdekat", emergency: "Darurat (api, asap, bau gas kuat): telepon 112.", copied: "Tautan disalin", openW: "Penalaran: Muse Spark Open (open weights)", demo: "Mode demo: jawaban contoh, tanpa biaya API.",
@@ -27,13 +28,14 @@ const T = {
         samples: "Try a sample:", sMotor: "bike won't start", sPump: "pump gives no water", sFaucet: "dripping tap", sRice: "dead rice cooker", sTire: "flat tyre",
         working: "Checking…", retry: "Try again", answerHere: "Your answer", send: "Send", diagnosis: "Diagnosis", safetyFirst: "Safety first",
         tools: "Tools", materials: "Parts", listen: "Listen", prevStep: "Previous step", next: "Next", handsFree: "Hands-free mode (read aloud + voice commands)", vListening: "Listening… say next, back, repeat, check, still broken or stop.", vHelp: "Voice commands: next · back · repeat · check · still broken · stop", vNoSR: "This phone can't listen continuously. Tap the mic button for each command.", ptt: "🎙️ Tap, then say a command", pttRec: "⏹️ Speak now… (tap to send)", vHeard: "Heard «{text}»", vUnknown: "Didn't catch «{text}». Try next, back, repeat, check.", vOff: "Hands-free mode off.",
-        done: "Done when:", outcomeAsk: "Does it work again?", fixedBtn: "It works now 🎉", proBtn: "Took it to a mechanic", fixedThanks: "Great, repair done.", proThanks: "That is a safe choice. Show the PDF report to the mechanic.", savedTotal: "Total saved", savedFrom: "from", savedUnit: "repairs", preTitle: "Before you start, make sure:", preLocked: "Tick everything first to unlock step 1.", preReady: "✅ Ready. Step 1 is open.", waitFor: "Wait {n} minutes", timerStart: "Start timer", timerStop: "Stop", timerDone: "Waiting time is over. Go on to the next step.", checkStep: "Check this step", trialMin: "Trial: how many minutes did the fix take?", fbNote: "🧪 Demo answer (live API unavailable)", mech: "🧑‍🔧 Call a mechanic", hoSub: "Send this summary to a workshop, then find the nearest one. The PDF report has a mechanic brief page.", hoWa: "Send on WhatsApp", hoMaps: "Workshops near me", hoPdf: "PDF report for the mechanic", hoMsg: "Message to send", liveGuide: "Live camera guide", liveCheck: "📸 Check now", liveClose: "Close camera", liveStart: "Starting the camera…", liveAim: "Point the camera at the {name}", liveFound: "🎯 Found {name}", liveLost: "Can't see the {name} yet. Move the phone slowly.", liveNoPart: "This step does not point at one part. Use Check now.", liveNoCam: "The live camera is not available on this phone. Use the photo button to check the step.", liveLimit: "The live camera limit for this repair is used up. Use a photo to check the step.", share: "Share report", pdf: "Download PDF report", workshop: "Workshop sheets (large print)", hood: "Under the hood: models used", hs_listen: "Listen", hs_gate: "Text safety gate", hs_look: "Look at photo", hs_segment: "Mark parts", hs_diagnose: "Diagnose", hs_plan: "Plan steps", hs_safety: "Plan safety gate", hs_illustrate: "Helper diagram", hs_narrate: "Voice guide", wa: "Send shopping list to WhatsApp", buy: "Compare prices", garage: "My garage", garageNote: "Your repair history stays on this phone only. Guides open for 24 hours.", garageClear: "Clear history", again: "Fix something else", erase: "Delete my photos now", eraseAsk: "Delete the photos, voice and guide of this repair from the server now?", erased: "Deleted from the server.",
+        done: "Done when:", outcomeAsk: "Does it work again?", fixedBtn: "It works now 🎉", proBtn: "Took it to a mechanic", fixedThanks: "Great, repair done.", proThanks: "That is a safe choice. Show the PDF report to the mechanic.", savedTotal: "Total saved", savedFrom: "from", savedUnit: "repairs", savedUnit1: "repair", savedYou: "You saved about {x} compared with a workshop.", ocFixed: "Result: the owner says it works again.", ocPro: "Result: the owner took it to a mechanic.", linkLabel: "Link", preTitle: "Before you start, make sure:", preLocked: "Tick everything first to unlock step 1.", preReady: "✅ Ready. Step 1 is open.", waitFor: "Wait {n} minutes", timerStart: "Start timer", timerStop: "Stop", timerDone: "Waiting time is over. Go on to the next step.", checkStep: "Check this step", trialMin: "Trial: how many minutes did the fix take?", fbNote: "🧪 Demo answer (live API unavailable)", mech: "🧑‍🔧 Call a mechanic", hoSub: "Send this summary to a workshop, then find the nearest one. The PDF report has a mechanic brief page.", hoWa: "Send on WhatsApp", hoMaps: "Workshops near me", hoPdf: "PDF report for the mechanic", hoMsg: "Message to send", liveGuide: "Live camera guide", liveCheck: "📸 Check now", liveClose: "Close camera", liveStart: "Starting the camera…", liveAim: "Point the camera at the {name}", liveFound: "🎯 Found {name}", liveLost: "Can't see the {name} yet. Move the phone slowly.", liveNoPart: "This step does not point at one part. Use Check now.", liveNoCam: "The live camera is not available on this phone. Use the photo button to check the step.", liveLimit: "The live camera limit for this repair is used up. Use a photo to check the step.", share: "Share report", pdf: "Download PDF report", workshop: "Workshop sheets (large print)", hood: "Under the hood: models used", hs_listen: "Listen", hs_gate: "Text safety gate", hs_look: "Look at photo", hs_segment: "Mark parts", hs_diagnose: "Diagnose", hs_plan: "Plan steps", hs_safety: "Plan safety gate", hs_illustrate: "Helper diagram", hs_narrate: "Voice guide", wa: "Send shopping list to WhatsApp", buy: "Compare prices", garage: "My garage", garageNote: "Your repair history stays on this phone only. Guides open for 24 hours.", garageClear: "Clear history", again: "Fix something else", erase: "Delete my photos now", eraseAsk: "Delete the photos, voice and guide of this repair from the server now?", erased: "Deleted from the server.",
         stuck: "Still broken, try another plan", stuckHere: "What happened? (e.g. tried it, still dead)",
         needPhoto: "Take or upload a photo first.", needDesc: "Describe the problem (voice or text).",
         footer: "Light repairs only. For gas, house wiring, or high voltage, call a professional.",
         stages: { listen: "Listening", gate: "First safety check", look: "Looking at the photo", segment: "Finding the parts (SAM 3.1)", diagnose: "Diagnosing",
                   plan: "Planning steps", safety: "Plan safety check", illustrate: "Drawing diagrams", narrate: "Preparing voice" },
-        diff: "Difficulty", min: "min", est: "est.", shopCost: "shop", save: "save",  stopTitle: "STOP: don't continue on your own", triedTitle: "Time for a repair shop", stopNow: "Do this now:",
+        diff: "Difficulty", min: "min", est: "parts", shopCost: "shop", save: "save",  stopTitle: "STOP: don't continue on your own", triedTitle: "Time for a repair shop", stopNow: "Do this now:",
+        stopNow_gas: ["Close the regulator / cylinder valve; no flames, no light switches.", "Open doors and windows; leave the room if the smell is strong.", "Call the gas supplier or a certified gas technician and show them this report."], stopNow_mains: ["Switch off the breaker (MCB) if it is safe to reach; don't touch bare wires.", "Don't open the casing, socket or panel.", "Call a licensed electrician or a service centre and show them this report."], stopNow_brake: ["Don't ride or drive it, not even a short way.", "Push it or have it towed to a workshop.", "Show the mechanic this report."],
         stopNowRed: ["Switch it off and unplug it / close the gas / stop the engine.", "Don't open the casing or the inside.", "Take it to a service centre or call a technician, and show them this report."],
         stopNowTried: ["Leave it switched off and safe.", "Download the PDF report: it lists everything already tried.", "Show it to the shop so they don't start from zero."],
         findService: "Find a service centre nearby", emergency: "Emergency (fire, smoke, strong gas smell): call 112.", copied: "Link copied", openW: "Reasoning: Muse Spark Open (open weights)", demo: "Demo mode: sample answers, no API cost.",
@@ -50,14 +52,15 @@ T.jv = Object.assign({}, T.id, {
   samples: "Jajal conto:", sMotor: "motor mogok", sPump: "pompa ora metu banyu", sFaucet: "kran netes", sRice: "rice cooker mati", sTire: "ban kempes",
   working: "Lagi dipriksa…", retry: "Jajal maneh", answerHere: "Wangsulanmu", send: "Kirim", diagnosis: "Diagnosa", safetyFirst: "Slamet dhisik",
   tools: "Piranti", materials: "Suku cadang", listen: "Rungokna", prevStep: "Langkah sadurunge", next: "Terus", handsFree: "Mode tanpa tangan (diwacakake + prentah swara)", vListening: "Ngrungokake… ucapna terus, bali, baleni, priksa, isih rusak, utawa mandheg.", vHelp: "Prentah swara: terus · bali · baleni · priksa · isih rusak · mandheg", vNoSR: "HP iki ora bisa ngrungokake terus. Tutul tombol mikrofon saben prentah.", ptt: "🎙️ Tutul, banjur ucapna prentah", pttRec: "⏹️ Ngomong saiki… (tutul kanggo ngirim)", vHeard: "Krungu «{text}»", vUnknown: "Durung ngerti «{text}». Jajal terus, bali, baleni, priksa.", vOff: "Mode tanpa tangan mati.",
-  done: "Rampung yen:", outcomeAsk: "Wis urip maneh?", fixedBtn: "Wis rampung 🎉", proBtn: "Digawa menyang bengkel", fixedThanks: "Apik! Ndandani rampung.", proThanks: "Ora apa-apa, digawa menyang ahli iku pilihan sing aman. Laporan PDF bisa dituduhake marang mekanik.", savedTotal: "Total irit", savedFrom: "saka", savedUnit: "ndandani", preTitle: "Sadurunge miwiti, priksa:", preLocked: "Centhang kabeh dhisik, banjur langkah 1 mbukak.", preReady: "✅ Siap. Langkah 1 wis mbukak.", waitFor: "Antosna {n} menit", timerStart: "Wiwiti pangetung wektu", timerStop: "Mandhegna", timerDone: "Wektu antosan wis rampung. Terus menyang langkah sabanjure.", checkStep: "Priksa langkah iki", trialMin: "Uji coba: pirang menit ndandani?", fbNote: "🧪 Wangsulan conto (API live lagi ora kasedhiya)", mech: "🧑‍🔧 Celuk mekanik / bengkel", hoSub: "Kirim ringkesan iki menyang bengkel, banjur goleki sing paling cedhak. Laporan PDF ana ringkesan kanggo mekanik.", hoWa: "Kirim lewat WhatsApp", hoMaps: "Bengkel/servis paling cedhak", hoPdf: "Laporan PDF kanggo mekanik", hoMsg: "Pesen sing dikirim", liveGuide: "Pandhuan kamera langsung", liveCheck: "📸 Priksa saiki", liveClose: "Tutup kamera", liveStart: "Nguripake kamera…", liveAim: "Arahna kamera menyang {name}", liveFound: "🎯 Ketemu {name}", liveLost: "Durung ketemu {name}. Obahna HP alon-alon.", liveNoPart: "Langkah iki ora nuduhake perangan tartamtu. Enggo Priksa saiki.", liveNoCam: "Kamera langsung ora bisa dienggo ing HP iki. Enggo tombol foto kanggo mriksa langkah.", liveLimit: "Wates kamera langsung kanggo ndandani iki wis entek. Enggo foto kanggo mriksa langkah.", share: "Bagekna laporan", pdf: "Undhuh laporan PDF", workshop: "Lembar bengkel (cetak gedhe)", hood: "Ing mburi layar: model sing dipakai", hs_listen: "Rungokake swara", hs_gate: "Priksa slamet teks", hs_look: "Delok foto", hs_segment: "Tandhani bagean", hs_diagnose: "Diagnosa", hs_plan: "Nyusun langkah", hs_safety: "Priksa slamet rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Swara panuntun", wa: "Kirim dhaptar blanja menyang WhatsApp", buy: "Golek rega", garage: "Garasiku",
+  done: "Rampung yen:", outcomeAsk: "Wis urip maneh?", fixedBtn: "Wis rampung 🎉", proBtn: "Digawa menyang bengkel", fixedThanks: "Apik! Ndandani rampung.", proThanks: "Ora apa-apa, digawa menyang ahli iku pilihan sing aman. Laporan PDF bisa dituduhake marang mekanik.", savedTotal: "Total irit", savedFrom: "saka", savedUnit: "ndandani", savedYou: "Sampeyan irit kira-kira {x} tinimbang menyang bengkel.", ocFixed: "Asil: sing duwe kandha wis urip maneh.", ocPro: "Asil: sing duwe nggawa menyang bengkel.", linkLabel: "Pranala", preTitle: "Sadurunge miwiti, priksa:", preLocked: "Centhang kabeh dhisik, banjur langkah 1 mbukak.", preReady: "✅ Siap. Langkah 1 wis mbukak.", waitFor: "Antosna {n} menit", timerStart: "Wiwiti pangetung wektu", timerStop: "Mandhegna", timerDone: "Wektu antosan wis rampung. Terus menyang langkah sabanjure.", checkStep: "Priksa langkah iki", trialMin: "Uji coba: pirang menit ndandani?", fbNote: "🧪 Wangsulan conto (API live lagi ora kasedhiya)", mech: "🧑‍🔧 Celuk mekanik / bengkel", hoSub: "Kirim ringkesan iki menyang bengkel, banjur goleki sing paling cedhak. Laporan PDF ana ringkesan kanggo mekanik.", hoWa: "Kirim lewat WhatsApp", hoMaps: "Bengkel/servis paling cedhak", hoPdf: "Laporan PDF kanggo mekanik", hoMsg: "Pesen sing dikirim", liveGuide: "Pandhuan kamera langsung", liveCheck: "📸 Priksa saiki", liveClose: "Tutup kamera", liveStart: "Nguripake kamera…", liveAim: "Arahna kamera menyang {name}", liveFound: "🎯 Ketemu {name}", liveLost: "Durung ketemu {name}. Obahna HP alon-alon.", liveNoPart: "Langkah iki ora nuduhake perangan tartamtu. Enggo Priksa saiki.", liveNoCam: "Kamera langsung ora bisa dienggo ing HP iki. Enggo tombol foto kanggo mriksa langkah.", liveLimit: "Wates kamera langsung kanggo ndandani iki wis entek. Enggo foto kanggo mriksa langkah.", share: "Bagekna laporan", pdf: "Undhuh laporan PDF", workshop: "Lembar bengkel (cetak gedhe)", hood: "Ing mburi layar: model sing dipakai", hs_listen: "Rungokake swara", hs_gate: "Priksa slamet teks", hs_look: "Delok foto", hs_segment: "Tandhani bagean", hs_diagnose: "Diagnosa", hs_plan: "Nyusun langkah", hs_safety: "Priksa slamet rencana", hs_illustrate: "Gambar bantu", hs_narrate: "Swara panuntun", wa: "Kirim dhaptar blanja menyang WhatsApp", buy: "Golek rega", garage: "Garasiku",
   garageNote: "Riwayat ndandani mung disimpen ing HP iki. Pandhuan bisa dibukak 24 jam.", garageClear: "Busak riwayat", again: "Ndandani barang liya", erase: "Busak fotoku saiki", eraseAsk: "Busak foto, swara, lan pandhuan iki saka server saiki?", erased: "Wis dibusak saka server.",
   stuck: "Isih rusak, jajal rencana liya", stuckHere: "Kepiye kedadeyane? (umpamane wis dijajal, tetep mati)",
   needPhoto: "Jupuk utawa unggah foto dhisik.", needDesc: "Critakna masalahe (swara utawa ketik).",
   footer: "Mung kanggo ndandani sing entheng. Yen gas, listrik omah, utawa tegangan dhuwur, celuk teknisi.",
   stages: { listen: "Ngrungokake", gate: "Priksa keamanan wiwitan", look: "Ndeleng foto", segment: "Nandhani perangan (SAM 3.1)", diagnose: "Nggoleki sebabe",
             plan: "Nyusun langkah", safety: "Priksa keamanan rencana", illustrate: "Nggambar diagram", narrate: "Nyiapake swara" },
-  diff: "Angel", min: "menit", est: "kira-kira", shopCost: "bengkel", save: "irit",  stopTitle: "MANDHEG: aja diterusake dhewe", triedTitle: "Wayahe menyang bengkel/servis", stopNow: "Tindakake saiki:",
+  diff: "Angel", min: "menit", est: "sparepart", shopCost: "bengkel", save: "irit",  stopTitle: "MANDHEG: aja diterusake dhewe", triedTitle: "Wayahe menyang bengkel/servis", stopNow: "Tindakake saiki:",
+  stopNow_gas: ["Tutup regulator / katup tabung gas, aja nyumet geni utawa nguripke saklar.", "Bukak lawang lan jendela, metu saka kamar yen ambune banter.", "Hubungi agen resmi elpiji utawa teknisi gas, tuduhna laporan iki."], stopNow_mains: ["Pateni MCB yen aman digayuh; aja nyenthuh kabel sing kebukak.", "Aja mbukak casing, stop kontak, utawa panel.", "Celuk teknisi listrik sing duwe sertifikat utawa servis resmi, tuduhna laporan iki."], stopNow_brake: ["Aja ditumpaki, senajan cedhak.", "Surung utawa derek menyang bengkel.", "Tuduhna laporan iki marang mekanik."],
   stopNowRed: ["Pateni lan copot saka listrik / tutup gas / pateni mesin.", "Aja mbukak casing utawa jerone.", "Gawanen menyang servis resmi utawa celuk teknisi, tuduhna laporan iki."],
   stopNowTried: ["Jarna tetep mati lan aman.", "Undhuh laporan PDF: isine apa wae sing wis dijajal.", "Tuduhna menyang bengkel/servis supaya ora mbaleni saka nol."],
   findService: "Golek servis paling cedhak", emergency: "Darurat (geni, kebul, ambu gas banget): telpon 112.", copied: "Tautan wis disalin", openW: "Nalar: Muse Spark Open (open weights)",
@@ -392,12 +395,16 @@ async function submit(sample) {
       fd.append("audio", audioBlob, "voice." + ext);
     }
     const r = await fetch("/api/sessions", { method: "POST", body: fd });
+    if (r.status >= 502) throw new TypeError("server unavailable");  // a sleeping host's gateway page, not our API
     const j = await r.json();
     if (!r.ok) throw new Error(j.detail || r.statusText);
     history.pushState({ tc: 1 }, "", "#" + j.id);  // Back returns to the first screen instead of leaving the site
     show("progress"); startElapsed(); follow(j.id);
-  } catch (e) { $("formErr").textContent = netMsg(e); }
-  finally { $("goBtn").disabled = false; }
+    return "ok";
+  } catch (e) {
+    $("formErr").textContent = netMsg(e);
+    return e && e.name === "TypeError" ? "net" : "err";  // "net": the request never reached the server
+  } finally { $("goBtn").disabled = false; }
 }
 
 /* Keyboard and screen-reader access: the hidden file inputs sit inside labels, which a keyboard cannot reach. */
@@ -480,6 +487,7 @@ function renderProgress(s) {
   const stopped = ["stopped", "exhausted"].includes(s.status);
   if ($("progTitle")) $("progTitle").textContent = stopped ? (s.status === "stopped" ? "⛔ " + t("stopHead") : "🧰 " + t("triedTitle")) : t("working");
   $("stopBox").classList.toggle("hidden", !stopped);
+  if ($("stopAgain")) $("stopAgain").classList.toggle("hidden", !stopped);  // a stop is not a dead end: fix something else
   if (stopped) {
     const fresh = $("stopBox").classList.contains("hidden") || !$("stopBox").innerHTML;
     renderStop(s); saveGarage(s);
@@ -505,7 +513,10 @@ function renderStop(s) {
   const red = s.status === "stopped";
   const obj = ((s.object_report || {}).object || "").trim();
   const q = encodeURIComponent((lang === "en" ? "repair service " : "servis ") + (obj || ""));
-  const actions = (red ? t("stopNowRed") : t("stopNowTried")).map((a) => `<li>${esc(a)}</li>`).join("");
+  // the gate's category (gas / house wiring / brakes) picks the "do this now" list; anything else gets the general one
+  const gate = (s.agent_log || []).find((e) => e && e.kind === "gate" && e.ok === false);
+  const catList = red && gate && ["gas", "mains", "brake"].includes(gate.category) ? t("stopNow_" + gate.category) : null;
+  const actions = (Array.isArray(catList) ? catList : red ? t("stopNowRed") : t("stopNowTried")).map((a) => `<li>${esc(a)}</li>`).join("");
   $("stopBox").innerHTML =
     `<p class="stopTitle">${red ? "⛔ " + esc(t("stopTitle")) : "🧰 " + esc(t("triedTitle"))}</p>`
     + `<p>${esc(s.stop_reason || "")}</p>`
@@ -692,18 +703,28 @@ function showCheck(r) {
     + (r.fallback ? `<p class="small fbNote">${esc(t("fbNote"))}</p>` : "");
 }
 
+// The read-only /guide/<id> page someone shared (its body carries the session id).
+function sharedView() { const sid = document.body.dataset.sid; return !!sid && !sid.startsWith("{{"); }
 function renderOutcome() {
   const box = $("outcome"); if (!box || !S) return;
   const oc = S.outcome || {}, r = oc.result || "";
+  if (sharedView()) {
+    // judge QA 2026-11-02: the shared guide is read-only; a viewer sees the owner's answer but cannot change it
+    box.classList.toggle("hidden", !S.plan || !r);
+    box.querySelectorAll(".row, b[data-t='outcomeAsk']").forEach((el) => el.classList.add("hidden"));
+    if ($("trialBox")) $("trialBox").classList.add("hidden");
+    $("outcomeMsg").textContent = r === "fixed" ? t("ocFixed") : r === "pro" ? t("ocPro") : "";
+    return;
+  }
   box.classList.toggle("hidden", !S.plan);
   if ($("trialBox")) $("trialBox").classList.toggle("hidden", !trialLabel());
   $("fixedBtn").setAttribute("aria-pressed", String(r === "fixed")); $("proBtn").setAttribute("aria-pressed", String(r === "pro"));
-  $("outcomeMsg").textContent = r === "fixed" ? t("fixedThanks") + (oc.saved_idr ? ` ${t("save")} ${rupiah(oc.saved_idr)}.` : "") : r === "pro" ? t("proThanks") : "";
+  $("outcomeMsg").textContent = r === "fixed" ? t("fixedThanks") + (oc.saved_idr ? " " + t("savedYou").replace("{x}", rupiah(oc.saved_idr)) : "") : r === "pro" ? t("proThanks") : "";
 }
 // v1.25.7: the last step passed and every step is camera-verified: bring "Does it work again?" on screen (it sat far
 // below the step card, so the repair seemed to just stop) and say so for screen readers.
 function askOutcome() {
-  const box = $("outcome"); if (!box || !S || box.classList.contains("hidden") || (S.outcome || {}).result) return;
+  const box = $("outcome"); if (!box || !S || sharedView() || box.classList.contains("hidden") || (S.outcome || {}).result) return;
   $("outcomeMsg").textContent = t("allChecked");
   const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (box.scrollIntoView) box.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
@@ -719,7 +740,7 @@ function trialLabel() {
   } catch (_) { return ""; }
 }
 async function sendOutcome(result) {
-  if (!S || !S.id) return;
+  if (!S || !S.id || sharedView()) return;  // never from someone else's shared guide
   const fd = new FormData(); fd.append("result", result);
   const tl = trialLabel();
   if (tl) {
@@ -880,7 +901,8 @@ function setupResult() {
     } finally { $("stuckBtn").disabled = false; }
   });
   on("shareBtn", "click", async () => {
-    const url = replayOn() ? location.origin + "/?replay=1" : location.origin + "/guide/" + S.id;  // a recording has no shared guide page
+    // a recording has no shared guide page; in the static build the page may live under a sub-path
+    const url = replayOn() ? location.origin + homePath() + "?replay=1" : location.origin + "/guide/" + S.id;
     const dx = (S && S.diagnosis) || {}, c = (dx.causes || [])[S.cause_index || 0] || (dx.causes || [])[0];
     const text = [S.object_report && S.object_report.object, c && c.title].filter(Boolean).join(": ");  // the link preview card shows the rest
     if (navigator.share) {
@@ -893,7 +915,7 @@ function setupResult() {
       } catch (e) { if (e && e.name === "AbortError") return; }
       try { await navigator.share({ title: "Tukang Copilot", text, url }); return; } catch (_) {}
     }
-    try { await navigator.clipboard.writeText(url); alert(t("copied")); } catch (_) { prompt("Link", url); }
+    try { await navigator.clipboard.writeText(url); alert(t("copied")); } catch (_) { prompt(t("linkLabel"), url); }
   });
   on("eraseBtn", "click", () => {
     if (!S || !S.id || !confirm(t("eraseAsk"))) return;
@@ -904,6 +926,7 @@ function setupResult() {
     });
   });
   on("againBtn", "click", freshStart);
+  on("stopAgainBtn", "click", freshStart);
 }
 
 window.SAFETY_BASE = {
@@ -1043,7 +1066,7 @@ function renderGarage() {
   const g = loadGarage();
   if ($("garageSaved")) {
     const fixed = g.filter((e) => e && e.outcome === "fixed"), sum = fixed.reduce((a, e) => a + (Number(e.saved) || 0), 0);
-    $("garageSaved").textContent = sum > 0 ? `💰 ${t("savedTotal")} ${rupiah(sum)} ${t("savedFrom")} ${fixed.length} ${t("savedUnit")}` : "";
+    $("garageSaved").textContent = sum > 0 ? `💰 ${t("savedTotal")} ${rupiah(sum)} ${t("savedFrom")} ${fixed.length} ${t(fixed.length === 1 && T[lang] && T[lang].savedUnit1 ? "savedUnit1" : "savedUnit")}` : "";
     $("garageSaved").classList.toggle("hidden", !(sum > 0));
   }
   $("garage").classList.toggle("hidden", !g.length || ($("capture") && $("capture").classList.contains("hidden")));
@@ -1258,7 +1281,12 @@ function setupDemo() {
   on("demoBtn", "click", async () => {
     setTour(true);
     if (await useReplay()) { await window.TCReplay.start(lang); wakeNote(false); await health(); }
-    submit("motor");
+    const res = await submit("motor");
+    // The page loaded but the server stopped answering (it fell asleep, the connection dropped): play the
+    // recorded demo instead of leaving a judge on "No connection".
+    if (res === "net" && window.TCReplay && !replayOn() && await window.TCReplay.start(lang)) {
+      $("formErr").textContent = ""; wakeNote(false); await health(); submit("motor");
+    }
   });
   on("tourClose", "click", () => setTour(false));
   on("tourToggle", "click", toggleTour);

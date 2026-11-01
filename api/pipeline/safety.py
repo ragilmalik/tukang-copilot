@@ -26,6 +26,10 @@ _MSG = {
         "id": "Bagian ini menyimpan energi berbahaya (tegangan tinggi, rem hidrolik, bahan bakar, atau airbag). Bawa ke servis resmi.",
         "jv": "Bagean iki nyimpen energi mbebayani (tegangan dhuwur, rem hidrolik, bensin, utawa airbag). Gawanen menyang servis resmi.",
         "en": "This part stores dangerous energy (high voltage, brake hydraulics, fuel, or an airbag). Take it to a service centre."},
+    "brake": {
+        "id": "Rem yang blong atau tidak pakem itu soal nyawa. Jangan dikendarai; dorong atau derek ke bengkel, biar mekanik yang memperbaiki remnya.",
+        "jv": "Rem sing blong utawa ora pakem iku perkara nyawa. Aja ditumpaki; surung utawa derek menyang bengkel, ben mekanik sing ndandani reme.",
+        "en": "Brakes that fail or feel weak are a life-safety part. Don't ride or drive it; push or tow it to a workshop and let a mechanic fix the brakes."},
     "fire": {
         "id": "Ada api, asap, atau baterai menggembung. Jauhi barangnya, matikan listrik dari sumbernya bila aman, dan hubungi pemadam kebakaran (113).",
         "jv": "Ana geni, kukus, utawa baterai mlembung. Adohana barange, pateni listrik saka sumbere yen aman, lan hubungi pemadam kebakaran (113).",
@@ -52,6 +56,11 @@ _TEXT_RULES: list[tuple[str, str]] = [
      r"|\b(kipas (angin )?(plafon|gantung|langit-langit)|ceiling fan)\b.{0,60}\b(kabel|wir\w*|sambung\w*|pasang|install\w*|reconnect\w*|connect\w*)"
      r"|\b(kabel|wir\w*|sambung\w*|reconnect\w*)\b.{0,60}\b(kipas (angin )?(plafon|gantung)|ceiling fan|ceiling)\b"
      r"|\bwater heater\b.{0,40}\b(bongkar|buka|elemen|open|element)", "mains"),
+    # v1.26.0 judge QA: brake failure on the owner's own motorbike ("rem motorku blong", "rem ora makan",
+    # "my brakes don't work", "spongy brakes") slipped through; only "rem mobil blong" was caught.
+    (r"\brem(ku|e|ne|nya)?\b( \w+){0,3} (n?g?e?blong|los|ngempos|kopong|kurang pakem|(ora|tidak|nggak|gak|ga|enggak|ndak) (makan|pakem|nyekel|ngerem|berfungsi|bekerja|jalan|mempan))\b"
+     r"|\b(brakes? (don'?t|do not|doesn'?t|does not|won'?t|will not|aren'?t|are not|isn'?t|is not|stopped) (work\w*|stop\w*|hold\w*|grab\w*|bite|biting)|no brakes?(?! ?(light|lamp|pad|switch|sensor))|brakes? (feel |are |is |went |go )?(spongy|soft|mushy|weak|gone)"
+     r"|spongy brakes?|brake (pedal|lever) (goes |sinks |drops |pulls )?(to the (floor|bar|grip|handlebar)|all the way))\b", "brake"),
     (r"\b(brake (line|hose|pipe)s?|selang rem|pipa rem|minyak rem\w*|rem (mobil(ku)? )?blong|brakes? (failed|failure|gone))\b", "hv"),
     # "gas" alone also means the throttle on a motorbike ("tarik gas"), so only cooking/LPG gas contexts stop
     (r"\b(elpiji|lpg|tabung gas|selang gas|regulator gas|bau gas|gas bocor|bocor gas|kompor gas|gas leak|gas smell|smell gas|gas line|gas hose)\b", "gas"),

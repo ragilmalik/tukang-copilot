@@ -17,13 +17,13 @@ LEVEL = {"green": ((22, 120, 60), {"id": "AMAN", "jv": "AMAN", "en": "SAFE"}),
          "red": ((185, 28, 28), {"id": "STOP", "jv": "MANDHEG", "en": "STOP"})}
 TXT = {
     "id": {"likely": "Paling mungkin", "steps": "{n} langkah", "min": "~{m} menit", "save": "hemat Rp{s}",
-           "checked": "Tiap langkah dicek kamera", "demo": "MODE DEMO: jawaban contoh, foto pengganti",
+           "checked": "{v} dari {n} langkah lolos cek kamera", "camera": "Kamera mengecek tiap langkah", "demo": "MODE DEMO: jawaban contoh, foto pengganti",
            "tag": "Foto + cerita → panduan perbaikan", "made": "Meta Muse Spark + SAM 3.1"},
     "jv": {"likely": "Sing paling mungkin", "steps": "{n} langkah", "min": "~{m} menit", "save": "irit Rp{s}",
-           "checked": "Saben langkah dipriksa kamera", "demo": "MODE DEMO: wangsulan conto, foto gantosan",
+           "checked": "{v} saka {n} langkah lolos priksa kamera", "camera": "Kamera mriksa saben langkah", "demo": "MODE DEMO: wangsulan conto, foto gantosan",
            "tag": "Foto + crita → tuntunan ndandani", "made": "Meta Muse Spark + SAM 3.1"},
     "en": {"likely": "Most likely", "steps": "{n} steps", "min": "~{m} min", "save": "save Rp{s}",
-           "checked": "Every step camera-checked", "demo": "DEMO MODE: sample answers, stand-in photo",
+           "checked": "{v} of {n} steps passed a camera check", "camera": "The camera checks each step", "demo": "DEMO MODE: sample answers, stand-in photo",
            "tag": "Photo + a few words → a repair guide", "made": "Meta Muse Spark + SAM 3.1"},
 }
 _FONT_DIRS = ("/usr/share/fonts/truetype/dejavu", "/usr/share/fonts/dejavu", "")
@@ -90,6 +90,18 @@ def _rupiah(n: Any) -> str:
         return ""
 
 
+def check_line(s: dict[str, Any], lang: str) -> tuple[str, bool]:
+    """The camera-check line: a real count ("2 of 4 steps passed a camera check"), never "every step checked" for a
+    plan nobody has checked yet (judge QA 2026-11-02). Returns (text, any step passed)."""
+    tx = TXT[lang if lang in TXT else "id"]
+    steps = [st for st in ((s.get("plan") or {}).get("steps") or []) if isinstance(st, dict)]
+    if not steps:
+        return "", False
+    checks = s.get("checks") or {}
+    v = sum(1 for st in steps if (checks.get(str(st.get("n"))) or {}).get("passed"))
+    return ("✓ " + tx["checked"].format(v=v, n=len(steps)), True) if v else (tx["camera"], False)
+
+
 def build(s: dict[str, Any], folder: Path, out: Path) -> Path:
     lang = s.get("lang") if s.get("lang") in TXT else "id"
     tx = TXT[str(lang)]
@@ -136,8 +148,9 @@ def build(s: dict[str, Any], folder: Path, out: Path) -> Path:
     if bits:
         d.text((x, y), "  ·  ".join(bits), font=_font(26), fill=INK)
         y += 40
-    if plan.get("steps"):
-        d.text((x, y), "✓ " + tx["checked"], font=_font(24), fill=(22, 120, 60))
+    line, passed = check_line(s, str(lang))
+    if line:
+        d.text((x, y), line, font=_font(24), fill=(22, 120, 60) if passed else MUTED)
     # footer: models + an honest demo label
     d.line((x, H - 92, right, H - 92), fill=(230, 222, 210), width=2)
     d.text((x, H - 78), tx["made"], font=_font(22, True), fill=MUTED)
