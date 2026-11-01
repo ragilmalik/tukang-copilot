@@ -7,7 +7,10 @@
    This file only answers /api/* calls while the replay is switched on; otherwise it does nothing. */
 (function () {
   "use strict";
-  const BASE = "/static/replay/";
+  // Static judge build (scripts/build_static.py sets window.TC_STATIC): no server at all, so paths are relative to the
+  // page (works under a GitHub Pages sub-path) and the recording is always on.
+  const STATIC = !!window.TC_STATIC;
+  const BASE = (STATIC ? "" : "/") + "static/replay/";
   const realFetch = window.fetch ? window.fetch.bind(window) : null;
   const RealES = window.EventSource;
   const R = { on: false, data: null, L: null, lang: "id", cur: null, phase: "", tick: 900 };
@@ -17,6 +20,7 @@
   const nope = (key) => json({ detail: tr(key), replay: true }, 503);
 
   function forced() {
+    if (STATIC) return true;
     try { return new URLSearchParams(location.search).get("replay") === "1"; } catch (_) { return false; }
   }
 
@@ -130,7 +134,10 @@
   }
 
   async function start(lang) {
-    if (R.on) return true;
+    if (R.on) {  // already on (forced or static build): follow a language change made before the demo starts
+      if (!R.cur && R.data && R.data.langs[lang]) { R.lang = lang; R.L = R.data.langs[lang]; }
+      return true;
+    }
     if (!realFetch) return false;
     try { await load(); } catch (_) { return false; }
     R.lang = R.data.langs[lang] ? lang : "id";

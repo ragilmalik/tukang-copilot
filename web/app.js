@@ -851,10 +851,10 @@ function setupResult() {
     const id = S.id;
     fetch(`/api/sessions/${encodeURIComponent(id)}`, { method: "DELETE" }).catch(() => null).then(() => {
       try { localStorage.setItem(GARAGE_KEY, JSON.stringify(loadGarage().filter((e) => e && e.id !== id))); } catch (_) {}
-      alert(t("erased")); history.replaceState(null, "", "/"); location.reload();
+      alert(t("erased")); history.replaceState(null, "", homePath()); location.reload();
     });
   });
-  on("againBtn", "click", () => { history.replaceState(null, "", "/"); location.reload(); });
+  on("againBtn", "click", () => { history.replaceState(null, "", homePath()); location.reload(); });
 }
 
 window.SAFETY_BASE = {
@@ -1221,6 +1221,9 @@ function setupDemo() {
   if ($("preList")) $("preList").addEventListener("change", () => setTimeout(updateTour, 0));
 }
 
+// "/" on the server; the page's own path in the static judge build (it may live under a GitHub Pages sub-path).
+function homePath() { return window.TC_STATIC ? location.pathname : "/"; }
+
 /* ---------------- laptop view (v1.25) ---------------- */
 // At >= 1024 px the page shows the app in a phone frame plus a side panel (web/style.css). The QR code encodes the
 // page's own address so a judge on a laptop can carry on with a phone; the encoder (web/vendor/qrcode.js, MIT,
@@ -1247,7 +1250,7 @@ function loadQr() {
   if (!$("qrBox") || !isDesk()) return;
   if (typeof window.qrcode === "function") { drawQr(); return; }
   if (document.getElementById("qrLib")) return;
-  const sc = document.createElement("script"); sc.id = "qrLib"; sc.src = "/static/vendor/qrcode.js"; sc.onload = drawQr;
+  const sc = document.createElement("script"); sc.id = "qrLib"; sc.src = (window.TC_STATIC ? "" : "/") + "static/vendor/qrcode.js"; sc.onload = drawQr;
   document.head.appendChild(sc);
 }
 function setupDesk() {
@@ -1284,7 +1287,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // PWA: install to home screen. The worker only caches the app shell; it fails quietly when sw.js is absent.
-if ("serviceWorker" in navigator && location.protocol !== "file:") {
+if ("serviceWorker" in navigator && location.protocol !== "file:" && !window.TC_STATIC) {  // the static judge build has no worker
   window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));
 }
 

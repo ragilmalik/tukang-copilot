@@ -36,7 +36,7 @@ def test_markup_has_frame_side_panel_qr_demo_and_language_buttons():
 def test_side_panel_only_on_wide_screens_and_qr_lib_lazy():
     assert ".side{display:none}" in CSS and "@media (min-width:1024px)" in CSS
     assert "vendor/qrcode.js" not in HTML                                  # phones never download the QR encoder
-    assert '"/static/vendor/qrcode.js"' in JS and "(min-width: 1024px)" in JS
+    assert '"static/vendor/qrcode.js"' in JS and "(min-width: 1024px)" in JS
 
 
 def test_vendored_qr_encoder_keeps_its_mit_licence():
