@@ -14,6 +14,7 @@ from api import impact
 from api.main import app
 from api.pipeline import engine
 from api.settings import settings
+from api.tests.owner_auth import owner
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -34,8 +35,8 @@ def _ready(sample: str = "pump", lang: str = "en") -> dict[str, Any]:
 
 def test_outcome_appends_a_row():
     s = _ready("pump")
-    client.post(f"/api/sessions/{s['id']}/outcome", data={"result": "fixed", "minutes": "35", "tester": "T1"})
-    client.post(f"/api/sessions/{s['id']}/outcome", data={"result": "pro"})
+    client.post(f"/api/sessions/{s['id']}/outcome", data={"result": "fixed", "minutes": "35", "tester": "T1"}, headers=owner(s['id']))
+    client.post(f"/api/sessions/{s['id']}/outcome", data={"result": "pro"}, headers=owner(s['id']))
     rows = impact.read()
     assert len(rows) == 2  # append-only: both taps are kept
     r = rows[0]
@@ -53,7 +54,7 @@ def test_outcome_appends_a_row():
 @pytest.mark.parametrize("data", [{"minutes": "-1"}, {"minutes": "601"}, {"tester": "<script>"}, {"tester": "x" * 41}])
 def test_bad_trial_fields_are_rejected(data):
     s = _ready("faucet")
-    assert client.post(f"/api/sessions/{s['id']}/outcome", data={"result": "fixed", **data}).status_code == 422
+    assert client.post(f"/api/sessions/{s['id']}/outcome", data={"result": "fixed", **data}, headers=owner(s['id'])).status_code == 422
     assert impact.read() == []
 
 
@@ -118,7 +119,7 @@ def test_download_endpoint_is_token_gated(monkeypatch):
     monkeypatch.setattr(settings, "impact_token", "s3cret")
     assert client.get("/api/impact/outcomes.jsonl", headers={"X-Impact-Token": "nope"}).status_code == 404
     s = _ready("faucet")
-    client.post(f"/api/sessions/{s['id']}/outcome", data={"result": "fixed"})
+    client.post(f"/api/sessions/{s['id']}/outcome", data={"result": "fixed"}, headers=owner(s['id']))
     r = client.get("/api/impact/outcomes.jsonl", headers={"X-Impact-Token": "s3cret"})
     assert r.status_code == 200 and json.loads(r.text.splitlines()[0])["session"] == s["id"]
 

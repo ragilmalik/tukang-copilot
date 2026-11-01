@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import re
+import secrets
 import shutil
 import tempfile
 from collections.abc import AsyncIterator, Awaitable, Callable
@@ -145,9 +146,23 @@ def _guard_followup(request: Request, sid: str) -> None:
         raise HTTPException(b.status, guard.message(b.kind, str(_load(sid).get("lang", "id"))), headers={"Retry-After": str(b.retry_after)})
 
 
+def _require_owner(s: dict[str, Any], request: Request) -> None:
+    """Owner-only actions (outcome, erase). A repair made through the web API has an owner token, returned once at
+    creation and kept in the owner's browser (localStorage); the shared guide link (/guide/{id}) does not carry it.
+    WhatsApp repairs get a token that is never sent anywhere (the chat itself is the owner). Sessions saved before
+    1.27.0 have none and stay open."""
+    want = str(s.get("owner_token") or "")
+    if not want:
+        return
+    got = request.headers.get("x-owner-token", "")
+    if not (got and secrets.compare_digest(got.encode(), want.encode())):
+        raise HTTPException(403, "Only the owner's phone can do this. A shared guide is read-only.")
+
+
 def public(s: dict[str, Any]) -> dict[str, Any]:
     # never on the wire: the owner's own words (text, history, phrases the injection guard caught) and raw errors
-    out = {k: v for k, v in s.items() if k not in {"text", "history", "error_detail", "input_flags"}}
+    # and the owner token: whoever holds the guide link must not be able to answer or erase for the owner (backlog Q14)
+    out = {k: v for k, v in s.items() if k not in {"text", "history", "error_detail", "input_flags", "owner_token"}}
     out["input_guard"] = len(s.get("input_flags") or [])
     out["files_base"] = f"/files/{s['id']}/"
     out["trace"] = build_trace(s)
@@ -327,8 +342,9 @@ async def create_session(request: Request, photos: list[UploadFile] | None = Fil
             audio_path = video_sound
         if not text.strip() and audio_path is None:
             raise HTTPException(400, "Describe the problem by voice or text")
+        owner = secrets.token_urlsafe(18)
         try:
-            s = engine.create(photo_paths, language, text, audio_path, category, sample=sample)
+            s = engine.create(photo_paths, language, text, audio_path, category, sample=sample, owner_token=owner)
         except RuntimeError as e:
             raise HTTPException(400, str(e))
         except OSError:
@@ -339,7 +355,7 @@ async def create_session(request: Request, photos: list[UploadFile] | None = Fil
         for d in tmp_dirs:
             shutil.rmtree(d, ignore_errors=True)
     engine.start(s["id"])
-    return {"id": s["id"]}
+    return {"id": s["id"], "owner_token": owner}
 
 
 @app.get("/api/demo/check-photo/{kind}")
@@ -372,9 +388,10 @@ def get_session(sid: str) -> dict[str, Any]:
 
 
 @app.delete("/api/sessions/{sid}")
-def delete_session(sid: str) -> dict[str, Any]:
-    """Erase this repair (photos, voice, PDFs) from the server now, instead of waiting for RETENTION_HOURS."""
-    _load(sid)
+def delete_session(sid: str, request: Request) -> dict[str, Any]:
+    """Erase this repair (photos, voice, PDFs) from the server now, instead of waiting for RETENTION_HOURS.
+    Owner only (X-Owner-Token header)."""
+    _require_owner(_load(sid), request)
     track.forget(sid)
     return {"id": sid, "deleted": engine.delete(sid)}
 
@@ -510,11 +527,12 @@ def post_replan(sid: str, request: Request, report: str = Form(default="")) -> d
 
 
 @app.post("/api/sessions/{sid}/outcome")
-def post_outcome(sid: str, result: str = Form(...), minutes: int | None = Form(default=None),
+def post_outcome(sid: str, request: Request, result: str = Form(...), minutes: int | None = Form(default=None),
                  tester: str = Form(default="")) -> dict[str, Any]:
     """The owner closes the loop: result is "fixed" (it works now) or "pro" (a mechanic took over).
-    Optional for trials: minutes the fix took, and a tester label (e.g. "T1"). Each call is appended to the impact log."""
-    _load(sid)
+    Optional for trials: minutes the fix took, and a tester label (e.g. "T1"). Each call is appended to the impact log.
+    Owner only (X-Owner-Token header): a shared guide viewer gets 403 (backlog Q14)."""
+    _require_owner(_load(sid), request)
     try:
         return public(engine.set_outcome(sid, result.strip().lower(), minutes, tester))
     except ValueError as e:

@@ -182,7 +182,7 @@ def main() -> int:
             try:
                 r = c.post("/api/sessions", data={"sample": "rice", "language": "en"})
                 r.raise_for_status()
-                sid = r.json()["id"]
+                sid, own = r.json()["id"], {"X-Owner-Token": r.json().get("owner_token", "")}
                 t0 = time.time()
                 st = ""
                 while time.time() - t0 < 240:
@@ -202,7 +202,7 @@ def main() -> int:
                 else:
                     line("FAIL", f"PDF report: HTTP {pdf.status_code} (repair status '{st}')",
                          "Fonts or Pillow missing in the image: redeploy from the repo's Dockerfile (Render: runtime docker).")
-                c.delete(f"/api/sessions/{sid}")
+                c.delete(f"/api/sessions/{sid}", headers=own)
             except (httpx.HTTPError, KeyError, ValueError) as e:
                 line("FAIL", f"could not run a sample repair ({e})",
                      "429/503 = the public spend guard (RATE_LIMIT_PER_HOUR / DAILY_BUDGET_USD) blocked it; wait or raise it in Environment.")

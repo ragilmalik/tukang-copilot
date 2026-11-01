@@ -11,6 +11,7 @@ from api import main
 from api.main import app
 from api.pipeline import engine
 from api.settings import settings
+from api.tests.owner_auth import owner
 
 client = TestClient(app)
 
@@ -30,11 +31,12 @@ def test_delete_erases_files_and_session():
     _wait(sid)
     folder = settings.data_dir / "sessions" / sid
     assert folder.exists() and any(folder.iterdir())
-    r = client.delete(f"/api/sessions/{sid}")
+    own = owner(sid)
+    r = client.delete(f"/api/sessions/{sid}", headers=own)
     assert r.status_code == 200 and r.json() == {"id": sid, "deleted": True}
     assert not folder.exists()
     assert client.get(f"/api/sessions/{sid}").status_code == 404
-    assert client.delete(f"/api/sessions/{sid}").status_code == 404  # already gone
+    assert client.delete(f"/api/sessions/{sid}", headers=own).status_code == 404  # already gone
     assert client.get(f"/api/sessions/{sid}/report.pdf").status_code == 404
 
 
@@ -45,7 +47,7 @@ def test_delete_unknown_or_bad_id_is_404():
 
 def test_delete_while_worker_running_does_not_resurrect_folder():
     sid = client.post("/api/sessions", data={"sample": "motor", "language": "id"}).json()["id"]
-    assert client.delete(f"/api/sessions/{sid}").status_code in (200, 404)
+    assert client.delete(f"/api/sessions/{sid}", headers=owner(sid)).status_code in (200, 404)
     time.sleep(1.0)  # let the worker thread finish its remaining saves
     for t in threading.enumerate():
         if t.name.startswith("session-"):

@@ -101,7 +101,8 @@ def test_shared_guide_shows_the_outcome_read_only(page):
     page.wait_for_timeout(500)
     assert page.is_hidden("#fixedBtn") and page.is_hidden("#proBtn")
     assert page.is_hidden("#outcome")                      # no answer yet: nothing to show
-    page.evaluate(f"fetch('/api/sessions/{sid}/outcome', {{method: 'POST', body: (() => {{ const f = new FormData(); f.append('result', 'fixed'); return f; }})()}})")
+    # the owner's phone (same browser, its localStorage holds the owner token) answers; the guide page itself cannot
+    page.evaluate(f"fetch('/api/sessions/{sid}/outcome', {{method: 'POST', headers: {{'X-Owner-Token': JSON.parse(localStorage.getItem('tc_owner'))['{sid}']}}, body: (() => {{ const f = new FormData(); f.append('result', 'fixed'); return f; }})()}})")
     page.wait_for_timeout(300)
     page.reload()
     page.wait_for_selector("#outcome:not(.hidden)", timeout=20000)

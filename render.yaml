@@ -1,6 +1,8 @@
 # One-click deploy on Render: dashboard.render.com -> New -> Blueprint -> pick this repo. Step by step: docs/DEPLOY.md
 # Render asks for four values during setup: MODEL_API_KEY (needed for LIVE mode), BASETEN_API_KEY (optional),
 # IMPACT_TOKEN (optional) and PUBLIC_BASE_URL (fill in the https Render URL once you know it; empty is OK at first).
+# It also asks for the four optional WhatsApp values (WA_TOKEN, WA_PHONE_NUMBER_ID, WA_VERIFY_TOKEN, WA_APP_SECRET):
+# leave them empty to skip WhatsApp, or follow docs/WHATSAPP.md.
 # With no MODEL_API_KEY the app still deploys and runs in free DEMO mode.
 services:
   - type: web
@@ -24,6 +26,15 @@ services:
         sync: false
       - key: PUBLIC_BASE_URL            # set to your https Render URL (e.g. https://tukang-copilot.onrender.com) after
         sync: false                     # the first deploy: mechanic hand-off / WhatsApp links use it
+      # ---- WhatsApp channel (optional, docs/WHATSAPP.md; all four empty = channel off, the web app is unchanged) ----
+      - key: WA_TOKEN                   # Cloud API access token (secret)
+        sync: false
+      - key: WA_PHONE_NUMBER_ID         # the business number's ID from WhatsApp > API Setup
+        sync: false
+      - key: WA_VERIFY_TOKEN            # your own word, also typed into the Meta webhook form
+        sync: false
+      - key: WA_APP_SECRET              # app secret, checks X-Hub-Signature-256 on every webhook POST (secret)
+        sync: false
       # ---- mode ----
       - key: MOCK                       # 1 = demo answers only, no Meta spend (instant fallback if the live API misbehaves)
         value: "0"

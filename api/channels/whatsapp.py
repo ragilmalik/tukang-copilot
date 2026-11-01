@@ -32,6 +32,7 @@ import hmac
 import json
 import logging
 import re
+import secrets
 import shutil
 import threading
 import time
@@ -563,7 +564,7 @@ def start_repair(conv: Conv) -> None:
     send_text(tr, t("working", conv.lang))
     text = "\n".join(conv.texts)[:MAX_TEXT]
     try:
-        s = engine.create(list(conv.photos), conv.lang, text, conv.audio, "")
+        s = engine.create(list(conv.photos), conv.lang, text, conv.audio, "", owner_token=secrets.token_urlsafe(18))  # never sent: the chat is the owner
     except RuntimeError as e:
         send_text(tr, t("bad_audio" if "recording" in str(e).lower() else "bad_photo", conv.lang))
         _clear_pending(conv)

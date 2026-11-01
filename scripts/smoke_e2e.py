@@ -52,7 +52,8 @@ def main() -> int:
         for sample, expect in (("motor", "ready"), ("pump", "ready"), ("faucet", "ready"), ("rice", "stopped"), ("tire", "ready")):
             print(f"[{sample}]")
             t0 = time.time()
-            sid = c.post("/api/sessions", data={"sample": sample, "language": "id"}).json()["id"]
+            made = c.post("/api/sessions", data={"sample": sample, "language": "id"}).json()
+            sid, own = made["id"], {"X-Owner-Token": made.get("owner_token", "")}
             s = wait(c, sid)
             if s["status"] == "needs_answer":
                 ok(bool(s["question"]), f"agent asked a follow-up: {s['question'][:60]}")
@@ -86,11 +87,13 @@ def main() -> int:
             ok(g.status_code == 200 and f"/api/sessions/{sid}/card.png" in g.text, "shareable guide page with link-preview tags")
             card = c.get(f"/api/sessions/{sid}/card.png")
             ok(card.status_code == 200 and card.content[:8] == b"\x89PNG\r\n\x1a\n", f"share card PNG ({len(card.content) // 1024} KB)")
-            r = c.post(f"/api/sessions/{sid}/outcome", data={"result": "fixed"})
+            ok(c.post(f"/api/sessions/{sid}/outcome", data={"result": "fixed"}).status_code == 403,
+               "outcome refused without the owner token (shared guide is read-only)")
+            r = c.post(f"/api/sessions/{sid}/outcome", data={"result": "fixed"}, headers=own)
             ok(r.status_code == 200 and r.json()["outcome"]["result"] == "fixed", "outcome: it works now")
             r = c.get(f"/api/sessions/{sid}/report.pdf")
             ok(r.status_code == 200 and r.content[:4] == b"%PDF", f"PDF report ({len(r.content) // 1024} KB)")
-            ok(c.delete(f"/api/sessions/{sid}").json().get("deleted") is True and c.get(f"/api/sessions/{sid}").status_code == 404, "erase my photos now")
+            ok(c.delete(f"/api/sessions/{sid}", headers=own).json().get("deleted") is True and c.get(f"/api/sessions/{sid}").status_code == 404, "erase my photos now")
     print("\nALL PASSED" if not fails else f"\n{len(fails)} FAILED: {fails}")
     return 0 if not fails else 1
 

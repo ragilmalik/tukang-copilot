@@ -9,6 +9,7 @@ from PIL import Image
 from api.main import app
 from api.pipeline import engine
 from api.render import share_card
+from api.tests.owner_auth import owner
 
 client = TestClient(app)
 
@@ -50,7 +51,7 @@ def test_card_never_uses_the_owners_words(tmp_path):
 
 def test_card_gone_after_erase():
     sid = _done("faucet")
-    assert client.delete(f"/api/sessions/{sid}").status_code == 200
+    assert client.delete(f"/api/sessions/{sid}", headers=owner(sid)).status_code == 200
     assert client.get(f"/api/sessions/{sid}/card.png").status_code == 404
 
 

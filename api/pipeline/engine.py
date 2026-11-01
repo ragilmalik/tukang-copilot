@@ -109,8 +109,9 @@ def models_used() -> dict[str, str]:
 
 
 def create(photos: list[Path], lang: str, text: str = "", audio: Path | None = None, category: str = "",
-           sample: str = "") -> dict[str, Any]:
-    """Store the inputs and return a new session (not started)."""
+           sample: str = "", owner_token: str = "") -> dict[str, Any]:
+    """Store the inputs and return a new session (not started). owner_token (set by the web API) is the secret only the
+    owner's phone holds: closing the loop (outcome) and erasing need it, a shared guide link does not carry it."""
     if not photos:
         raise ValueError("at least one photo is required")
     sid = uuid.uuid4().hex[:12]
@@ -136,7 +137,7 @@ def create(photos: list[Path], lang: str, text: str = "", audio: Path | None = N
          "object_report": None, "parts": {}, "parts_image": None, "diagnosis": None, "plan": None, "cause_index": 0,
          "diagrams": {}, "audio": {}, "checks": {}, "safety": {"level": None, "reason": "", "disclaimer": safety.DISCLAIMER[lang]},
          "stop_reason": None, "error": None, "cost": None, "models": models_used(), "history": [],
-         "sample": sample, "agent_log": []}
+         "sample": sample, "agent_log": [], "owner_token": owner_token}
     save(s)
     return s
 

@@ -1,6 +1,7 @@
 """Demo assets from the REAL app running in demo (mock) mode: screenshots, captions, voice-over, a 2-3 min video.
 
-    python scripts/make_demo_assets.py shots     # Playwright drives the phone UI -> docs/demo/screenshots/*.png
+    python scripts/make_demo_assets.py shots     # Playwright drives the phone UI -> docs/demo/screenshots/*.png (+ wa)
+    python scripts/make_demo_assets.py wa        # only the WhatsApp simulator shots -> docs/demo/screenshots/30_whatsapp_*.png
     python scripts/make_demo_assets.py diagram   # docs/img/architecture.png (also used in the video)
     python scripts/make_demo_assets.py voice     # edge-tts voice-over per scene -> docs/demo/voice/*.mp3 (needs internet)
     python scripts/make_demo_assets.py video     # docs/demo/tukang-copilot-demo.mp4 (16:9) + captions .srt + vertical X clip
@@ -59,6 +60,7 @@ class Scene:
     min_s: float = 5.0
 
 
+WA_LABELS = ["Cause on your photo", "Tap a step button", "Gas leak: red stop"]
 HACKATHON_LINE = "Built during the Meta AI Developer Hackathon, Oct 26 to Nov 4, 2026 (first commit Oct 30)"
 
 SCENES: list[Scene] = [
@@ -102,14 +104,15 @@ SCENES: list[Scene] = [
     Scene("handoff", "18_handoff", "Hand-off to a bengkel: WhatsApp summary, nearest workshop, PDF with a mechanic brief.",
           "And when it's a job for a pro, one tap hands it off: a WhatsApp summary of what was found and tried, "
           "a search for the nearest bengkel, and a PDF with a brief for the mechanic.", 8),
-    Scene("share", "26_share_card", "Share a guide link: WhatsApp and X show this card (marked photo, cause, safety level).",
-          "Share the guide, and WhatsApp or X shows a card with your marked photo, the likely cause and the safety level.", 6),
     Scene("rice", "11_rice_stop", "RED STOP: opening 220 V internals → take it to a service centre.",
           "It also knows when to say no. A rice cooker that won't heat would mean opening 220 volt internals, "
           "so the safety gate stops the guidance.", 7),
     # v1.22: the stop-PDF scene was dropped to make room for the agent log and keep the cut under 3:00
-    Scene("lang", "20_javanese_result", "Basa Jawa UI and Javanese voice input, plus English.",
-          "The whole app runs in Bahasa Indonesia, Javanese and English, with Javanese voice input.", 5),
+    # v1.27: the "share" and "lang" scenes were dropped for the WhatsApp scene (Javanese is now shown in WhatsApp; cut stays under 3:00)
+    Scene("wa", "wa:30_whatsapp_jv_diagnosis,30_whatsapp_jv_steps,30_whatsapp_jv_redstop",
+          "Also works in WhatsApp, in Basa Jawa. Same agent, same safety gate.",
+          "It also works in WhatsApp, in Javanese. Send a photo, and the same agent replies with the marked photo, "
+          "the diagnosis and a button for each step. A gas leak still gets a red stop.", 6),
     Scene("ow", "21_open_weights", "One switch: reasoning on Muse Spark Open (open weights) via Baseten.",
           "And with one switch, diagnosis and planning run on Muse Spark Open, Meta's open-weights model, on Baseten. "
           "The app shows a badge when it does.", 6),
@@ -301,6 +304,61 @@ def shots() -> None:
     print("screenshots ->", SHOTS, sorted(p.name for p in SHOTS.glob("*.png")))
 
 
+# ---------------------------------------------------------------- WhatsApp simulator (v1.27)
+WA_SHOTS = ["30_whatsapp_jv_diagnosis", "30_whatsapp_jv_steps", "30_whatsapp_jv_redstop", "30_whatsapp_en_check", "30_whatsapp_en_pdf"]
+
+
+def wa_shots() -> None:
+    """The WhatsApp simulator page (/wa, demo mode): the same handler as the real Cloud API webhook, so these show what a
+    WhatsApp chat gets. Javanese: photo in, marked photo + diagnosis, step buttons, red stop; English: a step check and
+    the PDF report. Not a real WhatsApp number (that waits on Malik's Meta setup, docs/WHATSAPP.md)."""
+    from playwright.sync_api import sync_playwright
+
+    SHOTS.mkdir(parents=True, exist_ok=True)
+    base, srv = _server()
+    with sync_playwright() as p:
+        b = p.chromium.launch(executable_path=_chromium(), args=["--no-sandbox", "--no-proxy-server"])
+        for lang in ("jv", "en"):
+            pg = b.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2)
+            errors: list[str] = []
+            pg.on("pageerror", lambda e: errors.append(str(e)))
+
+            def snap(name: str) -> None:
+                pg.wait_for_timeout(800)
+                pg.screenshot(path=str(SHOTS / f"{name}.png")); print("shot", name, flush=True)
+
+            pg.goto(base + f"/wa?lang={lang}"); pg.wait_for_selector("#chips button")
+            pg.locator("#chips button").nth(0).click()                       # sample: dripping kitchen tap
+            pg.wait_for_selector(".btns button", timeout=30000)
+            if lang == "jv":
+                pg.wait_for_timeout(800)
+                # the diagnosis message (marked photo + likely cause) at the top of the chat
+                pg.evaluate("""(() => { const log = document.getElementById('log');
+                  const row = [...log.querySelectorAll('.row:not(.me)')].find((r) => r.textContent.includes('🩺'));
+                  log.scrollTop += row.getBoundingClientRect().top - log.getBoundingClientRect().top - 8; })()""")
+                snap("30_whatsapp_jv_diagnosis")
+                pg.evaluate("document.getElementById('log').scrollTop = 1e9")
+                snap("30_whatsapp_jv_steps")
+                pg.goto(base + f"/wa?lang={lang}"); pg.evaluate("sessionStorage.clear()"); pg.reload()
+                pg.wait_for_selector("#chips button")
+                pg.locator("#chips button").nth(3).click()                   # sample: gas smell -> red stop
+                pg.wait_for_function("document.querySelectorAll('.row:not(.me)').length >= 1", timeout=30000)
+                pg.wait_for_timeout(700)
+                snap("30_whatsapp_jv_redstop")
+            else:
+                pg.locator("#chips button").nth(4).click()                   # the stand-in "after" photo -> step check
+                pg.wait_for_function("document.querySelectorAll('.btns').length >= 2", timeout=30000)
+                snap("30_whatsapp_en_check")
+                pg.locator(".btns").last.locator("button").nth(2).click()    # Stop -> PDF report in the chat
+                pg.wait_for_selector(".doc", timeout=30000)
+                snap("30_whatsapp_en_pdf")
+            if errors:
+                raise SystemExit(f"/wa page errors: {errors}")
+            pg.close()
+        b.close()
+    srv.should_exit = True
+
+
 # ---------------------------------------------------------------- architecture diagram
 def diagram() -> None:
     im = Image.new("RGB", (W, H), BG); d = ImageDraw.Draw(im)
@@ -412,6 +470,27 @@ def _frame(sc: Scene, vertical: bool = False, subtitle: str = "") -> Image.Image
             im.paste(a.resize((aw, int(a.height * aw / a.width)), Image.Resampling.LANCZOS), ((fw - aw) // 2, 0))
         else:
             im.paste(a.resize((fw, int(a.height * fw / a.width))), (0, 0))
+    elif sc.image.startswith("wa:"):  # v1.27: three WhatsApp simulator screens side by side, each with a short label
+        names = sc.image[3:].split(",")
+        ph = 692 if vertical else 640
+        pw_ = int(780 * ph / 1688)
+        gap = 30 if vertical else 60
+        x = (fw - len(names) * pw_ - (len(names) - 1) * gap) // 2 if vertical else 100
+        y = 260 if vertical else 250
+        for k, name in enumerate(names):
+            shot = Image.open(SHOTS / f"{name}.png").convert("RGB").resize((pw_, ph), Image.Resampling.LANCZOS)
+            xx = x + k * (pw_ + gap)
+            d.rounded_rectangle([xx - 10, y - 10, xx + pw_ + 10, y + ph + 10], radius=28, fill=INK)
+            im.paste(shot, (xx, y))
+            lab = WA_LABELS[k] if k < len(WA_LABELS) else ""
+            lf = font(26 if vertical else 28)
+            d.text((xx + (pw_ - d.textlength(lab, font=lf)) / 2, y - 62), lab, fill=INK, font=lf)
+        if vertical:
+            d.text((80, 60), "WhatsApp simulator · demo mode · stand-in photos", fill=MUTED, font=font(30, False))
+        else:
+            cap_x = x + len(names) * (pw_ + gap) + 40
+            d.text((cap_x, 120), "Tukang Copilot", fill=ORANGE, font=font(56))
+            d.text((cap_x, 195), "WhatsApp simulator · demo mode", fill=MUTED, font=font(28, False))
     else:
         shot = Image.open(SHOTS / f"{sc.image}.png").convert("RGB")
         ph = fh - (560 if vertical else 120)
@@ -563,17 +642,17 @@ def video() -> None:
 
 def vertical(work: Path, has_voice: bool) -> None:
     """~45 s 9:16 clip for X (silent, captions only): 3 s title card, then hook, streaming progress, parts, live camera,
-    check, Muse Image diagram, rice stop, models, close. Each card has the Indonesian line plus an English caption."""
-    keys = ["title", "hook", "progress", "parts", "live", "check_pass", "diagram", "rice", "arch", "close"]
+    check, rice stop, WhatsApp (v1.27, in place of the Muse Image diagram), models, close. Each card has the Indonesian line plus an English caption."""
+    keys = ["title", "hook", "progress", "parts", "live", "check_pass", "rice", "wa", "arch", "close"]  # v1.27: wa replaced diagram
     short = {"title": "Tukang Copilot", "hook": "Motor mogok, bengkel tutup? Foto + ngomong.", "parts": "SAM 3.1 menandai part di foto KAMU.",
              "live": "Kamera langsung: part yang harus dipegang ditandai (demo).", "check_pass": "Tiap langkah dicek kamera ✓",
              "diagram": "Foto tidak cukup? Muse Image menggambar diagram (demo: gambar pengganti).",
-             "rice": "Bahaya? Dia bilang STOP.", "progress": "Lihat AI bekerja: hasil muncul tiap tahap.",
+             "rice": "Bahaya? Dia bilang STOP.", "wa": "Juga lewat WhatsApp, dalam Basa Jawa.", "progress": "Lihat AI bekerja: hasil muncul tiap tahap.",
              "arch": "Built with Meta Muse Spark + SAM 3.1 + Muse Image", "close": "Tukang Copilot · open source · mode demo"}
     english = {"title": "", "hook": "Bike won't start and the shop is closed? Snap it and say what's wrong.",
                "parts": "SAM 3.1 marks the parts on YOUR photo.", "live": "Live camera: the part to touch is outlined (demo).",
                "check_pass": "Every step is checked by the camera.", "diagram": "Photo not enough? Muse Image draws a diagram (demo stand-in).",
-               "rice": "Dangerous? It says STOP and hands you to a pro.", "progress": "Watch the AI work: results appear stage by stage.",
+               "rice": "Dangerous? It says STOP and hands you to a pro.", "wa": "Also works in WhatsApp (simulator, demo mode).", "progress": "Watch the AI work: results appear stage by stage.",
                "arch": "Voice Transcribe · Muse Spark · SAM 3.1 · Muse Image", "close": "Fix it yourself, safely. In Javanese."}
     parts: list[Path] = []
     for k in keys:
@@ -593,7 +672,7 @@ def vertical(work: Path, has_voice: bool) -> None:
 
 
 GIF_SHOTS = ["01_home", "02_progress", "03_question", "05_parts", "23_agent_log", "24_agent_jump", "15_preflight", "07_check_fail", "08_check_pass",
-             "16_live_guide", "09_replan", "28_diagram_step", "11_rice_stop", "20_javanese_result"]
+             "16_live_guide", "09_replan", "28_diagram_step", "11_rice_stop", "20_javanese_result", "30_whatsapp_jv_diagnosis"]
 
 
 def gif() -> None:
@@ -612,8 +691,8 @@ def gif() -> None:
 
 def main() -> None:
     cmd = sys.argv[1] if len(sys.argv) > 1 else "all"
-    steps = {"shots": [shots], "diagram": [diagram], "voice": [voice], "video": [video], "gif": [gif],
-             "all": [shots, diagram, voice, video, gif]}
+    steps = {"shots": [shots, wa_shots], "wa": [wa_shots], "diagram": [diagram], "voice": [voice], "video": [video], "gif": [gif],
+             "all": [shots, wa_shots, diagram, voice, video, gif]}
     for fn in steps[cmd]:
         fn()
 

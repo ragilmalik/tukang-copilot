@@ -44,3 +44,17 @@ def test_videos_fit_the_limits_and_timestamps_match():
     assert "0:00  title" in ts and "diagram" in ts and f"{main:.1f} s" in ts
     srt = (DEMO / "tukang-copilot-demo.en.srt").read_text(encoding="utf-8")
     assert "Muse Image draws a diagram" in srt
+
+
+def test_whatsapp_scene_in_javanese_with_its_screenshots():
+    """v1.27: a ~12 s WhatsApp scene (simulator, Basa Jawa): marked photo + diagnosis, step buttons, red stop."""
+    sc = next(s for s in mda.SCENES if s.key == "wa")
+    names = sc.image[3:].split(",")
+    assert sc.image.startswith("wa:") and names == ["30_whatsapp_jv_diagnosis", "30_whatsapp_jv_steps", "30_whatsapp_jv_redstop"]
+    for n in mda.WA_SHOTS:
+        assert (DEMO / "screenshots" / f"{n}.png").exists(), n
+    assert "WhatsApp" in sc.caption and "Basa Jawa" in sc.caption and "red stop" in sc.say
+    keys = [s.key for s in mda.SCENES]
+    assert keys.index("rice") < keys.index("wa") < keys.index("arch")
+    assert "  wa " in (DEMO / "TIMESTAMPS.txt").read_text(encoding="utf-8")
+    assert "30_whatsapp_jv_diagnosis" in mda.GIF_SHOTS

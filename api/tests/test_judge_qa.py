@@ -15,6 +15,7 @@ from fastapi.testclient import TestClient
 from api.main import app
 from api.pipeline import mock, safety
 from api.render import share_card
+from api.tests.owner_auth import owner
 
 client = TestClient(app)
 
@@ -138,7 +139,7 @@ def test_mechanic_brief_status_follows_it_works_now(lang, fixed, asked):
     sid = _ready("faucet", lang)
     before = [t for _, t in report_pdf.brief_lines(engine.load(sid), lang)]
     assert asked in before and fixed not in before
-    assert client.post(f"/api/sessions/{sid}/outcome", data={"result": "fixed"}).status_code == 200
+    assert client.post(f"/api/sessions/{sid}/outcome", data={"result": "fixed"}, headers=owner(sid)).status_code == 200
     after = [t for _, t in report_pdf.brief_lines(engine.load(sid), lang)]
     assert fixed in after and asked not in after
     assert client.get(f"/api/sessions/{sid}/report.pdf").status_code == 200
@@ -149,7 +150,7 @@ def test_mechanic_brief_after_took_it_to_a_mechanic_still_says_asked():
     from api.render import report_pdf
 
     sid = _ready("faucet", "en")
-    client.post(f"/api/sessions/{sid}/outcome", data={"result": "pro"})
+    client.post(f"/api/sessions/{sid}/outcome", data={"result": "pro"}, headers=owner(sid))
     rows = [t for _, t in report_pdf.brief_lines(engine.load(sid), "en")]
     assert "Owner asked for a mechanic" in rows
 

@@ -195,8 +195,7 @@
 </main>
 <p class="muted small center" id="disclaimer"></p>
 <footer class="muted small" data-t="footer">Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.</footer>
-<p class="small center" id="waSim"></p>
-<script>/* WhatsApp simulator link (docs/WHATSAPP.md); server only, the static judge build has no /wa */if (!window.TC_STATIC) { const a = document.createElement("a"); a.id = "waSimLink"; a.href = "/wa"; a.textContent = "💬 WhatsApp (simulator)"; a.style.cssText = "display:inline-block;min-height:44px;padding:12px 8px"; document.getElementById("waSim").appendChild(a); }</script>
+<p class="small center hidden" id="waSim"><a id="waSimLink" class="waSimLink" href="/wa" data-t="waSim">💬 Coba juga lewat WhatsApp (simulator)</a></p>
 </div><!-- /screen -->
 <div id="tourBar" class="tourBar hidden" data-testid="tour-bar"><button id="tourToggle" class="tourToggle" type="button" aria-expanded="true" aria-controls="tourText" aria-label="Kecilkan tip">💡</button><p id="tourText" role="status" aria-live="polite"></p><button id="tourClose" class="tourX" type="button" aria-label="Tutup">×</button></div>
 </div><!-- /phone -->

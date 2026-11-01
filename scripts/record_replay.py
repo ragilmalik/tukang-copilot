@@ -152,7 +152,8 @@ def record_lang(c: Any, lang: str, photos: dict[str, bytes], files_dir: Path, ou
     for res in ("fixed", "pro"):
         engine.save(copy.deepcopy(base))
         before = c.get(f"/api/sessions/{sid}").json()
-        after = c.post(f"/api/sessions/{sid}/outcome", data={"result": res}).json()
+        after = c.post(f"/api/sessions/{sid}/outcome", data={"result": res},
+                       headers={"X-Owner-Token": str(base.get("owner_token") or "")}).json()
         outcome[res] = _delta(before, after, set())
     engine.save(copy.deepcopy(base))
     before = c.get(f"/api/sessions/{sid}").json()

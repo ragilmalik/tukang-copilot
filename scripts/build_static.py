@@ -60,6 +60,7 @@ def _version() -> str:
 def _index_html(version: str) -> str:
     html = (WEB / "index.html").read_text(encoding="utf-8")
     html = re.sub(r'\s*<link rel="manifest"[^>]*>', "", html)  # no PWA install: the build has no service worker
+    html = re.sub(r'\s*<p [^>]*id="waSim"[^>]*>.*?</p>', "", html, flags=re.S)  # no /wa simulator without a server
     html = html.replace('href="/static/', 'href="static/').replace('src="/static/', 'src="static/')
     flag = (
         '\n  <!-- Static judge build (scripts/build_static.py): plays a RECORDED demo-mode run, never calls the API. -->\n'
@@ -78,7 +79,7 @@ def build(out: Path) -> dict[str, object]:
     if out.exists():
         shutil.rmtree(out)
     static = out / "static"
-    skip = {"index.html", "guide.html", "sw.js", "manifest.webmanifest"}
+    skip = {"index.html", "guide.html", "wa.html", "sw.js", "manifest.webmanifest"}
     shutil.copytree(WEB, static, ignore=lambda d, names: [n for n in names if Path(d) == WEB and n in skip])
     # the recording points at /static/replay/...: make it relative to the page
     rec = (static / "replay" / "demo.json").read_text(encoding="utf-8").replace('"/static/replay/', '"static/replay/')
@@ -112,7 +113,9 @@ def verify(out: Path) -> list[str]:
     for a in rec.get("assets", []):
         if a.startswith("/") or not (out / a).exists():
             probs.append(f"recording asset not found: {a}")
-    for name in ("sw.js", "manifest.webmanifest", "guide.html"):
+    if "waSim" in html:
+        probs.append("index.html still links the WhatsApp simulator (needs a server)")
+    for name in ("sw.js", "manifest.webmanifest", "guide.html", "wa.html"):
         if (out / "static" / name).exists():
             probs.append(f"server-only file copied: {name}")
     return probs

@@ -14,6 +14,7 @@ from PIL import Image
 from api.main import app
 from api.pipeline import engine, mock, track
 from api.settings import settings
+from api.tests.owner_auth import owner
 
 client = TestClient(app)
 WEB = Path(__file__).resolve().parents[2] / "web"
@@ -177,7 +178,7 @@ def test_delete_forgets_throttle():
     s = _ready("pump")
     _track(s["id"])
     assert s["id"] in track._last
-    client.delete(f"/api/sessions/{s['id']}")
+    client.delete(f"/api/sessions/{s['id']}", headers=owner(s['id']))
     assert s["id"] not in track._last
 
 

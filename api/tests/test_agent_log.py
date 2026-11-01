@@ -10,6 +10,7 @@ from PIL import Image
 
 from api.main import app
 from api.pipeline import engine
+from api.tests.owner_auth import owner
 
 client = TestClient(app)
 
@@ -62,7 +63,7 @@ def test_full_agent_loop_is_logged_with_tools():
     s = client.post(f"/api/sessions/{sid}/replan", data={"report": "tried, still dead"}).json()
     rp = [e for e in s["agent_log"] if e["kind"] == "replan"][-1]
     assert rp["tried"] == "Loose spark plug cap" and rp["cause"] == "Fouled spark plug" and rp["steps"] == 4
-    s = client.post(f"/api/sessions/{sid}/outcome", data={"result": "fixed"}).json()
+    s = client.post(f"/api/sessions/{sid}/outcome", data={"result": "fixed"}, headers=owner(sid)).json()
     assert s["agent_log"][-1] == {**s["agent_log"][-1], "kind": "outcome", "result": "fixed"}
     assert all(isinstance(e["t"], float) and e["t"] >= 0 for e in s["agent_log"])
 
