@@ -2,6 +2,13 @@
 
 All dates WIB (UTC+7). Everything below was built during the hackathon window (Oct 26 – Nov 4, 2026).
 
+## 1.25.6 (2026-11-01 WIB)
+Audit 12 (what a screen reader says, in each language; laptop view).
+- **The back button has a name.** The "previous step" control was only "◀"; it now says "Langkah sebelumnya" / "Langkah sadurunge" / "Previous step" (app and shared guide page).
+- **Labels follow the chosen language.** The SAM parts picture ("Highlighted parts"), the "How it works" list and the laptop QR code were English-only labels on the Indonesian and Javanese pages. A new `data-ta` hook in `applyLang` sets aria-labels from the language table.
+- Service-worker shell cache bumped to `tukang-shell-v9`.
+- 7 new real-Chromium tests in `test_playwright_labels.py` (they fail on 1.25.5).
+
 ## 1.25.5 (2026-11-01 WIB)
 Audit 11 (video and voice-recording refusals, landing in Basa Jawa).
 - **A too-long video no longer says your text is too long.** The server's "That video is too long" matched the long-text rule, so a 40 s clip got a message about the owner's text. Video rules now come first: unreadable video, too short, too long and unreadable voice recording each show a message in Bahasa, Basa Jawa or English (`videoBad`, `videoShort`, `videoLong`, `recBad`).

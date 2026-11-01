@@ -31,7 +31,7 @@
   <section id="capture" class="card">
     <h1 data-t="hero">Apa yang rusak?</h1>
     <p class="muted" data-t="heroSub">Foto barangnya, ceritakan masalahnya, dapat panduan perbaikan.</p>
-    <ol class="how" aria-label="How it works"><li data-t="how1">📷 Foto + cerita</li><li data-t="how2">🎯 AI tandai bagiannya</li><li data-t="how3">✅ Tiap langkah dicek kamera</li></ol>
+    <ol class="how" aria-label="Cara kerjanya" data-ta="howLabel"><li data-t="how1">📷 Foto + cerita</li><li data-t="how2">🎯 AI tandai bagiannya</li><li data-t="how3">✅ Tiap langkah dicek kamera</li></ol>
     <button id="demoBtn" class="btn demo big" type="button" data-testid="demo-btn" data-t="demoBtn">▶ Coba demo 1 ketuk</button>
     <p class="small muted demoSub" data-t="demoSub">Tanpa foto, tanpa akun: lihat AI memperbaiki motor mogok dari awal sampai cek kamera.</p>
     <p id="wakeNote" class="small wakeNote hidden" role="status"></p>
@@ -108,7 +108,7 @@
       <h2 id="dxObject"></h2>
       <p id="dxSummary"></p>
       <ul id="dxCauses" class="causes"></ul>
-      <div id="partsWrap" class="hidden"><img id="partsImg" alt="Highlighted parts" class="partsImg"><ul id="partsList" class="legend"></ul></div>
+      <div id="partsWrap" class="hidden"><img id="partsImg" alt="Foto dengan bagian yang ditandai" class="partsImg"><ul id="partsList" class="legend"></ul></div>
     </div>
 
     <div class="card agent hidden" id="agent" data-testid="agent-log">
@@ -149,7 +149,7 @@
       </div>
       <div id="checkResult" class="hidden" aria-live="polite"></div>
       <div class="row nav">
-        <button id="prevBtn" class="btn" type="button">◀</button>
+        <button id="prevBtn" class="btn" type="button" aria-label="Langkah sebelumnya" data-ta="prevStep">◀</button>
         <button id="playBtn" class="btn" type="button">🔊 <span data-t="listen">Dengarkan</span></button>
         <button id="nextBtn" class="btn primary" type="button"><span data-t="next">Lanjut</span> ▶</button>
       </div>
@@ -211,7 +211,7 @@
   </ul>
   <button id="sideDemo" class="btn demo big" type="button" data-testid="side-demo" data-t="deskDemo">▶ Putar demo 1 ketuk di sini</button>
   <div class="sideQr">
-    <div id="qrBox" class="qrBox" role="img" data-testid="side-qr" aria-label="QR"></div>
+    <div id="qrBox" class="qrBox" role="img" data-testid="side-qr" aria-label="Pindai untuk membuka di HP"></div>
     <div><p class="sideQrHead"><b data-t="deskQr">Pindai untuk membuka di HP</b></p><p class="small muted" data-t="deskQrSub">Kamera, suara, dan cek langkah paling enak di HP.</p><p id="qrUrl" class="small qrUrl"></p><p id="qrLocal" class="small qrLocal hidden" data-t="deskQrLocal">Alamat ini hanya jalan di komputer ini.</p></div>
   </div>
   <div class="sideLang" role="group" aria-label="Language">
