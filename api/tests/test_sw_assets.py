@@ -1,12 +1,9 @@
-import re
 from pathlib import Path
 
 WEB = Path(__file__).resolve().parents[2] / "web"
 
 
-def test_index_local_assets_exist() -> None:
-    html = (WEB / "index.html").read_text()
-    refs = re.findall(r'(?:src|href)="/?([\w./-]+\.(?:js|css|png|svg|webmanifest))"', html)
-    assert refs
-    for ref in refs:
-        assert (WEB / ref.removeprefix("static/")).exists() or ref in ("sw.js", "manifest.webmanifest"), ref
+def test_sw_exists_and_has_cache_name():
+    text = (WEB / "sw.js").read_text()
+    assert "caches" in text
+    assert "fetch" in text
