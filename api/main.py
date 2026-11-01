@@ -91,6 +91,11 @@ async def security_headers(request: Request, call_next: Callable[[Request], Awai
 
 app.mount("/static", StaticFiles(directory=WEB), name="static")
 
+from .channels import wa_sim, whatsapp  # noqa: E402  (WhatsApp channel + simulator, docs/WHATSAPP.md)
+
+app.include_router(whatsapp.router)
+app.include_router(wa_sim.router)
+
 
 async def _save_upload(up: UploadFile, allowed: set[str], limit: int, default_ext: str) -> Path:
     ext = (Path(up.filename or "").suffix or default_ext).lower()

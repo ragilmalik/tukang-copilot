@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#008069">
+<title>Tukang Copilot on WhatsApp (simulator)</title>
+<link rel="icon" href="/static/icons/icon-192.png">
+<style>
+  :root { --green:#008069; --bubble-me:#d9fdd3; --bg:#efeae2; --ink:#111b21; --muted:#667781; --link:#027eb5; --btn:#00a884; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; height:100%; }
+  body { font:15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:#d1d7db; }
+  .phone { max-width:480px; height:100%; margin:0 auto; display:flex; flex-direction:column; background:var(--bg); }
+  header { background:var(--green); color:#fff; display:flex; align-items:center; gap:10px; padding:10px 12px; }
+  .avatar { width:40px; height:40px; border-radius:50%; background:#fff; color:var(--green); font-weight:700; display:grid; place-items:center; flex:none; }
+  .who { flex:1; min-width:0; }
+  .who b { display:block; font-size:16px; }
+  .who small { opacity:.85; }
+  .langs { display:flex; gap:2px; }
+  .langs button { background:transparent; border:1px solid rgba(255,255,255,.5); color:#fff; border-radius:12px; padding:4px 8px; min-height:32px; font-size:12px; cursor:pointer; }
+  .langs button[aria-pressed="true"] { background:#fff; color:var(--green); }
+  .sim { background:#fff3c4; color:#5c4400; font-size:13px; padding:7px 12px; border-bottom:1px solid #ecd98a; }
+  .sim b { display:block; }
+  .sim a { color:#5c4400; }
+  #log { flex:1; overflow-y:auto; padding:10px 10px 4px; }
+  .day { text-align:center; margin:4px 0 10px; }
+  .day span { background:#fff; color:var(--muted); font-size:12px; padding:4px 10px; border-radius:8px; box-shadow:0 1px .5px rgba(0,0,0,.13); }
+  .hint { background:#fff8; color:var(--muted); text-align:center; font-size:13px; border-radius:8px; padding:8px 10px; margin:0 20px 10px; }
+  .row { display:flex; margin:4px 0; }
+  .row.me { justify-content:flex-end; }
+  .msg { max-width:84%; background:#fff; border-radius:8px; padding:6px 8px 4px; box-shadow:0 1px .5px rgba(0,0,0,.13); word-wrap:break-word; white-space:pre-wrap; }
+  .me .msg { background:var(--bubble-me); }
+  .msg img { display:block; width:100%; max-width:280px; border-radius:6px; margin-bottom:4px; }
+  .msg .time { display:block; text-align:right; font-size:11px; color:var(--muted); margin-top:2px; }
+  .msg .foot { color:var(--muted); font-size:12px; margin-top:4px; }
+  .msg a { color:var(--link); }
+  .btns { display:flex; flex-direction:column; gap:3px; margin-top:3px; max-width:84%; }
+  .btns button { background:#fff; border:0; border-radius:8px; color:var(--link); font:inherit; font-weight:600; padding:10px; min-height:44px; box-shadow:0 1px .5px rgba(0,0,0,.13); cursor:pointer; }
+  .btns button:disabled { color:#9aa5ab; cursor:default; }
+  .doc { display:flex; align-items:center; gap:10px; background:#f5f6f6; border-radius:6px; padding:10px; text-decoration:none; color:var(--ink); }
+  .doc .ic { background:#e2574c; color:#fff; font-weight:700; font-size:11px; border-radius:4px; padding:8px 5px; }
+  .doc small { color:var(--muted); display:block; }
+  .chips { display:flex; gap:6px; overflow-x:auto; padding:6px 8px; background:var(--bg); }
+  .chips button { flex:none; border:1px solid #c9d1d5; background:#fff; border-radius:16px; padding:6px 12px; min-height:36px; font:inherit; font-size:13px; cursor:pointer; }
+  form { display:flex; align-items:flex-end; gap:6px; padding:6px 8px calc(8px + env(safe-area-inset-bottom)); background:#f0f2f5; }
+  .box { flex:1; display:flex; align-items:center; background:#fff; border-radius:22px; padding:0 6px; min-height:44px; }
+  .box input[type=text] { flex:1; border:0; outline:0; font:inherit; padding:10px 6px; background:transparent; min-width:0; }
+  .icon { border:0; background:transparent; font-size:20px; width:40px; height:40px; border-radius:50%; cursor:pointer; display:grid; place-items:center; }
+  .send { background:var(--btn); color:#fff; width:46px; height:46px; flex:none; }
+  .send.rec { background:#e2574c; }
+  label.icon input { display:none; }
+  .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  :focus-visible { outline:3px solid #1f6feb; outline-offset:2px; }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior:auto !important; } }
+</style>
+</head>
+<body>
+<div class="phone">
+  <header>
+    <div class="avatar" aria-hidden="true">TC</div>
+    <div class="who"><b>Tukang Copilot</b><small id="status">online</small></div>
+    <div class="langs" role="group" aria-label="Language">
+      <button type="button" data-lang="id" aria-pressed="false">ID</button>
+      <button type="button" data-lang="jv" aria-pressed="false">JV</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </header>
+  <div class="sim" role="note"><b id="simLabel">Simulator, runs the same engine in demo mode</b><span id="simSub"></span></div>
+  <main id="log" aria-live="polite" aria-label="Chat"><div class="day"><span id="today">Today</span></div><p class="hint" id="hint"></p></main>
+  <div class="chips" id="chips" aria-label="Samples"></div>
+  <form id="form" autocomplete="off">
+    <div class="box">
+      <label class="icon" title="Photo" id="photoLbl"><span aria-hidden="true">📷</span><span class="sr-only" id="photoSr">Send a photo</span><input id="file" type="file" accept="image/*" capture="environment"></label>
+      <input id="text" type="text" maxlength="2000" aria-label="Message">
+    </div>
+    <button class="icon send" id="sendBtn" type="submit" aria-label="Send">➤</button>
+  </form>
+</div>
+<script>
+"use strict";
+const L = {
+  id: { sim: "Simulator, menjalankan mesin yang sama dalam mode demo", sub: "Bukan nomor WhatsApp sungguhan. Pesan diproses oleh webhook WhatsApp Tukang Copilot yang sama.",
+        ph: "Ketik pesan", hint: "Ketuk contoh di bawah, atau kirim foto barang yang rusak plus ceritanya (ketik atau pesan suara). Balasannya sama persis dengan di WhatsApp.", today: "Hari ini", online: "online", typing: "sedang mengetik...", photo: "Kirim foto", rec: "Rekam pesan suara", stopRec: "Kirim pesan suara",
+        tap: "Keran netes", motor: "Motor mogok", rice: "Rice cooker", gas: "Bau gas", after: "Kirim foto 'sesudah'", voice: "Pesan suara", file: "Dokumen PDF", erase: "HAPUS",
+        texts: { faucet: "Kran wastafel dapur netes terus walaupun sudah ditutup kencang.", motor: "Motor saya Honda Beat susah hidup dari pagi, distarter cuma bunyi tapi mesin nggak nyala.",
+                 rice: "Rice cooker saya nggak panas, lampunya mati padahal sudah dicolok.", gas: "Tabung gas di dapur bocor, baunya menyengat. Harus gimana?" } },
+  jv: { sim: "Simulator, nglakokake mesin sing padha ing mode demo", sub: "Dudu nomer WhatsApp tenan. Pesen diolah webhook WhatsApp Tukang Copilot sing padha.",
+        ph: "Ketik pesen", hint: "Tutul conto ing ngisor, utawa kirim foto barang sing rusak lan critane (ketik utawa pesen swara). Wangsulane padha karo ing WhatsApp.", today: "Dina iki", online: "online", typing: "lagi ngetik...", photo: "Kirim foto", rec: "Rekam pesen swara", stopRec: "Kirim pesen swara",
+        tap: "Kran netes", motor: "Motor mogok", rice: "Rice cooker", gas: "Ambu gas", after: "Kirim foto 'sawise'", voice: "Pesen swara", file: "Dokumen PDF", erase: "BUSAK",
+        texts: { faucet: "Kran wastafel pawon netes terus senajan wis ditutup kenceng.", motor: "Motorku Honda Beat angel urip wiwit esuk, distarter mung muni nanging mesine ora urip.",
+                 rice: "Rice cookerku ora panas, lampune mati senajan wis dicolok.", gas: "Kompor gase bocor, ambune banget. Aku kudu piye?" } },
+  en: { sim: "Simulator, runs the same engine in demo mode", sub: "Not a real WhatsApp number. Messages go through the same Tukang Copilot WhatsApp webhook handler.",
+        ph: "Type a message", hint: "Tap a sample below, or send a photo of something broken and say what is wrong (typed or a voice note). The replies are exactly what WhatsApp would show.", today: "Today", online: "online", typing: "typing...", photo: "Send a photo", rec: "Record a voice note", stopRec: "Send voice note",
+        tap: "Dripping tap", motor: "Bike won't start", rice: "Rice cooker", gas: "Gas smell", after: "Send 'after' photo", voice: "Voice note", file: "PDF document", erase: "DELETE",
+        texts: { faucet: "The kitchen faucet keeps dripping even when closed tight.", motor: "My Honda Beat won't start since this morning, the starter turns but the engine doesn't fire.",
+                 rice: "My rice cooker won't heat, the light is off even though it's plugged in.", gas: "There is a gas smell from the stove hose in my kitchen. What should I do?" } },
+};
+const $ = (id) => document.getElementById(id);
+const log = $("log");
+let lang = new URLSearchParams(location.search).get("lang") || localStorage.getItem("wasim.lang") || ((navigator.language || "id").slice(0, 2) === "en" ? "en" : "id");
+if (!L[lang]) lang = "id";
+let chat = sessionStorage.getItem("wasim.chat");
+if (!chat || !/^[a-f0-9]{20}$/.test(chat)) {
+  chat = Array.from(crypto.getRandomValues(new Uint8Array(10)), (b) => b.toString(16).padStart(2, "0")).join("");
+  sessionStorage.setItem("wasim.chat", chat);
+}
+let after = 0, polling = false, lastSample = "faucet", recorder = null, chunks = [];
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function fmt(s) {
+  return esc(s).replace(/\*([^*\n]+)\*/g, "<b>$1</b>")
+    .replace(/(https?:\/\/[^\s<]+)/g, (u) => `<a href="${u}" target="_blank" rel="noopener noreferrer">${/google\.com\/maps/.test(u) ? "Google Maps ↗" : u.replace(/^https?:\/\/(www\.)?/, "").slice(0, 40)}</a>`);
+}
+const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+function bubble(html, me) {
+  const row = document.createElement("div");
+  row.className = "row" + (me ? " me" : "");
+  row.innerHTML = `<div class="msg">${html}<span class="time">${now()}${me ? " ✓✓" : ""}</span></div>`;
+  log.appendChild(row);
+  row.querySelectorAll("img").forEach((im) => im.addEventListener("load", () => { log.scrollTop = log.scrollHeight; }));
+  log.scrollTop = log.scrollHeight;
+  return row;
+}
+const media = (id) => `/api/wa-sim/media/${chat}/${encodeURIComponent(id)}`;
+function render(m) {
+  if (m.type === "text") return bubble(fmt(m.text.body));
+  if (m.type === "image") return bubble(`<img src="${media(m.image.id)}" alt="${esc((m.image.caption || "").split("\n")[0] || "photo")}">${fmt(m.image.caption || "")}`);
+  if (m.type === "document") {
+    const d = m.document;
+    return bubble(`<a class="doc" href="${media(d.id)}" target="_blank" rel="noopener"><span class="ic">PDF</span><span>${esc(d.filename)}<small>${esc(L[lang].file)}</small></span></a>${fmt(d.caption || "")}`);
+  }
+  if (m.type === "interactive") {
+    const it = m.interactive;
+    const head = it.header && it.header.type === "image" ? `<img src="${media(it.header.image.id)}" alt="">` : "";
+    const row = bubble(`${head}${fmt(it.body.text)}${it.footer ? `<div class="foot">${esc(it.footer.text)}</div>` : ""}`);
+    const box = document.createElement("div");
+    box.className = "btns";
+    for (const b of it.action.buttons) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = b.reply.title;
+      btn.addEventListener("click", () => {
+        box.querySelectorAll("button").forEach((x) => (x.disabled = true));
+        bubble(esc(b.reply.title), true);
+        send({ button: b.reply.id + "|" + b.reply.title });
+      });
+      box.appendChild(btn);
+    }
+    row.appendChild(box);
+    row.style.flexDirection = "column";
+    log.scrollTop = log.scrollHeight;
+    return row;
+  }
+  return bubble(esc("[" + m.type + "]"));
+}
+async function poll() {
+  if (polling) return;
+  polling = true;
+  let idle = 0;
+  try {
+    while (idle < 6) {
+      const r = await fetch(`/api/wa-sim/poll?chat=${chat}&after=${after}`);
+      if (!r.ok) break;
+      const j = await r.json();
+      for (const x of j.messages) { after = Math.max(after, x.seq); render(x.message); }
+      $("status").textContent = j.busy ? L[lang].typing : L[lang].online;
+      idle = j.busy || j.messages.length ? 0 : idle + 1;
+      await new Promise((res) => setTimeout(res, j.busy ? 600 : 400));
+    }
+  } finally { polling = false; $("status").textContent = L[lang].online; }
+}
+async function send(fields, file, fileField) {
+  const fd = new FormData();
+  fd.append("chat", chat);
+  for (const [k, v] of Object.entries(fields || {})) fd.append(k, v);
+  if (file) fd.append(fileField, file, file.name || (fileField === "audio" ? "voice.webm" : "photo.jpg"));
+  $("status").textContent = L[lang].typing;
+  const r = await fetch("/api/wa-sim/send", { method: "POST", body: fd });
+  if (!r.ok) bubble(esc((await r.json().catch(() => ({}))).detail || r.statusText));
+  poll();
+}
+async function sendPhoto(blob, caption) {
+  const url = URL.createObjectURL(blob);
+  bubble(`<img src="${url}" alt="">${fmt(caption || "")}`, true);
+  await send(caption ? { text: caption } : {}, new File([blob], "photo.jpg", { type: blob.type || "image/jpeg" }), "photo");
+}
+async function sample(name) {
+  lastSample = name;
+  const t = L[lang].texts[name];
+  if (name === "gas") { bubble(fmt(t), true); return send({ text: t }); }
+  const blob = await (await fetch(`/api/wa-sim/sample/${name}.jpg`)).blob();
+  sendPhoto(blob, t);
+}
+async function afterPhoto() {
+  const s = lastSample === "rice" || lastSample === "gas" ? "faucet" : lastSample;
+  sendPhoto(await (await fetch(`/api/demo/check-photo/ok?sample=${s}`)).blob(), "");
+}
+function chips() {
+  const c = $("chips");
+  c.innerHTML = "";
+  const add = (label, fn) => { const b = document.createElement("button"); b.type = "button"; b.textContent = label; b.addEventListener("click", fn); c.appendChild(b); };
+  add("🚰 " + L[lang].tap, () => sample("faucet"));
+  add("🛵 " + L[lang].motor, () => sample("motor"));
+  add("🍚 " + L[lang].rice, () => sample("rice"));
+  add("⛔ " + L[lang].gas, () => sample("gas"));
+  add("✅ " + L[lang].after, afterPhoto);
+  add("🗑 " + L[lang].erase, () => { bubble(esc(L[lang].erase), true); send({ text: L[lang].erase }); });
+}
+function applyLang(l) {
+  lang = l;
+  localStorage.setItem("wasim.lang", l);
+  document.documentElement.lang = l === "jv" ? "jv" : l;
+  document.querySelectorAll(".langs button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === l)));
+  $("simLabel").textContent = L[l].sim;
+  $("simSub").textContent = (l === "en" ? "" : L.en.sim + ". ") + L[l].sub;
+  $("text").placeholder = L[l].ph;
+  $("today").textContent = L[l].today;
+  $("hint").textContent = L[l].hint;
+  $("status").textContent = L[l].online;
+  $("photoSr").textContent = L[l].photo;
+  $("sendBtn").setAttribute("aria-label", $("text").value ? "Send" : L[l].rec);
+  chips();
+}
+document.querySelectorAll(".langs button").forEach((b) => b.addEventListener("click", () => applyLang(b.dataset.lang)));
+$("text").addEventListener("input", () => { $("sendBtn").textContent = $("text").value ? "➤" : "🎤"; $("sendBtn").setAttribute("aria-label", $("text").value ? "Send" : L[lang].rec); });
+$("file").addEventListener("change", (e) => { const f = e.target.files[0]; if (f) sendPhoto(f, $("text").value.trim()); $("text").value = ""; e.target.value = ""; });
+$("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const t = $("text").value.trim();
+  if (t) { bubble(fmt(t), true); $("text").value = ""; $("sendBtn").textContent = "🎤"; return send({ text: t }); }
+  if (!navigator.mediaDevices || !window.MediaRecorder) return;
+  if (recorder) { recorder.stop(); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    chunks = [];
+    recorder = new MediaRecorder(stream);
+    recorder.ondataavailable = (ev) => chunks.push(ev.data);
+    recorder.onstop = () => {
+      stream.getTracks().forEach((tr) => tr.stop());
+      const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
+      recorder = null;
+      $("sendBtn").classList.remove("rec");
+      bubble("🎤 " + esc(L[lang].voice), true);
+      send({}, new File([blob], "voice.webm", { type: (blob.type || "audio/webm").split(";")[0] }), "audio");
+    };
+    recorder.start();
+    $("sendBtn").classList.add("rec");
+    $("sendBtn").setAttribute("aria-label", L[lang].stopRec);
+  } catch (err) { recorder = null; }
+});
+$("sendBtn").textContent = "🎤";
+applyLang(lang);
+fetch("/api/wa-sim/info").then((r) => r.json()).then((j) => { if (j.mode !== "mock") { $("simLabel").textContent = $("simLabel").textContent.replace(/demo/i, "live"); } }).catch(() => {});
+poll();
+</script>
+</body>
+</html>
