@@ -25,5 +25,10 @@ Muse Spark 1.3 / 1.2, Muse Image 1.0, Muse Voice Transcribe 1.0, SAM 3.1 and, op
 ## System
 FFmpeg (LGPL/GPL), DejaVu fonts (free license) in the Docker image.
 
+## Fonts and icons
+Barlow and Barlow Condensed by Jeremy Tribby, SIL Open Font License 1.1 (https://github.com/jpt/barlow). I took the latin woff2 files (Barlow 400 and 600, Barlow Condensed 700 and 800) from the Fontsource packages and serve them myself from `web/fonts/`, so the app never calls a font CDN. The licence is in `web/fonts/OFL.txt`.
+
+The UI icons are Lucide 1.66.0 (https://lucide.dev), ISC licence, with a few icons from Feather (MIT). `web/app.js` carries the path data for the 52 icons it uses and draws them as inline SVG; the licence text is in `web/vendor/lucide-LICENSE.txt`. The UI strings still contain emoji because the PDF, the WhatsApp text and the share text reuse them, but on screen each one is swapped for its Lucide icon.
+
 ## Assets
-I don't bundle any third-party images, icons, music or fonts. The UI icons are Unicode emoji, drawn by the user's own device. `samples/*.jpg` and `docs/img/*` are drawn by my own code in `api/pipeline/mock.py`. The demo photos and video are mine (Ragil Artza Rozaksyah).
+I don't bundle any third-party images or music. `samples/*.jpg` and `docs/img/*` are drawn by my own code in `api/pipeline/mock.py`. The demo photos and video are mine (Ragil Artza Rozaksyah).

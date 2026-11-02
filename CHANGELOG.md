@@ -2,6 +2,17 @@
 
 Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
 
+## 1.28.0 (2026-11-02)
+New look. The old screens looked like a form, so I redesigned the whole thing around a roadside bengkel sign: big condensed letters, safety colours that mean one thing each, and the camera up front.
+- Changed: `web/style.css` rewritten. Barlow and Barlow Condensed, served from `web/fonts` (OFL), no font CDN. Orange means do something, red means stop, yellow means check first, green means the camera passed it. Light and dark theme follow the phone.
+- Changed: first screen opens on a big "What's broken?", the 3 steps, the 1-tap demo on a dark plate with the SAM picture, and a camera viewfinder for your own photo. "Check it now" stays in a bar at the bottom.
+- Changed: result card puts the SAM-marked photo first; each cause shows its confidence as a big number and a bar. Step card has a progress bar (green for each step the camera checked), a bigger instruction, and the check result slides in green or red.
+- Changed: the red stop fills the card in safety red with barricade tape top and bottom, a white STOP strip and numbered "do this now" steps. "All safe causes tried" gets yellow and black tape.
+- Changed: icons are Lucide (ISC) inline SVG instead of emoji. The strings keep their emoji because the PDF, WhatsApp and share text reuse them; on screen they turn into icons and screen readers skip them.
+- Changed: garage, the share / PDF / workshop sheet / erase list, hands-free switch and the laptop frame restyled. Offline cache v13, now with the fonts.
+- Same as before: every element id, string, flow and API call. The WhatsApp simulator keeps its WhatsApp look on purpose. Screenshots re-made; the demo video is not re-made yet.
+- Tests: `test_web.py` now checks that every emoji the screen can show has an icon, that the fonts and both licences ship, and that nothing loads from a font CDN.
+
 ## 1.27.1 (2026-11-02)
 Docs and comments rewritten in my own words; video hook uses BPS 139 million; setup doc renamed.
 - Changed: the setup guide is now docs/SETUP.md ("How I run it"), with the test and demo-asset commands; docs/WINNING_PLAN.md dropped (docs/JUDGING_MAP.md covers it).

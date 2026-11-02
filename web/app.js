@@ -1,7 +1,7 @@
 /* Tukang Copilot phone web app. Plain JavaScript, no build step. Strings in id / jv / en. */
 const $ = (id) => document.getElementById(id);
 const T = {
-  id: { hero: "Apa yang rusak?", heroSub: "Foto barangnya, ceritakan masalahnya, dapat panduan perbaikan langkah demi langkah.", takePhoto: "Ambil foto (1–3)",
+  id: { hero: "Apa yang rusak?", ownTitle: "Atau periksa barangmu sendiri", heroSub: "Foto barangnya, ceritakan masalahnya, dapat panduan perbaikan langkah demi langkah.", takePhoto: "Ambil foto (1–3)",
         catMotor: "Motor", catPump: "Pompa air", catAppliance: "Elektronik rumah", catPlumbing: "Pipa/keran", catOther: "Lainnya",
         record: "Ketuk untuk bicara", stop: "Ketuk untuk berhenti", typeHere: "…atau ketik masalahnya di sini", go: "Periksa sekarang",
         samples: "Coba contoh:", sMotor: "motor mogok", sPump: "pompa tidak keluar air", sFaucet: "kran menetes", sRice: "rice cooker mati", sTire: "ban kempes",
@@ -22,7 +22,7 @@ const T = {
         verified: "langkah terverifikasi kamera", allChecked: "Semua langkah sudah dicek kamera. Sudah jalan lagi?", recording: "Merekam…", recorded: "Suara terekam ✓", micErr: "Mikrofon tidak bisa dipakai. Ketik saja masalahnya.",
         netErr: "Koneksi terputus. Cek sinyal lalu coba lagi.", offline: "Tidak ada internet. Diagnosis butuh sinyal; foto kamu tetap aman di HP.",
         exhausted: "Sudah semua", newPlan: "Rencana baru siap.", photos: "foto", videoBtn: "🎥 Atau rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar terbaik diambil otomatis)", videoBig: "Videonya terlalu besar. Rekam 5–10 detik saja.", videoBad: "Videonya tidak bisa dibaca. Coba rekam ulang 5–10 detik atau ambil foto saja.", videoShort: "Videonya terlalu pendek. Rekam 5–10 detik.", videoLong: "Videonya terlalu panjang. Rekam 5–10 detik saja.", recBad: "Rekaman suaranya tidak bisa dibaca. Rekam ulang atau ketik masalahnya.", badFile: "Berkas itu bukan foto. Pilih foto JPG, PNG, atau HEIC.", unreadPhoto: "Foto itu tidak bisa dibaca. Coba foto JPG atau PNG.", bigFile: "Berkasnya terlalu besar. Coba foto yang lebih kecil.", emptyFile: "Berkasnya kosong. Coba ambil lagi.", tooLong: "Teksnya terlalu panjang. Persingkat dulu." },
-  en: { hero: "What's broken?", heroSub: "Snap it, say what's wrong, get a step-by-step repair guide.", takePhoto: "Take photos (1–3)",
+  en: { hero: "What's broken?", ownTitle: "Or check your own", heroSub: "Snap it, say what's wrong, get a step-by-step repair guide.", takePhoto: "Take photos (1–3)",
         catMotor: "Motorbike", catPump: "Water pump", catAppliance: "Home appliance", catPlumbing: "Pipes/taps", catOther: "Other",
         record: "Tap to talk", stop: "Tap to stop", typeHere: "…or type the problem here", go: "Check it now",
         samples: "Try a sample:", sMotor: "bike won't start", sPump: "pump gives no water", sFaucet: "dripping tap", sRice: "dead rice cooker", sTire: "flat tyre",
@@ -46,7 +46,7 @@ const T = {
 };
 // Basa Jawa (ngoko, as spoken around Semarang). Falls back to Bahasa Indonesia for any key not listed.
 T.jv = Object.assign({}, T.id, {
-  hero: "Apa sing rusak?", heroSub: "Foto barange, critakna masalahe, entuk pandhuan ndandani langkah demi langkah.", takePhoto: "Jupuk foto (1–3)",
+  hero: "Apa sing rusak?", ownTitle: "Utawa priksa barangmu dhewe", heroSub: "Foto barange, critakna masalahe, entuk pandhuan ndandani langkah demi langkah.", takePhoto: "Jupuk foto (1–3)",
   catMotor: "Motor", catPump: "Pompa banyu", catAppliance: "Elektronik omah", catPlumbing: "Pipa/kran", catOther: "Liyane",
   record: "Tutul kanggo ngomong", stop: "Tutul kanggo mandheg", typeHere: "…utawa ketik masalahe ing kene", go: "Priksa saiki",
   samples: "Jajal conto:", sMotor: "motor mogok", sPump: "pompa ora metu banyu", sFaucet: "kran netes", sRice: "rice cooker mati", sTire: "ban kempes",
@@ -196,6 +196,119 @@ const T_DESK = {
 };
 /* I18N_DESK:end */
 ["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_DESK[k]));
+
+/* ICONS:start On-screen icons are Lucide (ISC licence, https://lucide.dev, see docs/ATTRIBUTIONS.md), drawn as inline SVG.
+   The text strings keep their emoji on purpose: the PDF, the WhatsApp text and the share text reuse them. On screen,
+   iconize() swaps each known emoji for its icon and keeps the emoji as zero-size hidden text, so copy, search and
+   textContent stay the same and screen readers hear only the words. */
+const ICON_PATHS = {
+  "camera": '<path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z"/><circle cx="12" cy="13" r="3"/>',
+  "video": '<path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
+  "mic": '<path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="13" rx="3"/>',
+  "square": '<rect width="18" height="18" x="3" y="3" rx="2"/>',
+  "play": '<path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/>',
+  "chevron-left": '<path d="m15 18-6-6 6-6"/>',
+  "chevron-right": '<path d="m9 18 6-6-6-6"/>',
+  "volume-2": '<path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/>',
+  "check": '<path d="M20 6 9 17l-5-5"/>',
+  "circle-check": '<circle cx="12" cy="12" r="10"/><path d="m16 9-5.5 5.5L8 12"/>',
+  "x": '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  "circle-x": '<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>',
+  "triangle-alert": '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  "octagon-x": '<path d="m15 9-6 6"/><path d="M2.586 16.726A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2h6.624a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586z"/><path d="m9 9 6 6"/>',
+  "map-pin": '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+  "file-text": '<path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+  "share-2": '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/>',
+  "trash-2": '<path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  "undo-2": '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/>',
+  "repeat-2": '<path d="m2 9 3-3 3 3"/><path d="M13 18H7a2 2 0 0 1-2-2V6"/><path d="m22 15-3 3-3-3"/><path d="M11 6h6a2 2 0 0 1 2 2v10"/>',
+  "scan-eye": '<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="1"/><path d="M18.944 12.33a1 1 0 0 0 0-.66 7.5 7.5 0 0 0-13.888 0 1 1 0 0 0 0 .66 7.5 7.5 0 0 0 13.888 0"/>',
+  "eye": '<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>',
+  "brain": '<path d="M12 18V5"/><path d="M15 13a4.17 4.17 0 01-3-4 4.17 4.17 0 01-3 4"/><path d="M17.707 6.294A3 3 0 1012 5a3 3 0 10-5.707 1.294"/><path d="M17.996 5.125a4 4 0 012.526 5.77"/><path d="M18 18a4 4 0 002-7.465"/><path d="M19.967 17.482a4 4 0 11-7.967.517 4 4 0 11-7.967-.517"/><path d="M6 18a4 4 0 01-2-7.465"/><path d="M6.004 5.125a4 4 0 00-2.526 5.77"/>',
+  "clipboard-list": '<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/>',
+  "bot": '<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
+  "lock-open": '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>',
+  "cog": '<path d="M11 10.27 7 3.34"/><path d="m11 13.73-4 6.93"/><path d="M12 22v-2"/><path d="M12 2v2"/><path d="M14 12h8"/><path d="m17 20.66-1-1.73"/><path d="m17 3.34-1 1.73"/><path d="M2 12h2"/><path d="m20.66 17-1.73-1"/><path d="m20.66 7-1.73 1"/><path d="m3.34 17 1.73-1"/><path d="m3.34 7 1.73 1"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="8"/>',
+  "ear": '<path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0"/><path d="M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4"/>',
+  "shield-check": '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+  "timer": '<line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/>',
+  "coins": '<path d="M13.744 17.736a6 6 0 1 1-7.48-7.48"/><path d="M15 6h1v4"/><path d="m6.134 14.768.866-.5 2 3.464"/><circle cx="16" cy="8" r="6"/>',
+  "receipt-text": '<path d="M13 16H8"/><path d="M14 8H8"/><path d="M16 12H8"/><path d="M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z"/>',
+  "lightbulb": '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
+  "hourglass": '<path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/>',
+  "party-popper": '<path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2h.01"/><path d="M22 20h.01"/><path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 10"/><path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11c-.11.7-.72 1.22-1.43 1.22H17"/><path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98C9.52 4.9 9 5.52 9 6.23V7"/><path d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"/>',
+  "hard-hat": '<path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/><path d="M14 6a6 6 0 0 1 6 6v3"/><path d="M4 15v-3a6 6 0 0 1 6-6"/><rect x="2" y="15" width="20" height="4" rx="1"/>',
+  "message-circle": '<path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/>',
+  "shopping-cart": '<path d="m2.05 2.05 1.099-.028a1 1 0 0 1 1.008.815l2.69 14.347A1 1 0 0 0 7.83 18H18"/><path d="M4.563 5h16.435a1 1 0 0 1 .981 1.204l-1.026 6.226A2 2 0 0 1 18.962 14H6.25"/><circle cx="18" cy="20" r="2"/><circle cx="8" cy="20" r="2"/>',
+  "toolbox": '<path d="M16 12v4"/><path d="M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><path d="M17 6a2 2 0 011.414.586l3 3A2 2 0 0122 11v8a2 2 0 01-2 2H4a2 2 0 01-2-2v-8a2 2 0 01.586-1.414l3-3A2 2 0 017 6z"/><path d="M2 14h20"/><path d="M8 12v4"/>',
+  "flask-conical": '<path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"/><path d="M6.453 15h11.094"/><path d="M8.5 2h7"/>',
+  "wifi-off": '<path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><path d="M19 12.859a10 10 0 0 0-2.007-1.523"/><path d="M2 8.82a15 15 0 0 1 4.177-2.643"/><path d="M22 8.82a15 15 0 0 0-11.288-3.764"/><path d="m2 2 20 20"/>',
+  "image": '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+  "arrow-right": '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  "circle-help": '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+  "refresh-cw": '<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
+  "wrench": '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"/>',
+  "printer": '<path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/>',
+  "cpu": '<path d="M12 20v2"/><path d="M12 2v2"/><path d="M17 20v2"/><path d="M17 2v2"/><path d="M2 12h2"/><path d="M2 17h2"/><path d="M2 7h2"/><path d="M20 12h2"/><path d="M20 17h2"/><path d="M20 7h2"/><path d="M7 20v2"/><path d="M7 2v2"/><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="8" y="8" width="8" height="8" rx="1"/>',
+  "languages": '<path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/>',
+  "history": '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
+  "crosshair": '<circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/>',
+  "hand": '<path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>'
+};
+const EMOJI_ICON = { "⚠": "triangle-alert", "📷": "camera", "📸": "camera", "✅": "circle-check", "🎯": "scan-eye", "✓": "check", "▶": "play",
+  "🧑‍🔧": "hard-hat", "⛔": "octagon-x", "🎉": "party-popper", "💬": "message-circle", "🎙": "mic", "🎤": "mic", "⏹": "square",
+  "🧪": "flask-conical", "✗": "x", "👁": "eye", "🧠": "brain", "📋": "clipboard-list", "🔁": "repeat-2", "🎥": "video", "🤖": "bot",
+  "🛡": "shield-check", "🔓": "lock-open", "🧰": "toolbox", "📍": "map-pin", "📄": "file-text", "⏱": "timer", "💰": "coins", "→": "arrow-right",
+  "⏳": "hourglass", "📡": "wifi-off", "🧾": "receipt-text", "🛒": "shopping-cart", "🟦": "cpu", "⚙": "cog", "👂": "ear", "❓": "circle-help",
+  "🖼": "image", "↻": "refresh-cw", "💡": "lightbulb", "🔧": "wrench", "↩": "undo-2", "🔊": "volume-2", "◀": "chevron-left", "❌": "circle-x" };
+const SVGNS = "http://www.w3.org/2000/svg";
+const icon = (name, cls) => `<svg class="ic${cls ? " " + cls : ""}" aria-hidden="true" focusable="false"><use href="#i-${name}"></use></svg>`;
+(function iconSprite() {
+  if (document.getElementById("tcIcons")) return;
+  const syms = Object.entries(ICON_PATHS).map(([k, v]) => `<symbol id="i-${k}" viewBox="0 0 24 24">${v}</symbol>`).join("");
+  document.body.insertAdjacentHTML("afterbegin", `<svg id="tcIcons" xmlns="${SVGNS}" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">${syms}</svg>`);
+})();
+const EMOJI_RE = new RegExp("(" + Object.keys(EMOJI_ICON).sort((a, b) => b.length - a.length).join("|") + ")\\uFE0F? ?", "gu");
+const ICON_SKIP = "pre,textarea,option,select,script,style,title,svg,.eg,.noic";
+function iconize(root) {
+  if (!root || typeof document.createTreeWalker !== "function") return;
+  const nodes = [];
+  if (root.nodeType === 3) nodes.push(root);
+  else if (root.nodeType === 1) {
+    const w = document.createTreeWalker(root, 4);  // text nodes only
+    while (w.nextNode()) nodes.push(w.currentNode);
+  }
+  for (const n of nodes) {
+    const p = n.parentElement, v = n.nodeValue || "";
+    if (!p || p.closest(ICON_SKIP)) continue;
+    EMOJI_RE.lastIndex = 0;
+    if (!EMOJI_RE.test(v)) continue;
+    EMOJI_RE.lastIndex = 0;
+    const frag = document.createDocumentFragment();
+    let last = 0, m;
+    while ((m = EMOJI_RE.exec(v))) {
+      if (m.index > last) frag.appendChild(document.createTextNode(v.slice(last, m.index)));
+      const svg = document.createElementNS(SVGNS, "svg"), use = document.createElementNS(SVGNS, "use");
+      svg.setAttribute("class", m.index > 0 && v.slice(0, m.index).trim() ? "ic icAfter" : "ic"); svg.setAttribute("aria-hidden", "true"); svg.setAttribute("focusable", "false");
+      use.setAttribute("href", "#i-" + EMOJI_ICON[m[1]]); svg.appendChild(use); frag.appendChild(svg);
+      const eg = document.createElement("span"); eg.className = "eg"; eg.setAttribute("aria-hidden", "true"); eg.textContent = m[0];
+      frag.appendChild(eg);
+      last = m.index + m[0].length;
+    }
+    if (last < v.length) frag.appendChild(document.createTextNode(v.slice(last)));
+    p.replaceChild(frag, n);
+  }
+}
+if (typeof MutationObserver === "function") {
+  new MutationObserver((muts) => {
+    for (const mu of muts) {
+      if (mu.type === "characterData") iconize(mu.target);
+      else mu.addedNodes.forEach((n) => iconize(n));
+    }
+  }).observe(document.body, { childList: true, subtree: true, characterData: true });
+}
+iconize(document.body);
+/* ICONS:end */
 
 // First visit: ?lang=id|jv|en, else the phone's language list (Indonesian or Javanese anywhere in it means that language,
 // so an Indonesian phone set to English still opens in Bahasa), else English for a visitor from anywhere else.
@@ -438,7 +551,7 @@ function show(which) {
     const h = $(which) && $(which).querySelector("h1, h2");
     if (h) { h.tabIndex = -1; try { h.focus({ preventScroll: true }); } catch (_) { /* old browsers */ } }
   }
-  if (!firstShow) toTop();  // a new screen starts at its top (the result opened half-way down)
+  if (!firstShow) { toTop(); if (typeof requestAnimationFrame === "function") requestAnimationFrame(toTop); }  // a new screen starts at its top (the result opened half-way down); the second call stops a smooth scroll still running from the question
   firstShow = false;
   if ($("garage")) $("garage").classList.toggle("hidden", which !== "capture" || !loadGarage().length);
 }
@@ -494,6 +607,7 @@ function renderProgress(s) {
   const stopped = ["stopped", "exhausted"].includes(s.status);
   if ($("progTitle")) $("progTitle").textContent = stopped ? (s.status === "stopped" ? "⛔ " + t("stopHead") : "🧰 " + t("triedTitle")) : t("working");
   $("stopBox").classList.toggle("hidden", !stopped);
+  $("progress").classList.toggle("isStop", s.status === "stopped"); $("progress").classList.toggle("isTried", s.status === "exhausted");
   if ($("stopAgain")) $("stopAgain").classList.toggle("hidden", !stopped);  // a stop is not a dead end: fix something else
   if (stopped) {
     const fresh = $("stopBox").classList.contains("hidden") || !$("stopBox").innerHTML;
@@ -564,7 +678,8 @@ function render(s) {
   $("safetyBadge").className = "level " + lvl; $("safetyBadge").textContent = t(lvl);
   $("safetyReason").textContent = dx.safety_reason || "";
   const ci = s.cause_index || 0, causes = dx.causes || [];
-  $("dxCauses").innerHTML = causes.map((c, i) => `<li${i === ci ? ' class="on"' : i < ci ? ' class="tried"' : ""}><span class="pct">${c.confidence}%</span> ${esc(c.title)}${i < ci ? ` <span class="triedTag">✗ ${esc(t("triedMark"))}</span>` : ""}<br><span class="muted small">${esc((c.evidence || []).join("; "))}</span></li>`).join("");
+  const pctOf = (c) => Math.max(0, Math.min(100, Number(c.confidence) || 0));
+  $("dxCauses").innerHTML = causes.map((c, i) => `<li${i === ci ? ' class="on"' : i < ci ? ' class="tried"' : ""}><span class="pct">${c.confidence}%</span> <span class="cTitle">${esc(c.title)}${i < ci ? ` <span class="triedTag">✗ ${esc(t("triedMark"))}</span>` : ""}</span><span class="bar" aria-hidden="true"><i style="--p:${pctOf(c)}%"></i></span><span class="ev">${esc((c.evidence || []).join("; "))}</span></li>`).join("");
   if ($("planBanner")) {  // after a re-plan the top of the screen must show that the plan changed, not the same first cause
     const cur = causes[ci];
     $("planBanner").textContent = ci > 0 && cur ? t("planOf").replace("{n}", String(ci + 1)).replace("{m}", String(causes.length)).replace("{cause}", cur.title) : "";
@@ -649,6 +764,7 @@ function renderStep() {
   clearTimeout(advT);
   const st = S.plan.steps[stepIdx];
   $("stepNo").textContent = st.n; $("stepTitle").textContent = `${st.n} / ${S.plan.steps.length}`;
+  if ($("stepBar")) $("stepBar").innerHTML = S.plan.steps.map((x, i) => `<i class="${((S.checks || {})[String(x.n)] || {}).passed ? "ok" : i === stepIdx ? "now" : ""}"></i>`).join("");
   $("stepText").textContent = st.instruction; $("stepWhy").textContent = st.why || "";
   const w = (st.warnings || []).join(" ");
   $("stepCaution").classList.toggle("hidden", !w); $("stepCaution").textContent = "⚠️ " + w;
@@ -704,7 +820,7 @@ function play() {
 }
 
 function showCheck(r) {
-  $("checkResult").classList.remove("hidden");
+  $("checkResult").classList.remove("hidden"); $("checkResult").classList.toggle("isPass", !!r.passed); $("checkResult").classList.toggle("isFail", !r.passed);
   $("checkResult").innerHTML = `<p class="${r.passed ? "pass" : "fail"}">${esc(r.passed ? t("pass") : t("fail"))}</p><p>${esc(r.observation)}</p>`
     + (r.correction ? `<p><b>→</b> ${esc(r.correction)}</p>` : "") + (r.escalate_hint ? `<p class="caution">${esc(r.escalate_hint)}</p>` : "")
     + (r.fallback ? `<p class="small fbNote">${esc(t("fbNote"))}</p>` : "");
@@ -768,12 +884,13 @@ async function sendOutcome(result) {
 // "Check my step": send one photo of the current step, show pass / correction, move on after a pass.
 async function checkPhoto(f) {
   const st = S.plan.steps[stepIdx], fd = new FormData(); fd.append("photo", f, f.name || "check.jpg");
-  $("checkResult").classList.remove("hidden"); $("checkResult").textContent = t("checking");
+  $("checkResult").classList.remove("hidden", "isPass", "isFail"); $("checkResult").textContent = t("checking");
   try {
     const r = await fetch(`/api/sessions/${S.id}/steps/${st.n}/check`, { method: "POST", body: fd });
     const j = await r.json();
     if (!r.ok) { $("checkResult").textContent = j.detail; return null; }
     S = await fetchSession(S.id); showCheck(j); renderVerified(); renderAgentLog(S, "agent");
+    if ($("stepBar")) { const k = $("stepBar").children[stepIdx]; if (k && j.passed) k.className = "ok"; }
     if (j.passed && stepIdx < S.plan.steps.length - 1) advT = setTimeout(() => { if (S && S.plan && stepIdx < S.plan.steps.length - 1) { stepIdx++; renderStep(); } }, 1500);
     else if (j.passed && S.plan.steps.every((x) => ((S.checks || {})[String(x.n)] || {}).passed) && !(S.outcome || {}).result) advT = setTimeout(askOutcome, 1500);
     return j;
@@ -1097,7 +1214,7 @@ function renderGarage() {
     const lvl = ["green", "amber", "red"].includes(e.level) ? e.level : "";
     return `<li><a href="/guide/${encodeURIComponent(e.id)}">${esc(e.object || e.id)}</a> ` +
       (lvl ? `<span class="level ${lvl}">${esc(t(lvl))}</span> ` : "") + (e.outcome === "fixed" ? "🎉 " : "") +
-      `<span class="muted small">${esc(day)}${e.total ? ` · ${e.verified}/${e.total} ✓` : ""}${e.fix ? " · " + esc(e.fix) : ""}</span></li>`;
+      `<span class="gMeta muted small">${esc(day)}${e.total ? ` · ${e.verified}/${e.total} ✓` : ""}${e.fix ? " · " + esc(e.fix) : ""}</span></li>`;
   }).join("");
 }
 

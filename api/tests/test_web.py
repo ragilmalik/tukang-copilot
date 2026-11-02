@@ -52,6 +52,18 @@ def test_accessibility_hooks_present():
         assert needle in INDEX, needle
     assert 'lang === "jv" ? "jv"' in JS  # Javanese UI must not be tagged as Indonesian for screen readers
     assert "setAttribute(\"aria-pressed\"" in JS
+    # 1.28 icons: every emoji the screen can show has a Lucide icon, and icons are hidden from screen readers
+    i0, i1 = JS.index("/* ICONS:start"), JS.index("/* ICONS:end */")
+    mapped = set(re.findall(r'"([^"\w\s]{1,4})": "[a-z0-9-]+"', JS[JS.index("const EMOJI_ICON"):i1]))
+    emoji = re.compile("[\U0001F000-\U0001FAFF\u2600-\u27BF\u2190-\u21FF\u2300-\u23FF\u25A0-\u25FF](?:\u200d[\U0001F000-\U0001FAFF])*")
+    used = set(emoji.findall(JS[:i0] + JS[i1:] + INDEX))
+    assert used and not used - mapped, used - mapped
+    assert 'aria-hidden="true" focusable="false"' in INDEX and '.eg{font-size:0' in css
+    for name in ("barlow-400", "barlow-600", "barlow-condensed-700", "barlow-condensed-800"):
+        assert (WEB / "fonts" / f"{name}.woff2").stat().st_size > 10000 and f"fonts/{name}.woff2" in css, name
+    assert "SIL Open Font License" in (WEB / "fonts" / "OFL.txt").read_text(encoding="utf-8")
+    assert "ISC License" in (WEB / "vendor" / "lucide-LICENSE.txt").read_text(encoding="utf-8")
+    assert "fonts.googleapis" not in css + INDEX and "fonts.gstatic" not in css + INDEX  # no font CDN
 
 
 def test_a11y_basics_in_html_pages():
