@@ -64,7 +64,7 @@ def test_own_photo_is_never_faked_in_the_recording(page):
     page.goto(page.base + "/?replay=1")
     _run_demo(page, "id")
     assert "rekaman" in page.inner_text("#modeBadge").lower()
-    page.set_input_files("#stepPhoto", str(FIX / "standin_faucet_hose_clamp.jpg"))
+    page.set_input_files("#stepPhoto", str(FIX / "sample_faucet_hose_clamp.jpg"))
     page.wait_for_function("document.querySelector('#checkResult').textContent.includes('server live')", timeout=10000)
     assert "✅" not in page.inner_text("#checkResult")
 

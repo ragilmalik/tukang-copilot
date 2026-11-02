@@ -1,5 +1,5 @@
 """Agent log ("What the AI did"): every decision is recorded with the tool that made it, the owner's own
-words never appear in it, and the 1-tap demo's stand-in check photos drive a real fail -> pass -> re-plan loop."""
+words never appear in it, and the 1-tap demo's sample check photos drive a real fail -> pass -> re-plan loop."""
 import io
 import json
 import time
@@ -48,7 +48,7 @@ def test_full_agent_loop_is_logged_with_tools():
     assert k.count("gate") == 1  # a resumed run does not log the text gate twice
     assert {"answer", "plan", "plan_guard"} <= set(k)
     assert next(e for e in s["agent_log"] if e["kind"] == "plan_guard")["ok"] is True
-    # verify: a dark stand-in fails, the right one passes
+    # verify: a dark sample fails, the right one passes
     dark = client.get("/api/demo/check-photo/dark?sample=motor")
     assert dark.status_code == 200 and dark.headers["content-type"] == "image/jpeg"
     r = client.post(f"/api/sessions/{sid}/steps/1/check", files={"photo": ("d.jpg", dark.content, "image/jpeg")}).json()

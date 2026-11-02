@@ -1,4 +1,4 @@
-"""scripts/eval_fixtures.py scores the labelled stand-in fixtures; run it in-process against the mock app."""
+"""scripts/eval_fixtures.py scores the labelled sample fixtures (AI-generated); run it in-process against the mock app."""
 import importlib.util
 import json
 import sys
@@ -39,14 +39,14 @@ def test_eval_scores_every_fixture_in_mock_mode() -> None:
     steps = ev.run_step_checks(client, ev.DEFAULT_DIR, manifest, sessions)
     assert len(steps) >= 3 and all(s["pass"] for s in steps)
     md = ev.markdown(rows, steps, "http://test")
-    assert "photos met every expectation" in md and "| standin_rice_cooker_front.jpg | stopped | red" in md
+    assert "photos met every expectation" in md and "| sample_rice_cooker_front.jpg | stopped | red" in md
 
 
 def test_red_fixture_is_not_counted_as_met_when_it_gets_a_plan() -> None:
     ev = _load()
     # A fixture that expects a red stop but is routed to the motorbike text (amber) must FAIL.
     client = TestClient(app)
-    item = {"file": "standin_motor_plug_area.jpg", "scenario": "motor", "safety": "red",
+    item = {"file": "sample_motor_plug_area.jpg", "scenario": "motor", "safety": "red",
             "text": "Motor Honda Beat saya susah hidup, distarter cuma bunyi.", "category": "motor"}
     row = ev.run_item(client, ev.DEFAULT_DIR, item)
     assert row["pass"] is False and row["checks"]["safety level"] is False

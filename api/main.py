@@ -269,7 +269,7 @@ def get_share_card(sid: str) -> FileResponse:
 
 @app.get("/og.png")
 def home_card() -> FileResponse:
-    """Link preview for the front page (built once per process from the labelled stand-in motorbike photo)."""
+    """Link preview for the front page (built once per process from the labelled AI-generated motorbike sample photo)."""
     from .render import share_card
 
     if (WEB / "og.png").exists():
@@ -360,25 +360,29 @@ async def create_session(request: Request, photos: list[UploadFile] | None = Fil
 
 @app.get("/api/demo/check-photo/{kind}")
 def demo_check_photo(kind: str, sample: str = "motor") -> Response:
-    """1-tap demo: a labelled STAND-IN 'after' photo so a visitor with no broken object can try "Check my step".
+    """1-tap demo: a labelled sample 'after' photo (AI-generated) so a visitor with no broken object can try "Check my step".
     kind=ok: the scenario's after-photo (or its sample photo); kind=dark: a too-dark shot that the check rejects."""
     if kind not in {"ok", "dark"} or sample not in SAMPLE_TEXT:
         raise HTTPException(404)
     if kind == "ok":
         p = SAMPLES / f"check_{sample}.jpg"
         return FileResponse(p if p.exists() else SAMPLES / f"{sample}.jpg", media_type="image/jpeg")
-    return Response(_dark_photo(), media_type="image/jpeg", headers={"Cache-Control": "max-age=3600"})
+    return Response(_dark_photo(sample), media_type="image/jpeg", headers={"Cache-Control": "max-age=3600"})
 
 
-def _dark_photo() -> bytes:
+def _dark_photo(sample: str = "motor") -> bytes:
+    """The sample's after-photo as if taken in a dark corner with no torch: the check must refuse it."""
     import io
 
-    from PIL import Image, ImageDraw
+    import numpy as np
+    from PIL import Image
 
-    im = Image.new("RGB", (800, 600), (8, 8, 10))
-    ImageDraw.Draw(im).text((16, 12), "STAND-IN - too dark (demo)", fill=(70, 70, 76))
+    src = SAMPLES / f"check_{sample}.jpg"
+    im = Image.open(src if src.exists() else SAMPLES / f"{sample}.jpg").convert("RGB")
+    im.thumbnail((800, 800))
+    a = np.asarray(im, dtype=np.float32) * 0.14 + np.random.default_rng(7).normal(0, 3.0, (im.height, im.width, 3))
     buf = io.BytesIO()
-    im.save(buf, "JPEG", quality=80)
+    Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)).save(buf, "JPEG", quality=80)
     return buf.getvalue()
 
 

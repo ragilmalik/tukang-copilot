@@ -17,13 +17,16 @@ LEVEL = {"green": ((22, 120, 60), {"id": "AMAN", "jv": "AMAN", "en": "SAFE"}),
          "red": ((185, 28, 28), {"id": "STOP", "jv": "MANDHEG", "en": "STOP"})}
 TXT = {
     "id": {"likely": "Paling mungkin", "steps": "{n} langkah", "min": "~{m} menit", "save": "hemat Rp{s}",
-           "checked": "{v} dari {n} langkah lolos cek kamera", "camera": "Kamera mengecek tiap langkah", "demo": "MODE DEMO: jawaban contoh, foto pengganti",
+           "checked": "{v} dari {n} langkah lolos cek kamera", "camera": "Kamera mengecek tiap langkah",
+           "demo": "MODE DEMO: jawaban contoh, foto contoh (dibuat AI)",
            "tag": "Foto + cerita → panduan perbaikan", "made": "Meta Muse Spark + SAM 3.1"},
     "jv": {"likely": "Sing paling mungkin", "steps": "{n} langkah", "min": "~{m} menit", "save": "irit Rp{s}",
-           "checked": "{v} saka {n} langkah lolos priksa kamera", "camera": "Kamera mriksa saben langkah", "demo": "MODE DEMO: wangsulan conto, foto gantosan",
+           "checked": "{v} saka {n} langkah lolos priksa kamera", "camera": "Kamera mriksa saben langkah",
+           "demo": "MODE DEMO: wangsulan conto, foto conto (digawe AI)",
            "tag": "Foto + crita → tuntunan ndandani", "made": "Meta Muse Spark + SAM 3.1"},
     "en": {"likely": "Most likely", "steps": "{n} steps", "min": "~{m} min", "save": "save Rp{s}",
-           "checked": "{v} of {n} steps passed a camera check", "camera": "The camera checks each step", "demo": "DEMO MODE: sample answers, stand-in photo",
+           "checked": "{v} of {n} steps passed a camera check", "camera": "The camera checks each step",
+           "demo": "DEMO MODE: sample answers, AI-generated sample photo",
            "tag": "Photo + a few words → a repair guide", "made": "Meta Muse Spark + SAM 3.1"},
 }
 _FONT_DIRS = ("/usr/share/fonts/truetype/dejavu", "/usr/share/fonts/dejavu", "")
@@ -166,8 +169,8 @@ HOME_LINES = ["Foto + cerita → panduan perbaikan", "AI menandai bagiannya (SAM
               "Bahasa Indonesia · Basa Jawa · English"]
 
 
-def build_home(photo: Path, out: Path, note: str = "Foto contoh (pengganti)") -> Path:
-    """Link preview for the app's front page: a labelled stand-in photo (ideally with SAM outlines) and four lines.
+def build_home(photo: Path, out: Path, note: str = "Foto contoh (dibuat AI), mode demo") -> Path:
+    """Link preview for the app's front page: a labelled sample photo, AI-generated (ideally with SAM outlines) and four lines.
     scripts/make_og.py renders web/og.png from a demo motorbike session; /og.png falls back to this at runtime."""
     img = Image.new("RGB", (W, H), PAPER)
     try:

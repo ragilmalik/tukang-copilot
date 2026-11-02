@@ -159,19 +159,19 @@ const T_REPLAY = {
         rpOnlyDemo: "Demo rekaman hanya berisi contoh motor. Untuk foto sendiri atau contoh lain, muat ulang saat server sudah bangun.",
         rpNoLive: "Bagian ini perlu server live; demo rekaman tidak bisa melakukannya.", rpNoMore: "Demo rekaman hanya punya satu rencana ulang.",
         planOf: "🔁 Rencana {n} dari {m}: {cause}", triedMark: "sudah dicoba", stopHead: "Dihentikan demi keselamatan", deskNote: "Dibuat untuk HP: buka halaman ini di HP untuk kamera, suara, dan cek langkah.",
-        thumbCap: "Foto contoh (pengganti) dengan bagian yang ditandai SAM 3.1" },
+        thumbCap: "Foto contoh (dibuat AI), mode demo. Bagian yang ditandai SAM 3.1" },
   jv: { rpBadge: "▶ Demo rekaman: puteran mode demo sing disimpen, tanpa server", rpWake: "Server lagi tangi (hosting gratis, bisa nganti 1 menit). Tombol demo langsung muter demo rekaman.",
         rpOwnPhoto: "Demo rekaman mung bisa muter loro foto conto. Foto sampeyan dhewe butuh server live: muat maneh kaca iki sedhela engkas.",
         rpOnlyDemo: "Demo rekaman mung isi conto motor. Kanggo foto dhewe utawa conto liya, muat maneh yen server wis tangi.",
         rpNoLive: "Bagean iki butuh server live; demo rekaman ora bisa nindakake.", rpNoMore: "Demo rekaman mung duwe siji rencana anyar.",
         planOf: "🔁 Rencana {n} saka {m}: {cause}", triedMark: "wis dijajal", stopHead: "Dimandhegake supaya slamet", deskNote: "Digawe kanggo HP: bukak kaca iki ing HP kanggo kamera, swara, lan cek langkah.",
-        thumbCap: "Foto conto (gantosan) kanthi bagean sing ditandhani SAM 3.1" },
+        thumbCap: "Foto conto (digawe AI), mode demo. Bagean sing ditandhani SAM 3.1" },
   en: { rpBadge: "▶ Recorded demo: a saved demo-mode run, no server", rpWake: "The server is waking up (free hosting, up to a minute). The demo button plays a recorded run right away.",
         rpOwnPhoto: "The recorded demo can only play the two sample photos. Your own photo needs the live server: reload the page in a moment.",
         rpOnlyDemo: "The recorded demo only has the motorbike sample. For your own photo or another sample, reload once the server is awake.",
         rpNoLive: "This part needs the live server; the recorded demo can't do it.", rpNoMore: "The recorded demo has only one re-plan.",
         planOf: "🔁 Plan {n} of {m}: {cause}", triedMark: "tried", stopHead: "Stopped for your safety", deskNote: "Made for phones: open this page on your phone for the camera, voice and step checks.",
-        thumbCap: "Stand-in sample photo with the parts SAM 3.1 marked" },
+        thumbCap: "Sample photo (AI-generated), demo mode. Parts marked by SAM 3.1" },
 };
 /* I18N_REPLAY:end */
 ["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_REPLAY[k]));

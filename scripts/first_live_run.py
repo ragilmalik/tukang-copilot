@@ -128,7 +128,7 @@ def render(r: dict[str, Any], sample: str, lang: str, fake: bool, missing: list[
           f"- Cost of the repair: **${(s.get('cost') or {}).get('spent_usd', 0):.4f}** "
           f"(cap ${(s.get('cost') or {}).get('budget_usd', settings.max_cost_usd)}); by model: "
           + ", ".join(f"{k} ${v:.4f}" for k, v in ((s.get('cost') or {}).get('by_model') or {}).items()), ""]
-    L += ["## What went in", "", f"- Photo: `samples/{sample}.jpg` (labelled stand-in sample photo)", f"- Owner text: {r['text']}"]
+    L += ["## What went in", "", f"- Photo: `samples/{sample}.jpg` (labelled AI-generated sample photo)", f"- Owner text: {r['text']}"]
     if r["question"]:
         L.append(f"- The AI asked: \"{r['question']}\" and the script answered \"{r['answer']}\"")
     L += ["", "## What the AI said", ""]

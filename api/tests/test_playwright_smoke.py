@@ -71,7 +71,7 @@ def test_main_flow_faucet_check_step(page):
     assert page.get_attribute("#workshopBtn", "href").endswith("/workshop.pdf")
     page.click("#hoodTitle")
     assert "sam-3.1" in page.inner_text("#hoodList") and page.locator("#hoodList li").count() >= 5
-    page.set_input_files("#stepPhoto", str(FIX / "standin_faucet_hose_clamp.jpg"))
+    page.set_input_files("#stepPhoto", str(FIX / "sample_faucet_hose_clamp.jpg"))
     page.wait_for_selector("#checkResult:not(.hidden)")
     page.wait_for_function("!document.querySelector('#checkResult').textContent.includes('…')", timeout=15000)
     assert page.text_content("#checkResult").strip()
@@ -167,7 +167,7 @@ def test_tip_bar_is_compact_and_collapses_after_first_check(page):
 
 
 def test_one_tap_demo_runs_the_whole_agent_loop(page):
-    """The 1-tap demo path: one tap, a quick answer, stand-in check photos (fail then pass), re-plan, agent log."""
+    """The 1-tap demo path: one tap, a quick answer, sample check photos (fail then pass), re-plan, agent log."""
     page.goto(page.base + "/")
     page.select_option("#lang", "en")
     box = page.locator("#demoBtn").bounding_box()

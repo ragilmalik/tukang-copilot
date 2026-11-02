@@ -1,148 +1,108 @@
-"""Draw ~10 clearly labelled STAND-IN photos for tests (spec §8): synthetic drawings, NOT real photos.
-Every image carries a visible red "STAND-IN" banner and an EXIF ImageDescription, so nobody mistakes
-them for evidence. I will swap in my own Semarang photos (same file names) when I have them.
-Run: python scripts/make_fixtures.py   -> api/tests/fixtures/*.jpg + manifest.json"""
+"""Label the sample photos for demo mode and the tests: samples/*.jpg (what "Try a sample" and the 1-tap demo
+send) and api/tests/fixtures/sample_*.jpg (spec §8 cases) plus manifest.json.
+
+The photos are AI-generated (an image model, prompted for a phone shot of each broken thing in an Indonesian
+home), NOT real repairs. Each copy gets a small "Sample photo (AI-generated), demo mode" tag in the corner
+and the same text in EXIF ImageDescription, so nobody takes them for evidence. My own Semarang photos go in
+api/tests/fixtures/real/ later and are never tagged like this.
+
+The part outlines that mock SAM returns for these photos are drawn by hand in api/pipeline/sample_masks.json
+(percent of width and height). This script only fills in each photo's dHash there, which is how mock mode
+recognises a sample after it was resized or re-encoded.
+
+Run: python scripts/make_fixtures.py --src DIR    (DIR holds the untagged originals: motor.jpg, pump.jpg, ...)
+     python scripts/make_fixtures.py              (re-tag nothing, only refresh manifest.json and the dHashes)
+"""
 from __future__ import annotations
 
+import argparse
 import json
-from collections.abc import Callable
+import sys
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-OUT = Path(__file__).resolve().parent.parent / "api" / "tests" / "fixtures"
-LABEL = "STAND-IN - synthetic test image, not a real photo"
-D = ImageDraw.ImageDraw
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+from api.pipeline.sample_masks import LABEL, MASKS_FILE, dhash  # noqa: E402
 
+SAMPLES = ROOT / "samples"
+OUT = ROOT / "api" / "tests" / "fixtures"
+FONT = ROOT / "web" / "fonts" / "barlow-600.woff2"
 
-def _font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
-    try:
-        return ImageFont.truetype("DejaVuSans-Bold.ttf", size)
-    except OSError:
-        return ImageFont.load_default()
+# source photo -> sample file name (served by the app), or None
+SAMPLE_FILES = {"motor": "motor", "check_motor": "check_motor", "pump": "pump", "check_pump": "check_pump", "faucet": "faucet",
+                "check_faucet": "check_faucet", "rice": "rice", "tire": "tire", "check_tire": "check_tire"}
 
-
-def _canvas(bg: tuple[int, int, int], w: int = 1024, h: int = 768) -> tuple[Image.Image, D]:
-    im = Image.new("RGB", (w, h), bg)
-    return im, ImageDraw.Draw(im)
-
-
-def motor_plug_area(d: D) -> None:
-    d.rectangle([120, 220, 900, 700], fill=(32, 32, 36)); d.rectangle([430, 300, 620, 470], fill=(18, 18, 18), outline=(200, 200, 200), width=6)
-    d.line([600, 330, 900, 200], fill=(12, 12, 12), width=22); d.ellipse([560, 300, 640, 360], fill=(150, 30, 30))
-
-
-def motor_plug_closeup(d: D) -> None:
-    d.rectangle([380, 120, 640, 260], fill=(200, 200, 205)); d.rectangle([450, 260, 570, 560], fill=(235, 235, 235))
-    d.rectangle([470, 560, 550, 650], fill=(40, 30, 25)); d.line([510, 650, 510, 700], fill=(30, 30, 30), width=10)
-
-
-def motor_step_cap_on(d: D) -> None:
-    motor_plug_area(d); d.ellipse([555, 295, 645, 365], outline=(46, 204, 113), width=8)
-
-
-def pump_overview(d: D) -> None:
-    d.rectangle([0, 600, 1024, 768], fill=(120, 115, 105)); d.rounded_rectangle([280, 260, 700, 560], radius=36, fill=(30, 90, 170))
-    d.ellipse([420, 130, 600, 280], fill=(200, 200, 205)); d.rectangle([20, 400, 290, 480], fill=(235, 235, 235)); d.rectangle([700, 340, 1000, 410], fill=(235, 235, 235))
-
-
-def pump_prime_plug(d: D) -> None:
-    d.ellipse([300, 180, 720, 600], fill=(200, 200, 205), outline=(90, 90, 95), width=8); d.rectangle([440, 300, 580, 440], fill=(110, 110, 115))
-    d.line([440, 370, 580, 370], fill=(60, 60, 60), width=10)
-
-
-def faucet_drip(d: D) -> None:
-    d.rectangle([60, 470, 964, 580], fill=(245, 245, 245)); d.rectangle([460, 120, 540, 470], fill=(190, 195, 200))
-    d.rectangle([540, 290, 820, 370], fill=(190, 195, 200)); d.ellipse([790, 390, 820, 430], fill=(80, 150, 230))
-
-
-def faucet_hose_clamp(d: D) -> None:
-    d.rectangle([100, 330, 924, 430], fill=(160, 160, 160)); d.rectangle([440, 300, 560, 460], fill=(200, 60, 50))
-    d.ellipse([600, 440, 630, 480], fill=(80, 150, 230))
-
-
-def rice_cooker_front(d: D) -> None:
-    d.ellipse([220, 160, 800, 360], fill=(250, 250, 250), outline=(160, 160, 160), width=6); d.rectangle([220, 260, 800, 680], fill=(250, 250, 250), outline=(160, 160, 160), width=6)
-    d.rectangle([440, 520, 580, 600], fill=(60, 60, 60))
-
-
-def rice_cooker_base_open(d: D) -> None:
-    d.ellipse([200, 200, 820, 640], fill=(70, 70, 75)); d.ellipse([360, 330, 660, 510], fill=(180, 120, 60))
-    for x in (300, 720):
-        d.line([x, 420, 512, 420], fill=(220, 40, 40), width=8)
-
-
-def tire_flat(d: D) -> None:
-    d.rectangle([0, 600, 1024, 768], fill=(95, 92, 88)); d.ellipse([250, 190, 790, 640], fill=(25, 25, 27)); d.ellipse([380, 320, 660, 520], fill=(170, 172, 178))
-    d.ellipse([500, 400, 540, 440], fill=(60, 60, 64)); d.line([512, 215, 512, 262], fill=(190, 190, 195), width=9); d.ellipse([505, 205, 520, 220], fill=(210, 210, 215))
-
-
-def tire_valve_check(d: D) -> None:
-    d.rectangle([0, 600, 1024, 768], fill=(95, 92, 88)); d.ellipse([200, 140, 820, 700], fill=(30, 30, 33)); d.ellipse([360, 300, 660, 540], fill=(170, 172, 178))
-    d.rectangle([700, 330, 740, 400], fill=(190, 190, 195)); d.ellipse([690, 322, 750, 345], fill=(60, 60, 64))
-
-
-def tire_sticker_closeup(d: D) -> None:
-    d.rectangle([180, 160, 840, 620], fill=(235, 235, 225), outline=(60, 60, 60), width=6)
-    for i in range(5):
-        d.line([240, 230 + i * 70, 780, 230 + i * 70], fill=(70, 70, 70), width=10)
-    d.ellipse([700, 450, 800, 550], fill=(220, 190, 40))
-
-
-def unknown_object(d: D) -> None:
-    d.rectangle([300, 200, 724, 600], fill=(120, 140, 110)); d.ellipse([440, 330, 584, 470], fill=(40, 40, 40))
-
-
-FIXTURES: list[dict[str, object]] = [
-    {"file": "standin_motor_plug_area.jpg", "draw": motor_plug_area, "bg": (60, 64, 70), "scenario": "motor", "safety": "amber",
+FIXTURES: list[dict[str, str]] = [
+    {"file": "sample_motor_plug_area.jpg", "src": "motor", "scenario": "motor", "safety": "amber",
      "text": "Motor Honda Beat saya susah hidup, distarter cuma bunyi.", "category": "motor"},
-    {"file": "standin_motor_plug_closeup.jpg", "draw": motor_plug_closeup, "bg": (70, 70, 74), "scenario": "motor", "safety": "amber",
+    {"file": "sample_motor_plug_closeup.jpg", "src": "motor_closeup", "scenario": "motor", "safety": "amber",
      "text": "Busi motor kelihatan hitam, mesin nggak nyala.", "category": "motor"},
-    {"file": "standin_motor_step_cap_on.jpg", "draw": motor_step_cap_on, "bg": (60, 64, 70), "scenario": "motor", "role": "step_check"},
-    {"file": "standin_pump_overview.jpg", "draw": pump_overview, "bg": (180, 175, 165), "scenario": "pump", "safety": "amber",
+    {"file": "sample_motor_step_cap_on.jpg", "src": "check_motor", "scenario": "motor", "role": "step_check"},
+    {"file": "sample_pump_overview.jpg", "src": "pump", "scenario": "pump", "safety": "amber",
      "text": "Pompa air Shimizu bunyi dan muter tapi air nggak keluar.", "category": "pump"},
-    {"file": "standin_pump_prime_plug.jpg", "draw": pump_prime_plug, "bg": (175, 170, 160), "scenario": "pump", "role": "step_check"},
-    {"file": "standin_faucet_drip.jpg", "draw": faucet_drip, "bg": (225, 230, 235), "scenario": "faucet", "safety": "green",
+    {"file": "sample_pump_prime_plug.jpg", "src": "check_pump", "scenario": "pump", "role": "step_check"},
+    {"file": "sample_faucet_drip.jpg", "src": "faucet", "scenario": "faucet", "safety": "green",
      "text": "Kran wastafel dapur netes terus walau sudah ditutup.", "category": "plumbing"},
-    {"file": "standin_faucet_hose_clamp.jpg", "draw": faucet_hose_clamp, "bg": (215, 220, 225), "scenario": "faucet", "safety": "green",
-     "text": "The tap hose under the sink is dripping at the clamp.", "category": "plumbing"},
-    {"file": "standin_rice_cooker_front.jpg", "draw": rice_cooker_front, "bg": (238, 232, 220), "scenario": "rice", "safety": "red",
+    {"file": "sample_faucet_step_dry.jpg", "src": "check_faucet", "scenario": "faucet", "role": "step_check"},
+    {"file": "sample_faucet_hose_clamp.jpg", "src": "faucet_hose", "scenario": "faucet", "safety": "green",
+     "text": "The tap hose under the sink is dripping at the clamp.", "category": "plumbing",
+     "parts_in_photo": 1},  # only the shut-off valve is in this under-sink picture, not the tap handle or spout
+    {"file": "sample_rice_cooker_front.jpg", "src": "rice", "scenario": "rice", "safety": "red",
      "text": "Rice cooker saya nggak panas, lampunya mati.", "category": "appliance"},
-    {"file": "standin_rice_cooker_base_open.jpg", "draw": rice_cooker_base_open, "bg": (230, 225, 215), "scenario": "rice", "safety": "red",
+    {"file": "sample_rice_cooker_base_open.jpg", "src": "rice_base_open", "scenario": "rice", "safety": "red",
      "text": "Rice cooker not heating, I opened the bottom cover.", "category": "appliance"},
-    {"file": "standin_tire_flat_nail.jpg", "draw": tire_flat, "bg": (150, 148, 142), "scenario": "tire", "safety": "amber",
+    {"file": "sample_tire_flat_nail.jpg", "src": "tire", "scenario": "tire", "safety": "amber",
      "text": "Ban belakang motor skutik kempes pelan-pelan, kayaknya kena paku.", "category": "motor"},
-    {"file": "standin_tire_flat_nail_en.jpg", "draw": tire_flat, "bg": (140, 140, 138), "scenario": "tire", "safety": "amber",
+    {"file": "sample_tire_flat_nail_en.jpg", "src": "tire_wheel", "scenario": "tire", "safety": "amber",
      "text": "My scooter rear tyre keeps going flat, I see a nail in the tread.", "category": "motor"},
-    {"file": "standin_tire_valve_check.jpg", "draw": tire_valve_check, "bg": (150, 148, 142), "scenario": "tire", "role": "step_check"},
-    {"file": "standin_tire_pressure_sticker.jpg", "draw": tire_sticker_closeup, "bg": (120, 120, 118), "scenario": "tire", "role": "reference"},
-    {"file": "standin_unknown_object.jpg", "draw": unknown_object, "bg": (200, 200, 200), "scenario": "motor", "role": "edge_case",
+    {"file": "sample_tire_valve_check.jpg", "src": "tire_valve", "scenario": "tire", "role": "step_check"},
+    {"file": "sample_tire_nail_out.jpg", "src": "check_tire", "scenario": "tire", "role": "step_check"},
+    {"file": "sample_tire_pressure_gauge.jpg", "src": "tire_gauge", "scenario": "tire", "role": "reference"},
+    {"file": "sample_unknown_object.jpg", "src": "unknown", "scenario": "motor", "role": "edge_case",
      "text": "Ini rusak.", "category": "other"},
 ]
 
 
-def make(item: dict[str, object]) -> Path:
-    bg = item["bg"]; draw = item["draw"]
-    assert isinstance(bg, tuple) and callable(draw)
-    im, d = _canvas(bg)
-    fn: Callable[[D], None] = draw
-    fn(d)
-    d.rectangle([0, 0, im.width, 56], fill=(200, 20, 20))
-    d.text((16, 12), LABEL, fill=(255, 255, 255), font=_font(28))
-    exif = Image.Exif(); exif[0x010E] = LABEL  # ImageDescription
-    p = OUT / str(item["file"])
-    im.save(p, "JPEG", quality=82, exif=exif)
-    return p
+def tag(src: Path, dst: Path, max_side: int) -> None:
+    """Copy one original with the corner tag and the EXIF label."""
+    im = Image.open(src).convert("RGB")
+    im.thumbnail((max_side, max_side))
+    w = im.width
+    size = max(14, w // 52)
+    font = ImageFont.truetype(str(FONT), size) if FONT.exists() else ImageFont.load_default()
+    pad, m = size // 2, max(8, w // 90)
+    x0, y0, x1, y1 = ImageDraw.Draw(im).textbbox((0, 0), LABEL, font=font)
+    box = (m, m, m + (x1 - x0) + 2 * pad, m + (y1 - y0) + 2 * pad)
+    layer = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    d.rounded_rectangle(box, radius=(box[3] - box[1]) // 2, fill=(20, 22, 26, 170))
+    d.text((box[0] + pad - x0, box[1] + pad - y0), LABEL, fill=(255, 255, 255, 235), font=font)
+    out = Image.alpha_composite(im.convert("RGBA"), layer).convert("RGB")
+    exif = Image.Exif()
+    exif[0x010E] = LABEL  # ImageDescription
+    out.save(dst, "JPEG", quality=84, exif=exif, optimize=True)
 
 
 def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--src", type=Path, help="folder with the untagged originals (<name>.jpg)")
+    a = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
-    manifest = []
-    for item in FIXTURES:
-        make(item)
-        manifest.append({k: v for k, v in item.items() if k not in ("draw", "bg")})
+    if a.src:
+        for name, sample in SAMPLE_FILES.items():
+            tag(a.src / f"{name}.jpg", SAMPLES / f"{sample}.jpg", 1200)
+        for item in FIXTURES:
+            tag(a.src / f"{item['src']}.jpg", OUT / item["file"], 1024)
+    masks = json.loads(MASKS_FILE.read_text())
+    for name, entry in masks["photos"].items():
+        p = SAMPLES / f"{SAMPLE_FILES[name]}.jpg" if name in SAMPLE_FILES else OUT / next(i["file"] for i in FIXTURES if i["src"] == name)
+        entry["dhash"] = dhash(Image.open(p))
+    MASKS_FILE.write_text(json.dumps(masks, indent=1, ensure_ascii=False) + "\n")
+    manifest = [{k: v for k, v in item.items() if k != "src"} for item in FIXTURES]
     (OUT / "manifest.json").write_text(json.dumps({"note": LABEL, "fixtures": manifest}, indent=2, ensure_ascii=False) + "\n")
-    print(f"{len(FIXTURES)} stand-in fixtures -> {OUT}")
+    print(f"{len(SAMPLE_FILES)} sample photos, {len(FIXTURES)} fixtures, {len(masks['photos'])} outlined photos")
 
 
 if __name__ == "__main__":

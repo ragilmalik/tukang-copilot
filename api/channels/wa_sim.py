@@ -8,7 +8,7 @@ would spend real model calls (the live-mode guard limits still apply).
     POST /api/wa-sim/send               chat, text | photo | audio | button   (one inbound WhatsApp message)
     GET  /api/wa-sim/poll?chat=&after=  replies with seq > after, plus busy (a reply is still being worked on)
     GET  /api/wa-sim/media/{chat}/{id}  a photo or PDF the chat sent back
-    GET  /api/wa-sim/sample/{name}.jpg  the labelled stand-in sample photos, so the page can send one
+    GET  /api/wa-sim/sample/{name}.jpg  the labelled sample photos (AI-generated), so the page can send one
 """
 from __future__ import annotations
 

@@ -16,6 +16,7 @@ from typing import Any
 import numpy as np
 from PIL import Image, ImageDraw, ImageStat
 
+from . import sample_masks
 from .mock_jv import jv
 
 TRANSCRIPTS = {
@@ -43,10 +44,11 @@ def _L(lang: str, id_: str, en: str) -> str:
 
 
 # --- Look
-def object_report(sc: str, lang: str) -> dict[str, Any]:
+def object_report(sc: str, lang: str, photo: Path | None = None) -> dict[str, Any]:
     rep = _object_report(sc, lang)
+    known = sample_masks.lookup(photo) if photo is not None else None
     for c in rep["components"]:
-        c["prompt_box"] = list(_BOXES[c["sam_phrase"]])
+        c["prompt_box"] = (sample_masks.box(known, c["sam_phrase"]) if known else None) or list(_BOXES[c["sam_phrase"]])
     return rep
 
 
@@ -235,6 +237,9 @@ _BOXES = {"spark plug cap": (0.40, 0.35, 0.62, 0.58), "ignition cable": (0.55, 0
 
 def segment(image_path: Path, phrase: str) -> list[dict[str, Any]]:
     w, h = Image.open(image_path).size
+    known = sample_masks.lookup(image_path)
+    if known is not None:  # one of the sample photos: the part outlines drawn by hand on it
+        return sample_masks.segment(known, phrase, w, h)
     box = _BOXES.get(phrase)
     if box is None:
         return []  # SAM returns an empty list when nothing matches; mimic that
@@ -293,7 +298,8 @@ def diagram(photo: Path, step_n: int, out: Path) -> Path:
 
 
 def make_sample_photos(folder: Path) -> dict[str, Path]:
-    """Draws simple stand-in photos for the three scenarios (used by tests and 'Try a sample')."""
+    """Draws plain placeholder pictures for the five scenarios (some tests use them; the app ships real-looking
+    AI-generated sample photos in samples/, so this only runs if that folder is missing)."""
     folder.mkdir(parents=True, exist_ok=True)
     out = {}
     # motor

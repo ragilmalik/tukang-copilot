@@ -271,7 +271,8 @@ def stage_look(s: dict[str, Any]) -> ObjectReport:
     d = session_dir(s["id"])
     content = [_photo_part(d / p) for p in s["photos"]] + [{"type": "text", "text": f"Owner's description:\n{description(s)}"}]
     rep = _chat_json(ObjectReport, prompts.get("look", lang_name=prompts.LANG_NAME[s["lang"]]), content, "object_report",
-                     mock.object_report(_scenario(s), s["lang"]), model=settings.vision_model, effort="medium", fallback_into=s)
+                     mock.object_report(_scenario(s), s["lang"], d / s["photos"][0] if s["photos"] else None),
+                     model=settings.vision_model, effort="medium", fallback_into=s)
     s["object_report"] = rep.model_dump()
     _event(s, "look", model=s["models"]["look"], object=rep.object, n=len(rep.components), ms=int((time.time() - t0) * 1000))
     _stage(s, "look", "done", rep.object, int((time.time() - t0) * 1000))

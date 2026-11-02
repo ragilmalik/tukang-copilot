@@ -1,4 +1,4 @@
-"""Run every labelled stand-in fixture (api/tests/fixtures, made by scripts/make_fixtures.py) through the
+"""Run every labelled sample fixture (AI-generated photos) (api/tests/fixtures, made by scripts/make_fixtures.py) through the
 HTTP flow in mock mode and check the expected scenario outcome and safety level."""
 import json
 import time
@@ -9,8 +9,10 @@ from fastapi.testclient import TestClient
 from PIL import Image
 
 from api.main import app
+from api.pipeline.sample_masks import LABEL
 
 FIX = Path(__file__).parent / "fixtures"
+ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = json.loads((FIX / "manifest.json").read_text())["fixtures"]
 client = TestClient(app)
 
@@ -24,18 +26,30 @@ def _wait(sid, until=("ready", "stopped", "needs_answer", "error", "exhausted"))
     raise AssertionError("timeout")
 
 
+def _tagged(p: Path) -> None:
+    """EXIF label plus the dark corner tag that says the same thing on the picture itself."""
+    im = Image.open(p)
+    assert im.getexif().get(0x010E, "") == LABEL
+    assert max(im.size) <= 1536
+    m = max(8, im.width // 90)
+    px = im.convert("RGB").getpixel((m + 6, m + max(14, im.width // 52) // 2 + 6))
+    assert isinstance(px, tuple) and max(px[:3]) < 110
+
+
 def test_ten_fixtures_all_clearly_labelled():
     assert len(MANIFEST) >= 10
+    assert "AI-generated" in LABEL and "demo mode" in LABEL
     for item in MANIFEST:
         p = FIX / item["file"]
-        assert p.name.startswith("standin_")
-        im = Image.open(p)
-        assert "STAND-IN" in im.getexif().get(0x010E, "")
-        assert max(im.size) <= 1536
-        px = im.convert("RGB").getpixel((5, 5))  # red banner top-left
-        assert isinstance(px, tuple)
-        r, g, b = px[:3]
-        assert r > 150 and g < 80 and b < 80
+        assert p.name.startswith("sample_")
+        _tagged(p)
+
+
+def test_app_sample_photos_are_labelled_too():
+    samples = sorted((ROOT / "samples").glob("*.jpg"))
+    assert {p.stem for p in samples} >= {"motor", "pump", "faucet", "rice", "tire", "check_motor"}
+    for p in samples:
+        _tagged(p)
 
 
 @pytest.mark.parametrize("item", [i for i in MANIFEST if "safety" in i], ids=lambda i: i["file"])

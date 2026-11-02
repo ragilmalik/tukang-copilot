@@ -1,91 +1,102 @@
 {
-  "note": "STAND-IN - synthetic test image, not a real photo",
+  "note": "Sample photo (AI-generated), demo mode",
   "fixtures": [
     {
-      "file": "standin_motor_plug_area.jpg",
+      "file": "sample_motor_plug_area.jpg",
       "scenario": "motor",
       "safety": "amber",
       "text": "Motor Honda Beat saya susah hidup, distarter cuma bunyi.",
       "category": "motor"
     },
     {
-      "file": "standin_motor_plug_closeup.jpg",
+      "file": "sample_motor_plug_closeup.jpg",
       "scenario": "motor",
       "safety": "amber",
       "text": "Busi motor kelihatan hitam, mesin nggak nyala.",
       "category": "motor"
     },
     {
-      "file": "standin_motor_step_cap_on.jpg",
+      "file": "sample_motor_step_cap_on.jpg",
       "scenario": "motor",
       "role": "step_check"
     },
     {
-      "file": "standin_pump_overview.jpg",
+      "file": "sample_pump_overview.jpg",
       "scenario": "pump",
       "safety": "amber",
       "text": "Pompa air Shimizu bunyi dan muter tapi air nggak keluar.",
       "category": "pump"
     },
     {
-      "file": "standin_pump_prime_plug.jpg",
+      "file": "sample_pump_prime_plug.jpg",
       "scenario": "pump",
       "role": "step_check"
     },
     {
-      "file": "standin_faucet_drip.jpg",
+      "file": "sample_faucet_drip.jpg",
       "scenario": "faucet",
       "safety": "green",
       "text": "Kran wastafel dapur netes terus walau sudah ditutup.",
       "category": "plumbing"
     },
     {
-      "file": "standin_faucet_hose_clamp.jpg",
+      "file": "sample_faucet_step_dry.jpg",
+      "scenario": "faucet",
+      "role": "step_check"
+    },
+    {
+      "file": "sample_faucet_hose_clamp.jpg",
       "scenario": "faucet",
       "safety": "green",
       "text": "The tap hose under the sink is dripping at the clamp.",
-      "category": "plumbing"
+      "category": "plumbing",
+      "parts_in_photo": 1
     },
     {
-      "file": "standin_rice_cooker_front.jpg",
+      "file": "sample_rice_cooker_front.jpg",
       "scenario": "rice",
       "safety": "red",
       "text": "Rice cooker saya nggak panas, lampunya mati.",
       "category": "appliance"
     },
     {
-      "file": "standin_rice_cooker_base_open.jpg",
+      "file": "sample_rice_cooker_base_open.jpg",
       "scenario": "rice",
       "safety": "red",
       "text": "Rice cooker not heating, I opened the bottom cover.",
       "category": "appliance"
     },
     {
-      "file": "standin_tire_flat_nail.jpg",
+      "file": "sample_tire_flat_nail.jpg",
       "scenario": "tire",
       "safety": "amber",
       "text": "Ban belakang motor skutik kempes pelan-pelan, kayaknya kena paku.",
       "category": "motor"
     },
     {
-      "file": "standin_tire_flat_nail_en.jpg",
+      "file": "sample_tire_flat_nail_en.jpg",
       "scenario": "tire",
       "safety": "amber",
       "text": "My scooter rear tyre keeps going flat, I see a nail in the tread.",
       "category": "motor"
     },
     {
-      "file": "standin_tire_valve_check.jpg",
+      "file": "sample_tire_valve_check.jpg",
       "scenario": "tire",
       "role": "step_check"
     },
     {
-      "file": "standin_tire_pressure_sticker.jpg",
+      "file": "sample_tire_nail_out.jpg",
+      "scenario": "tire",
+      "role": "step_check"
+    },
+    {
+      "file": "sample_tire_pressure_gauge.jpg",
       "scenario": "tire",
       "role": "reference"
     },
     {
-      "file": "standin_unknown_object.jpg",
+      "file": "sample_unknown_object.jpg",
       "scenario": "motor",
       "role": "edge_case",
       "text": "Ini rusak.",

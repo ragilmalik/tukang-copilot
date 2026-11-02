@@ -1,4 +1,4 @@
-"""Flat scooter tyre scenario end to end over HTTP with the labelled stand-in fixtures (id and en text),
+"""Flat scooter tyre scenario end to end over HTTP with the labelled sample fixtures (id and en text),
 camera check with the valve photo, re-plan to the leaking valve stem, PDF report. Mock mode, no Meta calls."""
 import json
 import time
@@ -28,7 +28,7 @@ def _wait(sid: str, until: tuple[str, ...] = ("ready", "stopped", "needs_answer"
 def test_tire_fixtures_are_labelled_stand_ins():
     assert len(TIRE) >= 4
     for item in TIRE:
-        assert item["file"].startswith("standin_tire_") and (FIX / item["file"]).exists()
+        assert item["file"].startswith("sample_tire_") and (FIX / item["file"]).exists()
 
 
 @pytest.mark.parametrize("item", [i for i in TIRE if "safety" in i], ids=lambda i: i["file"])

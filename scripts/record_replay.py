@@ -6,10 +6,10 @@ no server and no model calls. Nothing here is a live answer; it is the demo-mode
 
 Output (all under web/replay/, served at /static/replay/):
   demo.json          per language (id, jv, en): progress snapshots, the follow-up question, the ready session, and one
-                     "delta" per action (step check with each stand-in photo, re-plan, outcome) so actions can be
+                     "delta" per action (step check with each sample photo, re-plan, outcome) so actions can be
                      replayed in any order
   files/*.jpg        the photos the sessions show (sample photo, SAM-marked photo, part crops)
-  check_ok.jpg, check_dark.jpg   the two labelled stand-in "check my step" photos
+  check_ok.jpg, check_dark.jpg   the two labelled sample "check my step" photos
   card-<lang>.png, report-<lang>.pdf   share card and PDF report
 
 Regenerate after changing the mock answers, the session shape or the UI flow:
@@ -102,7 +102,7 @@ def _check(c: Any, sid: str, n: int, photo: bytes) -> tuple[int, dict[str, Any]]
 
 
 def _record_checks(c: Any, sid: str, photos: dict[str, bytes], files_dir: Path) -> dict[str, Any]:
-    """For the current plan: each step x each stand-in photo, recorded against the same starting state (fresh copy),
+    """For the current plan: each step x each sample photo, recorded against the same starting state (fresh copy),
     so the replay can apply them in whatever order the visitor taps."""
     from api.pipeline import engine
 
@@ -117,7 +117,7 @@ def _record_checks(c: Any, sid: str, photos: dict[str, bytes], files_dir: Path) 
             after = c.get(f"/api/sessions/{sid}").json()
             for tr in ((after.get("checks") or {}).get(str(n)) or {}).get("tries") or []:
                 src = engine.session_dir(sid) / str(tr.get("photo", ""))
-                if tr.get("photo") and src.is_file():  # both stand-in photos get the same name on the server: keep both
+                if tr.get("photo") and src.is_file():  # both sample photos get the same name on the server: keep both
                     name = f"{src.stem}_{kind}{src.suffix}"
                     shutil.copyfile(src, files_dir / name)
                     tr["photo"] = name
@@ -173,7 +173,7 @@ def build(out_dir: Path, pace: float = PACE_S) -> dict[str, Any]:
 
     samples = ROOT / "samples"
     ok_path = samples / "check_motor.jpg"
-    photos = {"ok": (ok_path if ok_path.exists() else samples / "motor.jpg").read_bytes(), "dark": _dark_photo()}
+    photos = {"ok": (ok_path if ok_path.exists() else samples / "motor.jpg").read_bytes(), "dark": _dark_photo("motor")}
     tmp = Path(tempfile.mkdtemp(prefix="tc-replay-"))
     try:
         c = _setup(tmp)
@@ -193,7 +193,7 @@ def build(out_dir: Path, pace: float = PACE_S) -> dict[str, Any]:
                     if f.is_file() and f.suffix in {".jpg", ".png"})  # the service worker keeps these for offline use (no PDFs)
     data = {"format": FORMAT, "kind": "recorded-demo", "recorded_with": __version__, "sample": "motor",
             "max_check_fails": settings.max_check_fails, "assets": assets,
-            "note": "RECORDED demo-mode run (MOCK answers, labelled stand-in photos). Not a live model answer.",
+            "note": "RECORDED demo-mode run (MOCK answers, labelled AI-generated sample photos). Not a live model answer.",
             "models": health.get("models"), "langs": langs}
     (out_dir / "demo.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     return data

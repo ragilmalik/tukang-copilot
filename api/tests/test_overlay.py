@@ -63,13 +63,14 @@ def _reference_full_image(photo, found, out):
         edge = m.filter(ImageFilter.FIND_EDGES).filter(ImageFilter.MaxFilter(5))
         edges.paste(Image.new("RGBA", base.size, color + (255,)), (0, 0), edge)
         ys, xs = np.nonzero(union)
-        badges.append((part["label"], int(xs.min()), int(ys.min()), color))
+        k = int(np.argmin((xs - xs.min()) ** 2 + (ys - ys.min()) ** 2))  # the part pixel nearest its box corner
+        badges.append((part["label"], int(xs[k]), int(ys[k]), color))
     img = Image.alpha_composite(Image.alpha_composite(base.convert("RGBA"), tint), edges)
     d = ImageDraw.Draw(img)
     r = max(14, w // 40)
     f = overlay._font(int(r * 1.2))
     for label, x, y, color in badges:
-        cx, cy = min(max(x, r), w - r), min(max(y, r), h - r)
+        cx, cy = min(max(x - r * 3 // 4, r), w - r), min(max(y - r * 3 // 4, r), h - r)
         d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color + (255,), outline=(255, 255, 255, 255), width=3)
         d.text((cx, cy), str(label), fill=(255, 255, 255, 255), font=f, anchor="mm")
     img.convert("RGB").save(out, "JPEG", quality=90)

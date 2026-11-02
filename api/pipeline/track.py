@@ -7,7 +7,8 @@ polygon (from SAM's mask) for the browser to draw. Frames are never stored (priv
 
 Cost guards: a per-session minimum interval (TRACK_MIN_INTERVAL_S, too fast -> TooFast) and a per-session
 frame cap (MAX_TRACK_FRAMES); once the cap is reached the answer says so and the phone falls back to the
-still-photo check. Mock mode jitters the demo boxes from mock._BOXES so the overlay visibly "tracks".
+still-photo check. Mock mode jitters the demo outlines (hand-drawn on the sample photos, fixed boxes on any
+other picture) so the overlay visibly "tracks".
 """
 from __future__ import annotations
 

@@ -20,7 +20,7 @@ from api.tests.test_playwright_smoke import page, server  # noqa: E402,F401  (py
 
 def _red_stop(page, text, lang="en"):
     page.goto(page.base + f"/?lang={lang}")
-    page.set_input_files("#photo", str(FIX / "standin_unknown_object.jpg"))
+    page.set_input_files("#photo", str(FIX / "sample_unknown_object.jpg"))
     page.fill("#text", text)
     page.click("#goBtn")
     page.wait_for_selector("#stopAgain:not(.hidden)", timeout=20000)

@@ -1,4 +1,4 @@
-"""Water-pump scenario (SPEC §8 case 2) end to end over HTTP with the labelled stand-in fixtures:
+"""Water-pump scenario (SPEC §8 case 2) end to end over HTTP with the labelled sample fixtures:
 overview photo -> amber diagnosis (lost prime) -> camera check with the priming-plug photo -> re-plan to the
 foot valve -> PDF report. Mock mode, no Meta calls."""
 import json
@@ -30,7 +30,7 @@ def _fixture(role: str | None) -> dict[str, Any]:
 
 def test_pump_fixtures_are_labelled_stand_ins():
     for item in (_fixture(None), _fixture("step_check")):
-        assert item["file"].startswith("standin_pump_") and (FIX / item["file"]).exists()
+        assert item["file"].startswith("sample_pump_") and (FIX / item["file"]).exists()
 
 
 def test_pump_fixture_full_flow():

@@ -76,7 +76,9 @@ def run_item(c: httpx.Client, d: Path, item: dict[str, Any]) -> dict[str, Any]:
             checks["category"] = bool(cat) and (cat == item["category"] or item["category"] in cat or cat in item["category"])
         if s["status"] == "ready":
             checks["has steps"] = steps >= 3
-            checks["parts found"] = total > 0 and found / total >= 0.5
+            # a photo that shows only some of the scenario's parts says how many in "parts_in_photo"
+            need = int(item["parts_in_photo"]) if item.get("parts_in_photo") else total / 2
+            checks["parts found"] = total > 0 and found >= need
     return {"sid": sid, "file": item["file"], "scenario": item.get("scenario", ""), "status": s["status"], "level": level, "category": cat,
             "parts": f"{found}/{total}", "steps": steps, "asked": asked, "secs": round(time.time() - t0, 1),
             "cost": float((s.get("cost") or {}).get("spent_usd") or 0), "mode": s.get("mode", ""),
@@ -103,7 +105,7 @@ def markdown(rows: list[dict[str, Any]], steps: list[dict[str, Any]], base: str)
     lines = [
         "# Fixture evaluation", "",
         f"Server: `{base}`, mode **{mode}**, {time.strftime('%Y-%m-%d %H:%M', time.gmtime())} UTC.", "",
-        "The fixtures are labelled stand-ins, not real photos. In mock mode this shows the pipeline and safety routing work; "
+        "The fixtures are labelled AI-generated sample photos, not real repairs. In mock mode this shows the pipeline and safety routing work; "
         "only a LIVE run on real photos gives accuracy numbers.", "",
         f"**{n_ok}/{len(rows)} photos met every expectation.** Total model cost: ${cost:.3f}.", "",
         "| Photo | Status | Safety | Category | Parts found | Steps | Asked | Secs | Result |",
