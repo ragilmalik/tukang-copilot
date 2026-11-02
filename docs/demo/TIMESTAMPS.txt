@@ -1,25 +1,25 @@
 Tukang Copilot demo video: scene start times (mm:ss), made by scripts/make_demo_assets.py video
-File: docs/demo/tukang-copilot-demo.mp4, length 2:55 (175.7 s, ffprobe). Demo mode, labelled stand-in photos.
+File: docs/demo/tukang-copilot-demo.mp4, length 2:53 (173.5 s, ffprobe), 1920x1080 at 60 fps. Demo mode, AI-generated sample photos.
 English captions of the voice-over are burned in; the same text is in tukang-copilot-demo.en.srt.
 
 0:00  title       Tukang Copilot · Muse Spark + SAM 3.1 + Muse Image
 0:03  hook        139 million motorbikes in Indonesia (BPS 2024), plus water pumps.
-0:12  intro       Photo + voice in Bahasa, Javanese or English. No photo? ▶ 1-tap demo.
+0:12  intro       Photo + voice in Bahasa, Javanese or English. No photo? 1-tap demo.
 0:19  progress    Results stream in as each Meta model finishes: what it saw, SAM 3.1's outlines, the likely cause.
-0:29  question    Unsure? It asks one question instead of guessing.
-0:35  diagnosis   Likely causes with confidence, safety level, tools, time, cost vs bengkel price.
-0:44  parts       SAM 3.1 masks the real parts on your own photo, numbered.
-0:50  preflight   Safety first: the steps stay locked until every check is ticked.
-0:56  live        Live camera guide: SAM 3.1 highlights the part to touch, on the live camera.
-1:10  check_fail  Check my step: the photo is verified. ⚠ Correction when it's wrong.
-1:19  check_pass  ✓ Verified by the camera, then on to the next step.
-1:23  handsfree   Hands-free: steps read aloud, voice commands like “lanjut”, “ulang”, “cek”.
-1:31  replan      Still broken? The agent re-plans to the next likely cause.
-1:40  diagram     No photo can show it? Muse Image draws a diagram for the step, reviewed by Muse Spark (demo: stand-in drawing).
-1:48  agent       “What the AI did”: every decision, the model that made it, and why it asked.
-1:56  handoff     Hand-off to a bengkel: WhatsApp summary, nearest workshop, PDF with a mechanic brief.
-2:07  rice        Red stop: opening 220 V internals → take it to a service centre.
-2:16  wa          Also works in WhatsApp, in Basa Jawa. Same agent, same safety gate.
-2:28  ow          One switch: reasoning on Muse Spark Open (open weights) via Baseten.
-2:38  arch        Meta models: Voice Transcribe · Muse Spark · SAM 3.1 · Muse Image · Muse Spark Open (open weights).
-2:50  close       Open source, MIT licence, built during the Meta AI Developer Hackathon.
+0:28  question    Unsure? It asks one question instead of guessing.
+0:34  diagnosis   Likely causes with confidence, safety level, tools, time, cost vs bengkel price.
+0:43  parts       SAM 3.1 masks the real parts on your own photo, numbered.
+0:49  preflight   Safety first: the steps stay locked until every check is ticked.
+0:56  live        Live camera guide: SAM 3.1 outlines the part to touch, on the live camera.
+1:07  check_fail  Check my step: the photo is verified. A correction when it's wrong.
+1:16  check_pass  Verified by the camera, then on to the next step.
+1:20  handsfree   Hands-free: steps read aloud, voice commands like “lanjut”, “ulang”, “cek”.
+1:28  replan      Still broken? The agent re-plans to the next likely cause.
+1:36  diagram     No photo can show it? Muse Image draws a diagram for the step, reviewed by Muse Spark (demo: placeholder drawing).
+1:45  agent       “What the AI did”: every decision, the model that made it, and why it asked.
+1:53  handoff     Hand-off to a bengkel: WhatsApp summary, nearest workshop, PDF with a mechanic brief.
+2:04  rice        Red stop: opening 220 V internals → take it to a service centre.
+2:13  wa          Also works in WhatsApp, in Basa Jawa. Same agent, same safety gate.
+2:25  ow          One switch: reasoning on Muse Spark Open (open weights) via Baseten.
+2:34  arch        Meta models: Voice Transcribe · Muse Spark · SAM 3.1 · Muse Image · Muse Spark Open (open weights).
+2:47  close       Open source, MIT licence, built during the Meta AI Developer Hackathon.

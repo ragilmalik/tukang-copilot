@@ -1,163 +1,163 @@
 1
-00:00:03,000 --> 00:00:07,579
+00:00:03,000 --> 00:00:07,617
 In Indonesia, a small fault on a motorbike or a water pump can cost a day's wage.
 
 2
-00:00:07,579 --> 00:00:12,292
-Repair videos can't see your problem, and they're not in your language.
+00:00:07,617 --> 00:00:12,820
+Repair videos can't see your problem, and most of them aren't in your language.
 
 3
-00:00:12,292 --> 00:00:14,440
+00:00:12,820 --> 00:00:15,179
 Take a photo and say what's wrong.
 
 4
-00:00:14,440 --> 00:00:19,184
-This recording runs in demo mode, with labelled stand-in photos.
+00:00:15,179 --> 00:00:19,904
+This run is in demo mode, with AI-generated sample photos.
 
 5
-00:00:19,184 --> 00:00:23,915
-You watch the agent work: as each stage finishes, its result appears.
+00:00:19,904 --> 00:00:24,691
+Each stage shows its result as soon as it finishes: what Muse Spark saw,
 
 6
-00:00:23,915 --> 00:00:29,484
-What Muse Spark saw, the parts SAM 3.1 outlined, then the likely cause.
+00:00:24,691 --> 00:00:28,716
+the parts SAM 3.1 outlined, then the likely cause.
 
 7
-00:00:29,484 --> 00:00:35,104
+00:00:28,716 --> 00:00:34,336
 When the evidence is ambiguous, it asks one short question instead of guessing.
 
 8
-00:00:35,104 --> 00:00:38,357
+00:00:34,336 --> 00:00:37,617
 Then the diagnosis: likely causes with confidence,
 
 9
-00:00:38,357 --> 00:00:44,132
-a safety level, tools, time, and the parts cost against the repair-shop price.
+00:00:37,617 --> 00:00:43,436
+a safety level, tools, time, and the parts cost next to the repair-shop price.
 
 10
-00:00:44,132 --> 00:00:50,544
-The parts are masked and numbered on your own photo by SAM 3.1, not a generic diagram.
+00:00:43,436 --> 00:00:49,872
+SAM 3.1 masks and numbers the parts on your own photo, not on a generic diagram.
 
 11
-00:00:50,544 --> 00:00:53,142
-Before step one, a short safety checklist.
+00:00:49,872 --> 00:00:52,728
+Before step one there's a short safety checklist.
 
 12
-00:00:53,142 --> 00:00:56,812
-The steps stay locked until you tick every item.
+00:00:52,728 --> 00:00:56,284
+The steps stay locked until every item is ticked.
 
 13
-00:00:56,812 --> 00:00:58,522
-New: the live camera guide.
+00:00:56,284 --> 00:01:02,340
+The live camera guide: point the phone and SAM 3.1 outlines the part to touch, about once a second.
 
 14
-00:00:58,522 --> 00:01:05,046
-Point the phone and SAM 3.1 outlines the exact part to touch, about once a second, on the live picture.
+00:01:02,340 --> 00:01:07,016
+Here the camera is Chromium's fake camera playing a sample photo.
 
 15
-00:01:05,046 --> 00:01:10,496
-In this demo the camera is Chromium's fake camera playing a stand-in photo.
-
-16
-00:01:10,496 --> 00:01:12,323
+00:01:07,016 --> 00:01:08,832
 After each step, Check my step.
 
-17
-00:01:12,323 --> 00:01:15,505
+16
+00:01:08,832 --> 00:01:11,995
 Muse Spark compares the photo with the expected state.
 
-18
-00:01:15,505 --> 00:01:19,740
-Too dark here, so it asks for the torch instead of guessing.
+17
+00:01:11,995 --> 00:01:16,620
+This one is too dark, so it asks for the torch instead of guessing.
 
-19
-00:01:19,740 --> 00:01:23,740
+18
+00:01:16,620 --> 00:01:20,620
 Retake it, and the step is verified before you move on.
 
-20
-00:01:23,740 --> 00:01:24,627
+19
+00:01:20,620 --> 00:01:21,442
 Hands dirty?
 
+20
+00:01:21,442 --> 00:01:22,744
+Turn on hands-free.
+
 21
-00:01:24,627 --> 00:01:31,760
-Go hands-free: each step is read aloud, and the phone listens for lanjut, ulang or cek.
+00:01:22,744 --> 00:01:28,376
+Each step is read aloud, and the phone listens for lanjut, ulang or cek.
 
 22
-00:01:31,760 --> 00:01:32,693
+00:01:28,376 --> 00:01:29,321
 Still broken?
 
 23
-00:01:32,693 --> 00:01:37,862
-Say what happened, and the agent re-plans to the next most likely cause.
+00:01:29,321 --> 00:01:34,045
+Say what happened, and it re-plans to the next most likely cause.
 
 24
-00:01:37,862 --> 00:01:40,500
+00:01:34,045 --> 00:01:36,708
 Plan, act, verify, re-plan.
 
 25
-00:01:40,500 --> 00:01:45,792
+00:01:36,708 --> 00:01:41,892
 When a photo can't show a step, Muse Image draws a diagram and Muse Spark checks it.
 
 26
-00:01:45,792 --> 00:01:48,256
-This one is a demo stand-in.
+00:01:41,892 --> 00:01:45,184
+In demo mode the drawing is a placeholder.
 
 27
-00:01:48,256 --> 00:01:56,924
+00:01:45,184 --> 00:01:53,852
 Every decision is on screen: what it saw, why it asked, each photo check, each re-plan, and which Meta model did it.
 
 28
-00:01:56,924 --> 00:02:02,648
-And when it's a job for a pro, one tap hands it off: a WhatsApp summary of what was found and tried,
+00:01:53,852 --> 00:01:59,421
+When it's a job for a pro, one tap hands it off: a WhatsApp summary of what was found and tried,
 
 29
-00:02:02,648 --> 00:02:07,584
-a search for the nearest bengkel, and a PDF with a brief for the mechanic.
+00:01:59,421 --> 00:02:04,008
+a search for the nearest bengkel, and a PDF brief for the mechanic.
 
 30
-00:02:07,584 --> 00:02:09,360
+00:02:04,008 --> 00:02:05,823
 It also knows when to say no.
 
 31
-00:02:09,360 --> 00:02:16,612
-A rice cooker that won't heat would mean opening 220 volt internals, so the safety gate stops the guidance.
+00:02:05,823 --> 00:02:13,156
+Fixing a rice cooker that won't heat means opening 220 volt internals, so the safety gate stops the guide.
 
 32
-00:02:16,612 --> 00:02:19,071
-It also works in WhatsApp, in Javanese.
+00:02:13,156 --> 00:02:15,579
+It works in WhatsApp too, in Javanese.
 
 33
-00:02:19,071 --> 00:02:25,691
-Send a photo, and the same agent replies with the marked photo, the diagnosis and a button for each step.
+00:02:15,579 --> 00:02:22,212
+Send a photo and the same agent replies with the marked photo, the diagnosis and a button for each step.
 
 34
-00:02:25,691 --> 00:02:28,472
+00:02:22,212 --> 00:02:25,016
 A gas leak still gets a red stop.
 
 35
-00:02:28,472 --> 00:02:35,130
-And with one switch, diagnosis and planning run on Muse Spark Open, Meta's open-weights model, on Baseten.
+00:02:25,016 --> 00:02:31,502
+With one switch, diagnosis and planning run on Muse Spark Open, Meta's open-weights model, on Baseten.
 
 36
-00:02:35,130 --> 00:02:38,028
+00:02:31,502 --> 00:02:34,428
 The app shows a badge when it does.
 
 37
-00:02:38,028 --> 00:02:41,826
+00:02:34,428 --> 00:02:38,078
 Under the hood: Voice Transcribe, Muse Spark to see,
 
 38
-00:02:41,826 --> 00:02:47,888
+00:02:38,078 --> 00:02:43,905
 reason and check, SAM 3.1 for masks and live tracking, and Muse Image for diagrams.
 
 39
-00:02:47,888 --> 00:02:50,560
-Safety is enforced in code.
+00:02:43,905 --> 00:02:47,272
+The safety rules are enforced in code.
 
 40
-00:02:50,560 --> 00:02:51,524
+00:02:47,272 --> 00:02:48,236
 Tukang Copilot.
 
 41
-00:02:51,524 --> 00:02:55,560
+00:02:48,236 --> 00:02:53,472
 Every phone becomes a mechanic's apprentice.

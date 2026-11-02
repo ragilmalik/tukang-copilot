@@ -2,6 +2,13 @@
 
 Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
 
+## 1.29.0 (2026-11-02)
+Real-looking sample photos and a new demo video.
+- Changed: the flat stand-in drawings are gone. Every demo scenario now uses an AI-generated sample photo (motorbike spark plug, faucet, water pump, rice cooker, tyre), labelled as such on screen, with masks drawn by hand to sit on each part.
+- Changed: demo video re-shot on the new UI at 1080p 60 fps: phone frame, Barlow captions, crossfades, slow zooms on the marked parts, the camera check and the red stop. 2:53, WhatsApp scene at 2:13. X clip 43.5 s.
+- Changed: recorded demo re-recorded and shrunk (4.3 MB), offline cache v14, screenshots, GIF and thumbnail re-made.
+- Fixed: fixture eval no longer expects parts a photo cannot show (`parts_in_photo`).
+
 ## 1.28.0 (2026-11-02)
 New look. The old screens looked like a form, so I redesigned the whole thing around a roadside bengkel sign: big condensed letters, safety colours that mean one thing each, and the camera up front.
 - Changed: `web/style.css` rewritten. Barlow and Barlow Condensed, served from `web/fonts` (OFL), no font CDN. Orange means do something, red means stop, yellow means check first, green means the camera passed it. Light and dark theme follow the phone.

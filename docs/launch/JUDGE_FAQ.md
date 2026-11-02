@@ -32,7 +32,7 @@ cover this, and docs/EVAL.md measures it: 7/7 injection cases resisted, safety-s
 rules (12 of 20 red-team texts and 7 of 10 dangerous plan steps got through), and I fixed them in 1.25.
 
 **5. How do you know the step check works? What's your accuracy? (*)**
-I have routing evidence, not accuracy numbers yet. In demo mode, 10/10 labelled AI-generated sample photos and 3/3 step checks met
+I have routing evidence, not accuracy numbers yet. In demo mode, 10/10 labelled AI-generated sample photos and 5/5 step checks met
 their expected outcome (docs/EVAL_REPORT.md), and docs/EVAL.md adds the red-team safety and injection table (mock and
 fake-model, labelled). That shows the pipeline, the safety routing and the UI work. Accuracy needs the live API on real
 photos; `scripts/eval_fixtures.py` runs the same eval live with a folder of real photos and a manifest. User trials in

@@ -65,7 +65,7 @@ or straight away with one tap. Spend is capped per repair and per day.
 ## How I evaluate it
 - Engineering: 768 automated tests, 0 failed, 0 skipped (including real Chromium with a fake camera, and jsdom), a
   70-check end-to-end HTTP smoke, and clean mypy strict and ruff runs (docs/TEST_REPORT.md).
-- Pipeline and safety routing: 10/10 labelled stand-in photos and 3/3 step checks met their expectations in demo mode
+- Pipeline and safety routing: 10/10 labelled AI-generated sample photos and 5/5 step checks met their expectations in demo mode
   (docs/EVAL_REPORT.md). That proves the routing works. It says nothing about accuracy.
 - Red-team safety (docs/EVAL.md, mock and fake-model, labelled): safety-stop recall 100% on 33 dangerous cases,
   0 false stops on 17 safe cases, 7/7 prompt-injection cases resisted. The first run, against the v1.24 rules, let
