@@ -77,7 +77,7 @@ or straight away with one tap. Spend is capped per repair and per day.
   not claiming any results until they exist.
 
 ## Honest status
-The video and the 1-tap demo run in clearly labelled demo mode: stand-in photos, recorded model answers and Chromium's
+The video and the 1-tap demo run in clearly labelled demo mode: AI-generated sample photos, recorded model answers and Chromium's
 fake camera. I tested the live Meta path end to end against a stand-in server built from the official API docs.
 **A live Meta model answer is not yet verified.** I built everything here alone during the event, Oct 26 to Nov 4, 2026.
 The WhatsApp channel is tested against a fake Graph API and in the simulator. A real WhatsApp number is not connected

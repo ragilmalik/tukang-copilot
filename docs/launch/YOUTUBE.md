@@ -1,6 +1,6 @@
 # YouTube upload kit
 
-Upload the real-phone recording if I have one by then, otherwise `docs/demo/tukang-copilot-demo.mp4` (2:55, demo mode).
+Upload the real-phone recording if I have one by then, otherwise `docs/demo/tukang-copilot-demo.mp4` (2:53, demo mode).
 Unlisted is fine for judging, but Public helps with Most Viral and Community Vote. Open the link in a private window
 before pasting it into the form. For captions, upload `docs/demo/tukang-copilot-demo.en.srt` as English subtitles.
 The thumbnail is `docs/launch/thumbnail.png` (1280x720); custom thumbnails need a phone-verified YouTube account.
@@ -46,17 +46,17 @@ Why I built it: Indonesia has 139 million motorbikes (BPS 2024) and millions of 
 
 YouTube's rules: the first chapter starts at 0:00, there are at least 3 chapters, and each one lasts at least 10 seconds.
 
-### A. Current backup cut (`tukang-copilot-demo.mp4`, 2:55 v1.27 cut with the 3 s hook title card and the WhatsApp scene, timings from `docs/demo/TIMESTAMPS.txt`)
+### A. Current backup cut (`tukang-copilot-demo.mp4`, 2:53 v1.29 cut with the 3 s hook title card and the WhatsApp scene, timings from `docs/demo/TIMESTAMPS.txt`)
 ```
 0:00 A small fault costs a day's wage
 0:12 Photo, voice or 1-tap demo: results stream in
-0:29 One question, diagnosis and SAM 3.1 parts
-0:50 Safety tick list and live camera guide
-1:10 Check my step: the camera verifies
-1:23 Hands-free, re-plan and a Muse Image diagram
-1:48 What the AI did and the bengkel hand-off
-2:07 Safety STOP, then WhatsApp in Basa Jawa
-2:28 Open weights and how it works
+0:28 One question, diagnosis and SAM 3.1 parts
+0:49 Safety tick list and live camera guide
+1:07 Check my step: the camera verifies
+1:20 Hands-free, re-plan and a Muse Image diagram
+1:45 What the AI did and the bengkel hand-off
+2:04 Safety STOP, then WhatsApp in Basa Jawa
+2:25 Open weights and how it works
 ```
 I checked each chapter against the scene starts in `docs/demo/TIMESTAMPS.txt`, and all of them are at least 10 s long.
 If the video gets re-cut, re-read that file and move the chapters with it.

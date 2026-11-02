@@ -1,0 +1,23 @@
+{
+ "title": "",
+ "hook": "In Indonesia, a small fault on a motorbike or a water pump can cost a day's wage. Repair videos can't see your problem, and most of them aren't in your language.",
+ "intro": "Take a photo and say what's wrong. This run is in demo mode, with AI-generated sample photos.",
+ "progress": "Each stage shows its result as soon as it finishes: what Muse Spark saw, the parts SAM 3.1 outlined, then the likely cause.",
+ "question": "When the evidence is ambiguous, it asks one short question instead of guessing.",
+ "diagnosis": "Then the diagnosis: likely causes with confidence, a safety level, tools, time, and the parts cost next to the repair-shop price.",
+ "parts": "SAM 3.1 masks and numbers the parts on your own photo, not on a generic diagram.",
+ "preflight": "Before step one there's a short safety checklist. The steps stay locked until every item is ticked.",
+ "live": "The live camera guide: point the phone and SAM 3.1 outlines the part to touch, about once a second. Here the camera is Chromium's fake camera playing a sample photo.",
+ "check_fail": "After each step, Check my step. Muse Spark compares the photo with the expected state. This one is too dark, so it asks for the torch instead of guessing.",
+ "check_pass": "Retake it, and the step is verified before you move on.",
+ "handsfree": "Hands dirty? Turn on hands-free. Each step is read aloud, and the phone listens for lanjut, ulang or cek.",
+ "replan": "Still broken? Say what happened, and it re-plans to the next most likely cause. Plan, act, verify, re-plan.",
+ "diagram": "When a photo can't show a step, Muse Image draws a diagram and Muse Spark checks it. In demo mode the drawing is a placeholder.",
+ "agent": "Every decision is on screen: what it saw, why it asked, each photo check, each re-plan, and which Meta model did it.",
+ "handoff": "When it's a job for a pro, one tap hands it off: a WhatsApp summary of what was found and tried, a search for the nearest bengkel, and a PDF brief for the mechanic.",
+ "rice": "It also knows when to say no. Fixing a rice cooker that won't heat means opening 220 volt internals, so the safety gate stops the guide.",
+ "wa": "It works in WhatsApp too, in Javanese. Send a photo and the same agent replies with the marked photo, the diagnosis and a button for each step. A gas leak still gets a red stop.",
+ "ow": "With one switch, diagnosis and planning run on Muse Spark Open, Meta's open-weights model, on Baseten. The app shows a badge when it does.",
+ "arch": "Under the hood: Voice Transcribe, Muse Spark to see, reason and check, SAM 3.1 for masks and live tracking, and Muse Image for diagrams. The safety rules are enforced in code.",
+ "close": "Tukang Copilot. Every phone becomes a mechanic's apprentice."
+}

@@ -168,6 +168,23 @@ def record_lang(c: Any, lang: str, photos: dict[str, bytes], files_dir: Path, ou
     return _scrub(rec, sid, rid)
 
 
+def _shrink(out_dir: Path) -> None:
+    """The sample photos are detailed (about 250 KB each) and the service worker keeps every picture here for offline
+    use, so re-encode them smaller: JPEG at 960 px and quality 72, PNG down to 256 colours."""
+    from PIL import Image
+
+    for f in out_dir.rglob("*"):
+        if f.suffix == ".jpg" and f.stat().st_size > 60_000:
+            with Image.open(f) as im:
+                rgb = im.convert("RGB")
+            rgb.thumbnail((960, 960), Image.Resampling.LANCZOS)
+            rgb.save(f, "JPEG", quality=72, optimize=True, progressive=True)
+        elif f.suffix == ".png" and f.stat().st_size > 150_000:
+            with Image.open(f) as im:
+                q = im.convert("RGB").quantize(256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.FLOYDSTEINBERG)
+            q.save(f, "PNG", optimize=True)
+
+
 def build(out_dir: Path, pace: float = PACE_S) -> dict[str, Any]:
     from api.main import _dark_photo, __version__
 
@@ -187,6 +204,7 @@ def build(out_dir: Path, pace: float = PACE_S) -> dict[str, Any]:
         health = c.get("/api/health").json()
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+    _shrink(out_dir)
     from api.settings import settings
 
     assets = sorted(f"/static/replay/{f.relative_to(out_dir).as_posix()}" for f in out_dir.rglob("*")

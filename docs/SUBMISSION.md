@@ -63,7 +63,7 @@ BUILT IN THE EVENT (Oct 26 to Nov 4, 2026), SOLO
 FastAPI and a vanilla-JS PWA. 768 automated tests pass (0 failed, 0 skipped), including real-Chromium runs with a fake camera. An end-to-end HTTP smoke of 70 checks passes, mypy strict and ruff are clean, and it deploys with Docker and Render. Red-team eval (docs/EVAL.md, mock and fake-model, labelled; live run pending): safety-stop recall 100% on 33 dangerous cases, 0 false stops on 17 safe cases, 7/7 prompt-injection cases resisted. When I ran it against the v1.24 rules it caught real gaps (12 of 20 red-team texts and 7 of 10 dangerous plan steps slipped through), and I fixed them in 1.25. On a laptop the app opens in a phone frame with a QR code so you can continue on a phone, and a static judge build plays the recorded demo with no server and no cold start. Five demo scenarios: motorbike, water pump, faucet, rice cooker (safety stop), flat scooter tyre.
 
 HONEST STATUS
-The demo video and the 1-tap demo run in clearly labelled demo mode (stand-in photos, recorded model answers). I tested the live Meta path end to end against a stand-in server built from the official API docs. A live Meta model answer is not yet verified. The WhatsApp channel is tested against a fake Graph API and a simulator page; a real WhatsApp number is not yet connected. User trials in Semarang are pending, and I'm not claiming any trial results.
+The demo video and the 1-tap demo run in clearly labelled demo mode (AI-generated sample photos, recorded model answers). I tested the live Meta path end to end against a stand-in server built from the official API docs. A live Meta model answer is not yet verified. The WhatsApp channel is tested against a fake Graph API and a simulator page; a real WhatsApp number is not yet connected. User trials in Semarang are pending, and I'm not claiming any trial results.
 
 Try it: [LIVE_URL] (tap "Try the 1-tap demo", about a minute, no photo needed).
 ```
@@ -79,7 +79,7 @@ opens while logged out.
 ```
 [YOUTUBE_URL]
 ```
-Upload kit: docs/launch/YOUTUBE.md (chapters match the re-cut). Current cut: `docs/demo/tukang-copilot-demo.mp4`, 2:55, opening with a 3 s hook title card with the hackathon dates, English captions burned in. Unlisted is fine; open it in a
+Upload kit: docs/launch/YOUTUBE.md (chapters match the re-cut). Current cut: `docs/demo/tukang-copilot-demo.mp4`, 2:53, opening with a 3 s hook title card with the hackathon dates, English captions burned in. Unlisted is fine; open it in a
 private window before submitting. The rules say the video must show only what was built during the hackathon, so keep
 the "built Oct 26 to Nov 4" line in the description.
 
@@ -151,11 +151,11 @@ The definitions come from the Participant Guide and the kickoff slide (see docs/
 
 | Prize | What I claim | Evidence |
 |---|---|---|
-| Best Agentic Use-Case ($5K; autonomy, effectiveness, practical usefulness) | A real multi-step loop on a physical object: ask when unsure, plan, gate on safety, verify each step from a photo, re-plan, escalate or hand off. Each decision is logged with the model or code rule that made it. | `api/pipeline/engine.py`, `api/trace.py`; screenshots `23_agent_log.png`, `24_agent_jump.png`, `25_pdf_agent.png`, `09_replan.png`; video 1:10 to 2:07; `test_agent_log.py`; red-team safety and injection numbers in docs/EVAL.md. The same loop runs over WhatsApp (camera checks, re-plan on "Problem", hand-off on "Stop"): `api/channels/whatsapp.py`, `test_whatsapp.py`, `30_whatsapp_*.png`, video 2:16 |
+| Best Agentic Use-Case ($5K; autonomy, effectiveness, practical usefulness) | A real multi-step loop on a physical object: ask when unsure, plan, gate on safety, verify each step from a photo, re-plan, escalate or hand off. Each decision is logged with the model or code rule that made it. | `api/pipeline/engine.py`, `api/trace.py`; screenshots `23_agent_log.png`, `24_agent_jump.png`, `25_pdf_agent.png`, `09_replan.png`; video 1:07 to 2:04; `test_agent_log.py`; red-team safety and injection numbers in docs/EVAL.md. The same loop runs over WhatsApp (camera checks, re-plan on "Problem", hand-off on "Stop"): `api/channels/whatsapp.py`, `test_whatsapp.py`, `30_whatsapp_*.png`, video 2:13 |
 | Most Viral ($20K; X engagement until Nov 8, 11:59 PM ET) | A 43.5 s vertical clip with a hook people know ("motor mogok, bengkel tutup"), Bahasa captions, a 6-post thread (one post shows the WhatsApp channel), and share cards that unfurl with the marked photo. | `docs/demo/tukang-copilot-x-vertical.mp4`, docs/launch/X_THREAD.md, `26_share_card.png` |
 | Community Vote ($10K; most votes in the public gallery, one per verified account) | An everyday Indonesian problem anyone can try free in a minute, with a vote kit in Indonesian, Javanese and English. | docs/launch/COMMUNITY_VOTE_KIT.md |
 | Best Build on Meta Open Weights ($10K; Muse Spark Open or Glimmer on own hardware or partner inference, verified by the infra partner) | Diagnosis and planning on Muse Spark Open via Baseten behind one switch, with a badge. **Claim only after one real, logged Baseten run.** Until then it is tested against a stand-in Baseten server only. | `USE_OPEN_WEIGHTS`, `21_open_weights.png`, `test_live_path.py` |
-| Best Creative Build ($5K; Muse Image or Muse Wonder) | Muse Image edits the owner's own photo into a teaching diagram, Spark reviews it, and a wrong one is redrawn once. This is a secondary claim: Muse Image supports the core flow rather than being the core. | `engine.make_diagram`, `28_diagram_step.png`, video 1:40 (demo mode: stand-in drawing) |
+| Best Creative Build ($5K; Muse Image or Muse Wonder) | Muse Image edits the owner's own photo into a teaching diagram, Spark reviews it, and a wrong one is redrawn once. This is a secondary claim: Muse Image supports the core flow rather than being the core. | `engine.make_diagram`, `28_diagram_step.png`, video 1:36 (demo mode: placeholder drawing) |
 
 ## Problem numbers and sources (all opened 2026-11-01)
 

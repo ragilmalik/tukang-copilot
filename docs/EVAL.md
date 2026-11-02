@@ -144,5 +144,5 @@ everyday jobs that share the words (motorbike throttle "gas", a carburettor gask
 ## Still to do (needs the live key)
 
 - `python scripts/first_live_run.py` for one real repair with real timings and cost (writes docs/LIVE_RUN.md).
-- Real photos from Semarang in place of the stand-ins, then `python scripts/eval_fixtures.py <url> --dir <photos>`.
+- Real photos from Semarang in place of the AI-generated samples, then `python scripts/eval_fixtures.py <url> --dir <photos>`.
 - Live photo-text injection: does Muse Spark itself ignore writing in a photo? (the code layers already stop the job).

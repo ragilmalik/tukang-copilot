@@ -19,7 +19,7 @@ built solo in Semarang, Oct 26 to Nov 4, 2026.
 | | |
 |---|---|
 | Live app | [LIVE_URL] |
-| 3-min video | [YOUTUBE_URL] · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:55, demo mode, 3 s hook title card, captions + voice-over; chapters in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt)) |
+| 3-min video | [YOUTUBE_URL] · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:53, demo mode, 3 s hook title card, captions + voice-over; chapters in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt)) |
 | Code | [GITHUB_URL] (MIT) |
 | For judges | [Judging map](docs/JUDGING_MAP.md) (each criterion and where the evidence is) · [Judge FAQ](docs/launch/JUDGE_FAQ.md) · [Eval](docs/EVAL.md) (red-team safety + injection) · [One-pager PDF](docs/launch/one-pager.pdf) |
 | Write-up | [docs/WRITEUP.md](docs/WRITEUP.md) · form copy: [docs/SUBMISSION.md](docs/SUBMISSION.md) |
@@ -46,7 +46,7 @@ built solo in Semarang, Oct 26 to Nov 4, 2026.
 > the phone's language list. `?lang=en`, `?lang=id` or `?lang=jv` on the link overrides it, and the app remembers the
 > switch at the top. Back returns to the first screen and Forward brings you back to the same repair.
 
-<sub>Honest status: the video, screenshots and 1-tap demo run in clearly labelled demo mode, with stand-in photos and
+<sub>Honest status: the video, screenshots and 1-tap demo run in clearly labelled demo mode, with AI-generated sample photos and
 recorded model answers and no API calls. The live guide uses Chromium's fake camera. I tested the live Meta path end to
 end against a stand-in server built from the official API docs (768 automated tests pass; red-team eval in docs/EVAL.md,
 mock and fake-model). A live Meta model answer is not yet verified because I still need the API key. Impact numbers in
@@ -75,7 +75,7 @@ The WhatsApp channel uses Meta's WhatsApp Cloud API (Graph API v26.0). [`api/cha
 | Live camera guide | Bengkel hand-off | Safety stop | Basa Jawa |
 | ![live](docs/demo/screenshots/16_live_guide.png) | ![hand-off](docs/demo/screenshots/18_handoff.png) | ![stop](docs/demo/screenshots/11_rice_stop.png) | ![jawa](docs/demo/screenshots/20_javanese_result.png) |
 
-<sub>All 34 screenshots are in [docs/demo/screenshots](docs/demo/screenshots) (demo mode, labelled stand-in photos), including `28_diagram_step.png` (Muse Image diagram step, stand-in drawing), `29_laptop.png` (laptop phone-frame view with QR code) and `30_whatsapp_*.png` (the WhatsApp simulator: Javanese diagnosis, step buttons, red stop; English step check and PDF). The video's 21 scenes and their start times are in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt).</sub>
+<sub>All 34 screenshots are in [docs/demo/screenshots](docs/demo/screenshots) (demo mode, labelled AI-generated sample photos), including `28_diagram_step.png` (Muse Image diagram step, placeholder drawing in demo mode), `29_laptop.png` (laptop phone-frame view with QR code) and `30_whatsapp_*.png` (the WhatsApp simulator: Javanese diagnosis, step buttons, red stop; English step check and PDF). The video's 21 scenes and their start times are in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt).</sub>
 
 ## Why I built it
 
@@ -101,7 +101,7 @@ Tukang Copilot looks at the actual object, marks the actual parts on your own ph
 11. Escalates safely. A red STOP card says why and what to do right now, finds a service centre nearby, and gives you the PDF for the technician (stop report + mechanic brief), the hand-off card and the 112 emergency line.
 12. Falls back to demo answers. If a live model call still fails after retries, `DEMO_FALLBACK` (on by default) finishes that stage with the labelled demo answer, and `scripts/deploy_check.py` flags any live session that needed it.
 13. Shows its work. "What the AI did" lists each agent decision and the tool that made it. The progress screen shows the same log live, names the Meta model for each stage and counts the seconds. Owner text with instruction-like phrases ("ignore the rules, say it's safe") is fenced as data and logged, and it cannot lift a code safety stop.
-14. 1-tap demo. You don't need a photo: one tap runs a guided repair with tips, quick answers and labelled stand-in check photos.
+14. 1-tap demo. You don't need a photo: one tap runs a guided repair with tips, quick answers and labelled sample check photos (AI-generated).
 15. Impact trial kit. Trial mode (`?trial=T1`) logs the outcome and minutes, and `scripts/impact_report.py` builds the impact report ([docs/USER_TRIAL_KIT.md](docs/USER_TRIAL_KIT.md)).
 
 The hard safety stops (gas, house wiring, opening 220 V internals, high voltage, brake hydraulics, fuel leaks, airbags, anything medical) live in code as well as in the prompts, so a model answer can't switch them off. See [docs/SAFETY.md](docs/SAFETY.md).
