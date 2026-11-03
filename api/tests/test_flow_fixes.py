@@ -181,7 +181,7 @@ def test_workshop_done_block_gets_its_own_page_only_when_it_does_not_fit(tmp_pat
     assert workshop_pdf.done_fits(doc, "No drips for 2 minutes.", "Light repairs only.")
     doc.y = workshop_pdf.TICK_Y - 100
     assert not workshop_pdf.done_fits(doc, "No drips for 2 minutes.", "Light repairs only.")
-    plan = {"steps": [{"n": 1, "instruction": "x " * 400}], "done_check": "It holds air for a day."}
+    plan = {"steps": [{"n": 1, "instruction": "x " * 1000}], "done_check": "It holds air for a day."}  # condensed type fits more per line
     out = workshop_pdf.build({"lang": "en"}, {"plan": plan}, tmp_path, tmp_path / "w.pdf")
     assert _pdf_pages(out.read_bytes()) >= 3  # a full step page pushes "Done when" to a page of its own
 

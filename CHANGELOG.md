@@ -2,6 +2,11 @@
 
 Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
 
+## 1.29.2 (2026-11-03)
+- Changed: the PDF report, the workshop sheet and the share cards now look like the app: Barlow type, a dark header with the wrench plate, safety plates in the real colours (black on yellow for caution), number plates for steps (green once the camera passed them), bars for the likely causes, drawn tick boxes instead of "[ ]".
+- Changed: share card and the front-page preview (`web/og.png`) re-drawn on the concrete background and saved as 256-colour PNG, about 170 KB instead of about 480 KB, so WhatsApp shows the preview.
+- Added: `api/render/brand.py` and the Barlow TTFs (OFL) in `api/render/fonts`. Characters Barlow does not have are drawn with DejaVu instead of empty boxes.
+
 ## 1.29.1 (2026-11-03)
 - Fixed: an expired or erased guide link opened as raw JSON. It is now a short page in Bahasa, Basa Jawa or English with a button to start a repair (still 404).
 - Fixed: on a 390x844 phone the "Check it now" bar covered the 1-tap demo button. The bar only floats once you start your own repair.

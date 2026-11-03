@@ -7,15 +7,16 @@ import re
 from pathlib import Path
 from typing import Any
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 from .. import handoff
+from . import brand
 from ..trace import build_trace
 
 W, H = 1240, 1754  # A4 at 150 dpi
 M = 90  # margin
-INK, MUTED, ORANGE = (28, 28, 30), (110, 110, 118), (255, 122, 0)
-SAFETY_COLOR = {"green": (34, 150, 80), "amber": (215, 140, 0), "red": (205, 40, 40)}
+INK, MUTED, ORANGE = brand.INK, brand.MUTED, brand.ORANGE
+SAFETY_COLOR = {"green": brand.GREEN, "amber": brand.YELLOW, "red": brand.RED}
 
 LABELS: dict[str, dict[str, str]] = {
     "id": {"title": "Laporan Perbaikan", "object": "Barang", "problem": "Masalah", "fix": "Penyebab yang ditangani", "safety": "Keselamatan",
@@ -30,7 +31,7 @@ LABELS: dict[str, dict[str, str]] = {
            "hood": "Di balik layar: model yang dipakai", "before": "Sebelum mulai, pastikan",
            "st_listen": "Dengar suara", "st_gate": "Cek keselamatan teks", "st_look": "Lihat foto", "st_segment": "Tandai bagian",
            "st_diagnose": "Diagnosa", "st_plan": "Susun langkah", "st_safety": "Cek keselamatan rencana", "st_illustrate": "Gambar bantu",
-           "st_narrate": "Suara pemandu", "code_tool": "aturan di kode"},
+           "st_narrate": "Suara pemandu", "code_tool": "aturan di kode", "causes": "Kemungkinan penyebab"},
     "en": {"title": "Repair Report", "object": "Item", "problem": "Problem", "fix": "Cause worked on", "safety": "Safety",
            "steps": "Steps", "verified": "verified by camera", "tools": "Tools", "parts": "Parts", "total": "Estimated parts cost",
            "shop": "Typical shop price (labour + parts)", "save": "Saved by doing it yourself (parts only)",
@@ -43,7 +44,7 @@ LABELS: dict[str, dict[str, str]] = {
            "hood": "Under the hood: models used", "before": "Before you start, make sure",
            "st_listen": "Listen", "st_gate": "Text safety gate", "st_look": "Look at photo", "st_segment": "Mark parts",
            "st_diagnose": "Diagnose", "st_plan": "Plan steps", "st_safety": "Plan safety gate", "st_illustrate": "Helper diagram",
-           "st_narrate": "Voice guide", "code_tool": "rules in code"},
+           "st_narrate": "Voice guide", "code_tool": "rules in code", "causes": "Likely causes"},
 }
 # Basa Jawa: every label a Javanese owner reads in the PDF (the app screen already speaks Javanese; the rest of the
 # PDF used to fall back to Indonesian). Wording follows web/app.js. api/tests/test_report_pdf_jv.py guards it.
@@ -59,7 +60,7 @@ LABELS["jv"] = dict(
     hood="Ing mburi layar: model sing dipakai", before="Sadurunge miwiti, priksa dhisik",
     st_listen="Rungokake swara", st_gate="Priksa slamet teks", st_look="Delok foto", st_segment="Tandhani bagean",
     st_diagnose="Diagnosa", st_plan="Nyusun langkah", st_safety="Priksa slamet rencana", st_illustrate="Gambar bantu",
-    st_narrate="Swara panuntun", code_tool="aturan ing kode")
+    st_narrate="Swara panuntun", code_tool="aturan ing kode", causes="Sebab sing mungkin")
 
 
 BRIEF: dict[str, dict[str, str]] = {
@@ -269,12 +270,10 @@ def brief_photos(session: dict[str, Any], session_dir: Path, lang: str, limit: i
 def _draw_brief(doc: _Doc, session: dict[str, Any], session_dir: Path, lang: str) -> None:
     B = BRIEF.get(lang, BRIEF["id"])
     doc._new_page()
-    doc.d.rectangle([0, 0, W, 14], fill=ORANGE)
-    doc.text(B["title"], 40, bold=True)
+    doc.band(B["title"])
     for kind, txt in brief_lines(session, lang):
         if kind == "h":
-            doc.space(8)
-            doc.text(txt, 28, bold=True)
+            doc.heading(txt, 30)
         elif kind == "m":
             doc.text(txt, 21, color=MUTED, indent=10)
         else:
@@ -282,8 +281,7 @@ def _draw_brief(doc: _Doc, session: dict[str, Any], session_dir: Path, lang: str
     pics = brief_photos(session, session_dir, lang)
     if not pics:
         return
-    doc.space(8)
-    doc.text(B["photos"], 28, bold=True)
+    doc.heading(B["photos"], 30, keep=380)
     cell_w, cell_h = (W - 2 * M - 30) // 2, 330
     for i in range(0, len(pics), 2):
         doc.need(cell_h + 40)
@@ -295,19 +293,13 @@ def _draw_brief(doc: _Doc, session: dict[str, Any], session_dir: Path, lang: str
                 continue
             pic.thumbnail((cell_w, cell_h))
             x = M + j * (cell_w + 30)
-            doc.im.paste(pic, (x, doc.y))
-            doc.d.rectangle([x, doc.y, x + pic.width, doc.y + pic.height], outline=(200, 200, 205), width=2)
-            doc.d.text((x, doc.y + pic.height + 6), cap, font=_font(20), fill=MUTED)
+            doc.paste_round(pic, x, doc.y, 12)
+            brand.draw(doc.d, (x, doc.y + pic.height + 6), cap, "semi", 20, MUTED)
         doc.y += cell_h + 40
 
 
-def _font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
-    for name in (("DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf"),):
-        for folder in ("/usr/share/fonts/truetype/dejavu", "/usr/share/fonts/dejavu"):
-            p = Path(folder) / name
-            if p.exists():
-                return ImageFont.truetype(str(p), size)
-    return ImageFont.load_default(size=size)
+def _font(size: int, bold: bool = False) -> Any:
+    return brand.font("semi" if bold else "body", size)
 
 
 def rupiah(n: int | float | None) -> str:
@@ -330,6 +322,8 @@ def _wrap(draw: ImageDraw.ImageDraw, text: str, font: Any, width: int) -> list[s
 
 
 class _Doc:
+    """A4 pages drawn as images: Barlow type, the app's safety colours, a thin orange strip on top of every page."""
+
     def __init__(self, footer: str, page_word: str) -> None:
         self.pages: list[Image.Image] = []
         self.footer, self.page_word = footer, page_word
@@ -339,6 +333,7 @@ class _Doc:
     def _new_page(self) -> None:
         self.im = Image.new("RGB", (W, H), "white")
         self.d = ImageDraw.Draw(self.im)
+        self.d.rectangle([0, 0, W, 12], fill=ORANGE)
         self.pages.append(self.im)
         self.y = M
 
@@ -346,20 +341,44 @@ class _Doc:
         if self.y + h > H - M - 40:
             self._new_page()
 
-    def text(self, s: str, size: int = 26, bold: bool = False, color: tuple[int, int, int] = INK, indent: int = 0, gap: int = 8) -> None:
-        f = _font(size, bold)
-        for line in _wrap(self.d, s, f, W - 2 * M - indent):
+    def text(self, s: str, size: int = 26, bold: bool = False, color: tuple[int, int, int] = INK, indent: int = 0, gap: int = 8,
+             kind: str = "") -> None:
+        k = kind or ("semi" if bold else "body")
+        for line in brand.wrap(self.d, s, k, size, W - 2 * M - indent):
             self.need(size + gap)
-            self.d.text((M + indent, self.y), line, font=f, fill=color)
+            brand.draw(self.d, (M + indent, self.y), line, k, size, color)
             self.y += size + gap
+
+    def heading(self, s: str, size: int = 34, keep: int = 110, color: tuple[int, int, int] = INK) -> None:
+        """A section title in Barlow Condensed, never left alone at the foot of a page."""
+        self.space(14)
+        self.need(size + keep)
+        self.text(s, size, color=color, kind="display", gap=10)
+
+    def band(self, title: str, sub: str = "") -> None:
+        """Dark header plate across the top of a page: the app icon, the name, and what this page is."""
+        h = 190 if sub else 170
+        self.d.rectangle([0, 0, W, h], fill=brand.DARK)
+        self.d.rectangle([0, h, W, h + 10], fill=ORANGE)
+        brand.wrench_plate(self.im, M, 44, 64)
+        brand.draw(self.d, (M + 84, 38), "Tukang Copilot", "display", 54, brand.WHITE)
+        brand.draw(self.d, (M + 84, 98), title, "cond", 34, ORANGE)
+        if sub:
+            brand.draw(self.d, (M + 84, 142), sub, "body", 22, (190, 196, 204))
+        self.y = h + 44
 
     def space(self, h: int = 18) -> None:
         self.y += h
 
     def rule(self) -> None:
         self.need(20)
-        self.d.line([M, self.y + 6, W - M, self.y + 6], fill=(225, 225, 230), width=2)
+        self.d.line([M, self.y + 6, W - M, self.y + 6], fill=brand.LINE, width=2)
         self.y += 22
+
+    def paste_round(self, pic: Image.Image, x: int, y: int, radius: int = 18) -> None:
+        mask = Image.new("L", pic.size, 0)
+        ImageDraw.Draw(mask).rounded_rectangle([0, 0, pic.width - 1, pic.height - 1], radius=radius, fill=255)
+        self.im.paste(pic, (x, y), mask)
 
     def image(self, path: Path, max_h: int = 620) -> None:
         try:
@@ -369,18 +388,66 @@ class _Doc:
             return
         pic.thumbnail((W - 2 * M, max_h))
         self.need(pic.height + 10)
-        self.im.paste(pic, (M, self.y))
-        self.y += pic.height + 14
+        self.paste_round(pic, M + (W - 2 * M - pic.width) // 2, self.y)
+        self.y += pic.height + 16
+
+    def box(self, x: int, y: int, size: int = 30, ticked: bool = False) -> None:
+        """A drawn tick box (green with a white tick when done), instead of "[ ]" text."""
+        if ticked:
+            self.d.rounded_rectangle([x, y, x + size, y + size], radius=7, fill=brand.GREEN)
+            self.d.line([x + size * .22, y + size * .52, x + size * .43, y + size * .72, x + size * .8, y + size * .3],
+                        fill=brand.WHITE, width=max(3, size // 8), joint="curve")
+        else:
+            self.d.rounded_rectangle([x, y, x + size, y + size], radius=7, outline=INK, width=3)
 
     def finish(self) -> list[Image.Image]:
         n = len(self.pages)
         for i, page in enumerate(self.pages, 1):
             d = ImageDraw.Draw(page)
-            d.line([M, H - M - 10, W - M, H - M - 10], fill=(225, 225, 230), width=2)
-            d.text((M, H - M), self.footer, font=self.f_small, fill=MUTED)
+            d.line([M, H - M - 10, W - M, H - M - 10], fill=brand.LINE, width=2)
+            brand.draw(d, (M, H - M), self.footer, "body", 21, MUTED)
             tag = f"{self.page_word} {i}/{n}"
-            d.text((W - M - d.textlength(tag, font=self.f_small), H - M), tag, font=self.f_small, fill=MUTED)
+            brand.draw(d, (W - M - brand.length(d, tag, "semi", 21), H - M), tag, "semi", 21, MUTED)
         return self.pages
+
+
+def _safety_plate(doc: _Doc, level: str, L: dict[str, str], reason: str) -> None:
+    """Full-width plate in the safety colour (black on yellow, white on red and green, as on the phone)."""
+    fill, on = brand.LEVEL.get(level, (brand.PLATE_2, INK))
+    word = L.get(level, level.upper())
+    lines = brand.wrap(doc.d, reason, "body", 24, W - 2 * M - 60)[:4] if reason else []
+    h = 92 + len(lines) * 32
+    doc.need(h + 10)
+    doc.d.rounded_rectangle([M, doc.y, W - M, doc.y + h], radius=18, fill=fill)
+    tw = brand.draw(doc.d, (M + 30, doc.y + 18), word, "display", 48, on)
+    brand.draw(doc.d, (M + 30 + tw + 18, doc.y + 34), L["safety"], "semi", 24, on)
+    yy = doc.y + 80
+    for ln in lines:
+        brand.draw(doc.d, (M + 30, yy), ln, "body", 24, on)
+        yy += 32
+    doc.y += h + 18
+
+
+def _causes(doc: _Doc, session: dict[str, Any], L: dict[str, str]) -> None:
+    dx = session.get("diagnosis") or {}
+    causes = [c for c in dx.get("causes") or [] if isinstance(c, dict) and c.get("title")][:3]
+    if not causes:
+        return
+    doc.heading(L["causes"], 30)
+    cur = int(session.get("cause_index") or 0)
+    for i, c in enumerate(causes):
+        conf = max(0, min(100, int(c.get("confidence") or 0)))
+        doc.need(76)
+        y = doc.y
+        col = brand.ORANGE_TEXT if i == cur else MUTED
+        brand.draw(doc.d, (M, y - 4), f"{conf}%", "display", 44, col)
+        x = M + 120
+        brand.draw(doc.d, (x, y), brand.wrap(doc.d, str(c["title"]), "semi", 25, W - M - x, 1)[0], "semi", 25, INK)
+        doc.d.rounded_rectangle([x, y + 40, W - M, y + 50], radius=5, fill=brand.PLATE_2)
+        if conf:
+            doc.d.rounded_rectangle([x, y + 40, x + int((W - M - x) * conf / 100), y + 50], radius=5,
+                                    fill=brand.ORANGE if i == cur else brand.LINE)
+        doc.y = y + 72
 
 
 def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: Path) -> Path:
@@ -390,108 +457,126 @@ def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: 
         lang = "id"
     L = LABELS[lang]
     doc = _Doc(L["made"], L["page"])
-    doc.d.rectangle([0, 0, W, 14], fill=ORANGE)
-    doc.text(f"Tukang Copilot: {L['title']}", 46, bold=True)
-    doc.text(f"#{rep.get('id', '')}" + (f"   {L['demo']}" if session.get("mode") == "mock" else ""), 22, color=MUTED)
+    doc.band(L["title"], f"#{rep.get('id', '')}" + (f"   ·   {L['demo']}" if session.get("mode") == "mock" else ""))
     if session.get("fallback"):
-        doc.text(f"{L['fallback']}: {', '.join(str(x) for x in session['fallback'])}", 22, bold=True, color=SAFETY_COLOR["amber"])
-    doc.rule()
+        doc.text(f"{L['fallback']}: {', '.join(str(x) for x in session['fallback'])}", 22, bold=True, color=brand.ORANGE_TEXT)
 
     level = rep.get("safety_level") or ""
     if level:
-        doc.need(60)
-        col = SAFETY_COLOR.get(level, MUTED)
-        label, bf = f"{L['safety']}: {L.get(level, level.upper())}", _font(26, True)
-        doc.d.rounded_rectangle([M, doc.y, M + 36 + int(doc.d.textlength(label, font=bf)), doc.y + 48], radius=12, fill=col)
-        doc.d.text((M + 18, doc.y + 9), label, font=bf, fill="white")
-        doc.y += 64
-        reason = (session.get("safety") or {}).get("reason") or ""
-        if reason:
-            doc.text(reason, 24, color=MUTED)
+        _safety_plate(doc, str(level), L, str((session.get("safety") or {}).get("reason") or ""))
     if session.get("stop_reason"):
-        doc.text(str(session["stop_reason"]), 26, bold=True, color=SAFETY_COLOR["red"])
+        doc.text(str(session["stop_reason"]), 26, bold=True, color=brand.RED)
 
     for key, val in (("object", rep.get("object")), ("problem", rep.get("problem")), ("fix", rep.get("fix"))):
         if val:
             doc.space(6)
-            doc.text(L[key], 22, bold=True, color=MUTED, gap=4)
-            doc.text(str(val), 28)
+            doc.text(L[key], 21, bold=True, color=MUTED, gap=2)
+            doc.text(str(val), 30 if key == "object" else 27, kind="cond" if key == "object" else "")
 
     photo = session_dir / (session.get("parts_image") or "")
     if session.get("parts_image") and photo.exists():
-        doc.space(10)
-        doc.text(L["photo"], 22, bold=True, color=MUTED, gap=4)
-        doc.image(photo, 560)
+        doc.space(12)
+        doc.text(L["photo"], 21, bold=True, color=MUTED, gap=6)
+        doc.image(photo, 540)
+
+    _causes(doc, session, L)
 
     pre = [str(x) for x in ((session.get("diagnosis") or {}).get("before_you_start") or []) if x]
     if pre:
-        doc.space(6)
-        doc.text(L["before"], 24, bold=True, color=MUTED, gap=4)
+        doc.space(14)
+        doc.need(60 + 40 * len(pre))
+        top = doc.y
+        doc.y += 18
+        doc.text(L["before"], 24, bold=True, indent=24, gap=10)
         for x in pre:
-            doc.text(f"{L['todo']}  {x}", 24, indent=10)
+            doc.box(M + 24, doc.y + 1, 26)
+            doc.text(x, 24, indent=66)
+        doc.y += 10
+        _tint_under(doc, top, brand.YELLOW_TINT)
+        doc.d.rounded_rectangle([M, top, W - M, doc.y], radius=16, outline=brand.YELLOW, width=4)
+        doc.y += 8
 
     steps = (session.get("plan") or {}).get("steps", [])
     if steps:
-        doc.rule()
-        doc.text(f"{L['steps']} ({rep.get('steps_verified', 0)}/{rep.get('steps_total', 0)} {L['verified']})", 30, bold=True)
+        doc.heading(f"{L['steps']} ({rep.get('steps_verified', 0)}/{rep.get('steps_total', 0)} {L['verified']})")
         checks = session.get("checks") or {}
         for st in steps:
             ok = bool(checks.get(str(st.get("n")), {}).get("passed"))
-            doc.text(f"{L['ok'] if ok else L['todo']}  {st.get('n')}. {st.get('instruction', '')}", 25, color=INK if ok else (60, 60, 66), indent=0)
+            doc.need(70)
+            y = doc.y
+            # number plate: dark, or green when the camera passed this step (the heading says how many)
+            doc.d.rounded_rectangle([M, y, M + 40, y + 40], radius=9, fill=brand.GREEN if ok else brand.DARK)
+            n = str(st.get("n"))
+            brand.draw(doc.d, (M + 20 - brand.length(doc.d, n, "display", 30) / 2, y + 3), n, "display", 30, brand.WHITE)
+            doc.y = y + 4
+            doc.text(str(st.get("instruction", "")) + (f"  ({L['verified']})" if ok else ""), 25, indent=62)
             if st.get("expected_state"):
-                doc.text(f"-> {st['expected_state']}", 22, color=MUTED, indent=70)
+                doc.text(f"-> {st['expected_state']}", 21, color=MUTED, indent=62)
+            doc.y = max(doc.y, y + 52) + 8
         done = (session.get("plan") or {}).get("done_check")
         if done:
-            doc.space(6)
-            doc.text(done, 24, bold=True)
+            doc.space(4)
+            doc.text(done, 25, bold=True, color=brand.GREEN)
 
     items = [(L["tools"], rep.get("tools") or []), (L["parts"], rep.get("parts") or [])]
     if any(v for _, v in items):
-        doc.rule()
         total = 0
         for head, rows in items:
             if not rows:
                 continue
-            doc.text(head, 28, bold=True)
+            doc.heading(head, 30)
             for r in rows:
                 price = int(r.get("est_price_idr") or 0)
                 total += price
-                doc.text(f"- {r.get('name', '')}   {rupiah(price) if price else ''}", 24, indent=10)
-            doc.space(6)
+                doc.need(40)
+                y = doc.y
+                doc.text(f"- {r.get('name', '')}", 24, indent=10)
+                if price:
+                    tag = rupiah(price)
+                    brand.draw(doc.d, (W - M - brand.length(doc.d, tag, "semi", 24), y), tag, "semi", 24, INK)
+                doc.d.line([M + 10, doc.y - 2, W - M, doc.y - 2], fill=brand.PLATE_2, width=2)
         parts_total = sum(int(r.get("est_price_idr") or 0) for r in items[1][1]) if len(items) > 1 else total
         shown = rep.get("cost_estimate_idr") or parts_total
         mins = rep.get("minutes_estimate")
-        doc.text(f"{L['total']}: {rupiah(shown)}" + (f"   ~{mins} {L['minutes']}" if mins else ""), 26, bold=True)
+        doc.space(10)
+        doc.need(60)
+        doc.d.rounded_rectangle([M, doc.y - 6, W - M, doc.y + 44], radius=12, fill=brand.PLATE_2)
+        doc.y += 4
+        doc.text(f"{L['total']}: {rupiah(shown)}" + (f"   ~{mins} {L['minutes']}" if mins else ""), 26, bold=True, indent=16)
+        doc.space(6)
         shop, saving = int(rep.get("shop_cost_estimate_idr") or 0), int(rep.get("diy_saving_idr") or 0)
         if shop:
-            doc.text(f"{L['shop']}: {rupiah(shop)}", 24)
+            doc.text(f"{L['shop']}: {rupiah(shop)}", 24, indent=16)
             if saving:
-                doc.text(f"{L['save']}: {rupiah(saving)}", 24)
+                doc.text(f"{L['save']}: {rupiah(saving)}", 24, bold=True, color=brand.GREEN, indent=16)
 
     oc = rep.get("outcome") or {}
     if oc.get("result") in ("fixed", "pro"):
-        doc.rule()
-        doc.text(f"{L['outcome']}: {L['o_' + oc['result']]}", 28, bold=True)
+        doc.space(10)
+        doc.need(70)
+        tint = brand.GREEN_TINT if oc["result"] == "fixed" else brand.PLATE_2
+        top = doc.y
+        doc.y += 16
+        doc.text(f"{L['outcome']}: {L['o_' + oc['result']]}", 28, bold=True, indent=20)
         if oc.get("saved_idr"):
-            doc.text(f"{L['save']}: {rupiah(int(oc['saved_idr']))}", 24)
+            doc.text(f"{L['save']}: {rupiah(int(oc['saved_idr']))}", 24, indent=20)
+        doc.y += 8
+        _tint_under(doc, top, tint)
 
     if rep.get("attempts"):
-        doc.rule()
-        doc.text(L["attempts"], 28, bold=True)
+        doc.heading(L["attempts"], 30)
         for a in rep["attempts"]:
             doc.text(f"- {a}", 23, indent=10)
 
     ag = agent_lines(session, lang)
     if ag:
-        doc.rule()
-        doc.text(AGENT.get(lang, AGENT["id"])["agentTitle"], 28, bold=True)
+        doc.heading(AGENT.get(lang, AGENT["id"])["agentTitle"], 30)
         for line in ag:
             doc.text(f"- {line}", 21, indent=10, gap=5)
 
     rows = [r for r in build_trace(session) if r["status"] == "done"]
     if rows:
-        doc.rule()
-        doc.text(L["hood"], 26, bold=True)
+        doc.heading(L["hood"], 28)
         for r in rows:
             secs = f"  {r['ms'] / 1000:.1f}s" if (r.get("ms") or 0) >= 100 else ""
             tool = L["code_tool"] if r["kind"] == "code" else r["tool"]  # "rules in code" follows the report's language
@@ -503,3 +588,18 @@ def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: 
     out.parent.mkdir(parents=True, exist_ok=True)
     pages[0].save(out, "PDF", resolution=150.0, save_all=True, append_images=pages[1:])
     return out
+
+
+def _tint_under(doc: _Doc, top: int, tint: tuple[int, int, int]) -> None:
+    """Put a tinted plate behind lines already drawn between `top` and doc.y (white page, so only white pixels change)."""
+    if doc.y <= top or doc.y > H:
+        return
+    box = (M, top, W - M, doc.y)
+    region = doc.im.crop(box)
+    plate = Image.new("RGB", region.size, tint)
+    mask = Image.new("L", region.size, 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, region.width - 1, region.height - 1], radius=16, fill=255)
+    white = region.convert("L").point(lambda v: 255 if v >= 250 else 0)
+    from PIL import ImageChops
+
+    doc.im.paste(plate, box[:2], ImageChops.multiply(mask, white))

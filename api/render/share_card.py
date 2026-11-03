@@ -8,10 +8,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageFilter, ImageOps
+
+from . import brand
 
 W, H = 1200, 630
-INK, MUTED, ORANGE, PAPER = (28, 32, 38), (95, 99, 110), (180, 83, 9), (255, 250, 244)
 LEVEL = {"green": ((22, 120, 60), {"id": "AMAN", "jv": "AMAN", "en": "SAFE"}),
          "amber": ((176, 104, 0), {"id": "HATI-HATI", "jv": "ATI-ATI", "en": "CAUTION"}),
          "red": ((185, 28, 28), {"id": "STOP", "jv": "MANDHEG", "en": "STOP"})}
@@ -19,51 +20,16 @@ TXT = {
     "id": {"likely": "Paling mungkin", "steps": "{n} langkah", "min": "~{m} menit", "save": "hemat Rp{s}",
            "checked": "{v} dari {n} langkah lolos cek kamera", "camera": "Kamera mengecek tiap langkah",
            "demo": "MODE DEMO: jawaban contoh, foto contoh (dibuat AI)",
-           "tag": "Foto + cerita → panduan perbaikan", "made": "Meta Muse Spark + SAM 3.1"},
+           "tag": "Foto + cerita, dapat panduan perbaikan", "made": "Meta Muse Spark + SAM 3.1"},
     "jv": {"likely": "Sing paling mungkin", "steps": "{n} langkah", "min": "~{m} menit", "save": "irit Rp{s}",
            "checked": "{v} saka {n} langkah lolos priksa kamera", "camera": "Kamera mriksa saben langkah",
            "demo": "MODE DEMO: wangsulan conto, foto conto (digawe AI)",
-           "tag": "Foto + crita → tuntunan ndandani", "made": "Meta Muse Spark + SAM 3.1"},
+           "tag": "Foto + crita, oleh tuntunan ndandani", "made": "Meta Muse Spark + SAM 3.1"},
     "en": {"likely": "Most likely", "steps": "{n} steps", "min": "~{m} min", "save": "save Rp{s}",
            "checked": "{v} of {n} steps passed a camera check", "camera": "The camera checks each step",
            "demo": "DEMO MODE: sample answers, AI-generated sample photo",
-           "tag": "Photo + a few words → a repair guide", "made": "Meta Muse Spark + SAM 3.1"},
+           "tag": "A photo and a few words, then a repair guide", "made": "Meta Muse Spark + SAM 3.1"},
 }
-_FONT_DIRS = ("/usr/share/fonts/truetype/dejavu", "/usr/share/fonts/dejavu", "")
-
-
-def _font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
-    name = "DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf"
-    for d in _FONT_DIRS:
-        try:
-            return ImageFont.truetype(str(Path(d) / name) if d else name, size)
-        except OSError:
-            continue
-    return ImageFont.load_default()
-
-
-def _wrap(draw: ImageDraw.ImageDraw, text: str, font: Any, width: int, max_lines: int) -> list[str]:
-    words, lines, cur = (text or "").split(), [], ""
-    for w in words:
-        trial = (cur + " " + w).strip()
-        if draw.textlength(trial, font=font) <= width:
-            cur = trial
-            continue
-        if cur:
-            lines.append(cur)
-        cur = w
-        if len(lines) == max_lines:
-            break
-    if cur and len(lines) < max_lines:
-        lines.append(cur)
-    if len(lines) == max_lines and " ".join(lines) != " ".join(words):  # cut: end the last line with an ellipsis
-        last = lines[-1]
-        while last and draw.textlength(last + "…", font=font) > width:
-            last = last[:-1]
-        lines[-1] = last.rstrip(" ,;:.") + "…"
-    return lines
-
-
 def _panel(im: Image.Image, box: tuple[int, int]) -> Image.Image:
     """The whole photo, uncropped (SAM outlines near the edges stay visible), on a dimmed blurred copy of itself."""
     im = ImageOps.exif_transpose(im).convert("RGB")
@@ -105,42 +71,64 @@ def check_line(s: dict[str, Any], lang: str) -> tuple[str, bool]:
     return ("✓ " + tx["checked"].format(v=v, n=len(steps)), True) if v else (tx["camera"], False)
 
 
+def _save(img: Image.Image, out: Path) -> None:
+    """256-colour PNG: about 170 KB instead of about 480 KB. WhatsApp skips link-preview images much over 300 KB."""
+    img.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.FLOYDSTEINBERG).save(out, "PNG", optimize=True)
+
+
+def _header(img: Image.Image, d: ImageDraw.ImageDraw, x: int, tag: str) -> None:
+    brand.wrench_plate(img, x, 40, 50)
+    brand.draw(d, (x + 64, 38), "Tukang Copilot", "display", 46, brand.INK)
+    brand.draw(d, (x, 104), tag, "body", 23, brand.MUTED)
+
+
+def _footer(d: ImageDraw.ImageDraw, x: int, right: int, made: str, demo: str) -> None:
+    d.line((x, H - 92, right, H - 92), fill=brand.LINE, width=2)
+    brand.draw(d, (x, H - 80), made, "semi", 22, brand.MUTED)
+    if demo:
+        brand.draw(d, (x, H - 46), demo, "semi", 18, brand.ORANGE_TEXT)
+
+
 def build(s: dict[str, Any], folder: Path, out: Path) -> Path:
     lang = s.get("lang") if s.get("lang") in TXT else "id"
     tx = TXT[str(lang)]
-    img = Image.new("RGB", (W, H), PAPER)
+    img = Image.new("RGB", (W, H), brand.BETON)
     img.paste(_photo(folder, s, (560, H)), (0, 0))
     d = ImageDraw.Draw(img)
     x, right = 600, W - 48
-    d.text((x, 44), "Tukang Copilot", font=_font(40, True), fill=INK)
-    d.text((x, 96), tx["tag"], font=_font(24), fill=MUTED)
+    _header(img, d, x, tx["tag"])
 
     rep = s.get("object_report") or {}
     dx = s.get("diagnosis") or {}
     plan = s.get("plan") or {}
     y = 150
-    for line in _wrap(d, str(rep.get("object") or ""), _font(42, True), right - x, 2):
-        d.text((x, y), line, font=_font(42, True), fill=INK)
-        y += 54
+    for line in brand.wrap(d, str(rep.get("object") or ""), "display", 50, right - x, 2):
+        brand.draw(d, (x, y), line, "display", 50, brand.INK)
+        y += 52
     causes = dx.get("causes") or []
     idx = int(s.get("cause_index") or 0)
     cause = causes[idx] if 0 <= idx < len(causes) else (causes[0] if causes else None)
     if isinstance(cause, dict) and cause.get("title"):
-        y += 10
-        d.text((x, y), f"{tx['likely']}:", font=_font(24), fill=MUTED)
-        y += 34
-        for line in _wrap(d, f"{cause['title']} ({int(cause.get('confidence') or 0)}%)", _font(32, True), right - x, 2):
-            d.text((x, y), line, font=_font(32, True), fill=ORANGE)
-            y += 42
+        y += 16
+        brand.draw(d, (x, y), tx["likely"], "semi", 21, brand.MUTED)
+        y += 30
+        pct = f"{int(cause.get('confidence') or 0)}%"
+        pw = brand.draw(d, (x, y - 6), pct, "display", 60, brand.ORANGE_TEXT)
+        lines = brand.wrap(d, str(cause["title"]), "cond", 30, right - x - pw - 18, 2)
+        ty = y + (14 if len(lines) == 1 else 0)
+        for line in lines:
+            brand.draw(d, (x + pw + 18, ty), line, "cond", 30, brand.INK)
+            ty += 32
+        y += 70
     level = str(dx.get("safety_level") or (s.get("safety") or {}).get("level") or "")
     if level in LEVEL:
-        y += 14
-        col, words = LEVEL[level]
-        f = _font(26, True)
-        tw = int(d.textlength(words[str(lang)], font=f))
-        d.rounded_rectangle((x, y, x + tw + 32, y + 44), radius=22, fill=col)
-        d.text((x + 16, y + 7), words[str(lang)], font=f, fill=(255, 255, 255))
-        y += 60
+        y += 6
+        words = LEVEL[level][1]
+        col, on = brand.LEVEL[level]
+        tw = int(brand.length(d, words[str(lang)], "display", 28))
+        d.rounded_rectangle((x, y, x + tw + 30, y + 42), radius=9, fill=col)
+        brand.draw(d, (x + 15, y + 5), words[str(lang)], "display", 28, on)
+        y += 58
     bits = []
     if plan.get("steps"):
         bits.append(tx["steps"].format(n=len(plan["steps"])))
@@ -149,46 +137,47 @@ def build(s: dict[str, Any], folder: Path, out: Path) -> Path:
     if dx.get("diy_saving_idr") and level != "red":
         bits.append(tx["save"].format(s=_rupiah(dx["diy_saving_idr"])))
     if bits:
-        d.text((x, y), "  ·  ".join(bits), font=_font(26), fill=INK)
-        y += 40
+        brand.draw(d, (x, y), "  ·  ".join(bits), "semi", 25, brand.INK)
+        y += 38
     line, passed = check_line(s, str(lang))
-    if line:
-        d.text((x, y), line, font=_font(24), fill=(22, 120, 60) if passed else MUTED)
-    # footer: models + an honest demo label
-    d.line((x, H - 92, right, H - 92), fill=(230, 222, 210), width=2)
-    d.text((x, H - 78), tx["made"], font=_font(22, True), fill=MUTED)
-    if s.get("mode") == "mock":
-        d.text((x, H - 46), tx["demo"], font=_font(19), fill=ORANGE)
+    if line and y < H - 120:
+        brand.draw(d, (x, y), line, "semi", 22, brand.GREEN if passed else brand.MUTED)
+    _footer(d, x, right, tx["made"], tx["demo"] if s.get("mode") == "mock" else "")
     out.parent.mkdir(parents=True, exist_ok=True)
-    img.save(out, "PNG", optimize=True)
+    _save(img, out)
     return out
 
 
 HOME_TITLE, HOME_MADE = "Tukang Copilot", "Meta Muse Spark + SAM 3.1"
-HOME_LINES = ["Foto + cerita → panduan perbaikan", "AI menandai bagiannya (SAM 3.1)", "Tiap langkah dicek kamera",
+HOME_HEAD = "Apa yang rusak?"
+HOME_LINES = ["Foto + cerita, dapat panduan perbaikan", "AI menandai bagiannya (SAM 3.1)", "Tiap langkah dicek kamera",
               "Bahasa Indonesia · Basa Jawa · English"]
 
 
 def build_home(photo: Path, out: Path, note: str = "Foto contoh (dibuat AI), mode demo") -> Path:
-    """Link preview for the app's front page: a labelled sample photo, AI-generated (ideally with SAM outlines) and four lines.
+    """Link preview for the app's front page: a labelled sample photo, AI-generated (ideally with SAM outlines) and a few lines.
     scripts/make_og.py renders web/og.png from a demo motorbike session; /og.png falls back to this at runtime."""
-    img = Image.new("RGB", (W, H), PAPER)
+    img = Image.new("RGB", (W, H), brand.BETON)
     try:
         with Image.open(photo) as im:
             img.paste(_panel(im, (560, H)), (0, 0))
     except OSError:
-        img.paste(Image.new("RGB", (560, H), (60, 64, 72)), (0, 0))
+        img.paste(Image.new("RGB", (560, H), brand.DARK_2), (0, 0))
     d = ImageDraw.Draw(img)
-    d.rounded_rectangle((16, H - 52, 16 + int(d.textlength(note, font=_font(20))) + 24, H - 16), radius=14, fill=(0, 0, 0))
-    d.text((28, H - 47), note, font=_font(20), fill=(255, 255, 255))
-    x = 600
-    d.text((x, 70), HOME_TITLE, font=_font(54, True), fill=INK)
-    y = 170
-    for i, line in enumerate(HOME_LINES):
-        d.text((x, y), ("✓ " if i in (1, 2) else "") + line, font=_font(28, i == 0), fill=ORANGE if i == 0 else INK)
-        y += 62
-    d.line((x, H - 92, W - 48, H - 92), fill=(230, 222, 210), width=2)
-    d.text((x, H - 78), HOME_MADE, font=_font(22, True), fill=MUTED)
+    nw = int(brand.length(d, note, "body", 20))
+    d.rounded_rectangle((16, H - 52, 16 + nw + 24, H - 16), radius=10, fill=brand.DARK)
+    brand.draw(d, (28, H - 47), note, "body", 20, brand.WHITE)
+    x, right = 600, W - 48
+    _header(img, d, x, HOME_LINES[0])
+    brand.draw(d, (x, 150), HOME_HEAD, "display", 76, brand.INK)
+    y = 262
+    for i, line in enumerate(HOME_LINES[1:3], 1):
+        d.rounded_rectangle((x, y + 2, x + 34, y + 36), radius=8, fill=brand.GREEN)
+        d.line((x + 8, y + 19, x + 15, y + 26, x + 27, y + 11), fill=brand.WHITE, width=4, joint="curve")
+        brand.draw(d, (x + 48, y), line, "semi", 28, brand.INK)
+        y += 56
+    brand.draw(d, (x, y + 14), HOME_LINES[3], "body", 25, brand.MUTED)
+    _footer(d, x, right, HOME_MADE, "")
     out.parent.mkdir(parents=True, exist_ok=True)
-    img.save(out, "PNG", optimize=True)
+    _save(img, out)
     return out
