@@ -13,7 +13,7 @@ Order: live run first, Baseten optional, real clip and trials, then repo/deploy,
 - [ ] (keys) Optional, with the deploy: WhatsApp channel (docs/WHATSAPP.md: Meta app and test number, fill `WA_TOKEN`, `WA_PHONE_NUMBER_ID`, `WA_VERIFY_TOKEN`, `WA_APP_SECRET` in Render, paste the webhook URL); then one real chat test and update the "Honest status" lines
 - [ ] `deploy_check.py <url> --live` → READY
 - [ ] Phone test over 4G: camera, live guide, hands-free (Android Chrome jv-ID), WhatsApp hand-off, PDF
-- [ ] (keys) Upload the video to YouTube (real recording per DEMO_SCRIPT.md, or the 2:55 backup cut) and post the X clip
+- [ ] (keys) Upload the video to YouTube (real recording per DEMO_SCRIPT.md, or the 2:53 backup cut) and post the X clip
 - [ ] Fill in the links in README and SUBMISSION
 - [ ] (keys) Paste the docs/SUBMISSION.md fields into Cerebral Valley (account ragilmalika) and submit before Nov 5 09:00 WIB
 - [ ] (keys) Share docs/launch/COMMUNITY_VOTE_KIT.md when voting opens Tue Nov 10, 00:00 WIB
@@ -37,6 +37,10 @@ Order: live run first, Baseten optional, real clip and trials, then repo/deploy,
 - [x] Video: 3 s hook title card with the hackathon dates, burned-in English captions, Muse Image diagram scene, TIMESTAMPS.txt; 2:57 cut, 43.5 s X clip (v1.25)
 - [x] Docs brought in line with the 1.25 re-cut (chapters, timestamps, 29 shots, 43.5 s clip) and the new evidence (EVAL, laptop view, static build, first_live_run) in SUBMISSION / JUDGING_MAP / JUDGE_FAQ; one-pager re-made (v1.25)
 - [x] Flaky agent-log scroll test now waits on conditions (v1.25)
+- [x] WhatsApp channel (Cloud API webhook, fake Graph API tests, `/wa` simulator) and an owner token for outcome and erase (v1.27)
+- [x] New look: bengkel-sign design, Barlow, Lucide icons, light and dark theme (v1.28)
+- [x] AI-generated sample photos, labelled, in place of the flat drawings; demo video re-shot at 1080p60, 2:53, X clip 43.5 s (v1.29.0)
+- [x] PDF report, workshop sheet and share cards in the new look; friendly page for expired guide links; strict CSP and HSTS; STOP card on shared red-stop links; axe-core clean on every main screen (v1.29.1 to v1.29.4)
 - [ ] After the live run: `python scripts/run_eval.py` stays green; add the live numbers to the docs
 - [ ] Open the live link a few minutes before judging or recording so the free server is awake (a brand-new visitor can't get the recording until the page itself loads)
 

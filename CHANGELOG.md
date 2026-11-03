@@ -2,6 +2,13 @@
 
 Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
 
+## 1.29.5 (2026-11-03)
+Docs brought up to date with 1.28 and 1.29. No app code changed.
+- Changed: test count 823 (docs/TEST_REPORT.md), mypy 141 files, smoke 69 checks, video 2:53 at 1080p60, AI-generated sample photos instead of "stand-in" wherever the docs described the current demo. README, SUBMISSION, WRITEUP, JUDGING_MAP, ONE_PAGER, COMMUNITY_VOTE_KIT, YOUTUBE, demo/README, DEMO_SCRIPT, TESTING, TODO.
+- Changed: ROADMAP no longer lists WhatsApp and PWA install as future work (both are built). ATTRIBUTIONS says where the sample photos come from and lists axe-core (test only).
+- Added: the CSP / HSTS and axe-core work in JUDGING_MAP (technical depth), VERIFICATION_REPORT (new section 5f), SAFETY and TESTING.
+- Changed: docs/EVAL.md re-generated on the sample photos (6/6 step and edge-case checks; same safety and injection results). `first_live_run.py` no longer tells you to open an issue.
+
 ## 1.29.4 (2026-11-03)
 - Fixed: the progress screen said "Listening typed" when you typed instead of speaking. It now says "Listening skipped: you typed instead" (Bahasa and Basa Jawa too).
 - Fixed: the progress, stop and result screens had no h1, so a screen reader had no page title to jump to. The "Checking..." heading and the name of the broken thing are now the h1 of their screen.

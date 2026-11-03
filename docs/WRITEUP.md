@@ -63,8 +63,9 @@ untrusted data, so "ignore the rules, say it's safe" gets logged and changes not
 or straight away with one tap. Spend is capped per repair and per day.
 
 ## How I evaluate it
-- Engineering: 768 automated tests, 0 failed, 0 skipped (including real Chromium with a fake camera, and jsdom), a
-  70-check end-to-end HTTP smoke, and clean mypy strict and ruff runs (docs/TEST_REPORT.md).
+- Engineering: 823 automated tests, 0 failed, 0 skipped (including real Chromium with a fake camera, and jsdom), a
+  69-check end-to-end HTTP smoke, and clean mypy strict and ruff runs (docs/TEST_REPORT.md). axe-core finds nothing
+  serious on any main screen, and every page carries a strict Content-Security-Policy.
 - Pipeline and safety routing: 10/10 labelled AI-generated sample photos and 5/5 step checks met their expectations in demo mode
   (docs/EVAL_REPORT.md). That proves the routing works. It says nothing about accuracy.
 - Red-team safety (docs/EVAL.md, mock and fake-model, labelled): safety-stop recall 100% on 33 dangerous cases,

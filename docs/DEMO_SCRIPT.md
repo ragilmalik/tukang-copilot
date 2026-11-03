@@ -19,7 +19,7 @@ bike. Voice-over in English with Bahasa on screen, or Bahasa with English subtit
 | 2:45–2:55 | Logo + repo + live link. | "Tukang Copilot. Every phone becomes a mechanic's apprentice." |
 
 The backup cut already exists: docs/demo/tukang-copilot-demo.mp4 (2:53, demo mode, labelled AI-generated sample photos and
-Chromium's fake camera, English voice-over + captions .srt). It follows the same order in 21 scenes (v1.27, start times
+Chromium's fake camera, English voice-over + captions .srt). It follows the same order in 21 scenes (v1.29 cut on the new UI, 1080p60, start times
 in docs/demo/TIMESTAMPS.txt): hook title card, hook, intro, progress with streaming results, question, diagnosis, parts,
 safety list, live camera, check ⚠, check ✓, hands-free, re-plan, Muse Image diagram, agent log, hand-off, rice STOP,
 WhatsApp in Basa Jawa (simulator), open weights, architecture, close.

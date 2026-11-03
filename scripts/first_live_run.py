@@ -44,8 +44,8 @@ FIXES = {
     "busy": "Meta is busy or rate-limiting. Wait a minute and run this again.",
     "network": "Could not reach Meta. Check the internet connection (and any proxy), then run this again.",
     "budget": "The per-repair cost cap was hit. Raise MAX_COST_USD in .env a little, or try the faucet sample.",
-    "invalid": "The model answered in a shape the app could not use. Run once more; if it repeats, open an issue and attach docs/LIVE_RUN.md.",
-    "generic": "Something unexpected failed. Open an issue and attach docs/LIVE_RUN.md (it has no key in it).",
+    "invalid": "The model answered in a shape the app could not use. Run once more; if it repeats, docs/LIVE_RUN.md shows the error, and docs/META_API_NOTES.md has the shapes the app expects.",
+    "generic": "Something unexpected failed. The error is in docs/LIVE_RUN.md (it has no key in it, so it is safe to share); docs/TROUBLESHOOTING.md has the usual fixes.",
 }
 
 

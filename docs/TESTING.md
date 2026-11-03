@@ -1,6 +1,6 @@
 # Testing
 
-## Automated (free, offline, ~60 s)
+## Automated (free, offline; the full run took about 14 minutes on a 2-CPU box)
 ```bash
 pip install -r requirements-dev.txt
 python -m playwright install chromium  # optional: browser tests skip cleanly without a Chromium
@@ -16,14 +16,18 @@ CI (`.github/workflows/ci.yml`) runs the same thing on every push. The browser t
 | `test_engine.py` | Full pipeline per scenario: green faucet, amber motor with follow-up/resume, red rice cooker, gate stop, 3 languages, step check pass/fail/escalate, re-plan → exhaust, audio deleted, path-safe ids, 24 h cleanup, budget guard |
 | `test_api.py` | HTTP: health, pages, multi-photo upload, files, guide, report, answer, check, replan, SSE stream, 7 bad-request cases, 404s and path traversal |
 | `test_live_path.py` | The real `meta_client` (HTTP, multipart ASR, structured output, SAM SSE + mask parsing, image edits, Baseten) against `api/testing/fake_meta.py`; wrong key → clean 401 |
-| `test_fixtures.py` | All 14 stand-in fixtures are labelled (red banner + EXIF) and each runs end to end with the expected safety level; step-check photos accepted |
+| `test_fixtures.py` | All 16 sample fixtures (AI-generated photos) carry the "Sample photo (AI-generated), demo mode" corner tag and EXIF label, and each runs end to end with the expected safety level; step-check photos accepted |
 | `test_video.py` | Video → 3 frames from different moments; sharper frame wins; >30 s and garbage rejected with 400; video-only session uses the clip's sound; photos + video capped at 3 |
 | `test_playwright_smoke.py` | Real Chromium, phone viewport: faucet flow + check-my-step, motor follow-up question, rice STOP card (3 actions, maps link, PDF works, 112), PWA manifest, open-weights badge (+ language switch), video capture; fails on any JS error |
 | `test_pwa.py` | Manifest valid with 192/512/maskable icons served; service worker never caches the API; health reports open weights only when really active |
 | `test_i18n.py` | Every Indonesian UI string exists in Basa Jawa and English |
 | `test_set_keys.py` | One-step key swap writes MODEL_API_KEY/MOCK=0 (+ Baseten) and runs the checks; no key → .env untouched |
 | `test_report_pdf.py` | PDF repair report |
-| `test_web.py` | `app.js` parses; every element id the JS uses exists; every UI string has id + en text; shared page is read-only; no secrets in web files |
+| `test_web.py` | `app.js` parses; every element id the JS uses exists; every UI string has id + en text; shared page is read-only; no secrets in web files; every emoji the screen can show has a Lucide icon; the Barlow fonts and both licences ship; nothing loads from a font CDN |
+| `test_csp.py` | Every HTML page sends a strict Content-Security-Policy (no inline script, no eval), JSON answers don't; HSTS only when the proxy says https; no inline script or event handler in the pages; `web/wa.js` served as a file; status notes and disclaimer inside landmarks |
+| `test_playwright_a11y.py` | Real Chromium: axe-core finds nothing serious or critical on the home, progress, question, result, stop, shared guide, WhatsApp simulator and laptop screens; one h1 per screen; file pickers are native inputs in the tab order. Needs axe-core from npm (`npm install --prefix /tmp/jd axe-core`) and skips without it |
+| `test_gone_page.py` | An expired or erased guide link gets a short page in the owner's language (still 404), with the link id escaped |
+| `test_gzip.py` | Text is gzipped; fonts, photos, PNGs, audio and PDFs are sent as they are |
 
 ## Recorded demo (v1.24)
 - `python scripts/record_replay.py` re-records `web/replay/` after a change to the mock answers, the session shape or the demo flow; `--check` exits 1 when the recording no longer matches (also a test in `test_replay.py`).

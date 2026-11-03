@@ -1,14 +1,19 @@
 # Roadmap (after the hackathon)
 
+Some things I first put on this list got built during the hackathon after all: the WhatsApp channel (webhook and
+simulator done, a real number still needs my Meta app setup), installing the app as a PWA, SAM 3.1 on live camera
+frames with hands-free voice commands, the bengkel hand-off (WhatsApp summary, Maps search, mechanic brief PDF), the
+water pump scenario, and an axe-core accessibility pass on every main screen. What is left:
+
 | When | What | Why |
 |---|---|---|
-| Nov 2026 | Real-photo eval set (50 photos, 5 object types) with expected parts and causes; track SAM hit rate and top-1 diagnosis accuracy | Honest accuracy numbers |
-| Nov 2026 | Water pump, fan, washing machine and bicycle fixtures, plus prompt tuning | Most common household faults |
-| Dec 2026 | Live camera mode: realtime Voice Transcribe over WebSocket, plus SAM video tracking of the part while the user works | Hands-free, no photo taking |
+| Nov 2026 | First live run on the real Meta API, then the same eval on real Semarang photos (50 photos, 5 object types) with expected parts and causes; track SAM hit rate and top-1 diagnosis accuracy | Honest accuracy numbers |
+| Nov 2026 | Connect the WhatsApp channel to a real number and run the user trials there | Where Indonesians already are |
+| Nov 2026 | Fan, washing machine and bicycle scenarios, plus prompt tuning | Most common household faults |
+| Dec 2026 | Realtime Voice Transcribe over WebSocket for the live camera guide, and SAM video tracking instead of one frame a second | Smoother hands-free repairs |
 | Dec 2026 | Cloudflare R2 storage plus a SQLite index, so sessions survive restarts and scale past one server | Production |
 | Q1 2027 | Offline / low-signal diagnosis on Muse Glimmer (open weights, on-device); sync when online | Rural areas |
-| Q1 2027 | "Kirim ke bengkel": send the report to a nearby mechanic with photos and what was tried; quote and booking | Local shops get the jobs people can't finish |
-| Q1 2027 | WhatsApp chat (photo and voice note in, steps out) | Where Indonesians already are |
-| Q2 2027 | Workshop mode: turn a successful session into a clean illustrated guide (Muse Image) for others | Community knowledge base |
+| Q1 2027 | "Kirim ke bengkel" part two: a nearby mechanic gets the report with photos and what was tried, and can send a quote and a booking | Local shops get the jobs people can't finish |
+| Q2 2027 | Turn a successful repair into a clean illustrated guide (Muse Image) that other people can follow | Community knowledge base |
 | Q2 2027 | Apprentice mode for repair shops: training checklists verified by camera | B2B |
-| Later | PWA install, more languages (Sundanese, Madurese), accessibility review | Reach |
+| Later | More languages (Sundanese, Madurese), and a test with real TalkBack and VoiceOver users | Reach |

@@ -48,7 +48,7 @@ built solo in Semarang, Oct 26 to Nov 4, 2026.
 
 <sub>Honest status: the video, screenshots and 1-tap demo run in clearly labelled demo mode, with AI-generated sample photos and
 recorded model answers and no API calls. The live guide uses Chromium's fake camera. I tested the live Meta path end to
-end against a stand-in server built from the official API docs (768 automated tests pass; red-team eval in docs/EVAL.md,
+end against a stand-in server built from the official API docs (823 automated tests pass; red-team eval in docs/EVAL.md,
 mock and fake-model). A live Meta model answer is not yet verified because I still need the API key. Impact numbers in
 docs/IMPACT.md are mock data until real trials run.</sub>
 
@@ -177,7 +177,7 @@ To deploy on the Render free plan, follow [docs/DEPLOY.md](docs/DEPLOY.md) click
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Errors and fixes |
 | [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) | 3-minute video script + shot list + backup plan |
 | [docs/SUBMISSION.md](docs/SUBMISSION.md) | Field-by-field copy for the live Cerebral Valley form, sourced problem numbers, bonus prize claims |
-| [docs/WRITEUP.md](docs/WRITEUP.md) | Write-up (~850 words): problem, user, demo, how it works, safety, eval, honest status, what's next |
+| [docs/WRITEUP.md](docs/WRITEUP.md) | Write-up (~1,150 words): problem, user, demo, how it works, safety, eval, honest status, what's next |
 | [docs/JUDGING_MAP.md](docs/JUDGING_MAP.md) | Official criteria and bonus prize rules → evidence in the repo, and the open gaps |
 | [docs/launch/](docs/launch/) | Launch kit: YouTube (title, chapters, thumbnail), X thread, community vote kit (id/jv/en), judge FAQ, one-pager PDF, architecture diagram |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Render deploy click by click, settings, roll back |
@@ -193,6 +193,7 @@ To deploy on the Render free plan, follow [docs/DEPLOY.md](docs/DEPLOY.md) click
 
 I wrote everything in this repository from scratch during the event window (Oct 26 to Nov 4, 2026). [CHANGELOG.md](CHANGELOG.md) has the dated list, and the git history shows the commit dates.
 
+- 2026-11-02 and 11-03 (v1.28 to v1.29): new look based on a roadside bengkel sign (Barlow type, Lucide icons, safety colours, light and dark theme), AI-generated sample photos labelled as such in place of the flat drawings, demo video re-shot (2:53, 1080p60), PDF report, workshop sheet and share card in the same look, strict Content-Security-Policy and HSTS, a STOP card on shared red-stop links, a friendly page for expired guide links, axe-core clean on every main screen.
 - 2026-11-02 (v1.27): WhatsApp channel (Cloud API webhook, same engine and safety gate, simulator at `/wa`, fake Graph API tests), and an owner token so a shared guide link cannot answer or erase for the owner.
 - 2026-10-31 (v1.22): agent log "What the AI did", 1-tap guided demo, prompt-injection hardening, follow-up rate limit + photo-check cap, Javanese demo answers, WCAG AA contrast, model chips + elapsed time on progress, 8× faster overlay rendering.
 - 2026-10-31: live camera guide (SAM 3.1 on camera frames), hands-free voice commands, bengkel hand-off (WhatsApp + Maps + mechanic brief PDF), demo fallback, impact trial kit, Render free-plan deploy readiness + `deploy_check.py`, safety tick list, outcome buttons, timers, bengkel price vs DIY, HEIC photos, offline handling, accessibility, privacy erase, regenerated demo video/screenshots (v1.8 → v1.21).

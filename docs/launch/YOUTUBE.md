@@ -20,7 +20,7 @@ Point your phone at something broken and say what's wrong in Bahasa Indonesia, J
 
 I built it solo for the Meta Global AI Developer Hackathon (Indie track, Push the Frontier). Everything in this video was built during the event, Oct 26 to Nov 4, 2026.
 
-This recording runs in clearly labelled demo mode: stand-in photos and recorded model answers, no API cost.
+This recording runs in clearly labelled demo mode: AI-generated sample photos and recorded model answers, no API cost.
 
 Try it (1-tap demo, no photo needed): [LIVE_URL]
 Code (MIT): [GITHUB_URL]
