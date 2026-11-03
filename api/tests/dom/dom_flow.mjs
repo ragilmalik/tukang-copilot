@@ -33,14 +33,14 @@ async function run(lang, sample) {
   await sleep(300);
   check(`${lang}: demo badge`, await until(() => !d.getElementById("modeBadge").classList.contains("hidden"), 5000));
   check(`${lang}: html lang attribute`, d.documentElement.lang === lang, d.documentElement.lang);
-  check(`${lang}: pickers reachable by keyboard`, ["photoBox", "videoBox", "stepPhotoLabel"].every((i) => d.getElementById(i).tabIndex === 0));
+  check(`${lang}: pickers reachable by keyboard`, ["photo", "video", "stepPhoto"].every((i) => !d.getElementById(i).hidden && d.getElementById(i).tabIndex === 0)
+    && ["photoBox", "videoBox", "stepPhotoLabel"].every((i) => !d.getElementById(i).hasAttribute("role")));
   check(`${lang}: mic button has aria-pressed`, d.getElementById("micBtn").getAttribute("aria-pressed") === "false");
   const chip = d.querySelector('#cats .chip[data-cat="pump"]');
   chip.click();
   check(`${lang}: category chip aria-pressed toggles`, chip.getAttribute("aria-pressed") === "true"
     && d.querySelector('#cats .chip[data-cat="motor"]').getAttribute("aria-pressed") === "false");
   chip.click();
-  d.getElementById("photoBox").dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
   const viaDemo = sample === "motor" && lang === "en";  // the 1-tap demo button runs the motor sample with the tour
   check(`${lang}: 1-tap demo button translated`, !/demoBtn/.test(d.getElementById("demoBtn").textContent) && d.getElementById("demoBtn").textContent.length > 8);
   if (viaDemo) d.getElementById("demoBtn").click(); else d.querySelector(`button.sample[data-sample="${sample}"]`).click();
@@ -110,7 +110,7 @@ async function run(lang, sample) {
     check(`${lang}/${sample}: shop price chip shown with rupiah`, saveChip && !saveChip.classList.contains("hidden") && /Rp\d/.test(saveChip.textContent) && !/undefined|shopCost/.test(saveChip.textContent), saveChip && saveChip.textContent);
     check(`${lang}/${sample}: PDF + workshop links`, (d.getElementById("workshopBtn") || {}).href !== undefined);
     check(`${lang}/${sample}: erase button has a translated label`, !!d.getElementById("eraseBtn") && !/^erase$/.test(d.getElementById("eraseBtn").textContent) && d.getElementById("eraseBtn").textContent.length > 8);
-    check(`${lang}/${sample}: focus moved to result heading`, d.activeElement && d.activeElement.tagName === "H2", d.activeElement && d.activeElement.tagName);
+    check(`${lang}/${sample}: focus moved to result heading`, d.activeElement && d.activeElement.id === "dxObject", d.activeElement && d.activeElement.tagName);
     check(`${lang}/${sample}: safety badge`, d.getElementById("safetyBadge").textContent.trim().length > 0);
     // next step button moves on
     const before = d.getElementById("stepNo").textContent;

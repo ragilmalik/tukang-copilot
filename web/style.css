@@ -439,6 +439,10 @@ body.typing .tourBar{bottom:auto;top:calc(8px + env(safe-area-inset-top))}
 
 /* accessibility: visible keyboard focus, comfortable touch targets, reduced motion */
 :focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+/* file pickers: the real input stays in the tab order (a keyboard and a screen reader get a native button), the label is what you see */
+label:has(>input.pick){position:relative}
+input.pick{position:absolute;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden}
+label:has(>input.pick:focus-visible){outline:3px solid var(--blue);outline-offset:2px}
 h1:focus,h2:focus{outline:none}
 .btn,.chip,select{min-height:44px}
 .chip.sm,.specs .chip{min-height:0}

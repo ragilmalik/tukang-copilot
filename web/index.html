@@ -47,13 +47,13 @@
     <h2 class="secTitle" data-t="ownTitle">Atau periksa barangmu sendiri</h2>
 
     <label class="photoBox" id="photoBox">
-      <input id="photo" type="file" accept="image/*" capture="environment" multiple hidden>
+      <input id="photo" type="file" accept="image/*" capture="environment" multiple class="pick">
       <img id="photoPreview" alt="" class="hidden">
       <span class="shutter" aria-hidden="true"><span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-camera"></use></svg></span></span>
       <span id="photoHint"><span data-t="takePhoto">Ambil foto</span></span>
     </label>
     <label class="btn link videoBtn" id="videoBox">
-      <input id="video" type="file" accept="video/*" capture="environment" hidden>
+      <input id="video" type="file" accept="video/*" capture="environment" class="pick">
       <span data-t="videoBtn">🎥 Atau rekam video 5–10 detik</span>
     </label>
     <p class="small muted" id="videoHint" aria-live="polite"></p>
@@ -94,7 +94,7 @@
 
   <!-- 2. Progress -->
   <section id="progress" class="card hidden">
-    <h2 id="progTitle" data-t="working">Sedang memeriksa…</h2>
+    <h1 id="progTitle" data-t="working">Sedang memeriksa…</h1>
     <div id="stopBox" class="stop hidden" role="alert" aria-live="assertive"></div>
     <p id="stopAgain" class="stopAgain hidden"><button id="stopAgainBtn" class="btn big" type="button" data-testid="stop-again"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-undo-2"></use></svg><span data-t="again">Perbaiki barang lain</span></button></p>
     <p id="elapsed" class="small muted" aria-live="off"></p>
@@ -118,7 +118,7 @@
       <p id="fallbackNote" class="fbNote hidden" role="status" data-testid="fallback-note"></p>
       <p id="planBanner" class="planBanner hidden" role="status" data-testid="plan-banner"></p>
       <p class="dxMeta muted small"><span data-t="diagnosis">Diagnosa</span> <span id="safetyBadge" class="level"></span></p>
-      <h2 id="dxObject"></h2>
+      <h1 id="dxObject"></h1>
       <div id="partsWrap" class="hidden"><img id="partsImg" alt="Foto dengan bagian yang ditandai" class="partsImg"><ul id="partsList" class="legend"></ul></div>
       <p id="dxSummary"></p>
       <ul id="dxCauses" class="causes"></ul>
@@ -152,7 +152,7 @@
       <div id="stepTimer" class="timer hidden" role="timer" aria-live="off"><b id="timerLabel"></b> <span id="timerClock" class="clock" aria-live="polite"></span> <button id="timerBtn" class="btn" type="button"></button></div>
       <p id="stepCheck" class="check"></p>
       <label class="btn primary big" id="stepPhotoLabel"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-camera"></use></svg><span data-t="checkStep">Cek langkah ini</span>
-        <input id="stepPhoto" type="file" accept="image/*" capture="environment" hidden></label>
+        <input id="stepPhoto" type="file" accept="image/*" capture="environment" class="pick"></label>
       <p id="sampleCheckBox" class="small sampleCheck hidden" data-testid="sample-check"><span data-t="sampleTry">Belum punya foto? Coba foto contoh:</span>
         <button id="sampleBad" class="btn" type="button" data-t="sampleBad">📷 Foto gelap ✗</button> <button id="sampleGood" class="btn" type="button" data-t="sampleGood">📷 Foto benar ✓</button></p>
       <button id="liveBtn" class="btn" type="button" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-scan-eye"></use></svg><span data-t="liveGuide">Panduan kamera langsung</span></button>

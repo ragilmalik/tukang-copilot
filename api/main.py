@@ -79,6 +79,23 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(title="Tukang Copilot", version=__version__, lifespan=lifespan)
 app.add_middleware(GZipMiddleware, minimum_size=1024)  # app.js 90 KB → ~29 KB on 4G; SSE (text/event-stream) is never gzipped
+PACKED = (".woff2", ".jpg", ".jpeg", ".png", ".webp", ".gif", ".mp4", ".webm", ".mp3", ".pdf", ".ico", ".zip")
+
+
+class SkipGzipForPacked:
+    """Fonts, photos, audio and PDFs are already compressed: gzip saves nothing and costs CPU on a free server.
+    Decided from the path, before the gzip layer sees the request (it only gzips when the browser asks for it)."""
+
+    def __init__(self, app: Any) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        if scope["type"] == "http" and scope["path"].lower().endswith(PACKED):
+            scope = dict(scope, headers=[(k, v) for k, v in scope["headers"] if k.lower() != b"accept-encoding"])
+        await self.app(scope, receive, send)
+
+
+app.add_middleware(SkipGzipForPacked)  # added after GZip, so it runs first
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in settings.cors_origins.split(",")], allow_methods=["*"], allow_headers=["*"])
 # Pages only load our own files. Inline style attributes stay allowed (the bars and the icon sprite use them);
 # inline scripts do not, so an injected <script> or onclick= never runs. Shop and WhatsApp links are plain navigation.

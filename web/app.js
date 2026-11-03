@@ -90,7 +90,7 @@ const T_EXTRA = {
         ag_fallback: "Model live gagal setelah dicoba ulang: tahap {stage} memakai jawaban demo (diberi label)",
         ag_input_guard: "Ada kalimat berupa perintah di inputmu: diperlakukan sebagai data dan diabaikan",
         ag_outcome_fixed: "Kamu konfirmasi: sudah beres", ag_outcome_pro: "Kamu memilih membawa ke bengkel", ag_retry: "Mencoba ulang tahap yang gagal (ke-{n})",
-        note_typed: "diketik", note_stop: "dihentikan demi keselamatan", note_photo: "foto sudah cukup", note_browser: "suara browser", note_nocomp: "tidak ada bagian terlihat", note_steps: "{n} langkah",
+        note_typed: "dilewati: Anda mengetik", note_stop: "dihentikan demi keselamatan", note_photo: "foto sudah cukup", note_browser: "suara browser", note_nocomp: "tidak ada bagian terlihat", note_steps: "{n} langkah",
         agCode: "kode", elapsed: "{n} dtk", qYes: "Ya", qNo: "Tidak", qUnsure: "Tidak tahu",
         tourProgress: "Demo: AI sedang bekerja. Tiap baris = satu model Meta atau aturan keselamatan.", tourAsk: "AI belum yakin, jadi ia bertanya. Ketuk salah satu jawaban.",
         tourResult: "Lihat bagian yang ditandai SAM 3.1 dan log 'Yang dilakukan AI'. Lalu centang daftar keselamatan untuk membuka langkah 1.",
@@ -115,7 +115,7 @@ const T_EXTRA = {
         ag_fallback: "Model live gagal sawise dijajal maneh: tahap {stage} nganggo wangsulan demo (ana labele)",
         ag_input_guard: "Ana ukara prentah ing inputmu: dianggep data lan ora digatekake",
         ag_outcome_fixed: "Sampeyan ngonfirmasi: wis rampung", ag_outcome_pro: "Sampeyan milih nggawa menyang bengkel", ag_retry: "Nyoba maneh tahap sing gagal (kaping {n})",
-        note_typed: "ditulis", note_stop: "dimandhegake kanggo keamanan", note_photo: "foto wis cukup", note_browser: "swara browser", note_nocomp: "ora ana perangan sing katon", note_steps: "{n} langkah",
+        note_typed: "diliwati: sampeyan ngetik", note_stop: "dimandhegake kanggo keamanan", note_photo: "foto wis cukup", note_browser: "swara browser", note_nocomp: "ora ana perangan sing katon", note_steps: "{n} langkah",
         agCode: "kode", elapsed: "{n} dtk", qYes: "Iya", qNo: "Ora", qUnsure: "Ora ngerti",
         tourProgress: "Demo: AI lagi nyambut gawe. Saben baris = siji model Meta utawa aturan keamanan.", tourAsk: "AI durung yakin, mula takon. Tutul salah siji wangsulan.",
         tourResult: "Delengen perangan sing ditandhani SAM 3.1 lan log 'Sing ditindakake AI'. Banjur centhang dhaptar keamanan kanggo mbukak langkah 1.",
@@ -140,7 +140,7 @@ const T_EXTRA = {
         ag_fallback: "Live model failed after retries: {stage} used the labelled demo answer",
         ag_input_guard: "Your input contained instruction-like text: treated as data and ignored",
         ag_outcome_fixed: "You confirmed: it works now", ag_outcome_pro: "You chose to take it to a mechanic", ag_retry: "Retried the failed stage (#{n})",
-        note_typed: "typed", note_stop: "safety stop", note_photo: "photo is enough", note_browser: "browser voice", note_nocomp: "no visible parts", note_steps: "{n} steps",
+        note_typed: "skipped: you typed instead", note_stop: "safety stop", note_photo: "photo is enough", note_browser: "browser voice", note_nocomp: "no visible parts", note_steps: "{n} steps",
         agCode: "code", elapsed: "{n} s", qYes: "Yes", qNo: "No", qUnsure: "Not sure",
         tourProgress: "Demo: the AI is working. Each line is one Meta model or safety rule.", tourAsk: "The AI isn't sure, so it asks. Tap an answer.",
         tourResult: "See the parts SAM 3.1 outlined and the 'What the AI did' log. Then tick the safety list to unlock step 1.",
@@ -448,7 +448,6 @@ function setupCapture() {
     document.querySelectorAll("#cats .chip").forEach((x) => { x.classList.toggle("on", x.dataset.cat === category); x.setAttribute("aria-pressed", String(x.dataset.cat === category)); });
   }));
   document.querySelectorAll("#cats .chip").forEach((x) => x.setAttribute("aria-pressed", "false"));
-  setupKeyboardPickers();
   // The Go bar floats only once the owner starts their own repair; until then the 1-tap demo stays uncovered.
   const arm = () => setTimeout(() => { if ($("capture")) $("capture").classList.toggle("armed", !!(photoFiles.length || videoFile || audioBlob || category || ($("text") && $("text").value.trim()))); }, 0);
   ["change", "input", "click"].forEach((ev) => { if ($("capture")) $("capture").addEventListener(ev, arm); });
@@ -530,17 +529,6 @@ async function submit(sample) {
     $("formErr").textContent = netMsg(e);
     return e && e.name === "TypeError" ? "net" : "err";  // "net": the request never reached the server
   } finally { $("goBtn").disabled = false; }
-}
-
-/* Keyboard and screen-reader access: the hidden file inputs sit inside labels, which a keyboard cannot reach. */
-function setupKeyboardPickers() {
-  ["photoBox", "videoBox", "stepPhotoLabel"].forEach((id) => {
-    const el = $(id); if (!el) return;
-    el.tabIndex = 0; el.setAttribute("role", "button");
-    el.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); const inp = el.querySelector("input"); if (inp) inp.click(); }
-    });
-  });
 }
 
 let firstShow = true;

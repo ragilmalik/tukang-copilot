@@ -32,7 +32,7 @@
     <p class="muted" data-t="heroSub">Foto barangnya, ceritakan masalahnya, dapat panduan perbaikan.</p>
 
     <label class="photoBox" id="photoBox">
-      <input id="photo" type="file" accept="image/*" capture="environment" multiple hidden>
+      <input id="photo" type="file" accept="image/*" capture="environment" multiple class="pick">
       <img id="photoPreview" alt="" class="hidden">
       <span class="shutter" aria-hidden="true"><span><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-camera"></use></svg></span></span>
       <span id="photoHint"><span data-t="takePhoto">Ambil foto</span></span>
@@ -61,7 +61,7 @@
 
   <!-- 2. Progress -->
   <section id="progress" class="card hidden">
-    <h2 id="progTitle" data-t="working">Sedang memeriksa…</h2>
+    <h1 id="progTitle" data-t="working">Sedang memeriksa…</h1>
     <ol id="stageList" class="stages"></ol>
     <div id="question" class="hidden">
       <p class="q" id="questionText"></p>
@@ -78,7 +78,7 @@
     <div class="card">
       <p id="fallbackNote" class="fbNote hidden" role="status" data-testid="fallback-note"></p>
       <p class="dxMeta muted small"><span data-t="diagnosis">Diagnosa</span> <span id="safetyBadge" class="level"></span></p>
-      <h2 id="dxObject"></h2>
+      <h1 id="dxObject"></h1>
       <div id="partsWrap" class="hidden"><img id="partsImg" alt="Foto dengan bagian yang ditandai" class="partsImg"><ul id="partsList" class="legend"></ul></div>
       <p id="dxSummary"></p>
       <ul id="dxCauses" class="causes"></ul>
