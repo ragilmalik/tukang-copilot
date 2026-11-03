@@ -34,7 +34,7 @@ def scenario(text: str, category: str = "") -> str:
         return "pump"
     if re.search(r"\b(kempes|kempis|ban (motor |belakang |depan )?(bocor|kempes|kempis|gembos)|gembos|tambal ban|tubeless|flat (tyre|tire)|puncture|tyre|tire|nail in (the|my) (tyre|tire))\b", t):
         return "tire"
-    if re.search(r"\b(kran|keran|faucet|tap|wastafel|netes|menetes|plumbing|pipa)\b", t):
+    if re.search(r"\b(kran|keran|faucet|tap|wastafel|netes|menetes|plumbing|pipa|ledeng|sink|bak cuci)\b", t):
         return "faucet"
     return "motor"
 

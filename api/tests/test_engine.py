@@ -149,7 +149,7 @@ def test_pump_amber_full_run_and_replan_to_foot_valve(samples):
 @pytest.mark.parametrize("text,cat,want", [
     ("Pompa air nggak keluar airnya", "", "pump"), ("my water pump runs dry", "", "pump"), ("airnya mati", "pump", "pump"),
     ("filter udara kotor, air filter", "", "motor"), ("kran netes", "", "faucet"), ("magic com mati", "", "rice"),
-    ("ban belakang kempes", "motor", "tire"), ("my tyre has a puncture", "", "tire"), ("tambal ban tubeless", "", "tire"), ("motor mogok busi", "motor", "motor"),
+    ("ledeng di dapur bocor", "", "faucet"), ("the kitchen sink leaks", "", "faucet"), ("ban belakang kempes", "motor", "tire"), ("my tyre has a puncture", "", "tire"), ("tambal ban tubeless", "", "tire"), ("motor mogok busi", "motor", "motor"),
 ])
 def test_scenario_routing(text, cat, want):
     from api.pipeline import mock

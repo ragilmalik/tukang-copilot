@@ -2,6 +2,9 @@
 
 Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
 
+## 1.29.7 (2026-11-04)
+- Fixed: demo mode sent "ledeng" and "sink" descriptions to the motorbike scenario. They now go to the dripping tap one.
+
 ## 1.29.6 (2026-11-03)
 - Fixed: after "Still broken", the PDF report and the mechanic brief listed the attempt in English ("Tried 'Cop busi longgar', result: ...") even in Bahasa and Basa Jawa. It now reads "Dicoba: ... Hasilnya: ..." / "Dijajal: ... Asile: ...". The model still gets the English line.
 - Fixed: after a re-plan the link preview card said "Most likely 22%" for the cause being tried, while the 70% one had already failed. It now says "Plan 2 of 3, being tried now", and the guide page's preview text names that cause too.
