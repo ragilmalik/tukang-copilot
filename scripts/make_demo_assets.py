@@ -216,7 +216,7 @@ def shots() -> None:
         pg.click("#goBtn"); pg.wait_for_selector("#progress:not(.hidden)")
         # partial results stream in (MOCK_PACE holds each finished stage on screen)
         pg.wait_for_selector("#lf-segment img", timeout=30000)
-        pg.wait_for_function("document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
+        pg.wait_for_function("() => document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
         pg.evaluate("document.querySelector('#stageList').scrollIntoView({block: 'start'}); window.scrollBy(0, -110)")
         snap("02_progress")
         pg.wait_for_selector("#question:not(.hidden)", timeout=30000); pg.fill("#answerText", "Ya, ada bau bensin")  # fuel arrives: the demo diagnosis moves to 70%
@@ -228,13 +228,13 @@ def shots() -> None:
         tick_preflight()
         pg.locator("#stepCard").scroll_into_view_if_needed(); snap("06_step")
         pg.set_input_files("#stepPhoto", str(dark))
-        pg.wait_for_function("!document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
+        pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
         pg.locator("#checkResult").scroll_into_view_if_needed(); snap("07_check_fail")
         pg.set_input_files("#stepPhoto", str(FIX / "sample_motor_step_cap_on.jpg"))
         pg.wait_for_timeout(600)
-        pg.wait_for_function("!document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
+        pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
         pg.locator("#checkResult").scroll_into_view_if_needed(); snap("08_check_pass")
-        pg.wait_for_function("document.querySelector('#stepNo').textContent.trim() === '2'", timeout=10000)  # auto-advanced
+        pg.wait_for_function("() => document.querySelector('#stepNo').textContent.trim() === '2'", timeout=10000)  # auto-advanced
         pg.locator("#agent .agGo", has_text="Langkah 1 dicek").first.click()          # tap a log line → back to that step
         pg.wait_for_selector("#stepCard.flash"); pg.wait_for_timeout(900)
         pg.evaluate("window.scrollBy(0, -40)"); snap("24_agent_jump")
@@ -242,7 +242,7 @@ def shots() -> None:
         pg.locator("#voiceBar").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,180)"); snap("17_hands_free")
         pg.uncheck("#handsFree")
         pg.fill("#stuckText", "Sudah dicoba, mesin tetap tidak nyala."); pg.click("#stuckBtn")
-        pg.wait_for_function("document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled",
+        pg.wait_for_function("() => document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled",
                              timeout=20000); pg.wait_for_timeout(600)
         pg.wait_for_selector("#planBanner:not(.hidden)"); pg.evaluate("window.scrollTo(0, 0)"); snap("09_replan")  # re-plan banner + tried cause
         pg.evaluate("document.querySelector('#agent').scrollIntoView({block: 'start'}); window.scrollBy(0, -70)"); snap("23_agent_log")
@@ -277,7 +277,7 @@ def shots() -> None:
         pg.evaluate("window.scrollTo(0,0)"); snap("10_pump")
         tick_preflight()
         pg.click("#liveBtn"); pg.wait_for_selector("#live:not(.hidden)")
-        pg.wait_for_function("/^🎯/.test(document.querySelector('#liveState').textContent)", timeout=20000)
+        pg.wait_for_function("() => /^🎯/.test(document.querySelector('#liveState').textContent)", timeout=20000)
         pg.wait_for_timeout(900)
         pg.evaluate("document.querySelector('#liveBtn').scrollIntoView({block: 'start'}); window.scrollBy(0, -90)"); snap("16_live_guide")
         pg.click("#liveClose")
@@ -351,12 +351,12 @@ def wa_shots() -> None:
                 pg.goto(base + f"/wa?lang={lang}"); pg.evaluate("sessionStorage.clear()"); pg.reload()
                 pg.wait_for_selector("#chips button")
                 pg.locator("#chips button").nth(3).click()                   # sample: gas smell -> red stop
-                pg.wait_for_function("document.querySelectorAll('.row:not(.me)').length >= 1", timeout=30000)
+                pg.wait_for_function("() => document.querySelectorAll('.row:not(.me)').length >= 1", timeout=30000)
                 pg.wait_for_timeout(700)
                 snap("30_whatsapp_jv_redstop")
             else:
                 pg.locator("#chips button").nth(4).click()                   # the sample "after" photo -> step check
-                pg.wait_for_function("document.querySelectorAll('.btns').length >= 2", timeout=30000)
+                pg.wait_for_function("() => document.querySelectorAll('.btns').length >= 2", timeout=30000)
                 snap("30_whatsapp_en_check")
                 pg.locator(".btns").last.locator("button").nth(2).click()    # Stop -> PDF report in the chat
                 pg.wait_for_selector(".doc", timeout=30000)

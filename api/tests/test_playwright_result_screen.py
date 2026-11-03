@@ -16,7 +16,7 @@ def test_result_opens_at_the_top_and_question_gets_focus(page):
     page.select_option("#lang", "en")
     page.click("#demoBtn")
     page.wait_for_selector("#question:not(.hidden)", timeout=20000)
-    page.wait_for_function("document.activeElement && document.activeElement.closest('#quickAns')", timeout=5000)
+    page.wait_for_function("() => document.activeElement && document.activeElement.closest('#quickAns')", timeout=5000)
     page.keyboard.press("Enter")                                           # keyboard only: answers "Yes"
     page.wait_for_selector("#result:not(.hidden)", timeout=20000)
     page.wait_for_timeout(300)

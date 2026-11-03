@@ -41,7 +41,7 @@ def test_a_non_photo_is_refused_at_once_in_the_owners_language(phone, tmp_path, 
     phone.goto(phone.base + f"/?lang={lang}")
     phone.wait_for_selector("#photo", state="attached")
     phone.set_input_files("#photo", str(f))
-    phone.wait_for_function("document.querySelector('#formErr').textContent.length > 3")
+    phone.wait_for_function("() => document.querySelector('#formErr').textContent.length > 3")
     assert NOT_A_PHOTO[lang] in phone.inner_text("#formErr")
     # nothing was kept: the preview box stays empty and Go asks for a photo again
     assert phone.evaluate("document.querySelector('#photoPreview').classList.contains('hidden')")
@@ -59,7 +59,7 @@ def test_a_broken_photo_is_refused_by_the_server_in_the_owners_language(phone, t
     phone.set_input_files("#photo", str(f))
     phone.fill("#text", "motor mati")
     phone.click("#goBtn")
-    phone.wait_for_function("document.querySelector('#formErr').textContent.length > 3")
+    phone.wait_for_function("() => document.querySelector('#formErr').textContent.length > 3")
     msg = phone.inner_text("#formErr")
     assert UNREADABLE[lang] in msg
     assert lang == "en" or "Could not read" not in msg
@@ -73,9 +73,9 @@ def test_a_good_photo_after_a_bad_one_clears_the_error(phone, tmp_path):
     phone.goto(phone.base + "/?lang=en")
     phone.wait_for_selector("#photo", state="attached")
     phone.set_input_files("#photo", str(bad))
-    phone.wait_for_function("document.querySelector('#formErr').textContent.length > 3")
+    phone.wait_for_function("() => document.querySelector('#formErr').textContent.length > 3")
     phone.set_input_files("#photo", str(good))
-    phone.wait_for_function("document.querySelector('#formErr').textContent === ''")
+    phone.wait_for_function("() => document.querySelector('#formErr').textContent === ''")
     assert not phone.evaluate("document.querySelector('#photoPreview').classList.contains('hidden')")
 
 
@@ -110,7 +110,7 @@ def test_a_broken_video_is_refused_in_the_owners_language(phone, tmp_path, lang)
     phone.set_input_files("#video", str(f))
     phone.fill("#text", "motor mati")
     phone.click("#goBtn")
-    phone.wait_for_function("document.querySelector('#formErr').textContent.length > 3")
+    phone.wait_for_function("() => document.querySelector('#formErr').textContent.length > 3")
     msg = phone.inner_text("#formErr")
     assert VIDEO_BAD[lang] in msg
     assert lang == "en" or "Could not read" not in msg
@@ -133,7 +133,7 @@ def test_a_too_long_video_is_not_called_a_long_text(phone, tmp_path, lang):
     phone.set_input_files("#video", str(f))
     phone.fill("#text", "motor mati")
     phone.click("#goBtn")
-    phone.wait_for_function("document.querySelector('#formErr').textContent.length > 3")
+    phone.wait_for_function("() => document.querySelector('#formErr').textContent.length > 3")
     msg = phone.inner_text("#formErr")
     assert VIDEO_LONG[lang] in msg
     assert "text" not in msg.lower() and "teks" not in msg.lower()

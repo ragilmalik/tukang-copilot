@@ -20,8 +20,10 @@
     <option value="en">English</option>
   </select>
 </header>
+<aside class="notes" aria-label="Status">
 <div id="offlineBar" class="badge hidden" role="status"></div>
 <div id="modeBadge" class="badge hidden"></div>
+</aside>
 
 <main>
   <!-- 1. Capture -->
@@ -59,7 +61,7 @@
 
   <!-- 2. Progress -->
   <section id="progress" class="card hidden">
-    <h2 data-t="working">Sedang memeriksa…</h2>
+    <h2 id="progTitle" data-t="working">Sedang memeriksa…</h2>
     <ol id="stageList" class="stages"></ol>
     <div id="question" class="hidden">
       <p class="q" id="questionText"></p>
@@ -147,8 +149,10 @@
     <details id="hood" class="hood hidden"><summary id="hoodTitle">Under the hood</summary><ul id="hoodList" class="small"></ul></details>
   </section>
 </main>
-<p class="muted small center" id="disclaimer"></p>
-<footer class="muted small" data-t="footer">Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.</footer>
+<footer class="muted small">
+<p class="center" id="disclaimer"></p>
+<p data-t="footer">Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.</p>
+</footer>
 <audio id="player"></audio>
 <script src="/static/app.js"></script>
 </body>

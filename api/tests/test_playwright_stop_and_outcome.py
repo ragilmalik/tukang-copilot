@@ -59,7 +59,7 @@ def test_cost_chip_says_parts_and_outcome_reads_as_a_sentence(page):
     page.wait_for_selector("#result:not(.hidden)", timeout=20000)
     assert page.inner_text("#gCost").startswith("💰 parts Rp")
     page.click("#fixedBtn")
-    page.wait_for_function("document.querySelector('#outcomeMsg').textContent.includes('Rp')", timeout=10000)
+    page.wait_for_function("() => document.querySelector('#outcomeMsg').textContent.includes('Rp')", timeout=10000)
     msg = page.inner_text("#outcomeMsg")
     assert "You saved about Rp67.000 compared with a workshop." in msg and " save Rp" not in msg
     page.click("#againBtn")
@@ -73,7 +73,7 @@ def test_indonesian_outcome_and_parts_chip(page):
     page.wait_for_selector("#result:not(.hidden)", timeout=20000)
     assert page.inner_text("#gCost").startswith("💰 sparepart Rp")
     page.click("#fixedBtn")
-    page.wait_for_function("document.querySelector('#outcomeMsg').textContent.includes('Rp')", timeout=10000)
+    page.wait_for_function("() => document.querySelector('#outcomeMsg').textContent.includes('Rp')", timeout=10000)
     assert "Kamu hemat sekitar Rp67.000 dibanding ke bengkel." in page.inner_text("#outcomeMsg")
 
 

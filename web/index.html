@@ -24,10 +24,12 @@
     <option value="en">English</option>
   </select>
 </header>
+<aside class="notes" aria-label="Status">
 <div id="offlineBar" class="badge hidden" role="status"></div>
 <div id="modeBadge" class="badge hidden"></div>
 <p id="deskNote" class="deskNote small" data-t="deskNote">Dibuat untuk HP: buka halaman ini di HP untuk kamera, suara, dan cek langkah.</p>
 <div id="owBadge" class="badge ow hidden" data-testid="open-weights-badge"></div>
+</aside>
 
 <main>
   <!-- 1. Capture -->
@@ -204,9 +206,11 @@
     <details id="hood" class="hood hidden"><summary id="hoodTitle">Under the hood</summary><ul id="hoodList" class="small"></ul></details>
   </section>
 </main>
-<p class="muted small center" id="disclaimer"></p>
-<footer class="muted small" data-t="footer">Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.</footer>
-<p class="small center hidden" id="waSim"><a id="waSimLink" class="waSimLink" href="/wa" data-t="waSim">💬 Coba juga lewat WhatsApp (simulator)</a></p>
+<footer class="muted small">
+<p class="center" id="disclaimer"></p>
+<p data-t="footer">Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.</p>
+<p class="center hidden" id="waSim"><a id="waSimLink" class="waSimLink" href="/wa" data-t="waSim">💬 Coba juga lewat WhatsApp (simulator)</a></p>
+</footer>
 </div><!-- /screen -->
 <div id="tourBar" class="tourBar hidden" data-testid="tour-bar"><button id="tourToggle" class="tourToggle" type="button" aria-expanded="true" aria-controls="tourText" aria-label="Kecilkan tip">💡</button><p id="tourText" role="status" aria-live="polite"></p><button id="tourClose" class="tourX" type="button" aria-label="Tutup">×</button></div>
 </div><!-- /phone -->

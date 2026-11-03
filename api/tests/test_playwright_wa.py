@@ -68,7 +68,7 @@ def test_simulator_repair_flow(server, lang, label, first, done):
         assert pg.locator(".btns button").first.inner_text() == done
         assert pg.locator("#log img").count() >= 2  # the owner's photo and the SAM-marked photo
         pg.locator(".btns button").first.click()
-        pg.wait_for_function("document.querySelectorAll('.btns').length >= 2", timeout=30000)
+        pg.wait_for_function("() => document.querySelectorAll('.btns').length >= 2", timeout=30000)
         assert first.replace("1", "2", 1) in pg.inner_text("#log")
         b.close()
     assert wa.wait_idle(20)
@@ -82,7 +82,7 @@ def test_simulator_red_stop_shows_no_steps(server):
         pg.reload()
         pg.wait_for_selector("#chips button")
         pg.locator("#chips button").nth(3).click()  # gas smell, text only
-        pg.wait_for_function("document.querySelectorAll('.row:not(.me)').length >= 1", timeout=30000)
+        pg.wait_for_function("() => document.querySelectorAll('.row:not(.me)').length >= 1", timeout=30000)
         pg.wait_for_timeout(1500)
         text = pg.inner_text("#log")
         assert "keslametan" in text and "Google Maps" in text and "Langkah" not in text

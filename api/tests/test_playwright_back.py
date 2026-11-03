@@ -45,7 +45,7 @@ def test_start_again_lands_on_a_clean_first_screen_without_a_hash(page):
     page.wait_for_selector("#result:not(.hidden)", timeout=20000)
     page.click("#againBtn")
     page.wait_for_selector("#capture:not(.hidden)", timeout=10000)
-    page.wait_for_function("location.hash === ''", timeout=5000)
+    page.wait_for_function("() => location.hash === ''", timeout=5000)
     assert _visible(page, "#capture") and not _visible(page, "#result")
 
 

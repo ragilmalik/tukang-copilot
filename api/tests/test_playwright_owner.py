@@ -31,7 +31,7 @@ def test_owner_answers_but_another_phone_with_the_link_cannot(page):
     other.close()
     # the owner's own button still works
     page.click("#fixedBtn")
-    page.wait_for_function("document.querySelector('#outcomeMsg').textContent.includes('Rp')", timeout=10000)
+    page.wait_for_function("() => document.querySelector('#outcomeMsg').textContent.includes('Rp')", timeout=10000)
     assert "You saved about" in page.inner_text("#outcomeMsg")
 
 

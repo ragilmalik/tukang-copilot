@@ -2,6 +2,12 @@
 
 Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
 
+## 1.29.3 (2026-11-03)
+- Fixed: a shared guide link to a red stop opened an empty result page. It now shows the STOP card with its "do this now" list, and a repair that is still running shows its progress.
+- Added: a strict Content-Security-Policy on every HTML page (scripts only from the site itself, no inline script, no eval) and HSTS when the request came in over https through Render's proxy. The WhatsApp simulator's script moved out of the page into `web/wa.js`.
+- Changed: the WhatsApp simulator has the wrench plate as its avatar and Barlow in the header, and its grey text is darker so it passes contrast. Status notes sit in an aside and the disclaimer in the footer, so screen readers find them in a landmark.
+- Changed: browser tests wait with functions instead of string expressions, which the new policy blocks. Offline cache v16.
+
 ## 1.29.2 (2026-11-03)
 - Changed: the PDF report, the workshop sheet and the share cards now look like the app: Barlow type, a dark header with the wrench plate, safety plates in the real colours (black on yellow for caution), number plates for steps (green once the camera passed them), bars for the likely causes, drawn tick boxes instead of "[ ]".
 - Changed: share card and the front-page preview (`web/og.png`) re-drawn on the concrete background and saved as 256-colour PNG, about 170 KB instead of about 480 KB, so WhatsApp shows the preview.

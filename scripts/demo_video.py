@@ -817,7 +817,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 at(0.9)
                 scroll_to("#stageList", -110, 800)
                 pg.wait_for_selector("#lf-segment img", timeout=30000)
-                pg.wait_for_function("document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
+                pg.wait_for_function("() => document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
                 rec.mark("sam")
                 pg.wait_for_timeout(700)
                 scroll_by(330, 1100)
@@ -863,7 +863,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
             def check_fail(at: Callable[[float], None]) -> None:
                 at(0.6)
                 pg.set_input_files("#stepPhoto", str(dark))
-                pg.wait_for_function("!document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
+                pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
                 at(2.0)
                 scroll_to("#checkResult", -330, 900)
 
@@ -871,11 +871,11 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 at(0.2)
                 pg.set_input_files("#stepPhoto", str(FIX / "sample_motor_step_cap_on.jpg"))
                 pg.wait_for_timeout(500)
-                pg.wait_for_function("!document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
+                pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
                 rec.mark("pass")
 
             def handsfree(at: Callable[[float], None]) -> None:
-                pg.wait_for_function("document.querySelector('#stepNo').textContent.trim() === '2'", timeout=10000)
+                pg.wait_for_function("() => document.querySelector('#stepNo').textContent.trim() === '2'", timeout=10000)
                 at(0.8)
                 scroll_to("#handsFree", -420, 900)
                 at(2.0)
@@ -893,7 +893,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 pg.keyboard.type("Sudah dicoba, mesin tetap tidak nyala.", delay=26)
                 at(3.2)
                 pg.click("#stuckBtn")
-                pg.wait_for_function("document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled",
+                pg.wait_for_function("() => document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled",
                                      timeout=20000)
                 pg.wait_for_selector("#planBanner:not(.hidden)")
                 at(4.6)

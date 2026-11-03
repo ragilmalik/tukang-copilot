@@ -420,7 +420,8 @@ details.agent{margin-top:12px;padding:2px 14px 8px;border-radius:14px;background
 .garage .gMeta{display:block}
 
 footer{text-align:center;padding:8px 20px 28px;max-width:600px;margin:0 auto}
-#disclaimer{max-width:600px;margin:0 auto;padding:0 20px}
+footer p{margin:0 0 8px}
+#disclaimer{max-width:600px;margin:0 auto 8px}
 #disclaimer:empty{display:none}
 .waSimLink{display:inline-block;min-height:44px;padding:12px 8px;line-height:20px;color:var(--blue);font-weight:600}
 

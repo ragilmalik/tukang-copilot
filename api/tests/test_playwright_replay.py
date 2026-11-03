@@ -45,15 +45,15 @@ def test_demo_plays_the_recording_when_the_server_sleeps(page):
     assert page.is_visible("#partsImg")
     assert page.evaluate("document.querySelector('#partsImg').naturalWidth") > 0   # recorded SAM-marked photo loads
     page.click("#sampleBad")
-    page.wait_for_function("document.querySelector('#checkResult').textContent.includes('⚠')", timeout=15000)
+    page.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('⚠')", timeout=15000)
     page.click("#sampleGood")
-    page.wait_for_function("document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
+    page.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
     assert "1/4" in page.inner_text("#verifiedCount")
     assert page.get_attribute("#pdfBtn", "href") == "/static/replay/report-en.pdf"
     assert not page.is_visible("#workshopBtn")                            # not recorded: hidden, not faked
     page.fill("#stuckText", "tried it, still dead")
     page.click("#stuckBtn")
-    page.wait_for_function("document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled", timeout=15000)
+    page.wait_for_function("() => document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled", timeout=15000)
     log = page.inner_text("#agent")
     for bit in ("muse-spark-1.3", "sam-3.1", "not yet", "correct", "Still broken: new"):
         assert bit in log, bit
@@ -65,7 +65,7 @@ def test_own_photo_is_never_faked_in_the_recording(page):
     _run_demo(page, "id")
     assert "rekaman" in page.inner_text("#modeBadge").lower()
     page.set_input_files("#stepPhoto", str(FIX / "sample_faucet_hose_clamp.jpg"))
-    page.wait_for_function("document.querySelector('#checkResult').textContent.includes('server live')", timeout=10000)
+    page.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('server live')", timeout=10000)
     assert "✅" not in page.inner_text("#checkResult")
 
 
@@ -75,6 +75,6 @@ def test_forced_replay_sends_nothing_to_the_server(page):
     page.goto(page.base + "/?replay=1")
     _run_demo(page, "jv")
     page.click("#sampleGood")
-    page.wait_for_function("document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
+    page.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
     assert not sent, sent
     assert "rekaman" in page.inner_text("#modeBadge").lower()

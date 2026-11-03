@@ -80,6 +80,13 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(title="Tukang Copilot", version=__version__, lifespan=lifespan)
 app.add_middleware(GZipMiddleware, minimum_size=1024)  # app.js 90 KB → ~29 KB on 4G; SSE (text/event-stream) is never gzipped
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in settings.cors_origins.split(",")], allow_methods=["*"], allow_headers=["*"])
+# Pages only load our own files. Inline style attributes stay allowed (the bars and the icon sprite use them);
+# inline scripts do not, so an injected <script> or onclick= never runs. Shop and WhatsApp links are plain navigation.
+CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; "
+       "media-src 'self' blob:; connect-src 'self'; font-src 'self'; worker-src 'self'; manifest-src 'self'; "
+       "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'")
+
+
 @app.middleware("http")
 async def security_headers(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
     """Cheap hardening: no MIME sniffing, no framing, no referrer leaks, camera and mic only for this origin."""
@@ -88,6 +95,10 @@ async def security_headers(request: Request, call_next: Callable[[Request], Awai
     resp.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
     resp.headers.setdefault("Referrer-Policy", "no-referrer")
     resp.headers.setdefault("Permissions-Policy", "camera=(self), microphone=(self), geolocation=(self)")
+    if resp.headers.get("content-type", "").startswith("text/html"):
+        resp.headers.setdefault("Content-Security-Policy", CSP)
+    if request.headers.get("x-forwarded-proto") == "https":  # Render and other proxies end TLS in front of us
+        resp.headers.setdefault("Strict-Transport-Security", "max-age=31536000")
     return resp
 
 

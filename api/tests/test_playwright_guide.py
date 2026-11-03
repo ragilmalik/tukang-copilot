@@ -61,3 +61,30 @@ def test_main_screen_order_is_unchanged(phone):
     order = phone.evaluate("""() => { const ids = ['dxObject','agent','stepCard'];
         return ids.map(i => [...document.querySelectorAll('#result > *')].findIndex(e => e.contains(document.getElementById(i)))); }""")
     assert order == sorted(order), order
+
+
+def _finished_session(base: str, sample: str, lang: str) -> str:
+    with httpx.Client(trust_env=False, timeout=30) as c:
+        sid = c.post(base + "/api/sessions", data={"sample": sample, "language": lang}).json()["id"]
+        end = time.time() + 40
+        while time.time() < end:
+            if c.get(f"{base}/api/sessions/{sid}").json().get("status") not in ("created", "running"):
+                return str(sid)
+            time.sleep(0.1)
+    raise AssertionError("session never finished")
+
+
+@pytest.mark.parametrize("lang", ["id", "jv", "en"])
+def test_red_stop_guide_link_shows_the_stop_card(phone, lang):
+    """A shared link to a red stop used to open an empty result page (no steps, no warning)."""
+    sid = _finished_session(phone.base, "rice", lang)
+    errs: list[str] = []
+    csp: list[str] = []
+    phone.on("pageerror", lambda e: errs.append(str(e)))
+    phone.on("console", lambda m: csp.append(m.text) if "Content Security Policy" in m.text else None)
+    phone.goto(f"{phone.base}/guide/{sid}")
+    phone.wait_for_selector("#stopBox:not(.hidden)", timeout=20000)
+    assert phone.locator("#result").is_hidden()
+    box = phone.inner_text("#stopBox")
+    assert len(box) > 40, box
+    assert errs == [] and csp == [], (errs, csp)

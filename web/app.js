@@ -1516,7 +1516,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const shared = document.body.dataset.sid;
   if (shared && !shared.startsWith("{{")) { // read-only /guide/<id> page
     on("lang", "change", (e) => { lang = e.target.value; applyLang(); });
-    fetchSession(shared).then((s) => { S = s; lang = s.lang; applyLang(); render(s); });
+    fetchSession(shared).then((s) => {
+      S = s; lang = s.lang; applyLang();
+      if (s.status === "ready") { render(s); return; }
+      // a red stop or "every safe cause tried" shows its STOP card, a repair still running shows its progress
+      show("progress"); renderProgress(s);
+      if (["created", "running"].includes(s.status)) follow(shared);
+    });
     return;
   }
   setupCapture(); renderGarage();

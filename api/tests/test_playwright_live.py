@@ -53,14 +53,14 @@ def test_live_guide_draws_highlight_over_fake_camera(base):
             box.check()
         pg.click("#liveBtn")
         pg.wait_for_selector("#live:not(.hidden)")
-        pg.wait_for_function("document.querySelector('#liveState').textContent.startsWith('🎯 Found')", timeout=15000)
+        pg.wait_for_function("() => document.querySelector('#liveState').textContent.startsWith('🎯 Found')", timeout=15000)
         assert 200 in tracked
         lit = pg.evaluate("""() => { const c = document.querySelector('#liveCanvas'); const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
                                      let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 0) n++; return n; }""")
         assert lit > 500, lit  # the orange outline/box is really drawn over the video
         assert pg.evaluate("document.querySelector('#liveVideo').videoWidth") > 0
         pg.click("#liveCheck")
-        pg.wait_for_function("(() => { const t = document.querySelector('#checkResult').textContent; return t && !t.includes('…'); })()", timeout=15000)
+        pg.wait_for_function("() => (() => { const t = document.querySelector('#checkResult').textContent; return t && !t.includes('…'); })()", timeout=15000)
         assert pg.text_content("#checkResult").strip()
         pg.click("#liveClose")
         assert pg.is_hidden("#live")

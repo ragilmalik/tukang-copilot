@@ -73,7 +73,7 @@ def test_main_flow_faucet_check_step(page):
     assert "sam-3.1" in page.inner_text("#hoodList") and page.locator("#hoodList li").count() >= 5
     page.set_input_files("#stepPhoto", str(FIX / "sample_faucet_hose_clamp.jpg"))
     page.wait_for_selector("#checkResult:not(.hidden)")
-    page.wait_for_function("!document.querySelector('#checkResult').textContent.includes('…')", timeout=15000)
+    page.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=15000)
     assert page.text_content("#checkResult").strip()
 
 
@@ -155,7 +155,7 @@ def test_tip_bar_is_compact_and_collapses_after_first_check(page):
     assert page.get_attribute("#tourToggle", "aria-expanded") == "false"
     assert page.get_attribute("#tourToggle", "aria-label") == "Show tip"
     page.click("#sampleGood")                                   # not covered by the chip
-    page.wait_for_function("document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
+    page.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
     page.click("#tourToggle")
     page.wait_for_selector("#tourBar:not(.collapsed)")
     assert page.get_attribute("#tourToggle", "aria-expanded") == "true" and "Still broken" in page.inner_text("#tourText")
@@ -181,12 +181,12 @@ def test_one_tap_demo_runs_the_whole_agent_loop(page):
     for b in page.locator("#preList input").all():
         b.check()
     page.click("#sampleBad")
-    page.wait_for_function("document.querySelector('#checkResult').textContent.includes('⚠')", timeout=15000)
+    page.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('⚠')", timeout=15000)
     page.click("#sampleGood")
-    page.wait_for_function("document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
+    page.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
     page.fill("#stuckText", "tried it, still dead")
     page.click("#stuckBtn")
-    page.wait_for_function("document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled", timeout=15000)
+    page.wait_for_function("() => document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled", timeout=15000)
     log = page.inner_text("#agent")
     for bit in ("muse-spark-1.3", "sam-3.1", "Only 55% sure", "not yet", "correct", "Still broken: new"):
         assert bit in log, bit
@@ -204,14 +204,14 @@ def test_tip_bar_moves_to_top_while_typing(page):
     low = page.locator("#tourBar").bounding_box()
     assert low and low["y"] > 844 / 2, low                     # bottom corner by default
     page.focus("#answerText")
-    page.wait_for_function("document.body.classList.contains('typing')")
+    page.wait_for_function("() => document.body.classList.contains('typing')")
     top = page.locator("#tourBar").bounding_box()
     assert top and top["y"] < 60, top                          # moved to the top while typing
     ans = page.locator("#answerText").bounding_box()
     assert ans and not (top["y"] < ans["y"] + ans["height"] and ans["y"] < top["y"] + top["height"] and
                         top["x"] < ans["x"] + ans["width"] and ans["x"] < top["x"] + top["width"]) or ans["y"] > 120
     page.locator("#answerText").blur()
-    page.wait_for_function("!document.body.classList.contains('typing')")
+    page.wait_for_function("() => !document.body.classList.contains('typing')")
     back = page.locator("#tourBar").bounding_box()
     assert back and back["y"] > 844 / 2, back
 
@@ -227,7 +227,7 @@ def test_progress_screen_streams_partial_results(page, monkeypatch):
     assert "Seen:" in page.inner_text("#lf-look") and page.locator("#progress:not(.hidden)").count() == 1
     assert page.locator("#lf-diagnose").count() == 0                       # diagnosis not there yet
     page.wait_for_selector("#lf-segment img", timeout=15000)
-    page.wait_for_function("document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
+    page.wait_for_function("() => document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
     assert "outlined" in page.inner_text("#lf-segment")
     page.wait_for_selector("#lf-diagnose", timeout=15000)
     assert "Most likely:" in page.inner_text("#lf-diagnose") and page.locator("#progress:not(.hidden)").count() == 1
@@ -260,18 +260,18 @@ def test_agent_log_lines_jump_to_what_they_describe(page):
     for b in page.locator("#preList input").all():
         b.check()
     page.click("#sampleBad")
-    page.wait_for_function("document.querySelector('#checkResult').textContent.includes('⚠')", timeout=15000)
+    page.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('⚠')", timeout=15000)
     page.click("#sampleGood")
-    page.wait_for_function("document.querySelector('#stepNo').textContent.trim() === '2'", timeout=15000)  # auto-advance
+    page.wait_for_function("() => document.querySelector('#stepNo').textContent.trim() === '2'", timeout=15000)  # auto-advance
     page.locator("#agent .agGo", has_text="Outlined").click()
     page.wait_for_selector("#partsWrap.flash", timeout=15000)
     assert _in_view(page, "#partsWrap")
     page.locator("#agent .agGo", has_text="Step 1 checked").first.click()
     page.wait_for_selector("#stepCard.flash", timeout=15000)
-    page.wait_for_function("document.querySelector('#stepNo').textContent.trim() === '1'", timeout=15000)
+    page.wait_for_function("() => document.querySelector('#stepNo').textContent.trim() === '1'", timeout=15000)
     assert _in_view(page, "#stepCard")
     assert page.get_attribute("#agent .agGo", "title") == "Show it on screen"
-    page.wait_for_function("document.activeElement && document.activeElement.id === 'stepCard'",
+    page.wait_for_function("() => document.activeElement && document.activeElement.id === 'stepCard'",
                            timeout=15000)                                              # focus follows for keyboards
 
 

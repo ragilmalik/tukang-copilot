@@ -19,7 +19,7 @@ def _open_steps(page):
 
 def _pass_current_step(page):
     page.click("#sampleGood")
-    page.wait_for_function("document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
+    page.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
 
 
 def test_tapping_next_right_after_a_pass_does_not_skip_a_step(page):
@@ -46,7 +46,7 @@ def test_going_back_right_after_a_pass_stays_put(page):
 def test_auto_advance_still_happens_when_the_owner_does_nothing(page):
     _open_steps(page)
     _pass_current_step(page)
-    page.wait_for_function("document.querySelector('#stepTitle').textContent.startsWith('2 /')", timeout=5000)
+    page.wait_for_function("() => document.querySelector('#stepTitle').textContent.startsWith('2 /')", timeout=5000)
 
 
 def test_next_on_the_last_step_after_a_pass_does_not_crash(page):
@@ -69,11 +69,11 @@ def test_last_verified_step_brings_the_outcome_question_on_screen(page):
     for i in range(total):
         _pass_current_step(page)
         if i < total - 1:
-            page.wait_for_function(f"document.querySelector('#stepTitle').textContent.startsWith('{i + 2} /')", timeout=5000)
-    page.wait_for_function("document.activeElement && document.activeElement.id === 'fixedBtn'", timeout=5000)
+            page.wait_for_function(f"() => document.querySelector('#stepTitle').textContent.startsWith('{i + 2} /')", timeout=5000)
+    page.wait_for_function("() => document.activeElement && document.activeElement.id === 'fixedBtn'", timeout=5000)
     assert "camera" in page.inner_text("#outcomeMsg")
     # the smooth scroll takes a moment: wait until the whole question is in view
-    page.wait_for_function("(() => { const r = document.getElementById('outcome').getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight + 2; })()", timeout=6000)
+    page.wait_for_function("() => (() => { const r = document.getElementById('outcome').getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight + 2; })()", timeout=6000)
 
 
 def test_outcome_question_is_not_forced_when_steps_are_unverified_or_answered(page):
@@ -99,6 +99,6 @@ def test_outcome_prompt_is_in_the_owner_language(page, lang, word):
     for i in range(total):
         _pass_current_step(page)
         if i < total - 1:
-            page.wait_for_function(f"document.querySelector('#stepTitle').textContent.startsWith('{i + 2} /')", timeout=5000)
-    page.wait_for_function("document.activeElement && document.activeElement.id === 'fixedBtn'", timeout=5000)
+            page.wait_for_function(f"() => document.querySelector('#stepTitle').textContent.startsWith('{i + 2} /')", timeout=5000)
+    page.wait_for_function("() => document.activeElement && document.activeElement.id === 'fixedBtn'", timeout=5000)
     assert word in page.inner_text("#outcomeMsg")

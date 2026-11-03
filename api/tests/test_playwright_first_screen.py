@@ -27,12 +27,12 @@ def test_demo_button_is_not_covered_until_the_owner_starts(page):
     assert _top_element_at_demo_button(page) == "demo"
     assert page.evaluate("getComputedStyle(document.querySelector('.actionBar')).position") != "sticky"
     page.click('#cats [data-cat="pump"]')
-    page.wait_for_function("document.querySelector('#capture').classList.contains('armed')")
+    page.wait_for_function("() => document.querySelector('#capture').classList.contains('armed')")
     assert page.evaluate("getComputedStyle(document.querySelector('.actionBar')).position") == "sticky"
     page.click('#cats [data-cat="pump"]')  # nothing chosen any more: the bar settles again
-    page.wait_for_function("!document.querySelector('#capture').classList.contains('armed')")
+    page.wait_for_function("() => !document.querySelector('#capture').classList.contains('armed')")
     page.fill("#text", "my pump hums")
-    page.wait_for_function("document.querySelector('#capture').classList.contains('armed')")
+    page.wait_for_function("() => document.querySelector('#capture').classList.contains('armed')")
 
 
 @pytest.mark.parametrize("lang,text", [("id", "Server sedang bermasalah"), ("jv", "Server lagi ana masalah"), ("en", "The server had a problem")])
@@ -42,7 +42,7 @@ def test_a_non_json_server_error_reads_as_a_sentence(page, lang, text):
     page.set_input_files("#photo", str(FIX / "sample_faucet_drip.jpg"))
     page.fill("#text", "kran netes")
     page.click("#goBtn")
-    page.wait_for_function("document.querySelector('#formErr').textContent.length > 3", timeout=10000)
+    page.wait_for_function("() => document.querySelector('#formErr').textContent.length > 3", timeout=10000)
     msg = page.inner_text("#formErr")
     assert text in msg and "JSON" not in msg and "token" not in msg
 
@@ -54,7 +54,7 @@ def test_garage_counts_a_passed_step_at_once(page):
     for x in page.locator("#preList input").all():
         x.check()
     page.set_input_files("#stepPhoto", str(FIX / "sample_faucet_hose_clamp.jpg"))
-    page.wait_for_function("(document.querySelector('#checkResult').className || '').includes('isPass')", timeout=20000)
+    page.wait_for_function("() => (document.querySelector('#checkResult').className || '').includes('isPass')", timeout=20000)
     got = page.evaluate("JSON.parse(localStorage.getItem('tc_garage'))[0]")
     assert got["verified"] == 1 and got["total"] >= 2, got
 
