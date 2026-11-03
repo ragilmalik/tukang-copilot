@@ -14,6 +14,7 @@ from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -202,7 +203,7 @@ def progress_view(s: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 def index(request: Request) -> str:
     base = _base(request)
     og = _og("Tukang Copilot: foto barang rusak, dapat panduan perbaikan",
@@ -242,9 +243,54 @@ def _og(title: str, desc: str, image: str, url: str) -> str:
             f'<meta name="twitter:card" content="summary_large_image">')
 
 
-@app.get("/guide/{sid}", response_class=HTMLResponse)
-def guide_page(sid: str, request: Request) -> str:
-    s = _load(sid)
+GONE = {
+    "id": {"title": "Panduan ini sudah tidak ada", "body": "Foto dan panduan perbaikan ini sudah dihapus dari server.",
+           "why": "Panduan hanya disimpan {h} jam, dan pemiliknya bisa menghapusnya lebih cepat. Riwayatnya tetap ada di HP pemilik.",
+           "start": "Periksa barangmu sendiri"},
+    "jv": {"title": "Pandhuan iki wis ora ana", "body": "Foto lan pandhuan ndandani iki wis dibusak saka server.",
+           "why": "Pandhuan mung disimpen {h} jam, lan sing duwe bisa mbusak luwih cepet. Riwayate isih ana ing HP sing duwe.",
+           "start": "Priksa barangmu dhewe"},
+    "en": {"title": "This guide is gone", "body": "The photos and repair guide behind this link were deleted from the server.",
+           "why": "Guides are kept for {h} hours and the owner can delete one sooner. The owner's phone still has the history.",
+           "start": "Check your own broken thing"},
+}
+LANG_NAMES = {"id": "Bahasa Indonesia", "jv": "Basa Jawa", "en": "English"}
+
+
+def _page_lang(request: Request) -> str:
+    """?lang= wins, then the browser's language list (Javanese or Indonesian anywhere keeps it local, like the app)."""
+    q = request.query_params.get("lang", "")
+    if q in GONE:
+        return q
+    al = request.headers.get("accept-language", "").lower()
+    tags = [t.split(";")[0].strip()[:2] for t in al.split(",") if t.strip()]
+    for want in ("jv", "id"):
+        if want in tags:
+            return want
+    return "en" if tags and tags[0] == "en" else "id"
+
+
+def _gone_page(sid: str, request: Request) -> HTMLResponse:
+    """An expired or erased guide link (they live RETENTION_HOURS and get shared on WhatsApp): a page, not raw JSON."""
+    lang = _page_lang(request)
+    g = GONE[lang]
+    e = html.escape
+    here = e(quote(sid, safe=""))
+    langs = " ".join(f'<a class="chip" href="/guide/{here}?lang={k}" hreflang="{k}" lang="{k}" aria-label="{v}"'
+                     + (' aria-current="true"' if k == lang else "") + f">{k.upper()}</a>" for k, v in LANG_NAMES.items())
+    page = (WEB / "gone.html").read_text(encoding="utf-8")
+    for k, v in (("LANG", lang), ("TITLE", e(g["title"])), ("BODY", e(g["body"])), ("START", e(g["start"])),
+                 ("WHY", e(g["why"].format(h=f"{settings.retention_hours:g}"))), ("LANGS", langs)):
+        page = page.replace("{{" + k + "}}", v)
+    return HTMLResponse(page, status_code=404, headers={"Cache-Control": "no-store"})
+
+
+@app.api_route("/guide/{sid}", methods=["GET", "HEAD"], response_class=HTMLResponse)
+def guide_page(sid: str, request: Request) -> Response:
+    try:
+        s = engine.load(sid)
+    except (FileNotFoundError, ValueError):
+        return _gone_page(sid, request)
     obj = (s.get("object_report") or {}).get("object") or "Tukang Copilot"
     causes = (s.get("diagnosis") or {}).get("causes") or []
     desc = (causes[0].get("title", "") + " · " if causes and isinstance(causes[0], dict) else "") + \
@@ -252,7 +298,7 @@ def guide_page(sid: str, request: Request) -> str:
     base = _base(request)
     og = _og(f"{obj} · Tukang Copilot", desc, f"{base}/api/sessions/{sid}/card.png", f"{base}/guide/{sid}")
     page = (WEB / "guide.html").read_text(encoding="utf-8").replace("{{TITLE}}", html.escape(obj)).replace("{{SID}}", sid)
-    return page.replace("</head>", og + "\n</head>", 1)
+    return HTMLResponse(page.replace("</head>", og + "\n</head>", 1))
 
 
 @app.get("/api/sessions/{sid}/card.png")

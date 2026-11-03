@@ -2,6 +2,14 @@
 
 Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
 
+## 1.29.1 (2026-11-03)
+- Fixed: an expired or erased guide link opened as raw JSON. It is now a short page in Bahasa, Basa Jawa or English with a button to start a repair (still 404).
+- Fixed: on a 390x844 phone the "Check it now" bar covered the 1-tap demo button. The bar only floats once you start your own repair.
+- Fixed: a 500 or a gateway's HTML error page showed "Unexpected token..." on screen. Now it says the server had a problem, in your language.
+- Fixed: My garage showed "0/4" after a step passed the camera check.
+- Added: laptop side panel links the WhatsApp simulator; the panel fits a 1280x800 screen.
+- Added: `HEAD /` and `HEAD /guide/{id}` work (uptime monitors). Offline cache v15.
+
 ## 1.29.0 (2026-11-02)
 Real-looking sample photos and a new demo video.
 - Changed: the flat stand-in drawings are gone. Every demo scenario now uses an AI-generated sample photo (motorbike spark plug, faucet, water pump, rice cooker, tyre), labelled as such on screen, with masks drawn by hand to sit on each part.

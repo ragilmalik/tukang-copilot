@@ -20,7 +20,7 @@ const T = {
         findService: "Cari servis terdekat", emergency: "Darurat (api, asap, bau gas kuat): telepon 112.", copied: "Tautan disalin", openW: "Penalaran: Muse Spark Open (open weights)", demo: "Mode demo: jawaban contoh, tanpa biaya API.",
         green: "AMAN", amber: "HATI-HATI", red: "STOP", pass: "✅ Langkah ini beres", fail: "⚠️ Belum pas", checking: "Memeriksa foto…",
         verified: "langkah terverifikasi kamera", allChecked: "Semua langkah sudah dicek kamera. Sudah jalan lagi?", recording: "Merekam…", recorded: "Suara terekam ✓", micErr: "Mikrofon tidak bisa dipakai. Ketik saja masalahnya.",
-        netErr: "Koneksi terputus. Cek sinyal lalu coba lagi.", offline: "Tidak ada internet. Diagnosis butuh sinyal; foto kamu tetap aman di HP.",
+        netErr: "Koneksi terputus. Cek sinyal lalu coba lagi.", srvErr: "Server sedang bermasalah. Coba lagi sebentar lagi.", offline: "Tidak ada internet. Diagnosis butuh sinyal; foto kamu tetap aman di HP.",
         exhausted: "Sudah semua", newPlan: "Rencana baru siap.", photos: "foto", videoBtn: "🎥 Atau rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar terbaik diambil otomatis)", videoBig: "Videonya terlalu besar. Rekam 5–10 detik saja.", videoBad: "Videonya tidak bisa dibaca. Coba rekam ulang 5–10 detik atau ambil foto saja.", videoShort: "Videonya terlalu pendek. Rekam 5–10 detik.", videoLong: "Videonya terlalu panjang. Rekam 5–10 detik saja.", recBad: "Rekaman suaranya tidak bisa dibaca. Rekam ulang atau ketik masalahnya.", badFile: "Berkas itu bukan foto. Pilih foto JPG, PNG, atau HEIC.", unreadPhoto: "Foto itu tidak bisa dibaca. Coba foto JPG atau PNG.", bigFile: "Berkasnya terlalu besar. Coba foto yang lebih kecil.", emptyFile: "Berkasnya kosong. Coba ambil lagi.", tooLong: "Teksnya terlalu panjang. Persingkat dulu." },
   en: { hero: "What's broken?", ownTitle: "Or check your own", heroSub: "Snap it, say what's wrong, get a step-by-step repair guide.", takePhoto: "Take photos (1–3)",
         catMotor: "Motorbike", catPump: "Water pump", catAppliance: "Home appliance", catPlumbing: "Pipes/taps", catOther: "Other",
@@ -41,7 +41,7 @@ const T = {
         findService: "Find a service centre nearby", emergency: "Emergency (fire, smoke, strong gas smell): call 112.", copied: "Link copied", openW: "Reasoning: Muse Spark Open (open weights)", demo: "Demo mode: sample answers, no API cost.",
         green: "SAFE", amber: "CAUTION", red: "STOP", pass: "✅ Step looks right", fail: "⚠️ Not quite", checking: "Checking photo…",
         verified: "steps verified by camera", allChecked: "All steps checked by the camera. Does it work again?", recording: "Recording…", recorded: "Voice recorded ✓", micErr: "Microphone unavailable. Please type the problem.",
-        netErr: "Connection lost. Check your signal and try again.", offline: "You are offline. Diagnosis needs a signal; your photos stay on your phone.",
+        netErr: "Connection lost. Check your signal and try again.", srvErr: "The server had a problem. Try again in a moment.", offline: "You are offline. Diagnosis needs a signal; your photos stay on your phone.",
         exhausted: "All tried", newPlan: "New plan ready.", photos: "photos", videoBtn: "🎥 Or record a 5–10 s video", videoOk: "Video ready ✓ (the 3 sharpest frames are picked for you)", videoBig: "That video is too big. Record 5–10 seconds.", videoBad: "That video could not be read. Record 5–10 seconds again, or take photos instead.", videoShort: "That video is too short. Record 5–10 seconds.", videoLong: "That video is too long. Record 5–10 seconds only.", recBad: "That voice recording could not be read. Record again or type the problem.", badFile: "That file is not a photo. Pick a JPG, PNG or HEIC picture.", unreadPhoto: "That photo could not be read. Try a JPG or PNG.", bigFile: "That file is too big. Try a smaller photo.", emptyFile: "That file is empty. Take it again.", tooLong: "That text is too long. Shorten it a little." },
 };
 // Basa Jawa (ngoko, as spoken around Semarang). Falls back to Bahasa Indonesia for any key not listed.
@@ -67,7 +67,7 @@ T.jv = Object.assign({}, T.id, {
   demo: "Mode demo: wangsulan conto, tanpa biaya API.",
   green: "AMAN", amber: "ATI-ATI", red: "MANDHEG", pass: "✅ Langkah iki wis bener", fail: "⚠️ Durung pas", checking: "Mriksa foto…",
   verified: "langkah wis dicek kamera", allChecked: "Kabeh langkah wis dicek kamera. Wis urip maneh?", recording: "Ngrekam…", recorded: "Swara kerekam ✓", micErr: "Mikrofon ora bisa dienggo. Ketik wae masalahe.",
-  netErr: "Sambungan megat. Priksa sinyal banjur coba maneh.", offline: "Ora ana internet. Diagnosis butuh sinyal; foto sampeyan tetep aman ing HP.",
+  netErr: "Sambungan megat. Priksa sinyal banjur coba maneh.", srvErr: "Server lagi ana masalah. Coba maneh sedhela engkas.", offline: "Ora ana internet. Diagnosis butuh sinyal; foto sampeyan tetep aman ing HP.",
   exhausted: "Wis kabeh dijajal", newPlan: "Rencana anyar wis siap.", photos: "foto", videoBtn: "🎥 Utawa rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar paling cetha dijupuk otomatis)", videoBig: "Videone kegedhen. Rekam 5–10 detik wae.", videoBad: "Videone ora bisa diwaca. Rekam maneh 5–10 detik utawa jupuk foto wae.", videoShort: "Videone cendhak banget. Rekam 5–10 detik.", videoLong: "Videone dawa banget. Rekam 5–10 detik wae.", recBad: "Rekaman swarane ora bisa diwaca. Rekam maneh utawa ketik masalahe.", badFile: "Berkas iku dudu foto. Pilih foto JPG, PNG, utawa HEIC.", unreadPhoto: "Foto iku ora bisa diwaca. Jajal foto JPG utawa PNG.", bigFile: "Berkase kegedhen. Jajal foto sing luwih cilik.", emptyFile: "Berkase kosong. Jupuk maneh.", tooLong: "Tulisane kepanjangen. Cekak-ana dhisik.",
 });
 
@@ -349,7 +349,7 @@ function applyLang() {
 // WhatsApp simulator link (docs/WHATSAPP.md): only when the server says /wa is on (demo mode or WA_SIM=1).
 // The static build has no server and no /wa (scripts/build_static.py also removes the element).
 if (!window.TC_STATIC && !(window.TCReplay && window.TCReplay.forced()) && $("waSim")) {  // ?replay=1 sends nothing to the server
-  fetch("/api/wa-sim/info").then((r) => (r.ok ? r.json() : null)).then((i) => { if (i && i.enabled) $("waSim").classList.remove("hidden"); }).catch(() => {});
+  fetch("/api/wa-sim/info").then((r) => (r.ok ? r.json() : null)).then((i) => { if (i && i.enabled) ["waSim", "sideWa"].forEach((k) => $(k) && $(k).classList.remove("hidden")); }).catch(() => {});
 }
 
 let HEALTH = null;
@@ -407,6 +407,8 @@ function netMsg(e) {
   const m = e && e.message ? String(e.message) : "";
   const local = localServerMsg(m);
   if (local) return local;
+  // a 500 or a proxy's HTML error page is not JSON: never show the parser's message
+  if ((e && e.name === "SyntaxError") || /not valid JSON|Unexpected token|JSON\.parse|unexpected end of/i.test(m)) return t("srvErr");
   return (!e || e.name === "TypeError" || /failed to fetch|load failed|networkerror|network request/i.test(m) || (typeof navigator !== "undefined" && navigator.onLine === false)) ? t("netErr") : (m || t("netErr"));
 }
 function setupOffline() {
@@ -447,6 +449,9 @@ function setupCapture() {
   }));
   document.querySelectorAll("#cats .chip").forEach((x) => x.setAttribute("aria-pressed", "false"));
   setupKeyboardPickers();
+  // The Go bar floats only once the owner starts their own repair; until then the 1-tap demo stays uncovered.
+  const arm = () => setTimeout(() => { if ($("capture")) $("capture").classList.toggle("armed", !!(photoFiles.length || videoFile || audioBlob || category || ($("text") && $("text").value.trim()))); }, 0);
+  ["change", "input", "click"].forEach((ev) => { if ($("capture")) $("capture").addEventListener(ev, arm); });
   on("micBtn", "click", toggleRec);
   on("goBtn", "click", () => submit(""));
   document.querySelectorAll(".sample").forEach((b) => b.addEventListener("click", () => submit(b.dataset.sample)));
@@ -471,7 +476,7 @@ async function toggleRec() {
     rec.onstop = () => {
       stream.getTracks().forEach((tr) => tr.stop());
       audioBlob = new Blob(chunks, { type: rec.mimeType || "audio/webm" });
-      $("micBtn").classList.remove("rec"); $("micBtn").setAttribute("aria-pressed", "false"); $("micBtn").innerHTML = "🎙️ " + esc(t("record")); $("recState").textContent = t("recorded");
+      $("micBtn").classList.remove("rec"); $("micBtn").setAttribute("aria-pressed", "false"); $("micBtn").innerHTML = "🎙️ " + esc(t("record")); $("recState").textContent = t("recorded"); if ($("capture")) $("capture").classList.add("armed");
     };
     rec.start(); $("micBtn").classList.add("rec"); $("micBtn").setAttribute("aria-pressed", "true"); $("micBtn").innerHTML = "⏹️ " + esc(t("stop")); $("recState").textContent = t("recording");
     setTimeout(() => rec && rec.state === "recording" && rec.stop(), 60000); // spec: max 60 s
@@ -889,7 +894,7 @@ async function checkPhoto(f) {
     const r = await fetch(`/api/sessions/${S.id}/steps/${st.n}/check`, { method: "POST", body: fd });
     const j = await r.json();
     if (!r.ok) { $("checkResult").textContent = j.detail; return null; }
-    S = await fetchSession(S.id); showCheck(j); renderVerified(); renderAgentLog(S, "agent");
+    S = await fetchSession(S.id); showCheck(j); renderVerified(); renderAgentLog(S, "agent"); saveGarage(S);  // garage shows the new "n/m ✓"
     if ($("stepBar")) { const k = $("stepBar").children[stepIdx]; if (k && j.passed) k.className = "ok"; }
     if (j.passed && stepIdx < S.plan.steps.length - 1) advT = setTimeout(() => { if (S && S.plan && stepIdx < S.plan.steps.length - 1) { stepIdx++; renderStep(); } }, 1500);
     else if (j.passed && S.plan.steps.every((x) => ((S.checks || {})[String(x.n)] || {}).passed) && !(S.outcome || {}).result) advT = setTimeout(askOutcome, 1500);
