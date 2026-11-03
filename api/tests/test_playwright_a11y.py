@@ -30,7 +30,8 @@ def phone(server):  # noqa: F811
 
 
 def _visible_h1(pg) -> list[str]:
-    return pg.evaluate("() => [...document.querySelectorAll('h1')].filter(h => h.offsetParent !== null).map(h => h.id || h.textContent)")
+    found: list[str] = pg.evaluate("() => [...document.querySelectorAll('h1')].filter(h => h.offsetParent !== null).map(h => h.id || h.textContent)")
+    return found
 
 
 def _axe(pg, name: str) -> list[str]:
