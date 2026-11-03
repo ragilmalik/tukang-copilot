@@ -1,2 +1,2 @@
 """Tukang Copilot backend."""
-__version__ = "1.29.3"
+__version__ = "1.29.4"

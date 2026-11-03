@@ -3,7 +3,7 @@
 // sleeps (free Render tier, ~50 s to wake) or the phone is offline.
 // API calls (/api/*), session files (/files/*) and guides are never cached: diagnosis needs the network,
 // and user photos must not linger on the device (24 h retention lives on the server).
-const CACHE = "tukang-shell-v16";  // bump on every release that changes the shell, so phones fetch the new app
+const CACHE = "tukang-shell-v17";  // bump on every release that changes the shell, so phones fetch the new app
 const SHELL = ["/", "/static/style.css", "/static/app.js", "/static/replay.js", "/manifest.webmanifest",
                "/static/icons/icon-192.png", "/static/icons/icon-512.png", "/static/demo-thumb.jpg", "/static/replay/demo.json",
                "/static/fonts/barlow-400.woff2", "/static/fonts/barlow-600.woff2", "/static/fonts/barlow-condensed-700.woff2",

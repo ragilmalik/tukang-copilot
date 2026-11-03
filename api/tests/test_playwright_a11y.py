@@ -87,8 +87,8 @@ def test_file_pickers_are_native_inputs_in_the_tab_order(phone):
 
 @pytest.mark.parametrize("lang,stage,note", [
     ("en", "Listening", "skipped: you typed instead"),
-    ("id", "Mendengarkan", "dilewati: Anda mengetik"),
-    ("jv", "Ngrungokake", "diliwati: sampeyan ngetik"),
+    ("id", "Mendengarkan", "dilewati: kamu mengetik"),
+    ("jv", "Ngrungokake", "diliwati: kowe ngetik"),
 ])
 def test_typed_repair_says_why_listening_was_skipped(phone, lang, stage, note):
     phone.goto(f"{phone.base}/?lang={lang}")

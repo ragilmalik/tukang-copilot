@@ -2,6 +2,12 @@
 
 Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
 
+## 1.29.4 (2026-11-03)
+- Fixed: the progress screen said "Listening typed" when you typed instead of speaking. It now says "Listening skipped: you typed instead" (Bahasa and Basa Jawa too).
+- Fixed: the progress, stop and result screens had no h1, so a screen reader had no page title to jump to. The "Checking..." heading and the name of the broken thing are now the h1 of their screen.
+- Fixed: the photo and video pickers were labels pretending to be buttons. The real file inputs are now in the tab order (visually hidden inside the picture), so a keyboard and a screen reader get a native button and the picture shows the focus ring. axe-core finds nothing on the home, progress, question, result, stop, shared guide, WhatsApp simulator and laptop screens.
+- Changed: fonts, photos, PNGs, audio and PDFs are no longer run through gzip (they are already packed; it only cost CPU on the free server). Text files are still gzipped. Offline cache v17.
+
 ## 1.29.3 (2026-11-03)
 - Fixed: a shared guide link to a red stop opened an empty result page. It now shows the STOP card with its "do this now" list, and a repair that is still running shows its progress.
 - Added: a strict Content-Security-Policy on every HTML page (scripts only from the site itself, no inline script, no eval) and HSTS when the request came in over https through Render's proxy. The WhatsApp simulator's script moved out of the page into `web/wa.js`.
