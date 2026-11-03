@@ -58,6 +58,23 @@ def _clean(s: Any, n: int = 160) -> str:
     return " ".join(str(s or "").split())[:n]
 
 
+# One line per "Still broken" press, in the report's language (the PDF and the mechanic brief).
+ATTEMPT = {"id": ("Dicoba: {cause}. Hasilnya: {report}", "masih rusak"),
+           "jv": ("Dijajal: {cause}. Asile: {report}", "isih rusak"),
+           "en": ("Tried: {cause}. Result: {report}", "still broken")}
+
+
+def attempt_lines(s: dict[str, Any], lang: str) -> list[str]:
+    """What the owner tried and what they said happened. Sessions from before 1.29.6 only kept the English
+    history line for the model, so those lines are shown as they were."""
+    line, empty = ATTEMPT.get(lang, ATTEMPT["id"])
+    tried = s.get("attempts")
+    if isinstance(tried, list) and tried:
+        return [line.format(cause=_clean(a.get("cause"), 90), report=_clean(a.get("report"), 200) or empty)
+                for a in tried if isinstance(a, dict)]
+    return [str(h) for h in s.get("history") or []]
+
+
 def maps_query(s: dict[str, Any]) -> str:
     """The Google Maps search for the right kind of workshop, from what the object is."""
     rep = s.get("object_report") or {}

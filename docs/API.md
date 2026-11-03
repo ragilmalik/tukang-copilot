@@ -76,7 +76,7 @@ curl -o report.pdf http://localhost:8000/api/sessions/$ID/report.pdf
 Large-print workshop sheets (A4) to pin up next to the job: a cover with the safety banner, the marked photo and a tick list of tools and parts, then one page per step (giant step number, instruction, warnings in a red box, what the camera should see, the step diagram or marked photo, a tick box) and a final "Done when" page. Session language. `409` while there is no plan (including a red safety stop), `404` for an unknown session.
 
 ## `GET /api/sessions/{id}/card.png`, `GET /og.png`
-Link-preview cards (1200×630 PNG, Open Graph size). The session card shows the SAM-marked photo, the object, the most likely cause with confidence, the safety badge and a plan line (steps, minutes, DIY saving), plus "DEMO MODE" in demo mode; it never shows the owner's own words. `409` before the photo has been looked at, `404` for an unknown or erased session. `/guide/{id}` carries `og:*` and `twitter:card` tags pointing at it (absolute URL from `PUBLIC_BASE_URL`, else the request host); the front page points at `/og.png` (`web/og.png`, made by `scripts/make_og.py` from a labelled AI-generated sample photo).
+Link-preview cards (1200×630 PNG, Open Graph size). The session card shows the SAM-marked photo, the object, the most likely cause with confidence (after a re-plan, the cause being tried with "Plan 2 of 3" above it), the safety badge and a plan line (steps, minutes, DIY saving), plus "DEMO MODE" in demo mode; it never shows the owner's own words. `409` before the photo has been looked at, `404` for an unknown or erased session. `/guide/{id}` carries `og:*` and `twitter:card` tags pointing at it (absolute URL from `PUBLIC_BASE_URL`, else the request host); the front page points at `/og.png` (`web/og.png`, made by `scripts/make_og.py` from a labelled AI-generated sample photo).
 
 ## `GET /manifest.webmanifest`, `GET /sw.js`
 PWA manifest and the app-shell service worker, served from the root so the app can be installed to the home screen. `404` if the file is missing.
@@ -84,8 +84,9 @@ PWA manifest and the app-shell service worker, served from the root so the app c
 ## `GET /api/sessions/{id}/report`
 ```json
 {"object":"Honda Beat, area busi","problem":"…","fix":"Busi kotor / berkerak","steps_total":4,"steps_verified":1,
- "tools":[…],"parts":[…],"cost_estimate_idr":25000,"shop_cost_estimate_idr":60000,"diy_saving_idr":35000,"minutes_estimate":20,"safety_level":"amber","attempts":["Tried 'Cop busi longgar', result: …"],"status":"ready"}
+ "tools":[…],"parts":[…],"cost_estimate_idr":25000,"shop_cost_estimate_idr":60000,"diy_saving_idr":35000,"minutes_estimate":20,"safety_level":"amber","attempts":["Dicoba: Cop busi longgar. Hasilnya: …"],"status":"ready"}
 ```
+`attempts` is one line per "Still broken" press, in the session's language (Bahasa, Basa Jawa or English). Repairs saved before 1.29.6 show the older English line.
 
 ## `GET /files/{id}/{name}`
 Only generated media: `photo1-3.jpg`, `parts.jpg`, `part_<id>.jpg`, `diagram_<n>.png`, `voice_<c>_<n>.mp3`, `check_*.jpg`. Everything else (incl. `session.json`) is 404.

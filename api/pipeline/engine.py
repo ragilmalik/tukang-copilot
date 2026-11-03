@@ -31,7 +31,7 @@ from typing import Any, TypeVar, cast
 from PIL import Image
 from pydantic import BaseModel, ValidationError
 
-from .. import cost, errors, prompts, untrusted
+from .. import cost, errors, handoff, prompts, untrusted
 from ..coerce import coerce
 from ..render import overlay
 from ..schemas import Diagnosis, DiagramReview, ObjectReport, RepairPlan, Step, StepCheck, json_schema
@@ -660,7 +660,9 @@ def replan(sid: str, report: str) -> dict[str, Any]:
         _stop(s, gate.reason, "gate")
         return s
     flag_injection(s, report)
-    s["history"].append(f"Tried '{dx.causes[min(s['cause_index'], len(dx.causes) - 1)].title}', result: {report or 'still broken'}")
+    tried_title = dx.causes[min(s["cause_index"], len(dx.causes) - 1)].title
+    s["history"].append(f"Tried '{tried_title}', result: {report or 'still broken'}")  # for the model, in English
+    s.setdefault("attempts", []).append({"cause": tried_title, "report": report})  # for the PDF, in the owner's language
     if s["cause_index"] + 1 >= len(dx.causes):
         s["status"], s["stop_reason"] = "exhausted", {
             "id": "Semua kemungkinan yang aman sudah dicoba. Bawa ke bengkel/servis dan tunjukkan laporan ini.",
@@ -670,6 +672,7 @@ def replan(sid: str, report: str) -> dict[str, Any]:
         save(s)
         return s
     before_hist = list(s["history"][:-1])
+    before_attempts = list(s["attempts"][:-1])
     s["cause_index"] += 1
     s.pop("outcome", None)  # a new plan means the earlier "fixed" no longer stands
     meter = cost.Meter(settings.max_cost_usd)
@@ -682,7 +685,7 @@ def replan(sid: str, report: str) -> dict[str, Any]:
             s["status"] = "ready"
     except Exception:
         s["cause_index"] -= 1  # the new plan never arrived: the person can press "Still broken" again
-        s["history"] = before_hist
+        s["history"], s["attempts"] = before_hist, before_attempts
         raise
     finally:
         prev = s.get("cost") or {}
@@ -781,7 +784,7 @@ def report(sid: str) -> dict[str, Any]:
             "fix": plan.get("cause_title", ""), "steps_total": len(steps), "steps_verified": verified,
             "tools": dx.get("tools", []), "parts": dx.get("parts", []), "cost_estimate_idr": dx.get("cost_estimate_idr", 0),
             "shop_cost_estimate_idr": dx.get("shop_cost_estimate_idr", 0), "diy_saving_idr": dx.get("diy_saving_idr", 0),
-            "minutes_estimate": dx.get("minutes_estimate"), "safety_level": s["safety"]["level"], "attempts": s.get("history", []),
+            "minutes_estimate": dx.get("minutes_estimate"), "safety_level": s["safety"]["level"], "attempts": handoff.attempt_lines(s, s["lang"]),
             "status": s["status"], "created": s["created"], "lang": s["lang"], "outcome": s.get("outcome")}
 
 

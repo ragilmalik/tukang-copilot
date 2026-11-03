@@ -1,6 +1,6 @@
 """Share card (1200x630 PNG, the Open Graph size): the link preview WhatsApp, X, Telegram and Facebook show when a
 repair guide link is shared. Left: the owner's photo with the parts SAM 3.1 outlined. Right: what it is, the most
-likely cause, the safety level, and the plan in one line. Demo sessions say so on the card.
+likely cause (or, after a re-plan, which plan is being tried), the safety level, and the plan in one line. Demo sessions say so on the card.
 
 Only model output and numbers go on the card, never the owner's own words (same rule as the agent log)."""
 from __future__ import annotations
@@ -17,15 +17,15 @@ LEVEL = {"green": ((22, 120, 60), {"id": "AMAN", "jv": "AMAN", "en": "SAFE"}),
          "amber": ((176, 104, 0), {"id": "HATI-HATI", "jv": "ATI-ATI", "en": "CAUTION"}),
          "red": ((185, 28, 28), {"id": "STOP", "jv": "MANDHEG", "en": "STOP"})}
 TXT = {
-    "id": {"likely": "Paling mungkin", "steps": "{n} langkah", "min": "~{m} menit", "save": "hemat Rp{s}",
+    "id": {"plan": "Rencana {n} dari {m}, dicoba sekarang", "likely": "Paling mungkin", "steps": "{n} langkah", "min": "~{m} menit", "save": "hemat Rp{s}",
            "checked": "{v} dari {n} langkah lolos cek kamera", "camera": "Kamera mengecek tiap langkah",
            "demo": "MODE DEMO: jawaban contoh, foto contoh (dibuat AI)",
            "tag": "Foto + cerita, dapat panduan perbaikan", "made": "Meta Muse Spark + SAM 3.1"},
-    "jv": {"likely": "Sing paling mungkin", "steps": "{n} langkah", "min": "~{m} menit", "save": "irit Rp{s}",
+    "jv": {"plan": "Rencana {n} saka {m}, dijajal saiki", "likely": "Sing paling mungkin", "steps": "{n} langkah", "min": "~{m} menit", "save": "irit Rp{s}",
            "checked": "{v} saka {n} langkah lolos priksa kamera", "camera": "Kamera mriksa saben langkah",
            "demo": "MODE DEMO: wangsulan conto, foto conto (digawe AI)",
            "tag": "Foto + crita, oleh tuntunan ndandani", "made": "Meta Muse Spark + SAM 3.1"},
-    "en": {"likely": "Most likely", "steps": "{n} steps", "min": "~{m} min", "save": "save Rp{s}",
+    "en": {"plan": "Plan {n} of {m}, being tried now", "likely": "Most likely", "steps": "{n} steps", "min": "~{m} min", "save": "save Rp{s}",
            "checked": "{v} of {n} steps passed a camera check", "camera": "The camera checks each step",
            "demo": "DEMO MODE: sample answers, AI-generated sample photo",
            "tag": "A photo and a few words, then a repair guide", "made": "Meta Muse Spark + SAM 3.1"},
@@ -110,7 +110,10 @@ def build(s: dict[str, Any], folder: Path, out: Path) -> Path:
     cause = causes[idx] if 0 <= idx < len(causes) else (causes[0] if causes else None)
     if isinstance(cause, dict) and cause.get("title"):
         y += 16
-        brand.draw(d, (x, y), tx["likely"], "semi", 21, brand.MUTED)
+        # after "Still broken" the card shows the cause being worked on, so say which plan it is: under "Most likely"
+        # a friend would read "22%" as the best guess when the 70% one was already tried
+        label = tx["plan"].format(n=idx + 1, m=len(causes)) if 0 < idx < len(causes) else tx["likely"]
+        brand.draw(d, (x, y), label, "semi", 21, brand.MUTED)
         y += 30
         pct = f"{int(cause.get('confidence') or 0)}%"
         pw = brand.draw(d, (x, y - 6), pct, "display", 60, brand.ORANGE_TEXT)

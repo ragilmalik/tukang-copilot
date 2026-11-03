@@ -239,7 +239,7 @@ def brief_lines(session: dict[str, Any], lang: str) -> list[tuple[str, str]]:
     rows.append(("h", B["tried"]))
     done = handoff.tried(session, why)
     rows += [("t", f"- {x}") for x in done] or [("t", B["nothing"])]
-    for a in session.get("history") or []:
+    for a in handoff.attempt_lines(session, lang):
         rows.append(("m", f"  {a}"))
     checks = session.get("checks") or {}
     steps = (session.get("plan") or {}).get("steps") or []

@@ -191,7 +191,7 @@ def _require_owner(s: dict[str, Any], request: Request) -> None:
 def public(s: dict[str, Any]) -> dict[str, Any]:
     # never on the wire: the owner's own words (text, history, phrases the injection guard caught), raw errors,
     # and the owner token, so whoever holds the guide link cannot answer or erase for the owner
-    out = {k: v for k, v in s.items() if k not in {"text", "history", "error_detail", "input_flags", "owner_token"}}
+    out = {k: v for k, v in s.items() if k not in {"text", "history", "attempts", "error_detail", "input_flags", "owner_token"}}
     out["input_guard"] = len(s.get("input_flags") or [])
     out["files_base"] = f"/files/{s['id']}/"
     out["trace"] = build_trace(s)
@@ -321,7 +321,9 @@ def guide_page(sid: str, request: Request) -> Response:
         return _gone_page(sid, request)
     obj = (s.get("object_report") or {}).get("object") or "Tukang Copilot"
     causes = (s.get("diagnosis") or {}).get("causes") or []
-    desc = (causes[0].get("title", "") + " · " if causes and isinstance(causes[0], dict) else "") + \
+    idx = int(s.get("cause_index") or 0)
+    cur = causes[idx] if 0 <= idx < len(causes) else (causes[0] if causes else None)  # the cause the guide is on now
+    desc = (cur.get("title", "") + " · " if isinstance(cur, dict) else "") + \
         "Panduan perbaikan langkah demi langkah, tiap langkah dicek kamera."
     base = _base(request)
     og = _og(f"{obj} · Tukang Copilot", desc, f"{base}/api/sessions/{sid}/card.png", f"{base}/guide/{sid}")

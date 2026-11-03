@@ -2,6 +2,10 @@
 
 Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
 
+## 1.29.6 (2026-11-03)
+- Fixed: after "Still broken", the PDF report and the mechanic brief listed the attempt in English ("Tried 'Cop busi longgar', result: ...") even in Bahasa and Basa Jawa. It now reads "Dicoba: ... Hasilnya: ..." / "Dijajal: ... Asile: ...". The model still gets the English line.
+- Fixed: after a re-plan the link preview card said "Most likely 22%" for the cause being tried, while the 70% one had already failed. It now says "Plan 2 of 3, being tried now", and the guide page's preview text names that cause too.
+
 ## 1.29.5 (2026-11-03)
 Docs brought up to date with 1.28 and 1.29. No app code changed.
 - Changed: test count 823 (docs/TEST_REPORT.md), mypy 141 files, smoke 69 checks, video 2:53 at 1080p60, AI-generated sample photos instead of "stand-in" wherever the docs described the current demo. README, SUBMISSION, WRITEUP, JUDGING_MAP, ONE_PAGER, COMMUNITY_VOTE_KIT, YOUTUBE, demo/README, DEMO_SCRIPT, TESTING, TODO.
