@@ -105,7 +105,7 @@ def test_app_keeps_the_token_on_the_phone_and_sends_it():
 # --- WhatsApp simulator link on the first screen
 def test_index_links_the_simulator_hidden_until_the_server_says_it_is_on():
     html = (WEB / "index.html").read_text(encoding="utf-8")
-    m = re.search(r'<p class="small center hidden" id="waSim"><a id="waSimLink" class="waSimLink" href="/wa" data-t="waSim">', html)
+    m = re.search(r'<p class="[^"]*\bhidden\b[^"]*" id="waSim"><a id="waSimLink" class="waSimLink" href="/wa" data-t="waSim">', html)
     assert m
     js = (WEB / "app.js").read_text(encoding="utf-8")
     assert 'fetch("/api/wa-sim/info")' in js and "i.enabled" in js
