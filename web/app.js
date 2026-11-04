@@ -15,6 +15,7 @@ const T = {
                   plan: "Menyusun langkah", safety: "Cek keselamatan rencana", illustrate: "Menggambar diagram", narrate: "Menyiapkan suara" },
         diff: "Kesulitan", min: "menit", est: "sparepart", shopCost: "bengkel", save: "hemat",  stopTitle: "STOP: jangan lanjutkan sendiri", triedTitle: "Saatnya ke bengkel/servis", stopNow: "Lakukan sekarang:",
         stopNow_gas: ["Tutup regulator / katup tabung gas, jangan nyalakan api atau saklar.", "Buka pintu dan jendela, keluar dari ruangan bila baunya kuat.", "Hubungi agen resmi elpiji atau teknisi gas, tunjukkan laporan ini."], stopNow_mains: ["Matikan MCB bila aman dijangkau; jangan sentuh kabel yang terbuka.", "Jangan buka casing, stop kontak, atau panel.", "Panggil teknisi listrik bersertifikat atau servis resmi, tunjukkan laporan ini."], stopNow_brake: ["Jangan dikendarai, walau dekat.", "Dorong atau derek ke bengkel.", "Tunjukkan laporan ini ke mekanik."],
+        stopNow_appliance: ["Cabut steker dari stopkontak dan biarkan dingin.", "Jangan buka casing: di dalamnya ada listrik 220V.", "Bawa ke servis resmi atau panggil teknisi, tunjukkan laporan ini."],
         stopNowRed: ["Matikan dan cabut dari listrik / tutup gas / matikan mesin.", "Jangan buka casing atau bagian dalamnya.", "Bawa ke servis resmi atau panggil teknisi, tunjukkan laporan ini."],
         stopNowTried: ["Biarkan dalam keadaan mati dan aman.", "Unduh laporan PDF: berisi apa saja yang sudah dicoba.", "Tunjukkan ke bengkel/servis supaya tidak mengulang dari nol."],
         findService: "Cari servis terdekat", emergency: "Darurat (api, asap, bau gas kuat): telepon 112.", copied: "Tautan disalin", openW: "Penalaran: Muse Spark Open (open weights)", demo: "Mode demo: jawaban contoh, tanpa biaya API.",
@@ -36,6 +37,7 @@ const T = {
                   plan: "Planning steps", safety: "Plan safety check", illustrate: "Drawing diagrams", narrate: "Preparing voice" },
         diff: "Difficulty", min: "min", est: "parts", shopCost: "shop", save: "save",  stopTitle: "STOP: don't continue on your own", triedTitle: "Time for a repair shop", stopNow: "Do this now:",
         stopNow_gas: ["Close the regulator / cylinder valve; no flames, no light switches.", "Open doors and windows; leave the room if the smell is strong.", "Call the gas supplier or a certified gas technician and show them this report."], stopNow_mains: ["Switch off the breaker (MCB) if it is safe to reach; don't touch bare wires.", "Don't open the casing, socket or panel.", "Call a licensed electrician or a service centre and show them this report."], stopNow_brake: ["Don't ride or drive it, not even a short way.", "Push it or have it towed to a workshop.", "Show the mechanic this report."],
+        stopNow_appliance: ["Unplug it from the wall socket and let it cool.", "Don't open the casing: there is 220V inside.", "Take it to a service centre or call a technician, and show them this report."],
         stopNowRed: ["Switch it off and unplug it / close the gas / stop the engine.", "Don't open the casing or the inside.", "Take it to a service centre or call a technician, and show them this report."],
         stopNowTried: ["Leave it switched off and safe.", "Download the PDF report: it lists everything already tried.", "Show it to the shop so they don't start from zero."],
         findService: "Find a service centre nearby", emergency: "Emergency (fire, smoke, strong gas smell): call 112.", copied: "Link copied", openW: "Reasoning: Muse Spark Open (open weights)", demo: "Demo mode: sample answers, no API cost.",
@@ -57,10 +59,11 @@ T.jv = Object.assign({}, T.id, {
   stuck: "Isih rusak, jajal rencana liya", stuckHere: "Kepiye kedadeyane? (umpamane wis dijajal, tetep mati)",
   needPhoto: "Jupuk utawa unggah foto dhisik.", needDesc: "Critakna masalahe (swara utawa ketik).",
   footer: "Mung kanggo ndandani sing entheng. Yen gas, listrik omah, utawa tegangan dhuwur, celuk teknisi.",
-  stages: { listen: "Ngrungokake", gate: "Priksa keamanan wiwitan", look: "Ndeleng foto", segment: "Nandhani perangan (SAM 3.1)", diagnose: "Nggoleki sebabe",
-            plan: "Nyusun langkah", safety: "Priksa keamanan rencana", illustrate: "Nggambar diagram", narrate: "Nyiapake swara" },
+  stages: { listen: "Ngrungokake", gate: "Priksa keslametan wiwitan", look: "Ndeleng foto", segment: "Nandhani perangan (SAM 3.1)", diagnose: "Nggoleki sebabe",
+            plan: "Nyusun langkah", safety: "Priksa keslametan rencana", illustrate: "Nggambar diagram", narrate: "Nyiapake swara" },
   diff: "Angel", min: "menit", est: "sparepart", shopCost: "bengkel", save: "irit",  stopTitle: "MANDHEG: aja diterusake dhewe", triedTitle: "Wayahe menyang bengkel/servis", stopNow: "Tindakake saiki:",
   stopNow_gas: ["Tutup regulator / katup tabung gas, aja nyumet geni utawa nguripke saklar.", "Bukak lawang lan jendela, metu saka kamar yen ambune banter.", "Hubungi agen resmi elpiji utawa teknisi gas, tuduhna laporan iki."], stopNow_mains: ["Pateni MCB yen aman digayuh; aja nyenthuh kabel sing kebukak.", "Aja mbukak casing, stop kontak, utawa panel.", "Celuk teknisi listrik sing duwe sertifikat utawa servis resmi, tuduhna laporan iki."], stopNow_brake: ["Aja ditumpaki, senajan cedhak.", "Surung utawa derek menyang bengkel.", "Tuduhna laporan iki marang mekanik."],
+  stopNow_appliance: ["Copot steker saka stopkontak lan enteni nganti adhem.", "Aja mbukak casing: ing njero ana listrik 220V.", "Gawanen menyang servis resmi utawa celuk teknisi, tuduhna laporan iki."],
   stopNowRed: ["Pateni lan copot saka listrik / tutup gas / pateni mesin.", "Aja mbukak casing utawa jerone.", "Gawanen menyang servis resmi utawa celuk teknisi, tuduhna laporan iki."],
   stopNowTried: ["Jarna tetep mati lan aman.", "Undhuh laporan PDF: isine apa wae sing wis dijajal.", "Tuduhna menyang bengkel/servis supaya ora mbaleni saka nol."],
   findService: "Golek servis paling cedhak", emergency: "Darurat (geni, kebul, ambu gas banget): telpon 112.", copied: "Tautan wis disalin", openW: "Nalar: Muse Spark Open (open weights)",
@@ -106,8 +109,8 @@ const T_EXTRA = {
         ag_gate_stop: "Ana tembung mbebayani ({category}): mandheg sadurunge takon model", ag_look: "Ndeleng foto: {object}, {n} perangan ditemokake",
         ag_segment: "Nandhani {found} saka {of} perangan ing fotomu (masker piksel)", ag_diagnose: "Sing paling mungkin: {cause} ({conf}%), saka {n} kemungkinan",
         ag_ask: "Lagi yakin {conf}% (ing ngisor {threshold}%): takon siji bab dhisik, ora ngira-ira", ag_answer: "Wangsulanmu ditampa, diagnosa dibaleni",
-        ag_plan: "Nyusun {steps} langkah kanggo: {cause}", ag_guard_ok: "Rencana dipriksa aturan keamanan ing kode: lolos ({level})",
-        ag_guard_stop: "Rencana ditolak aturan keamanan: MANDHEG", ag_illustrate: "Nggambar {made} saka {of} diagram saka fotomu",
+        ag_plan: "Nyusun {steps} langkah kanggo: {cause}", ag_guard_ok: "Rencana dipriksa aturan keslametan ing kode: lolos ({level})",
+        ag_guard_stop: "Rencana ditolak aturan keslametan: MANDHEG", ag_illustrate: "Nggambar {made} saka {of} diagram saka fotomu",
         ag_redrawn: ", {redrawn} digambar maneh sawise dipriksa", ag_check_ok: "Langkah {step} dipriksa saka foto anyar: bener",
         ag_check_fail: "Langkah {step} dipriksa saka foto anyar: durung pas, diwenehi koreksi", ag_check_esc: " (gagal bola-bali, nyaranake rencana liya)",
         ag_replan: "Isih rusak: rencana anyar {steps} langkah kanggo {cause}", ag_esc_red: "Kebangeten mbebayani yen digarap dhewe: diarahake menyang teknisi + laporan",
@@ -115,10 +118,10 @@ const T_EXTRA = {
         ag_fallback: "Model live gagal sawise dijajal maneh: tahap {stage} nganggo wangsulan demo (ana labele)",
         ag_input_guard: "Ana ukara prentah ing inputmu: dianggep data lan ora digatekake",
         ag_outcome_fixed: "Sampeyan ngonfirmasi: wis rampung", ag_outcome_pro: "Sampeyan milih nggawa menyang bengkel", ag_retry: "Nyoba maneh tahap sing gagal (kaping {n})",
-        note_typed: "diliwati: kowe ngetik", note_stop: "dimandhegake kanggo keamanan", note_photo: "foto wis cukup", note_browser: "swara browser", note_nocomp: "ora ana perangan sing katon", note_steps: "{n} langkah",
+        note_typed: "diliwati: kowe ngetik", note_stop: "dimandhegake kanggo keslametan", note_photo: "foto wis cukup", note_browser: "swara browser", note_nocomp: "ora ana perangan sing katon", note_steps: "{n} langkah",
         agCode: "kode", elapsed: "{n} dtk", qYes: "Iya", qNo: "Ora", qUnsure: "Ora ngerti",
-        tourProgress: "Demo: AI lagi nyambut gawe. Saben baris = siji model Meta utawa aturan keamanan.", tourAsk: "AI durung yakin, mula takon. Tutul salah siji wangsulan.",
-        tourResult: "Delengen perangan sing ditandhani SAM 3.1 lan log 'Sing ditindakake AI'. Banjur centhang dhaptar keamanan kanggo mbukak langkah 1.",
+        tourProgress: "Demo: AI lagi nyambut gawe. Saben baris = siji model Meta utawa aturan keslametan.", tourAsk: "AI durung yakin, mula takon. Tutul salah siji wangsulan.",
+        tourResult: "Delengen perangan sing ditandhani SAM 3.1 lan log 'Sing ditindakake AI'. Banjur centhang dhaptar keslametan kanggo mbukak langkah 1.",
         tourCheck: "Jajal 'Priksa langkah iki' nganggo foto conto: foto peteng ditolak, foto bener lolos.",
         tourStuck: "Banjur tutul 'Isih rusak' ing ngisor kanggo ndeleng AI nyusun rencana anyar.", tourClose: "Tutup", tourTip: "Tampilake pitutur", tourHide: "Cilikna pitutur",
         sampleTry: "Durung duwe foto? Jajal foto conto:", sampleBad: "📷 Foto peteng ✗", sampleGood: "📷 Foto bener ✓",
@@ -633,7 +636,10 @@ function renderStop(s) {
   const q = encodeURIComponent((lang === "en" ? "repair service " : "servis ") + (obj || ""));
   // the gate's category (gas / house wiring / brakes) picks the "do this now" list; anything else gets the general one
   const gate = (s.agent_log || []).find((e) => e && e.kind === "gate" && e.ok === false);
-  const catList = red && gate && ["gas", "mains", "brake"].includes(gate.category) ? t("stopNow_" + gate.category) : null;
+  // a red stop on a plugged-in thing (rice cooker, pump) says "unplug it", not "close the gas / stop the engine"
+  const kind = ((s.object_report || {}).category || "").toLowerCase();
+  const catList = red && gate && ["gas", "mains", "brake"].includes(gate.category) ? t("stopNow_" + gate.category)
+    : red && ["appliance", "pump"].includes(kind) ? t("stopNow_appliance") : null;
   const actions = (Array.isArray(catList) ? catList : red ? t("stopNowRed") : t("stopNowTried")).map((a) => `<li>${esc(a)}</li>`).join("");
   $("stopBox").innerHTML =
     `<p class="stopTitle">${red ? "⛔ " + esc(t("stopTitle")) : "🧰 " + esc(t("triedTitle"))}</p>`
@@ -697,7 +703,8 @@ function render(s) {
     $("gSave").textContent = shop ? `🧾 ${t("shopCost")} ${rupiah(shop)}` + (sv ? ` · ${t("save")} ${rupiah(sv)}` : "") : "";
     $("gSave").classList.toggle("hidden", !shop);
   }
-  $("gSafety").innerHTML = (window.SAFETY_BASE[lang] || []).map((x) => `<li>${esc(x)}</li>`).join("");
+  const kindRules = (window.SAFETY_BY_KIND[String(rep.category || "").toLowerCase()] || {})[lang];
+  $("gSafety").innerHTML = (kindRules || window.SAFETY_BASE[lang] || []).map((x) => `<li>${esc(x)}</li>`).join("");
   const safeUrl = (u) => (/^https:\/\/(www\.tokopedia\.com|shopee\.co\.id|wa\.me)\//.test(u || "") ? u : "");
   const li = (i) => `<li>${esc(i.name)} <span class="muted small">${i.est_price_idr ? rupiah(i.est_price_idr) : ""}</span>` +
     (safeUrl(i.shop_url) ? ` <a class="buy small" href="${safeUrl(i.shop_url)}" target="_blank" rel="noopener noreferrer" title="Tokopedia">🛒 ${t("buy")}</a>` +
@@ -1066,6 +1073,21 @@ window.SAFETY_BASE = {
   id: ["Cabut steker / matikan mesin dan tunggu dingin sebelum mulai.", "Pakai sarung tangan dan kacamata bila ada serpihan, bensin, atau cairan."],
   jv: ["Copot steker / pateni mesin lan enteni adhem sadurunge miwiti.", "Nganggo sarung tangan lan kacamata yen ana pecahan, bensin, utawa cairan."],
   en: ["Unplug it / switch the engine off and let it cool before you start.", "Wear gloves and eye protection around shards, fuel or liquids."],
+};
+// "Safety first" by kind of repair, so a dripping tap doesn't get "switch the engine off"; anything else keeps the lines above
+window.SAFETY_BY_KIND = {
+  motor: { id: ["Matikan mesin, cabut kuncinya, dan tunggu mesin dingin sebelum mulai.", "Pakai sarung tangan dan jauhkan dari api bila ada bensin."],
+           jv: ["Pateni mesin, copot kuncine, lan enteni mesine adhem sadurunge miwiti.", "Nganggo sarung tangan lan adoh saka geni yen ana bensin."],
+           en: ["Switch the engine off, take the key out and let it cool before you start.", "Wear gloves and keep flames away around fuel."] },
+  plumbing: { id: ["Tutup kran stop dulu dan siapkan lap atau ember.", "Pakai sarung tangan bila ada pecahan atau karat."],
+              jv: ["Tutup kran stop dhisik lan siapna gombal utawa ember.", "Nganggo sarung tangan yen ana pecahan utawa karat."],
+              en: ["Close the stop valve first and keep a cloth or bucket ready.", "Wear gloves around broken bits or rust."] },
+  pump: { id: ["Cabut steker pompa dari stopkontak dan pastikan tanganmu kering.", "Pakai sandal karet: lantai di sekitar pompa sering basah."],
+          jv: ["Copot steker pompa saka stopkontak lan priksa tanganmu garing.", "Nganggo sandal karet: jogan cedhak pompa asring teles."],
+          en: ["Unplug the pump from the socket and make sure your hands are dry.", "Wear rubber sandals: the floor around a pump is often wet."] },
+  appliance: { id: ["Cabut steker dari stopkontak dan tunggu dingin sebelum mulai.", "Jangan buka casing alat yang masih tersambung listrik 220V."],
+               jv: ["Copot steker saka stopkontak lan enteni adhem sadurunge miwiti.", "Aja mbukak casing piranti sing isih nyambung listrik 220V."],
+               en: ["Unplug it from the socket and let it cool before you start.", "Never open the casing of anything still connected to 220V."] },
 };
 
 /* ---------------- hands-free voice loop ----------------

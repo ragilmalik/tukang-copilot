@@ -2,6 +2,12 @@
 
 Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
 
+## 1.29.9 (2026-11-04)
+- Fixed: a red stop on a rice cooker or a water pump said "switch it off and unplug it / close the gas / stop the engine". Appliances and pumps now get their own list: unplug it and let it cool, don't open the casing (220V inside), take it to a service centre. Gas, house wiring and brakes keep their lists.
+- Fixed: "Safety first" on the guide said "switch the engine off" for a dripping tap. Motorbike, tap, pump and appliance repairs each get their own two lines; anything else keeps the old general ones.
+- Changed: Basa Jawa says "keslametan" for safety everywhere (app and PDF). It mixed in the Indonesian "keamanan" in a few places.
+- Changed: in the PDF, causes already tried are greyed out and struck through with a red "tried" label, like on the phone. Offline cache v19.
+
 ## 1.29.8 (2026-11-04)
 - Fixed: the Basa Jawa PDF report after a re-plan had a page holding only the last line of the disclaimer. When the end does not fit, the "under the hood" list goes in two columns, or its last lines move over with the disclaimer.
 - Fixed: after "Still broken" focus stays on the page; it now moves to the "Plan 2 of 3" banner.

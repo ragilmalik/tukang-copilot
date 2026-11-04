@@ -46,11 +46,14 @@ def test_stop_card_says_what_to_do_for_that_hazard(page, text, must, must_not):
     assert must in box and must_not not in box
 
 
-def test_rice_cooker_red_stop_keeps_the_general_list(page):
+def test_rice_cooker_red_stop_says_unplug_it(page):
+    # 1.29.9: a plugged-in appliance gets "unplug it", not "close the gas / stop the engine"
     page.goto(page.base + "/?lang=en")
     page.click('button.sample[data-sample="rice"]')
     page.wait_for_selector("#stopAgain:not(.hidden)", timeout=20000)
-    assert "Don't open the casing" in page.inner_text("#stopBox")
+    box = page.inner_text("#stopBox")
+    assert "Unplug it from the wall socket" in box and "Don't open the casing" in box
+    assert "close the gas" not in box and "stop the engine" not in box
 
 
 def test_cost_chip_says_parts_and_outcome_reads_as_a_sentence(page):
