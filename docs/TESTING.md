@@ -28,6 +28,13 @@ CI (`.github/workflows/ci.yml`) runs the same thing on every push. The browser t
 | `test_playwright_a11y.py` | Real Chromium: axe-core finds nothing serious or critical on the home, progress, question, result, stop, shared guide, WhatsApp simulator and laptop screens; one h1 per screen; file pickers are native inputs in the tab order. Needs axe-core from npm (`npm install --prefix /tmp/jd axe-core`) and skips without it |
 | `test_gone_page.py` | An expired or erased guide link gets a short page in the owner's language (still 404), with the link id escaped |
 | `test_gzip.py` | Text is gzipped; fonts, photos, PNGs, audio and PDFs are sent as they are |
+| `test_replan_report.py`, `test_brief_now.py` | After "Still broken" the PDF report and the mechanic brief list the attempt in the owner's language; the cause being tried now is "being tried now", not "already tried"; the link preview follows the current plan |
+| `test_report_tail.py`, `test_report_tried_and_jv_words.py` | The PDF never ends with a page holding only the last line of the disclaimer; causes already tried are struck through with a "tried" label; Basa Jawa says "keslametan" |
+| `test_playwright_kind_safety.py` | Real Chromium: the red stop's "Do this now" list and the two "Safety first" lines depend on what is being fixed (appliance or pump: unplug; tap: stop valve; motorbike: engine off); the gas list wins over the kind |
+| `test_playwright_replan_stop.py`, `test_playwright_guide.py` | Focus moves to the "Plan 2 of 3" banner after a re-plan; the red stop has one nearest-service button and a message preview you can open; My garage says "camera-checked" and the plan number; a shared guide link opened after a re-plan shows the banner |
+| `test_playwright_share_shop_tour.py` | Price links are named by shop (Tokopedia, Shopee) and sit on one row; Share on a laptop writes "Link copied:" in a line, never an alert(); the 1-tap demo keeps the newest finding above the tip bar |
+| `test_static_cache.py` | /static sends Cache-Control: fonts and ?v= URLs a year (immutable), pictures a day, app code revalidated |
+| `test_jv_register.py` | Basa Jawa stays in ngoko: no "sampeyan", "antosna" or other krama words in the app, PDF or workshop sheets |
 
 ## Recorded demo (v1.24)
 - `python scripts/record_replay.py` re-records `web/replay/` after a change to the mock answers, the session shape or the demo flow; `--check` exits 1 when the recording no longer matches (also a test in `test_replay.py`).

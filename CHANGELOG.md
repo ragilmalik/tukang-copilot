@@ -2,6 +2,12 @@
 
 Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
 
+## 1.29.13 (2026-11-04)
+Docs, screenshots and video brought up to date. No app behaviour changed.
+- Changed: screenshots, hero GIF, YouTube thumbnail, demo video and X clip re-made on the 1.29.12 screens (rice cooker stop list, kind-specific "Safety first" lines, shop-named price links, one nearest-service button on the red stop, fold-out chevrons, Basa Jawa in ngoko).
+- Changed: quoted numbers (tests, mypy files, smoke checks, video length, offline cache) in README, SUBMISSION, WRITEUP, JUDGING_MAP, TESTING, VERIFICATION_REPORT, ONE_PAGER, COMMUNITY_VOTE_KIT, YOUTUBE and the demo docs. SAFETY describes the kind-specific lines and stop lists, DECISIONS and DEPLOY have a Cache-Control line, TESTING lists the new test files.
+- Fixed: a laptop share test used an untyped lambda that mypy --strict rejected.
+
 ## 1.29.12 (2026-11-04)
 - Changed: Basa Jawa sticks to ngoko ("kowe", "fotomu"), which most of the app already used. A few lines said "sampeyan" (the saved amount, the offline note, two agent log lines in the app and PDF, the recorded demo note) or "antosna" (the wait timer, also on the workshop sheets), so one screen could switch registers. Offline cache v21.
 

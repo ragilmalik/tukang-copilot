@@ -23,3 +23,5 @@ Judges get one URL. There is no build step, no CORS, no second deploy, and less 
 **D10. Standard-mode model ids only.** Contributor mode is cheaper, but it lets Meta train on users' photos. I won't accept that for a household app.
 
 **D11. Per-session cost cap ($0.50 default).** The hackathon credits are $150, and a runaway loop shouldn't be able to drain them.
+
+**D12. Cache-Control on /static, by file type (1.29.10).** Fonts and any URL with `?v=` are cached for a year as immutable, pictures, PDFs and the vendored QR library for a day, and app.js, style.css, the replay script and the recording get `no-cache`, so the phone asks again on every load and usually gets a cheap 304. I chose revalidation over hashed file names because there is no build step, and I want a push to show up on the next load instead of after a day. The service worker still serves the shell offline (cache `tukang-shell-v21`).

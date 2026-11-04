@@ -13,7 +13,9 @@ There are three independent layers, so one model mistake can't produce a dangero
 2. At model level, `diagnose.md` defines red, and a red Diagnosis stops the session.
 3. A plan gate scans every generated plan for hard-stop actions (opening 220 V casings / heating elements, opening rice cookers, microwaves, fridges, AC, dispensers; bleeding brake lines; splicing into wall/panel wiring; gas hoses). A hit forces red even when the model said green.
 
-Every guide also shows two base rules (unplug / engine off and cool; gloves and eye protection) and the disclaimer, in the user's language.
+Every guide also shows two "Safety first" lines and the disclaimer, in the user's language. Since 1.29.9 the two lines depend on what is being fixed: a motorbike gets "engine off, key out, let it cool" and "gloves, keep flames away from fuel", a tap gets "close the stop valve first", a pump gets "unplug it, dry hands" and "rubber sandals on a wet floor", and a home appliance gets "unplug it and let it cool" and "never open a casing that is still on 220V". Anything else keeps the old general pair (unplug or engine off and cool; gloves and eye protection).
+
+A red stop also has a "Do this now" list. Gas, house wiring and brakes each have their own. A rice cooker, another appliance or a water pump gets "unplug it and let it cool", "don't open the casing, there is 220V inside" and "take it to a service centre and show them this report". Before 1.29.9 those fell through to a general list that said "close the gas / stop the engine" for a rice cooker.
 
 During step checks, the verify prompt fails any photo that shows exposed live wires, fuel near a flame or a cut gas hose, and tells the user to stop.
 

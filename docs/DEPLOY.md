@@ -61,6 +61,7 @@ Start on Free. Switching later is one click (step 14) and doesn't need a code re
 ## Updates
 
 12. Every push to the `main` branch on GitHub redeploys automatically (`autoDeploy: true`). Watch **Events** for *Deploy live*. Run `deploy_check.py` again after big changes.
+    - You don't need to purge any cache after a deploy. Files under `/static` send Cache-Control: app.js, style.css and the recorded demo are revalidated on every load, fonts are cached for a year and pictures for a day (DECISIONS D12). A phone that installed the app gets the new version on its next load through the service worker.
 
 ## Roll back (if a new version breaks)
 
