@@ -5,7 +5,7 @@ Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oc
 ## 1.29.13 (2026-11-04)
 Docs, screenshots and video brought up to date. No app behaviour changed.
 - Changed: screenshots, hero GIF, YouTube thumbnail, demo video and X clip re-made on the 1.29.12 screens (rice cooker stop list, kind-specific "Safety first" lines, shop-named price links, one nearest-service button on the red stop, fold-out chevrons, Basa Jawa in ngoko).
-- Changed: quoted numbers (tests, mypy files, smoke checks, video length, offline cache) in README, SUBMISSION, WRITEUP, JUDGING_MAP, TESTING, VERIFICATION_REPORT, ONE_PAGER, COMMUNITY_VOTE_KIT, YOUTUBE and the demo docs. SAFETY describes the kind-specific lines and stop lists, DECISIONS and DEPLOY have a Cache-Control line, TESTING lists the new test files.
+- Changed: quoted numbers are now 894 tests (docs/TEST_REPORT.md), mypy strict on 150 files, 69 smoke checks, 21 Chromium test files; the video stays 2:53 and the X clip 43.5 s. README, SUBMISSION, WRITEUP, JUDGING_MAP, TESTING, ONE_PAGER and COMMUNITY_VOTE_KIT updated, VERIFICATION_REPORT has a new section 5g, docs/EVAL.md re-generated (same results). SAFETY describes the kind-specific lines and stop lists, DECISIONS and DEPLOY have a Cache-Control line, TESTING lists the new test files.
 - Fixed: a laptop share test used an untyped lambda that mypy --strict rejected.
 
 ## 1.29.12 (2026-11-04)

@@ -1,6 +1,6 @@
 # Testing
 
-## Automated (free, offline; the full run took about 14 minutes on a 2-CPU box)
+## Automated (free, offline; the full run took about 16 minutes on a 2-CPU box)
 ```bash
 pip install -r requirements-dev.txt
 python -m playwright install chromium  # optional: browser tests skip cleanly without a Chromium

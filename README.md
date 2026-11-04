@@ -48,7 +48,7 @@ built solo in Semarang, Oct 26 to Nov 4, 2026.
 
 <sub>Honest status: the video, screenshots and 1-tap demo run in clearly labelled demo mode, with AI-generated sample photos and
 recorded model answers and no API calls. The live guide uses Chromium's fake camera. I tested the live Meta path end to
-end against a stand-in server built from the official API docs (823 automated tests pass; red-team eval in docs/EVAL.md,
+end against a stand-in server built from the official API docs (894 automated tests pass; red-team eval in docs/EVAL.md,
 mock and fake-model). A live Meta model answer is not yet verified because I still need the API key. Impact numbers in
 docs/IMPACT.md are mock data until real trials run.</sub>
 

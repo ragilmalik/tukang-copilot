@@ -1,6 +1,6 @@
 # Verification report
 
-I checked the app against SPEC.md and the hackathon rules. The first version of this report is from 2026-10-30; the latest check is 2026-11-03 WIB (v1.29.4). Section 5d covers 1.24 and 1.25, section 5e covers 1.27.0, section 5f covers 1.28 and 1.29, and the earlier sections date from v1.22.0.
+I checked the app against SPEC.md and the hackathon rules. The first version of this report is from 2026-10-30; the latest check is 2026-11-04 WIB (v1.29.13). Section 5d covers 1.24 and 1.25, section 5e covers 1.27.0, section 5f covers 1.28 to 1.29.4, section 5g covers 1.29.6 to 1.29.13, and the earlier sections date from v1.22.0.
 
 Legend: ✅ verified by a test or run · 🟡 built, verified only offline (needs a real-key or real-phone check) · ⬜ not done yet (in TODO.md) · ↔️ done differently (see DECISIONS.md).
 
@@ -165,6 +165,26 @@ Evidence names point to tests in `api/tests/` (TEST_REPORT.md has the run) or to
 | No gzip for files that are already packed (fonts, photos, PNG, audio, PDF); offline cache `tukang-shell-v17` | ✅ | `test_gzip.py`, `web/sw.js` |
 
 **Run numbers (2026-11-03, v1.29.4):** `make_test_report.py` ALL PASSED: pytest **823 passed, 0 failed, 0 skipped** (818 s, real Chromium in 18 Playwright test files + jsdom), ruff, check_keys --fake, smoke; `mypy api --strict` no issues in 141 files; `smoke_e2e.py` ALL PASSED (69 checks; 70 in 1.27 with the same script, since some checks only run when a scenario has a follow-up question, a parts image or a diagram step) on a demo-mode server; `run_eval.py` (app 1.29.4): diagnosis 9/9, step and edge-case checks 6/6, stop recall and precision 100%, injection 7/7 (mock and fake-model).
+
+## 5g. v1.29.6 to v1.29.13 features
+
+These came from playing every flow again on a 390x844 phone and a laptop in all three languages, mostly in Basa Jawa.
+
+| Feature | Status | Evidence |
+|---|---|---|
+| After "Still broken" the PDF report and the mechanic brief list the attempt in the owner's language; the cause being tried is "being tried now", not "already tried"; the link preview says "Plan 2 of 3, being tried now" | ✅ | `test_replan_report.py`, `test_brief_now.py` |
+| Causes already tried are greyed out and struck through with a red "tried" label in the PDF, like on the phone; the PDF never ends with a page holding only the last line of the disclaimer | ✅ | `test_report_tried_and_jv_words.py`, `test_report_tail.py` |
+| The red stop's "Do this now" list fits the hazard: gas, house wiring and brakes keep their own lists, a rice cooker, another appliance or a water pump gets "unplug it and let it cool, don't open the casing (220V inside), take it to a service centre" | ✅ | `test_playwright_kind_safety.py`, `11_rice_stop.png`, video 2:04 |
+| The two "Safety first" lines on the guide fit the kind of repair (motorbike, tap, pump, appliance; anything else keeps the general pair) | ✅ | `test_playwright_kind_safety.py`, `15_preflight.png` |
+| A shared guide link opened after a re-plan shows the "Plan 2 of 3" banner; after "Still broken" focus moves to that banner | ✅ | `test_playwright_guide.py`, `test_playwright_replan_stop.py` |
+| The red stop has one nearest-service button; "See the message it sends" and every other fold-out has an open/close chevron; My garage says "0/4 camera-checked" and "plan 2" | ✅ | `test_playwright_replan_stop.py`, `22_stop_handoff.png`, `14_garage_jv.png` |
+| Tools and parts each link to Tokopedia and Shopee by name on one row ("Compare prices on ..." for screen readers) | ✅ | `test_playwright_share_shop_tour.py`, `04_diagnosis.png` |
+| Share on a laptop (no share sheet) writes "Link copied:" and the link in a line under the button, or just the link when the clipboard is blocked; no alert() or prompt() | ✅ (Chromium) | `test_playwright_share_shop_tour.py` |
+| /static files send Cache-Control: fonts and ?v= URLs a year (immutable), pictures and the QR library a day, app code revalidated on every load | ✅ | `test_static_cache.py`, DECISIONS D12 |
+| Basa Jawa in one register (ngoko) across the app, the PDF and the workshop sheets; "keslametan" for safety everywhere | ✅ (word lists) / 🟡 (a native speaker has not read every screen) | `test_jv_register.py`, `test_report_tried_and_jv_words.py` |
+| Screenshots, hero GIF, thumbnail, demo video and X clip re-made on these screens; offline cache `tukang-shell-v21` | ✅ | `docs/demo/`, `web/sw.js` |
+
+**Run numbers (2026-11-04, v1.29.13, commit 6ad8f0a):** `make_test_report.py` ALL PASSED: pytest **894 passed, 0 failed, 0 skipped** (961 s, real Chromium in 21 Playwright test files + jsdom), ruff, check_keys --fake, smoke; `mypy api --strict` no issues in 150 files; `smoke_e2e.py` ALL PASSED (69 checks) on a demo-mode server; `run_eval.py` (app 1.29.13): diagnosis 9/9, stop recall and precision 100%, injection 7/7 (mock and fake-model), the same results as 1.29.4. Demo video 2:53 (173.5 s by ffprobe, 1920x1080 at 60 fps, scene times unchanged), X clip 43.5 s.
 
 ## 6. What is not verified yet
 
