@@ -2,6 +2,11 @@
 
 Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
 
+## 1.29.11 (2026-11-04)
+- Fixed: the price links under each tool and part said "🛒 Compare prices" without naming the shop, and in the two narrow columns Tokopedia and Shopee each took their own tall row. Each link is now named by its shop ("🛒 Tokopedia", "Shopee", with "Compare prices on ..." for screen readers), both sit on one row, and tools and parts stack in one column on a phone.
+- Fixed: Share on a laptop (no share sheet) popped an alert() or a prompt(). It now writes "✅ Link copied:" and the link in a line under the button, or just the link when the browser blocks the clipboard.
+- Fixed: in the 1-tap demo on a phone the tip bar at the bottom covered the "Found so far" findings as they came in. The page now scrolls just enough to keep the newest one above the bar. Offline cache v20.
+
 ## 1.29.10 (2026-11-04)
 - Fixed: a shared guide link opened after "Still broken" showed the second plan's steps with no "Plan 2 of 3" banner, so the friend or mechanic reading it could not tell the first cause had already been tried.
 - Changed: files under /static now send Cache-Control. Fonts (and any URL with ?v=) are cached for a year as immutable, pictures and the vendored QR library for a day, and app.js, style.css, the replay script and the recording are revalidated on every load (a cheap 304), so a new release shows up at once. The service worker works as before.
