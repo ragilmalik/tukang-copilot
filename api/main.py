@@ -104,6 +104,26 @@ CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';
        "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'")
 
 
+# Browser caching for /static. Nothing here has a content hash in its name, so the rule is by kind of file:
+# - a ?v= query or a font file never changes under the same URL (a new font would get a new name): a year, immutable
+# - pictures and the vendored QR library: a day
+# - app.js, style.css, replay.js, the recording, HTML: no-cache, so the browser asks again (ETag, a cheap 304) and a
+#   new release shows up at once. The service worker still keeps its own offline copy of the shell.
+LONG_CACHE = "public, max-age=31536000, immutable"
+DAY_CACHE = "public, max-age=86400"
+REVALIDATE = "no-cache"
+
+
+def static_cache_control(path: str, query: str = "") -> str:
+    """Cache-Control for one /static path (query without the "?")."""
+    p = path.lower()
+    if any(part.startswith("v=") for part in query.split("&")) or p.endswith((".woff2", ".woff", ".ttf")):
+        return LONG_CACHE
+    if p.endswith((".png", ".jpg", ".jpeg", ".webp", ".gif", ".ico", ".svg", ".pdf", ".txt")) or p.startswith("/static/vendor/"):
+        return DAY_CACHE
+    return REVALIDATE
+
+
 @app.middleware("http")
 async def security_headers(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
     """Cheap hardening: no MIME sniffing, no framing, no referrer leaks, camera and mic only for this origin."""
@@ -114,6 +134,8 @@ async def security_headers(request: Request, call_next: Callable[[Request], Awai
     resp.headers.setdefault("Permissions-Policy", "camera=(self), microphone=(self), geolocation=(self)")
     if resp.headers.get("content-type", "").startswith("text/html"):
         resp.headers.setdefault("Content-Security-Policy", CSP)
+    if request.url.path.startswith("/static/") and resp.status_code in (200, 304):
+        resp.headers.setdefault("Cache-Control", static_cache_control(request.url.path, request.url.query))
     if request.headers.get("x-forwarded-proto") == "https":  # Render and other proxies end TLS in front of us
         resp.headers.setdefault("Strict-Transport-Security", "max-age=31536000")
     return resp

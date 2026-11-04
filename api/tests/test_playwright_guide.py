@@ -88,3 +88,24 @@ def test_red_stop_guide_link_shows_the_stop_card(phone, lang):
     box = phone.inner_text("#stopBox")
     assert len(box) > 40, box
     assert errs == [] and csp == [], (errs, csp)
+
+
+@pytest.mark.parametrize("lang,start", [("en", "🔁 Plan 2 of "), ("jv", "🔁 Rencana 2 saka "), ("id", "🔁 Rencana 2 dari ")])
+def test_shared_guide_after_a_replan_says_which_plan(phone, lang, start):
+    # 1.29.10: the shared link showed the second plan's steps with no sign the first cause had been tried
+    sid = _ready_session(phone.base, lang)
+    with httpx.Client(trust_env=False, timeout=30) as c:
+        r = c.post(f"{phone.base}/api/sessions/{sid}/replan", data={"report": "still dripping"})
+        assert r.status_code == 200, r.text
+    phone.goto(f"{phone.base}/guide/{sid}")
+    phone.wait_for_selector("#result:not(.hidden)", timeout=20000)
+    phone.wait_for_function("() => !document.querySelector('#planBanner').classList.contains('hidden')", timeout=10000)
+    assert phone.inner_text("#planBanner").startswith(start)
+    assert phone.locator("#dxCauses li.tried").count() == 1
+
+
+def test_shared_guide_on_the_first_plan_has_no_banner(phone):
+    sid = _ready_session(phone.base, "en")
+    phone.goto(f"{phone.base}/guide/{sid}")
+    phone.wait_for_selector("#result:not(.hidden)", timeout=20000)
+    assert phone.is_hidden("#planBanner")

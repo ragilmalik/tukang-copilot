@@ -2,6 +2,10 @@
 
 Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
 
+## 1.29.10 (2026-11-04)
+- Fixed: a shared guide link opened after "Still broken" showed the second plan's steps with no "Plan 2 of 3" banner, so the friend or mechanic reading it could not tell the first cause had already been tried.
+- Changed: files under /static now send Cache-Control. Fonts (and any URL with ?v=) are cached for a year as immutable, pictures and the vendored QR library for a day, and app.js, style.css, the replay script and the recording are revalidated on every load (a cheap 304), so a new release shows up at once. The service worker works as before.
+
 ## 1.29.9 (2026-11-04)
 - Fixed: a red stop on a rice cooker or a water pump said "switch it off and unplug it / close the gas / stop the engine". Appliances and pumps now get their own list: unplug it and let it cool, don't open the casing (220V inside), take it to a service centre. Gas, house wiring and brakes keep their lists.
 - Fixed: "Safety first" on the guide said "switch the engine off" for a dripping tap. Motorbike, tap, pump and appliance repairs each get their own two lines; anything else keeps the old general ones.
