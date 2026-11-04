@@ -53,8 +53,14 @@ def laptop(server):  # noqa: F811
         ctx.add_init_script("delete Navigator.prototype.share; delete Navigator.prototype.canShare;")
         pg = ctx.new_page()
         pg.base = server  # type: ignore[attr-defined]
-        pg.dialogs = []  # type: ignore[attr-defined]
-        pg.on("dialog", lambda d: (pg.dialogs.append(d.message), d.dismiss()))
+        seen: list[str] = []
+        pg.dialogs = seen  # type: ignore[attr-defined]
+
+        def on_dialog(d: pw.Dialog) -> None:
+            seen.append(d.message)
+            d.dismiss()
+
+        pg.on("dialog", on_dialog)
         yield pg
         b.close()
 
