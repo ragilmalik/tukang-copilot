@@ -2,6 +2,9 @@
 
 Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
 
+## 1.29.12 (2026-11-04)
+- Changed: Basa Jawa sticks to ngoko ("kowe", "fotomu"), which most of the app already used. A few lines said "sampeyan" (the saved amount, the offline note, two agent log lines in the app and PDF, the recorded demo note) or "antosna" (the wait timer, also on the workshop sheets), so one screen could switch registers. Offline cache v21.
+
 ## 1.29.11 (2026-11-04)
 - Fixed: the price links under each tool and part said "🛒 Compare prices" without naming the shop, and in the two narrow columns Tokopedia and Shopee each took their own tall row. Each link is now named by its shop ("🛒 Tokopedia", "Shopee", with "Compare prices on ..." for screen readers), both sit on one row, and tools and parts stack in one column on a phone.
 - Fixed: Share on a laptop (no share sheet) popped an alert() or a prompt(). It now writes "✅ Link copied:" and the link in a line under the button, or just the link when the browser blocks the clipboard.

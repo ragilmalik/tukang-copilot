@@ -30,7 +30,7 @@ def test_wait_bounds():
         RepairPlan.model_validate(d)
 
 
-@pytest.mark.parametrize(("lang", "word"), [("id", "Tunggu 10 menit"), ("jv", "Antosna 10 menit"), ("en", "Wait 10 minutes")])
+@pytest.mark.parametrize(("lang", "word"), [("id", "Tunggu 10 menit"), ("jv", "Enteni 10 menit"), ("en", "Wait 10 minutes")])
 def test_workshop_sheet_mentions_wait(monkeypatch, tmp_path, lang, word):
     from api.render.report_pdf import _Doc
 

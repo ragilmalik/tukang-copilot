@@ -21,7 +21,7 @@ TXT: dict[str, dict[str, str]] = {
     "en": {"title": "Workshop Sheet", "step": "STEP", "of": "of", "look": "When it is right, the camera sees:", "warn": "CAREFUL",
            "wait": "Wait {n} minutes", "gather": "Get these ready", "done": "Done when:", "tick": "Tick when finished", "empty": "No steps"},
     "jv": {"title": "Lembar Bengkel", "step": "LANGKAH", "of": "saka", "look": "Yen wis bener, kamera ndeleng:", "warn": "ATI-ATI",
-           "wait": "Antosna {n} menit", "gather": "Cepakna dhisik", "done": "Rampung yen:", "tick": "Centhang yen wis rampung", "empty": "Ora ana langkah"},
+           "wait": "Enteni {n} menit", "gather": "Cepakna dhisik", "done": "Rampung yen:", "tick": "Centhang yen wis rampung", "empty": "Ora ana langkah"},
 }
 
 
