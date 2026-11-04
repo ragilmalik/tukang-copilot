@@ -1394,7 +1394,7 @@ function keepAboveTourBar(el) {
   const bar = $("tourBar");
   if (!tour.on || !bar || bar.classList.contains("hidden") || document.body.classList.contains("typing")) return;
   const top = bar.getBoundingClientRect().top, r = el.getBoundingClientRect();
-  if (r.bottom > top - 8) window.scrollBy({ top: Math.min(r.bottom - top + 12, r.top - 70), behavior: "auto" });
+  if (r.bottom > top - 8) window.scrollTo({ top: window.scrollY + Math.min(r.bottom - top + 12, r.top - 70), behavior: "auto" });
 }
 
 /* ---------------- progress: model per stage + elapsed time ---------------- */

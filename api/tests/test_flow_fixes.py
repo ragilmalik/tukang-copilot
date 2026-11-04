@@ -190,7 +190,8 @@ def test_workshop_done_block_gets_its_own_page_only_when_it_does_not_fit(tmp_pat
 def test_share_fallback_label_is_translated():
     from pathlib import Path
     js = (Path(__file__).resolve().parents[2] / "web" / "app.js").read_text(encoding="utf-8")
-    assert 'prompt("Link"' not in js and 'prompt(t("linkLabel"), url)' in js
+    # 1.29.11: no prompt() any more, the link shows in a line under the button with the translated label
+    assert 'prompt("Link"' not in js and "prompt(t(" not in js and 'say(t("linkLabel") + ":")' in js
     for word in ('linkLabel: "Tautan"', 'linkLabel: "Link"', 'linkLabel: "Pranala"'):
         assert word in js
 
