@@ -216,6 +216,7 @@ code.tool.code{background:var(--grn-tint);color:var(--grn-text)}
 #progress.isStop .stages li.stopped::before{background:#fff}
 #progress.isStop .stages .note,#progress.isStop .muted,#progress.isStop .stages li.skipped{color:#FFE4E1}
 #progress.isStop code.tool{background:rgba(255,255,255,.16);color:#fff}
+#progress.isStop .agList .ic,#progress.isStop .agList li.handoff .ic,#progress.isStop .agArrow{color:#fff}
 #progress.isStop .liveFind,#progress.isStop details.agent{background:rgba(0,0,0,.14);color:#fff}
 #progress.isStop .lfList li{border-color:rgba(255,255,255,.18)}
 #progress.isStop #stopAgainBtn{background:#fff;color:#7E1312;box-shadow:0 3px 0 rgba(0,0,0,.25);width:100%}
@@ -369,12 +370,15 @@ body.handsfree .nav .btn{min-height:68px;font-size:1.2em}
 #stuckText{margin:16px 0 8px;min-height:72px}
 #stuckBtn,#mechBtn{width:100%;margin:0 0 8px}
 #stuckMsg:empty{display:none}
-.handoff{margin:12px 0;padding:14px 16px;border-radius:16px;background:var(--plate);color:var(--ink);box-shadow:inset 0 0 0 2px #0F7A40}
+div.handoff{margin:12px 0;padding:14px 16px;border-radius:16px;background:var(--plate);color:var(--ink);box-shadow:inset 0 0 0 2px #0F7A40}
 .hoTitle{font:800 var(--fs-m)/1.1 var(--font-d);margin:0 0 4px}
 .hoBtns{display:flex;gap:8px;flex-wrap:wrap}
 .hoBtns .btn{flex:1 1 140px}
 .hoText{white-space:pre-wrap;overflow-wrap:anywhere;font:var(--fs-s)/1.45 var(--font);background:var(--plate-2);padding:10px;border-radius:10px;margin:6px 0 0}
 details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
+/* summary is flex, so the browser marker is gone: draw a chevron so it reads as something to open */
+details>summary::after{content:"";flex:none;width:.42em;height:.42em;margin-left:.6em;border:solid currentColor;border-width:0 2px 2px 0;transform:translateY(-.12em) rotate(45deg);opacity:.75}
+details[open]>summary::after{transform:translateY(.12em) rotate(-135deg)}
 
 /* things to do with the guide */
 .actions{display:flex;flex-direction:column;margin:14px 0;border-radius:var(--r-plate);background:var(--plate);box-shadow:var(--lift);overflow:hidden}

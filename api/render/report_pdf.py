@@ -69,19 +69,22 @@ BRIEF: dict[str, dict[str, str]] = {
            "tried": "Yang sudah dicoba", "nothing": "Belum ada: dihentikan sebelum mulai demi keselamatan.", "checks": "Cek kamera per langkah",
            "pass": "OK", "fail": "BELUM", "status": "Status", "red": "STOP keselamatan", "exhausted": "Semua penyebab aman sudah dicoba",
            "requested": "Pemilik minta bantuan mekanik", "photos": "Foto dari pemilik", "photo": "Foto", "check": "Cek langkah",
-           "fixed": "Pemilik bilang sudah jalan lagi"},
+           "fixed": "Pemilik bilang sudah jalan lagi",
+           "open": "Masih dikerjakan pemilik, belum ada hasil", "now": "Sedang dicoba sekarang"},
     "jv": {"title": "Ringkesan kanggo mekanik", "sub": "Kaca iki bisa dicithak utawa dituduhake menyang bengkel supaya ora miwiti saka nol.",
            "found": "Sing ditemokake", "issues": "Katon ing foto", "causes": "Sebab sing mungkin", "marked": "Perangan sing ditandhani",
            "tried": "Sing wis dijajal", "nothing": "Durung ana: dimandhegake sadurunge miwiti kanggo keslametan.", "checks": "Cek kamera saben langkah",
            "pass": "OK", "fail": "DURUNG", "status": "Status", "red": "MANDHEG keslametan", "exhausted": "Kabeh sebab sing aman wis dijajal",
            "requested": "Sing duwe njaluk bantuan mekanik", "photos": "Foto saka sing duwe", "photo": "Foto", "check": "Cek langkah",
-           "fixed": "Sing duwe kandha wis urip maneh"},
+           "fixed": "Sing duwe kandha wis urip maneh",
+           "open": "Isih didandani dhewe karo sing duwe, durung ana asile", "now": "Lagi dijajal saiki"},
     "en": {"title": "Mechanic brief", "sub": "Print this page or show it to the workshop so they don't start from zero.",
            "found": "What was found", "issues": "Seen in the photo", "causes": "Likely causes", "marked": "Parts marked",
            "tried": "What was tried", "nothing": "Nothing: stopped before starting, for safety.", "checks": "Camera check per step",
            "pass": "OK", "fail": "NOT YET", "status": "Status", "red": "Safety STOP", "exhausted": "Every safe cause was tried",
            "requested": "Owner asked for a mechanic", "photos": "Owner's photos", "photo": "Photo", "check": "Step check",
-           "fixed": "Owner says it works again"},
+           "fixed": "Owner says it works again",
+           "open": "The owner is still on it, no result yet", "now": "Being tried now"},
 }
 
 
@@ -215,8 +218,9 @@ def brief_lines(session: dict[str, Any], lang: str) -> list[tuple[str, str]]:
     B = BRIEF.get(lang, BRIEF["id"])
     rep, dx = session.get("object_report") or {}, session.get("diagnosis") or {}
     why = handoff.reason(session)
-    # after "It works now" the status must not say the owner asked for a mechanic
-    status = "fixed" if why == "requested" and (session.get("outcome") or {}).get("result") == "fixed" else why
+    # the status says what the owner chose: "It works now", "Took it to a mechanic", or nothing yet
+    result = (session.get("outcome") or {}).get("result")
+    status = why if why != "requested" else {"fixed": "fixed", "pro": "requested"}.get(str(result), "open")
     rows: list[tuple[str, str]] = [("m", B["sub"]), ("h", B["status"]), ("t", B[status])]
     if why == "red" and session.get("stop_reason"):
         rows.append(("t", str(session["stop_reason"])))
@@ -237,8 +241,12 @@ def brief_lines(session: dict[str, Any], lang: str) -> list[tuple[str, str]]:
     if marked:
         rows.append(("m", f"{B['marked']}: " + ", ".join(marked)))
     rows.append(("h", B["tried"]))
-    done = handoff.tried(session, why)
-    rows += [("t", f"- {x}") for x in done] or [("t", B["nothing"])]
+    done, now = handoff.progress(session, why)
+    rows += [("t", f"- {x}") for x in done]
+    if now:
+        rows.append(("t", f"- {B['now']}: {now}"))
+    if not done and not now:
+        rows.append(("t", B["nothing"]))
     for a in handoff.attempt_lines(session, lang):
         rows.append(("m", f"  {a}"))
     checks = session.get("checks") or {}
@@ -575,19 +583,57 @@ def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: 
             doc.text(f"- {line}", 21, indent=10, gap=5)
 
     rows = [r for r in build_trace(session) if r["status"] == "done"]
-    if rows:
-        doc.heading(L["hood"], 28)
-        for r in rows:
-            secs = f"  {r['ms'] / 1000:.1f}s" if (r.get("ms") or 0) >= 100 else ""
-            tool = L["code_tool"] if r["kind"] == "code" else r["tool"]  # "rules in code" follows the report's language
-            doc.text(f"- {L.get('st_' + r['stage'], r['stage'])}: {tool}{secs}", 20, color=MUTED, indent=10)
-    doc.rule()
-    doc.text(L["disclaimer"], 22, color=MUTED)
+    hood = []
+    for r in rows:
+        secs = f"  {r['ms'] / 1000:.1f}s" if (r.get("ms") or 0) >= 100 else ""
+        tool = L["code_tool"] if r["kind"] == "code" else r["tool"]  # "rules in code" follows the report's language
+        hood.append(f"- {L.get('st_' + r['stage'], r['stage'])}: {tool}{secs}")
+    _hood_and_disclaimer(doc, L, hood)
     _draw_brief(doc, session, session_dir, lang)
     pages = doc.finish()
     out.parent.mkdir(parents=True, exist_ok=True)
     pages[0].save(out, "PDF", resolution=150.0, save_all=True, append_images=pages[1:])
     return out
+
+
+def _hood_and_disclaimer(doc: _Doc, L: dict[str, str], hood: list[str]) -> None:
+    """The "under the hood" list, then the disclaimer, which never goes alone onto a page of its own.
+
+    When the whole tail does not fit on the page, the list goes in two columns if that makes it fit; otherwise
+    the last two list lines move to the next page with the disclaimer."""
+    full_w = W - 2 * M
+    disc_h = 22 + len(brand.wrap(doc.d, L["disclaimer"], "body", 22, full_w)) * 30
+    avail = H - M - 40 - doc.y
+    head_h = 14 + 28 + 10
+
+    def col_h(lines: list[str], width: float) -> int:
+        return sum(len(brand.wrap(doc.d, t, "body", 20, width)) * 28 for t in lines)
+
+    if hood and head_h + col_h(hood, full_w - 10) + disc_h > avail:
+        half = (len(hood) + 1) // 2
+        cw = (full_w - 40) // 2
+        left, right = hood[:half], hood[half:]
+        two_h = max(col_h(left, cw - 10), col_h(right, cw - 10))
+        if head_h + two_h + disc_h <= avail:
+            doc.heading(L["hood"], 28)
+            top = doc.y
+            for col, lines in enumerate((left, right)):
+                doc.y = top
+                for t in lines:
+                    for line in brand.wrap(doc.d, t, "body", 20, cw - 10):
+                        brand.draw(doc.d, (M + 10 + col * (cw + 40), doc.y), line, "body", 20, MUTED)
+                        doc.y += 28
+            doc.y = top + two_h
+            hood = []
+    if hood:
+        doc.heading(L["hood"], 28)
+        for i, t in enumerate(hood):
+            if i == max(0, len(hood) - 2):  # keep the last lines with the disclaimer
+                doc.need(col_h(hood[i:], full_w - 10) + disc_h)
+            doc.text(t, 20, color=MUTED, indent=10)
+    doc.need(disc_h)
+    doc.rule()
+    doc.text(L["disclaimer"], 22, color=MUTED)
 
 
 def _tint_under(doc: _Doc, top: int, tint: tuple[int, int, int]) -> None:

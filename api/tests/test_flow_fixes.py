@@ -138,7 +138,8 @@ def test_mechanic_brief_status_follows_it_works_now(lang, fixed, asked):
 
     sid = _ready("faucet", lang)
     before = [t for _, t in report_pdf.brief_lines(engine.load(sid), lang)]
-    assert asked in before and fixed not in before
+    # nothing chosen yet: the brief does not claim the owner asked for a mechanic
+    assert report_pdf.BRIEF[lang]["open"] in before and asked not in before and fixed not in before
     assert client.post(f"/api/sessions/{sid}/outcome", data={"result": "fixed"}, headers=owner(sid)).status_code == 200
     after = [t for _, t in report_pdf.brief_lines(engine.load(sid), lang)]
     assert fixed in after and asked not in after

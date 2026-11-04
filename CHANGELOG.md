@@ -2,6 +2,14 @@
 
 Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
 
+## 1.29.8 (2026-11-04)
+- Fixed: the Basa Jawa PDF report after a re-plan had a page holding only the last line of the disclaimer. When the end does not fit, the "under the hood" list goes in two columns, or its last lines move over with the disclaimer.
+- Fixed: after "Still broken" focus stays on the page; it now moves to the "Plan 2 of 3" banner.
+- Fixed: in the red stop, the agent log's last line took the white hand-off card style by mistake (no padding, the time white on white). Icons on the red card are white now.
+- Changed: the red stop has one nearest-service button (it uses the hand-off's workshop search), and "Message to send" became "See the message it sends" with an open/close chevron on every fold-out.
+- Changed: My garage says "0/4 camera-checked" instead of "0/4 ✓", and "plan 2" after a re-plan.
+- Fixed: the mechanic brief listed the cause being tried as already tried and said the owner asked for a mechanic before they chose anything. It now says "Being tried now" and "The owner is still on it, no result yet". Offline cache v18.
+
 ## 1.29.7 (2026-11-04)
 - Fixed: demo mode sent "ledeng" and "sink" descriptions to the motorbike scenario. They now go to the dripping tap one.
 

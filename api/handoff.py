@@ -109,6 +109,16 @@ def tried(s: dict[str, Any], why: str) -> list[str]:
     return [_clean(c.get("title"), 90) for c in causes[:upto] if c.get("title")]
 
 
+def progress(s: dict[str, Any], why: str) -> tuple[list[str], str]:
+    """For the mechanic brief: causes already tried, and the one being tried now ("" once it is over).
+
+    The current cause counts as tried when every safe cause was used up or the owner gave a result."""
+    done = tried(s, why)
+    if not done or why == "exhausted" or (s.get("outcome") or {}).get("result") in {"fixed", "pro"}:
+        return done, ""
+    return done[:-1], done[-1]
+
+
 def message(s: dict[str, Any], lang: str, guide_url: str, pdf_url: str | None) -> str:
     """Short plain-text summary for WhatsApp (fits one phone screen)."""
     t = L.get(lang, L["id"])
