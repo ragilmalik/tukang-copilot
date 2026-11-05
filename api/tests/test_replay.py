@@ -16,24 +16,27 @@ c = TestClient(app)
 
 
 def test_recording_is_labelled_and_has_every_language():
-    assert DATA["kind"] == "recorded-demo" and "RECORDED" in DATA["note"] and "Not a live" in DATA["note"]
+    assert DATA["kind"] == "recorded-demo" and DATA["source"] == "meta-api-live"
+    assert "RECORDED live run" in DATA["note"] and "real Meta Model API" in DATA["note"] and DATA["recorded_at"]
     assert set(DATA["langs"]) == {"id", "jv", "en"} and DATA["sample"] == "motor"
     for lang, L in DATA["langs"].items():
         assert L["sid"] == f"replay-motor-{lang}"
         assert L["ask"]["snaps"][-1]["status"] == "needs_answer" and L["ask"]["session"]["question"]
         assert len(L["ask"]["snaps"]) >= 3                                 # it streams, stage by stage
-        assert L["ready"]["session"]["status"] == "ready" and L["ready"]["session"]["mode"] == "mock"
+        assert L["ready"]["session"]["status"] == "ready" and L["ready"]["session"]["mode"] == "live"
+        assert not L["ready"]["session"].get("fallback")                     # no stage fell back to canned answers
         assert L["ready"]["session"]["lang"] == lang
 
 
-def test_every_step_of_both_plans_has_a_pass_and_a_fail():
+def test_every_step_of_both_plans_has_both_sample_photos_checked():
     for L in DATA["langs"].values():
         steps0 = [st["n"] for st in L["ready"]["session"]["plan"]["steps"]]
         steps1 = [st["n"] for st in L["replan"]["set"]["plan"]["steps"]]
         for key, steps in (("0", steps0), ("1", steps1)):
             assert sorted(int(n) for n in L["checks"][key]) == sorted(steps)
-            for rec in L["checks"][key].values():
-                assert rec["ok"]["response"]["passed"] is True and rec["dark"]["response"]["passed"] is False
+            for rec in L["checks"][key].values():  # real verdicts: the after-photo fits some steps, never the dark one
+                assert isinstance(rec["ok"]["response"].get("passed"), bool) and rec["dark"]["response"]["passed"] is False
+        assert any(rec["ok"]["response"]["passed"] for plan in L["checks"].values() for rec in plan.values())
         assert L["replan"]["set"]["cause_index"] == 1
         assert set(L["outcome"]) == {"fixed", "pro"}
 
@@ -99,3 +102,7 @@ def test_replay_strings_in_all_three_languages():
         assert key in keys["en"], key
     assert all(keys["jv"][k] != keys["id"][k] for k in keys["id"])
     assert "Recorded demo" in keys["en"]["rpBadge"] and "rekaman" in keys["id"]["rpBadge"]
+    day = DATA["recorded_at"][:10]  # the badge names the day the recording was made
+    from datetime import date
+    label = f"{date.fromisoformat(day).day} Nov {day[:4]}"
+    assert all(label in keys[lang]["rpBadge"] for lang in ("id", "jv", "en")), label

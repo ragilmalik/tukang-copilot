@@ -10,6 +10,7 @@ import re
 import secrets
 import shutil
 import tempfile
+import time
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -22,12 +23,14 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import __version__, errors, guard, handoff, impact, shop
+from . import __version__, errors, guard, handoff, impact, logs, shop
 from .trace import build_trace
 from .pipeline import engine, media, mock, photos, track
 from .settings import ROOT, settings
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+logs.setup(os.getenv("LOG_FORMAT", "").strip().lower())
+access_log = logging.getLogger("tukang.http")
+REQUEST_ID = re.compile(r"^[A-Za-z0-9._-]{8,64}$")
 WEB = ROOT / "web"
 SAMPLES = ROOT / "samples"
 if not all((SAMPLES / f"{k}.jpg").exists() for k in ("motor", "pump", "faucet", "rice", "tire")):
@@ -126,8 +129,23 @@ def static_cache_control(path: str, query: str = "") -> str:
 
 @app.middleware("http")
 async def security_headers(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
-    """Cheap hardening: no MIME sniffing, no framing, no referrer leaks, camera and mic only for this origin."""
-    resp = await call_next(request)
+    """Cheap hardening: no MIME sniffing, no framing, no referrer leaks, camera and mic only for this origin.
+    Also gives every request an id (X-Request-ID, taken from the proxy when it looks sane) and logs one access line
+    with method, path (no query string), status and time. Static files are not logged."""
+    rid = request.headers.get("x-request-id", "")
+    if not REQUEST_ID.match(rid):
+        rid = secrets.token_hex(8)
+    t0 = time.perf_counter()
+    try:
+        resp = await call_next(request)
+    except Exception:
+        access_log.exception("request failed", extra={"request_id": rid, "method": request.method, "path": request.url.path})
+        raise
+    ms = int((time.perf_counter() - t0) * 1000)
+    resp.headers["X-Request-ID"] = rid
+    if not request.url.path.startswith("/static/"):
+        access_log.info("%s %s %s %dms id=%s", request.method, request.url.path, resp.status_code, ms, rid,
+                        extra={"request_id": rid, "method": request.method, "path": request.url.path, "status": resp.status_code, "ms": ms})
     resp.headers.setdefault("X-Content-Type-Options", "nosniff")
     resp.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
     resp.headers.setdefault("Referrer-Policy", "no-referrer")

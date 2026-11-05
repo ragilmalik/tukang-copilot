@@ -8,8 +8,10 @@
 from __future__ import annotations
 
 import json
+import time
 from typing import Any, Iterator
 
+import httpx
 import pytest
 
 from api import meta_client
@@ -76,7 +78,7 @@ def _sse(content: str, usage: dict[str, int]) -> list[str]:
 @pytest.fixture
 def no_sleep(monkeypatch: pytest.MonkeyPatch) -> list[float]:
     waits: list[float] = []
-    monkeypatch.setattr(meta_client.time, "sleep", waits.append)
+    monkeypatch.setattr(time, "sleep", waits.append)
     monkeypatch.setattr(settings, "meta_api_key", "test-key-not-real")
     return waits
 
@@ -88,7 +90,7 @@ def test_stream_chat_joins_deltas_and_keeps_usage(monkeypatch: pytest.MonkeyPatc
         sent.append(kw["json"])
         return _Resp(200, _sse('{"passed": true, "observation": "ok", "correction": ""}', {"prompt_tokens": 10, "completion_tokens": 5}))
 
-    monkeypatch.setattr(meta_client.httpx, "stream", fake)
+    monkeypatch.setattr(httpx, "stream", fake)
     out = meta_client.chat_json([{"role": "user", "content": "x"}], json_schema(StepCheck), "step_check")
     assert out == {"passed": True, "observation": "ok", "correction": ""}
     assert sent[0]["stream"] is True and sent[0]["stream_options"] == {"include_usage": True}
@@ -97,13 +99,13 @@ def test_stream_chat_joins_deltas_and_keeps_usage(monkeypatch: pytest.MonkeyPatc
 def test_stream_chat_retries_a_504_then_succeeds(monkeypatch: pytest.MonkeyPatch, no_sleep: list[float]) -> None:
     answers = [_Resp(504, [], "application/json", "upstream request deadline exceeded"),
                _Resp(200, _sse('{"ok": true, "problems": [], "fix_prompt": ""}', {"prompt_tokens": 1, "completion_tokens": 1}))]
-    monkeypatch.setattr(meta_client.httpx, "stream", lambda *a, **k: answers.pop(0))
+    monkeypatch.setattr(httpx, "stream", lambda *a, **k: answers.pop(0))
     assert meta_client.chat_json([], json_schema(DiagramReview), "diagram_review")["ok"] is True
     assert no_sleep == [2]
 
 
 def test_stream_chat_gives_up_after_retries(monkeypatch: pytest.MonkeyPatch, no_sleep: list[float]) -> None:
-    monkeypatch.setattr(meta_client.httpx, "stream", lambda *a, **k: _Resp(504, [], "application/json", "deadline"))
+    monkeypatch.setattr(httpx, "stream", lambda *a, **k: _Resp(504, [], "application/json", "deadline"))
     with pytest.raises(meta_client.MetaAPIError, match="504"):
         meta_client.chat_json([], json_schema(DiagramReview), "diagram_review")
     assert no_sleep == [2, 4, 8]
@@ -116,7 +118,7 @@ def test_stream_chat_does_not_retry_a_400(monkeypatch: pytest.MonkeyPatch, no_sl
         calls.append(1)
         return _Resp(400, [], "application/json", '{"error": "bad schema"}')
 
-    monkeypatch.setattr(meta_client.httpx, "stream", fake)
+    monkeypatch.setattr(httpx, "stream", fake)
     with pytest.raises(meta_client.MetaAPIError, match="400"):
         meta_client.chat_json([], json_schema(DiagramReview), "diagram_review")
     assert calls == [1] and no_sleep == []
@@ -124,7 +126,7 @@ def test_stream_chat_does_not_retry_a_400(monkeypatch: pytest.MonkeyPatch, no_sl
 
 def test_stream_error_event_is_an_error(monkeypatch: pytest.MonkeyPatch, no_sleep: list[float]) -> None:
     lines = ["data: " + json.dumps({"error": {"message": "overloaded"}})]
-    monkeypatch.setattr(meta_client.httpx, "stream", lambda *a, **k: _Resp(200, lines))
+    monkeypatch.setattr(httpx, "stream", lambda *a, **k: _Resp(200, lines))
     with pytest.raises(meta_client.MetaAPIError, match="overloaded"):
         meta_client.chat_json([], json_schema(DiagramReview), "diagram_review")
 
@@ -132,5 +134,5 @@ def test_stream_error_event_is_an_error(monkeypatch: pytest.MonkeyPatch, no_slee
 def test_plain_json_answer_is_still_read(monkeypatch: pytest.MonkeyPatch, no_sleep: list[float]) -> None:
     body = json.dumps({"choices": [{"message": {"content": '{"ok": false, "problems": ["x"], "fix_prompt": "y"}'}}],
                        "usage": {"prompt_tokens": 1, "completion_tokens": 1}})
-    monkeypatch.setattr(meta_client.httpx, "stream", lambda *a, **k: _Resp(200, [], "application/json", body))
+    monkeypatch.setattr(httpx, "stream", lambda *a, **k: _Resp(200, [], "application/json", body))
     assert meta_client.chat_json([], json_schema(DiagramReview), "diagram_review")["problems"] == ["x"]

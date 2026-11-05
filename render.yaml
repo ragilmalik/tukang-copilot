@@ -59,8 +59,8 @@ services:
       - key: TRACK_MIN_INTERVAL_S
         value: "0.6"
       # ---- behaviour ----
-      - key: DEMO_FALLBACK              # 1 = a live call that still fails after retries uses the labelled demo answer
-        value: "1"                      # for that stage (scripts/deploy_check.py flags any session that needed it)
+      - key: DEMO_FALLBACK              # 0 = a live call that still fails after retries shows a clear error and a retry
+        value: "0"                      # button; 1 = use the labelled canned answer for that stage instead
       - key: ILLUSTRATE
         value: "1"
       - key: DIAGRAM_CHECKER

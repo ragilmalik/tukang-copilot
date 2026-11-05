@@ -43,13 +43,29 @@ def _headers(json_body: bool = True) -> dict[str, str]:
     return h
 
 
+MAX_RETRY_AFTER_S = 30.0
+
+
+def backoff_s(attempt: int, r: httpx.Response | None = None) -> float:
+    """Seconds to wait before retry number `attempt` (0-based): 2, 4, 8 s, or the server's Retry-After on a 429/503
+    when it gives one in seconds (capped at 30 s, so a request never hangs on a bad header)."""
+    if r is not None and r.status_code in (429, 503):
+        try:
+            ra = float(r.headers.get("retry-after", ""))
+            if ra >= 0:
+                return min(ra, MAX_RETRY_AFTER_S)
+        except ValueError:
+            pass
+    return float(2 ** attempt * 2)
+
+
 def _post(url: str, *, retries: int = 3, timeout: float = 300.0, **kw: Any) -> httpx.Response:
     last: Exception | None = None
     for attempt in range(retries + 1):
         try:
             r = httpx.post(url, timeout=timeout, **kw)
             if r.status_code in RETRY_STATUS and attempt < retries:
-                wait = 2 ** attempt * 2
+                wait = backoff_s(attempt, r)
                 log.warning("HTTP %s from %s, retry in %ss", r.status_code, url, wait)
                 time.sleep(wait)
                 continue
@@ -166,8 +182,9 @@ def _stream_chat(url: str, body: dict[str, Any], retries: int = 3) -> tuple[str,
             with httpx.stream("POST", url, headers=headers, json=body, timeout=600) as r:
                 if r.status_code in RETRY_STATUS and attempt < retries:
                     r.read()
-                    log.warning("HTTP %s from %s, retry in %ss", r.status_code, url, 2 ** attempt * 2)
-                    time.sleep(2 ** attempt * 2)
+                    wait = backoff_s(attempt, r)
+                    log.warning("HTTP %s from %s, retry in %ss", r.status_code, url, wait)
+                    time.sleep(wait)
                     continue
                 if r.status_code >= 400:
                     r.read()

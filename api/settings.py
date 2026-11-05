@@ -78,7 +78,7 @@ class Settings:
     # and label it in the UI and PDF ("demo answer, live API unavailable") instead of failing the repair.
     # Download the impact trial log from a deployed server (GET /api/impact/outcomes.jsonl). Unset = endpoint off.
     impact_token: str = field(default_factory=lambda: _env("IMPACT_TOKEN"))
-    demo_fallback: bool = field(default_factory=lambda: _flag("DEMO_FALLBACK", default="1"))
+    demo_fallback: bool = field(default_factory=lambda: _flag("DEMO_FALLBACK", default="0"))
     # Live guide (camera overlay): SAM 3.1 on ~1 frame per second, capped per repair to keep cost bounded.
     max_track_frames: int = field(default_factory=lambda: int(_env("MAX_TRACK_FRAMES", default="120")))
     track_min_interval_s: float = field(default_factory=lambda: float(_env("TRACK_MIN_INTERVAL_S", default="0.6")))
