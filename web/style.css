@@ -246,6 +246,7 @@ code.tool.code{background:var(--grn-tint);color:var(--grn-text)}
 .level{display:inline-block;border-radius:6px;padding:3px 8px 2px;font:800 var(--fs-s)/1.1 var(--font-d);letter-spacing:.03em;color:#fff;vertical-align:2px}
 .level.green{background:var(--grn)}.level.amber{background:var(--yel);color:#1A1D21}.level.red{background:var(--red)}
 #dxObject{font-size:var(--fs-xl);margin:2px 0 8px}
+#dxObject::first-letter{text-transform:uppercase}  /* live answers often start lower case */
 #dxSummary{font-size:var(--fs-b);margin:0 0 14px}
 #partsWrap{margin:0 -20px 16px;background:var(--dark);padding:0 0 14px}
 .partsImg{display:block;width:100%;height:auto}

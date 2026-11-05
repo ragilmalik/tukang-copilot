@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-os.environ.update({"MOCK": "1", "MOCK_PACE": "0", "NARRATION_VOICE": "0", "DATA_DIR": tempfile.mkdtemp(prefix="tc-og-")})
+os.environ.update({"OFFLINE": "1", "MOCK_PACE": "0", "NARRATION_VOICE": "0", "DATA_DIR": tempfile.mkdtemp(prefix="tc-og-")})
 
 from PIL import Image  # noqa: E402
 

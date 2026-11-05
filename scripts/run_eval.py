@@ -5,7 +5,7 @@
     python scripts/run_eval.py --out -         # print the report instead of writing it
 
 Offline modes, both FREE, neither is a real model:
-  mock  the app's built-in demo answers (MOCK=1), no HTTP at all.
+  mock  the app's built-in offline sample answers (OFFLINE=1), no HTTP at all.
   fake  the REAL live code path (meta_client over HTTP, multipart, SSE, SAM masks, cost meter) against
         api/tests/doubles/fake_meta.py, a stand-in Meta server that answers with the same recorded fixtures.
 So the diagnosis numbers test the pipeline and its code gates, NOT Muse Spark's accuracy. The safety and injection

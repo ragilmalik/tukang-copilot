@@ -7,7 +7,7 @@ It prints one PASS / FAIL / SKIP line per Meta model the app uses, with a plain-
 and a separate line for the optional open-weights model (Muse Spark Open on Baseten).
 
 Exit codes: 0 = everything the app needs passed (LIVE mode will work), 1 = something failed,
-2 = no MODEL_API_KEY found at all (the app will run in free DEMO mode).
+2 = no MODEL_API_KEY found at all (the app will run in the free offline sample mode).
 
 See what it looks like without a key (built-in fake Meta server, no cost):
 
@@ -145,13 +145,13 @@ def main() -> int:
 
     print(f"Meta API base: {settings.meta_api_base}")
     if not settings.meta_api_key:
-        print(f"{RED}No MODEL_API_KEY found.{END} The app will run in free DEMO mode.\n"
+        print(f"{RED}No MODEL_API_KEY found.{END} The app will run in the free offline sample mode.\n"
               "To go live: run  python scripts/set_keys.py  and paste your key from dev.meta.ai > API keys.")
         return 2
     print(f"Key: ...{settings.meta_api_key[-4:]}  (only the last 4 characters are shown)")
     if settings.mock:
-        print(f"{YELLOW}Note:{END} MOCK=1 is set, so the app stays in DEMO mode even if the key works. "
-              "set_keys.py sets MOCK=0 for you.")
+        print(f"{YELLOW}Note:{END} OFFLINE=1 (or the old MOCK=1) is set, so the app stays in offline sample mode even if the key works. "
+              "set_keys.py sets OFFLINE=0 for you.")
     print()
 
     needed = {settings.vision_model: "look + diagnose + plan + verify", settings.reason_model: "diagnose + plan",

@@ -7,7 +7,7 @@ Run it once, right after `python scripts/set_keys.py` says ALL GOOD:
     python scripts/first_live_run.py --fake           # rehearsal against the built-in stand-in Meta server (free)
 
 What it does, in order:
-  1. Checks a Meta key is set (it never prints the key or any part of it) and that demo mode is off.
+  1. Checks a Meta key is set (it never prints the key or any part of it) and that offline sample mode is off.
   2. Asks Meta which models the key can use (free) and says which ones the app needs are missing.
   3. Runs ONE sample repair through the whole pipeline (look, SAM 3.1 outline, diagnose, plan, safety check,
      Muse Image diagram, voice), answers the follow-up question if the AI asks one, and checks one step photo.
@@ -15,7 +15,7 @@ What it does, in order:
   4. Writes docs/FIRST_LIVE_RUN.md: what the AI said, how long each stage took, and what it cost.
 
 Cost: one repair is a few US cents; the app's per-repair cap (MAX_COST_USD, default $0.50) still applies.
-Exit codes: 0 = it worked, 1 = the run failed (the message says what to do), 2 = no key / demo mode is on.
+Exit codes: 0 = it worked, 1 = the run failed (the message says what to do), 2 = no key / offline sample mode is on.
 """
 from __future__ import annotations
 
@@ -62,7 +62,7 @@ def preflight() -> int:
         say("No Meta key found. Run this first:  python scripts/set_keys.py   (paste the key, press Enter)")
         return 2
     if settings.mock:
-        say("MOCK=1 is set, so the app is in free demo mode. Remove MOCK=1 from .env (set_keys.py does this) and run again.")
+        say("OFFLINE=1 (or MOCK=1) is set, so the app is in the free offline sample mode. Set OFFLINE=0 in .env (set_keys.py does this) and run again.")
         return 2
     say(f"Meta key: found (not shown). Server: {_host(settings.meta_api_base)}")
     return 0

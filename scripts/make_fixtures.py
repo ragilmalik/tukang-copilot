@@ -1,4 +1,4 @@
-"""Label the sample photos for demo mode and the tests: samples/*.jpg (what "Try a sample" and the 1-tap demo
+"""Label the sample photos for offline sample mode and the tests: samples/*.jpg (what "Try a sample" and the 1-tap demo
 send) and api/tests/fixtures/sample_*.jpg (spec §8 cases) plus manifest.json.
 
 The photos are AI-generated (an image model, prompted for a phone shot of each broken thing in an Indonesian

@@ -137,7 +137,7 @@ def _server() -> tuple[str, Any]:
     # Live by default: every answer in the screenshots and the video comes from the real Meta Model API (needs the key).
     # DEMO_ASSETS_OFFLINE=1 runs the same flow on the offline canned answers, only for trying the script for free.
     if os.environ.get("DEMO_ASSETS_OFFLINE") == "1":
-        os.environ["MOCK"] = "1"
+        os.environ["OFFLINE"] = "1"
     os.environ.setdefault("NARRATION_VOICE", "0")
     os.environ.setdefault("WA_SIM", "1")  # the /wa simulator answers live too
     os.environ["NO_PROXY"] = "127.0.0.1,localhost"

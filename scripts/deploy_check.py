@@ -11,7 +11,7 @@ home screen), security headers (the camera needs `camera=(self)`), a PDF report,
 scripts/smoke_e2e.py run (all five demo scenarios). In LIVE mode any session whose `fallback` list is
 non-empty is a FAIL: DEMO_FALLBACK (on by default) would otherwise hide a bad key behind demo answers.
 
-Spend: in DEMO mode everything is free. In LIVE mode every repair calls real Meta models, so the PDF check
+Spend: in offline sample mode everything is free. In LIVE mode every repair calls real Meta models, so the PDF check
 and the full smoke only run with --live (about 5 repairs, roughly $0.10 to $0.50 in total, each repair is
 capped by MAX_COST_PER_SESSION_USD).
 """
@@ -118,12 +118,12 @@ def main() -> int:
             line("PASS", "every stage names its Meta model: " + ", ".join(sorted({str(v).split(' ')[0] for v in models.values()})))
         mode = h.get("mode")
         if mode == "live":
-            line("PASS", "LIVE mode: real Meta models answer (the key is set and MOCK=0)")
+            line("PASS", "LIVE mode: real Meta models answer (the key is set and OFFLINE=0)")
         elif h.get("meta_api_key"):
-            line("WARN", "DEMO mode although a key is set (MOCK=1)",
-                 "Render > your service > Environment: set MOCK to 0, Save. Leave it at 1 if you want the free demo on purpose.")
+            line("WARN", "Offline sample mode although a key is set (OFFLINE=1)",
+                 "Render > your service > Environment: set OFFLINE to 0, Save. Leave it at 1 if you want the free offline samples on purpose.")
         else:
-            line("WARN", "DEMO mode: no MODEL_API_KEY on the server (free recorded answers)",
+            line("WARN", "Offline sample mode: no MODEL_API_KEY on the server (free pre-written answers)",
                  "Render > your service > Environment > add MODEL_API_KEY with your dev.meta.ai key, Save (it redeploys by itself).")
         if mode == "live" and h.get("demo_fallback"):
             line("PASS", "demo fallback ON: if a live call fails the repair still finishes on a labelled demo answer "

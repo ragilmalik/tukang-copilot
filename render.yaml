@@ -36,7 +36,7 @@ services:
       - key: WA_APP_SECRET              # app secret, checks X-Hub-Signature-256 on every webhook POST (secret)
         sync: false
       # ---- mode ----
-      - key: MOCK                       # 1 = demo answers only, no Meta spend (instant fallback if the live API misbehaves)
+      - key: OFFLINE                    # 1 = offline sample answers only, no Meta spend (switch if the live API misbehaves)
         value: "0"
       - key: USE_OPEN_WEIGHTS           # 1 = diagnosis + plan on Muse Spark Open via Baseten (needs BASETEN_API_KEY)
         value: "0"

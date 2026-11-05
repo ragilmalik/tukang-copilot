@@ -5,7 +5,7 @@
     echo "$KEY" | python scripts/set_keys.py --stdin   # non-interactive (CI, scripts); first line = Meta key, optional second = Baseten
 
 It asks for your Meta Model API key (typing is hidden), optionally your Baseten key, writes them into the
-.env file next to app.py (creating it from .env.example), turns demo mode off, and runs
+.env file next to app.py (creating it from .env.example), turns offline sample mode off, and runs
 scripts/check_keys.py so you see PASS/FAIL for every Meta model straight away.
 On Render/Vercel, put the same names (MODEL_API_KEY, BASETEN_API_KEY, USE_OPEN_WEIGHTS) in the
 service's Environment settings instead; nothing else changes.
@@ -55,14 +55,15 @@ def main(argv: list[str] | None = None) -> int:
         shutil.copy(EXAMPLE, ENV) if EXAMPLE.exists() else ENV.write_text("")
     text = ENV.read_text(encoding="utf-8")
     text = set_var(text, "MODEL_API_KEY", key)
-    text = set_var(text, "MOCK", "0")
+    text = set_var(text, "OFFLINE", "0")
+    text = set_var(text, "MOCK", "0")  # old name, so an older .env cannot keep the app offline
     text = set_var(text, "DEMO_MODE", "0")
     bt = _ask("Optional: Baseten API key for open weights (Enter to skip): ", piped)
     if bt:
         text = set_var(text, "BASETEN_API_KEY", bt)
         text = set_var(text, "USE_OPEN_WEIGHTS", "1")
     ENV.write_text(text, encoding="utf-8")
-    print(f"Saved to {ENV.name} (demo mode is now off). Checking the keys now...\n", flush=True)
+    print(f"Saved to {ENV.name} (offline sample mode is now off). Checking the keys now...\n", flush=True)
     return subprocess.call(check, cwd=ROOT)
 
 

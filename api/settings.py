@@ -55,7 +55,7 @@ class Settings:
     open_model: str = field(default_factory=lambda: _env("OPEN_MODEL", default="meta-models/muse-spark-open"))
 
     # Behaviour
-    mock: bool = field(default_factory=lambda: _flag("MOCK", "DEMO_MODE"))
+    mock: bool = field(default_factory=lambda: _flag("OFFLINE", "MOCK", "DEMO_MODE"))  # OFFLINE=1: offline sample mode
     demo_mode: bool = field(default_factory=lambda: _flag("DEMO_MODE"))
     # Offline sample mode only: canned answers arrive in milliseconds, so each finished stage is held this long on screen so
     # a viewer can watch the object report, SAM masks and diagnosis stream in. Never applied to live Meta calls,
@@ -98,7 +98,8 @@ class Settings:
     # Storage and web
     data_dir: Path = field(default_factory=lambda: Path(_env("DATA_DIR", default=str(ROOT / "data"))))
     public_base_url: str = field(default_factory=lambda: _env("PUBLIC_BASE_URL").rstrip("/"))
-    cors_origins: str = field(default_factory=lambda: _env("CORS_ORIGINS", default="*"))
+    # Empty = same-origin only (the web app and the API share one host). A comma list allows those origins.
+    cors_origins: str = field(default_factory=lambda: _env("CORS_ORIGINS", default=""))
 
     @property
     def offline(self) -> bool:

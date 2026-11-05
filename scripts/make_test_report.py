@@ -48,7 +48,7 @@ def main() -> int:
     # 2. tests
     xml = Path(tempfile.mkdtemp()) / "junit.xml"
     rc_t, out_t, t_t = run([sys.executable, "-m", "pytest", "api/tests", "-q", "-p", "no:warnings", f"--junitxml={xml}"],
-                           env=ENV | {"MOCK": "1", "NARRATION_VOICE": "0"})
+                           env=ENV | {"OFFLINE": "1", "NARRATION_VOICE": "0"})
     ok &= rc_t == 0
     suites: dict[str, list[tuple[str, str, float]]] = {}
     if xml.exists():
@@ -68,7 +68,7 @@ def main() -> int:
     s = socket.socket(); s.bind(("127.0.0.1", 0)); port = s.getsockname()[1]; s.close()
     data = tempfile.mkdtemp()
     srv = subprocess.Popen([sys.executable, "-m", "uvicorn", "api.main:app", "--port", str(port)], cwd=ROOT,
-                           env=ENV | {"MOCK": "1", "NARRATION_VOICE": "0", "DATA_DIR": data}, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                           env=ENV | {"OFFLINE": "1", "NARRATION_VOICE": "0", "DATA_DIR": data}, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
         time.sleep(4)
         rc_s, out_s, t_s = run([sys.executable, "scripts/smoke_e2e.py", f"http://127.0.0.1:{port}"], timeout=180)

@@ -99,7 +99,9 @@ class SkipGzipForPacked:
 
 
 app.add_middleware(SkipGzipForPacked)  # added after GZip, so it runs first
-app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in settings.cors_origins.split(",")], allow_methods=["*"], allow_headers=["*"])
+_cors = [o.strip() for o in settings.cors_origins.split(",") if o.strip()]
+if _cors:  # off by default: the phone app is served from the same host, so no other site needs to call the API
+    app.add_middleware(CORSMiddleware, allow_origins=_cors, allow_methods=["GET", "POST", "DELETE"], allow_headers=["Content-Type", "X-Owner-Token"])
 # Pages only load our own files. Inline style attributes stay allowed (the bars and the icon sprite use them);
 # inline scripts do not, so an injected <script> or onclick= never runs. Shop and WhatsApp links are plain navigation.
 CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; "
