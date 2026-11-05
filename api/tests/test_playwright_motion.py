@@ -12,6 +12,19 @@ COUNT_VT = """() => { const real = document.startViewTransition && document.star
   window.__vtCalls = 0;
   if (real) document.startViewTransition = (cb) => { window.__vtCalls++; return real(cb); }; }"""
 
+# Keeps every Animation that element.animate() creates, so a test can look at the step slide after it has finished.
+# document.getAnimations() drops an animation once it ends (the slide lasts 270 ms), and on a busy machine the next
+# Playwright call can come later than that: asserting on getAnimations() right after a click was a race.
+KEEP_ANIMS = """() => { const real = Element.prototype.animate; window.__anims = [];
+  Element.prototype.animate = function (...a) { const an = real.apply(this, a); window.__anims.push(an); return an; }; }"""
+
+# Stretches the screen transition to a minute, so it is still running when the test taps (only the tap ends it).
+# A fixed 40 ms wait before the tap only worked while the 200 ms transition had not finished yet.
+SLOW_VT = """() => { const st = document.createElement('style'); st.id = 'slowVt';
+  st.textContent = '::view-transition-group(root),::view-transition-old(root),::view-transition-new(root)'
+    + '{animation-duration:60s!important}';
+  document.head.appendChild(st); }"""
+
 
 @pytest.fixture()
 def browser():
@@ -61,7 +74,7 @@ def test_screens_change_through_a_view_transition(browser, server):  # noqa: F81
     assert pg.evaluate("window.__vtCalls") == 2  # progress -> result
     # the new screen starts at its top with focus on its heading, for keyboard and screen-reader users
     pg.wait_for_function("() => document.activeElement && document.activeElement.id === 'dxObject'", timeout=5000)
-    assert pg.evaluate("scrollY") == 0
+    pg.wait_for_function("() => scrollY === 0", timeout=5000)  # toTop() runs again on the next frame
     assert not pg.errors, pg.errors
 
 
@@ -79,12 +92,17 @@ def test_reduced_motion_turns_transitions_and_step_slides_off(browser, server): 
 def test_next_slides_the_step_in_and_announces_it(browser, server):  # noqa: F811
     pg = _page(browser)
     _to_steps(pg, server)
+    pg.evaluate(KEEP_ANIMS)
     pg.click("#nextBtn")
     assert pg.inner_text("#stepTitle").startswith("2 /")  # the DOM changes at once, the slide is only paint
-    assert pg.evaluate("document.getAnimations().length") >= 1
+    # the head, picture and text each got a slide from the right (Next goes forward), however late this call comes
+    slides = pg.evaluate("""() => window.__anims.map((a) => { const k = a.effect.getKeyframes();
+      return { target: a.effect.target.id || a.effect.target.className, from: k[0].transform, ms: a.effect.getTiming().duration }; })""")
+    assert len(slides) >= 2, slides
+    assert all(x["from"] == "translateX(22px)" and x["ms"] == 210 for x in slides), slides
     status = pg.inner_text("#stepStatus")
     assert status.startswith("Step 2 of") and len(status) > 15, status
-    pg.wait_for_function("() => document.getAnimations().every((a) => a.playState !== 'running')", timeout=3000)
+    pg.wait_for_function("() => window.__anims.every((a) => a.playState === 'finished')", timeout=5000)
 
 
 def test_a_tap_during_a_screen_transition_still_reaches_its_button(browser, server):  # noqa: F811
@@ -94,11 +112,13 @@ def test_a_tap_during_a_screen_transition_still_reaches_its_button(browser, serv
     pg.evaluate("() => document.getElementById('cats').scrollIntoView({block: 'center'})")
     chip = '#cats .chip[data-cat="pump"]'
     box = pg.locator(chip).bounding_box()
+    pg.evaluate(SLOW_VT)
     pg.evaluate("() => swapView(() => {}, 'forward')")
-    pg.wait_for_timeout(40)
-    assert pg.evaluate("() => document.documentElement.matches(':active-view-transition')")
+    pg.wait_for_function("() => document.documentElement.matches(':active-view-transition')", timeout=5000)
     pg.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
-    pg.wait_for_function(f"() => document.querySelector('{chip}').getAttribute('aria-pressed') === 'true'", timeout=3000)
+    pg.wait_for_function(f"() => document.querySelector('{chip}').getAttribute('aria-pressed') === 'true'", timeout=5000)
+    # the tap itself ended the minute-long transition (finishMotion skips it), it did not run out on its own
+    pg.wait_for_function("() => !document.documentElement.matches(':active-view-transition')", timeout=5000)
 
 
 def test_double_tap_on_the_demo_starts_one_repair_and_shows_it_is_working(browser, server):  # noqa: F811

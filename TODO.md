@@ -2,6 +2,14 @@
 
 The entry deadline was Thu Nov 5, 2026, 09:00 WIB (Nov 4, 9 PM ET). Code is done; what is left is media, final numbers and the steps only I can do with my accounts.
 
+## 1.31.1 media and docs (6 Nov)
+- [x] A. Flaky test_playwright_motion fixed (deterministic waits, 6 clean runs)
+- [ ] B. Screenshots re-shot on the 1.31.0 UI from recorded live answers (1-tap demo recording + recorded live sessions); only the live camera guide calls SAM 3.1 live
+- [ ] C. Main video re-captured and rendered (under 3:00, 1080p60, captions, loudness and silence checked)
+- [ ] D. Vertical X clip, hero GIF, thumbnail (og image and demo thumb only if stale)
+- [ ] E. Docs: every placeholder filled with measured numbers, stale counts and wording fixed, one-pager and guide bundle rebuilt
+- [ ] F. Final full run (ruff, mypy, all tests, jsdom/axe, smoke, static build, replay check), numbers in the docs, push
+
 ## 1.31.0 UI pass (6 Nov)
 - [x] Screen changes through a View Transition (fallback: instant), skipped by the first tap or key, the tap still lands, off under reduced motion
 - [x] Step changes slide in (Web Animations), stay synchronous, are announced to screen readers and bring the card up under the header
@@ -19,7 +27,7 @@ The entry deadline was Thu Nov 5, 2026, 09:00 WIB (Nov 4, 9 PM ET). Code is done
 - [x] New tests: test_playwright_layout.py, test_playwright_motion.py, test_ui_motion.py
 - [x] Full checks: ruff clean, mypy strict 165 files, 853 non-browser + 145 Chromium tests passed (0 failed), jsdom and axe pass, offline smoke ALL PASSED (70 checks), static build and --check OK, replay fixture up to date
 - [x] Before/after screenshots reviewed (phone light/dark, 360, 430 Basa Jawa dark, laptop)
-- [ ] Watch test_playwright_motion: failed once in 4 runs on 6 Nov, passed 3 times since; find the flaky wait
+- [x] Watch test_playwright_motion: failed once in 4 runs on 6 Nov. The tap-during-a-transition test waited a fixed 40 ms and then expected the 200 ms screen transition to still be running, which a busy machine can miss (shown with a forced 400 ms delay); the transition is now stretched to a minute for that test and only the tap ends it. The step-slide test read document.getAnimations(), which only passed because unrelated bar animations linger; it now keeps the slide animations themselves and checks their direction and length. 6 clean runs in a row (6 Nov)
 
 ## Now (1.30.0, 6 Nov)
 - [x] Sample "plug cap" photo is checked on the step it shows (`sample_step`, api/sample_step.py), with a line saying which step; buttons say what each sample photo is
