@@ -1,6 +1,6 @@
-# Meta Model API notes (verified)
+# Meta Model API notes (verified live)
 
-I read these on dev.meta.ai on 2026-10-30 (WIB). Re-check them before the final demo: nothing marked ⚠️ has been tried with a real key yet (see VERIFICATION_REPORT.md).
+I read these on dev.meta.ai on 2026-10-30 (WIB) and checked every one against the real API with my own key on 2026-11-05 (WIB): all five models answered, and the runs are written up in [LIVE_RUN.md](LIVE_RUN.md). The section "What I saw on the live API" at the end lists where the real behaviour differs from what I expected from the docs.
 
 Base URL `https://api.meta.ai/v1` · header `Authorization: Bearer $MODEL_API_KEY` (docs name the variable `MODEL_API_KEY`; the app also accepts `META_API_KEY`). OpenAI-compatible SDKs work with `base_url`.
 
@@ -29,7 +29,7 @@ POST /v1/chat/completions
                                         {"type":"text","text":"…"}]}],
  "response_format":{"type":"json_schema","json_schema":{"name":"diagnosis","schema":{…}}}}
 ```
-Decoding is constrained. Recursive schemas are rejected (400), and nesting is capped at 10, so I inline `$defs`.
+Decoding is constrained. Recursive schemas are rejected (400), and nesting is capped at 10, so I inline `$defs`. Two things only the live API showed me: list every property in `required` (optional ones are left out), and send `"stream": true` (see below).
 
 **Audio input** (https://dev.meta.ai/docs/video-understanding#audio): content part `{"type":"input_audio","input_audio":{"data":"<base64 wav>","format":"wav"}}`, model `muse-spark-1.2`, `max_tokens` ≥ 4000.
 
@@ -57,6 +57,16 @@ POST /v1/responses   (stream: true, Accept: text/event-stream)
 Muse Spark $1.25 in / $4.25 out per 1M tokens · Muse Image $0.01 per image · SAM 3.1 $2.50 per 1,000 images · Voice Transcribe $0.18 per hour. Contributor-mode ids (`-contributor`) are cheaper but let Meta train on content: not used.
 
 ## Gotchas
-- A dev HTTP proxy can turn `localhost` calls into 404s: set `NO_PROXY=127.0.0.1,localhost` when testing against the fake server.
-- Model availability varies by country (Geographic Use Policy). Indonesia wasn't listed as restricted when I read it. ⚠️ Confirm with `scripts/check_keys.py`.
-- ⚠️ The exact error bodies and rate limits for a new hackathon team still need confirming on the first real call.
+- A dev HTTP proxy can turn `localhost` calls into 404s: set `NO_PROXY=127.0.0.1,localhost` when testing against the test double.
+- Model availability varies by country (Geographic Use Policy). Indonesia wasn't listed as restricted, and from Semarang `scripts/check_keys.py` passed for all five models (2026-11-05).
+
+## What I saw on the live API (2026-11-05)
+
+- **Headers.** Responses carry `x-request-id`, `x-ratelimit-limit-requests: 3000`, `x-ratelimit-limit-tokens: 4000000` and the matching `x-ratelimit-remaining-*`. I never hit a 429 during these runs.
+- **504 after about 20 s.** A non-streamed chat call with `response_format: json_schema` that thought for more than about 20 s came back as `504` with the body `upstream request deadline exceeded`, three times in a row. The same body with `"stream": true, "stream_options": {"include_usage": true}` ran for 48 s fine. The stream sends no content while the model reasons, then the JSON in a few `delta.content` chunks, then a last chunk with `usage` (it includes `completion_tokens_details.reasoning_tokens`), then `data: [DONE]`. The app streams every structured call now.
+- **Optional fields are skipped.** Under constrained decoding the model leaves out any property that is not in `required`, even when the prompt asks for it. `api/schemas.json_schema()` marks every property required.
+- **Reasoning eats `max_tokens`.** With `max_tokens: 3000` and `reasoning_effort: high` a hard prompt returned `content: null` and `finish_reason: length` (all 3000 tokens were reasoning). The app sends no `max_tokens` on Muse Spark 1.3 calls.
+- **SAM 3.1.** The stream is `response.created`, `response.in_progress`, `response.output_item.added`, `response.content_part.added`, one `response.output_text.delta` with the whole grammar, then the `.done` events and `response.completed`. A noun phrase ("tire") on the motorbike photo gave one box with `c=0.777` and a 196x120 one-bit mask; a box prompt with five boxes gave five masks in 3 to 8 s. Zero masks on the synthetic check image in `check_keys.py` is normal (nothing in it to find).
+- **Muse Image.** `reasoning_strength: high` takes about 20 s and sometimes hit the same 504; the client retries once and then asks at `low`. A 1536 px PNG came back as `b64_json` (about 0.8 to 1.8 MB).
+- **Errors.** I did not get a 401, 403 or 429 on the live API, so I have not seen their exact bodies. The client never retries a 4xx other than 429, and honours `Retry-After` (seconds, capped at 30 s) on 429/503.
+- **Cost.** A full repair (look, SAM, diagnose, plan, one step check) costs $0.05 to $0.07; a Muse Image diagram adds $0.01; a model-side red stop costs about $0.03.
