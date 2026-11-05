@@ -1,8 +1,8 @@
-"""First live run: one real repair through the real Meta models, written up in docs/LIVE_RUN.md.
+"""First live run: one real repair through the real Meta models, written up in docs/FIRST_LIVE_RUN.md.
 
 Run it once, right after `python scripts/set_keys.py` says ALL GOOD:
 
-    python scripts/first_live_run.py                  # motorbike sample, Indonesian, writes docs/LIVE_RUN.md
+    python scripts/first_live_run.py                  # motorbike sample, Indonesian, writes docs/FIRST_LIVE_RUN.md
     python scripts/first_live_run.py --sample faucet --lang en   # this sample also draws a Muse Image diagram
     python scripts/first_live_run.py --fake           # rehearsal against the built-in stand-in Meta server (free)
 
@@ -12,7 +12,7 @@ What it does, in order:
   3. Runs ONE sample repair through the whole pipeline (look, SAM 3.1 outline, diagnose, plan, safety check,
      Muse Image diagram, voice), answers the follow-up question if the AI asks one, and checks one step photo.
      DEMO_FALLBACK is switched off, so a stage that fails is reported, never silently replaced by demo answers.
-  4. Writes docs/LIVE_RUN.md: what the AI said, how long each stage took, and what it cost.
+  4. Writes docs/FIRST_LIVE_RUN.md: what the AI said, how long each stage took, and what it cost.
 
 Cost: one repair is a few US cents; the app's per-repair cap (MAX_COST_USD, default $0.50) still applies.
 Exit codes: 0 = it worked, 1 = the run failed (the message says what to do), 2 = no key / demo mode is on.
@@ -44,8 +44,8 @@ FIXES = {
     "busy": "Meta is busy or rate-limiting. Wait a minute and run this again.",
     "network": "Could not reach Meta. Check the internet connection (and any proxy), then run this again.",
     "budget": "The per-repair cost cap was hit. Raise MAX_COST_USD in .env a little, or try the faucet sample.",
-    "invalid": "The model answered in a shape the app could not use. Run once more; if it repeats, docs/LIVE_RUN.md shows the error, and docs/META_API_NOTES.md has the shapes the app expects.",
-    "generic": "Something unexpected failed. The error is in docs/LIVE_RUN.md (it has no key in it, so it is safe to share); docs/TROUBLESHOOTING.md has the usual fixes.",
+    "invalid": "The model answered in a shape the app could not use. Run once more; if it repeats, docs/FIRST_LIVE_RUN.md shows the error, and docs/META_API_NOTES.md has the shapes the app expects.",
+    "generic": "Something unexpected failed. The error is in docs/FIRST_LIVE_RUN.md (it has no key in it, so it is safe to share); docs/TROUBLESHOOTING.md has the usual fixes.",
 }
 
 
@@ -161,7 +161,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--sample", default="motor", choices=["motor", "faucet", "pump", "tire"])
     ap.add_argument("--lang", default="id", choices=["id", "jv", "en"])
-    ap.add_argument("--out", default=str(ROOT / "docs" / "LIVE_RUN.md"))
+    ap.add_argument("--out", default=str(ROOT / "docs" / "FIRST_LIVE_RUN.md"))
     ap.add_argument("--fake", action="store_true", help="rehearse against the built-in stand-in Meta server (free)")
     a = ap.parse_args(argv)
     if a.fake:

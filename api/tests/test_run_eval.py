@@ -28,9 +28,10 @@ def test_eval_fake_mode_stops_before_any_model_call():
     assert s["cost_usd_median"] and s["cost_usd_median"] > 0                 # the cost meter ran on the live code path
 
 
-def test_report_is_labelled_mock_and_pending_live():
+def test_report_says_which_column_is_a_real_model():
     md = run_eval.render([run_eval.eval_mode("mock")], "test")
-    assert "MOCK and FAKE-MODEL results, live run pending" in md and "not Muse Spark's accuracy" in md
+    assert "only one of them is a real model" in md and "It tests the plumbing, not a model" in md
+    assert "`live`" not in md.split("## Headline")[0]  # no live column claimed when none was run
     assert "\u2014" not in md
     doc = (ROOT / "docs" / "EVAL.md").read_text(encoding="utf-8")
-    assert "live run pending" in doc and "| mock | fake |" in doc
+    assert "| live | mock | fake |" in doc and "real Meta Model API" in doc
