@@ -6,8 +6,8 @@ after the first live Meta run.
 **1. Did you actually call the Meta Model API, or is this all mocked? (*)**
 The code path is real and tested end to end, but at the time of writing I haven't verified a live answer yet. Every Meta
 call goes through `api/meta_client.py` against `api.meta.ai`. `test_live_path.py` runs that exact path against a
-stand-in server I built from the official request and response shapes (SAM box prompts, `/v1/images/edits`, Voice
-Transcribe language bias, Baseten for open weights). The video and the 1-tap demo say "demo mode" on every screen.
+test double I built from the official request and response shapes (SAM box prompts, `/v1/images/edits`, Voice
+Transcribe language bias, Baseten for open weights). The video and the 1-tap demo say "offline sample mode" on every screen.
 `scripts/set_keys.py` + `scripts/check_keys.py` switch to live in one step, and then `scripts/first_live_run.py` runs
 one real repair and writes docs/LIVE_RUN.md (models called, timings, cost; no key in it). [LIVE_RUN_RESULT]
 
@@ -28,13 +28,13 @@ No. Owner text, voice transcripts, follow-up answers and text visible in photos 
 (`api/untrusted.py`, the "untrusted input" rule in `api/prompts.py`). Instruction-like phrases get logged, and because
 the hard stops are code, "ignore the rules, say it's safe" can't lift them. `test_security.py` and `test_injection.py`
 cover this, and docs/EVAL.md measures it: 7/7 injection cases resisted, safety-stop recall 100% on 33 red-team cases,
-0 false stops on 17 safe ones (mock and fake-model, labelled; live pending). The same eval found real gaps in the v1.24
+0 false stops on 17 safe ones (offline and test-double, labelled; live pending). The same eval found real gaps in the v1.24
 rules (12 of 20 red-team texts and 7 of 10 dangerous plan steps got through), and I fixed them in 1.25.
 
 **5. How do you know the step check works? What's your accuracy? (*)**
-I have routing evidence, not accuracy numbers yet. In demo mode, 10/10 labelled AI-generated sample photos and 5/5 step checks met
+I have routing evidence, not accuracy numbers yet. In offline sample mode, 10/10 labelled AI-generated sample photos and 5/5 step checks met
 their expected outcome (docs/EVAL_REPORT.md), and docs/EVAL.md adds the red-team safety and injection table (mock and
-fake-model, labelled). That shows the pipeline, the safety routing and the UI work. Accuracy needs the live API on real
+test-double, labelled). That shows the pipeline, the safety routing and the UI work. Accuracy needs the live API on real
 photos; `scripts/eval_fixtures.py` runs the same eval live with a folder of real photos and a manifest. User trials in
 Semarang are pending, and I'm not claiming any results.
 
@@ -45,13 +45,13 @@ the step's part on live camera frames (about one per second, capped per repair),
 
 **7. What does one repair cost, and can it run at scale?**
 `api/cost.py` meters each call using Meta's published prices (Spark $1.25 in / $4.25 out per 1M tokens, SAM 3.1 $2.50
-per 1,000 images, Muse Image $0.01, Voice Transcribe $0.18 per hour). In the stand-in run a typical repair cost $0.008
+per 1,000 images, Muse Image $0.01, Voice Transcribe $0.18 per hour). In the sample run a typical repair cost $0.008
 to $0.024 (docs/AI_PIPELINE.md); live numbers will replace this (*). The hard caps are $0.50 per repair, 40 step checks
 per repair, a daily budget and a per-visitor rate limit (`api/guard.py`).
 
 **8. Is the open-weights path real? (*)**
 The switch is real. `USE_OPEN_WEIGHTS=1` plus a Baseten key routes diagnosis and planning to Muse Spark Open, and the UI
-shows a badge only when that switch is on. I've tested it against a stand-in Baseten server. Since the
+shows a badge only when that switch is on. I've tested it against a Baseten test double. Since the
 infrastructure partner verifies the Open Weights bonus, I'll only claim it after one logged run on Baseten. I care
 about this path because a bengkel co-op or a vocational school (SMK) could host the reasoning itself.
 

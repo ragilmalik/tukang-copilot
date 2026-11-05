@@ -37,7 +37,7 @@ Order: live run first, Baseten optional, real clip and trials, then repo/deploy,
 - [x] Video: 3 s hook title card with the hackathon dates, burned-in English captions, Muse Image diagram scene, TIMESTAMPS.txt; 2:57 cut, 43.5 s X clip (v1.25)
 - [x] Docs brought in line with the 1.25 re-cut (chapters, timestamps, 29 shots, 43.5 s clip) and the new evidence (EVAL, laptop view, static build, first_live_run) in SUBMISSION / JUDGING_MAP / JUDGE_FAQ; one-pager re-made (v1.25)
 - [x] Flaky agent-log scroll test now waits on conditions (v1.25)
-- [x] WhatsApp channel (Cloud API webhook, fake Graph API tests, `/wa` simulator) and an owner token for outcome and erase (v1.27)
+- [x] WhatsApp channel (Cloud API webhook, Graph API test double tests, `/wa` simulator) and an owner token for outcome and erase (v1.27)
 - [x] New look: bengkel-sign design, Barlow, Lucide icons, light and dark theme (v1.28)
 - [x] AI-generated sample photos, labelled, in place of the flat drawings; demo video re-shot at 1080p60, 2:53, X clip 43.5 s (v1.29.0)
 - [x] PDF report, workshop sheet and share cards in the new look; friendly page for expired guide links; strict CSP and HSTS; STOP card on shared red-stop links; axe-core clean on every main screen (v1.29.1 to v1.29.4)

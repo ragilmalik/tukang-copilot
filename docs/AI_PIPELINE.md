@@ -45,4 +45,4 @@ User-facing text is in the chosen language (`{lang_name}`), while SAM phrases an
 `api/cost.py` meters every call (Spark tokens at $1.25/$4.25 per 1M, Muse Image $0.01, SAM $0.0025/image, ASR $0.18/h) and raises `BudgetExceeded` before a call that would pass `MAX_COST_PER_SESSION_USD`. A typical repair in the fake-server run cost $0.008 to $0.024.
 
 ## Demo / offline mode
-With `MOCK=1` or no key, `mock.py` answers each stage for three scenarios (motorbike amber with follow-up, faucet green with one diagram, rice cooker red). Step checks fail on dark or blank photos, so I can demo the ⚠️ path.
+With `OFFLINE=1` or no key, `mock.py` answers each stage for three scenarios (motorbike amber with follow-up, faucet green with one diagram, rice cooker red). Step checks fail on dark or blank photos, so I can demo the ⚠️ path.

@@ -4,7 +4,7 @@
 |---|---|---|
 | `'python' is not recognized` (Windows) | Python is not on PATH | Reinstall Python and tick "Add python.exe to PATH" |
 | start.bat window closes at once | An install error | Open `cmd` in the folder and run `start.bat` there so you can read the message |
-| Orange "Demo mode" line though you added a key | `.env` missing, key empty, or `MOCK=1` | Run `python scripts/set_keys.py` again; `/health` should say `"mode":"live"` |
+| Orange "Offline sample mode" line though you added a key | `.env` missing, key empty, or `OFFLINE=1` | Run `python scripts/set_keys.py` again; `/health` should say `"mode":"live"` |
 | check_keys: FAIL 401 | Wrong or revoked key | Create a new key on dev.meta.ai (API keys) and run set_keys.py |
 | check_keys: FAIL 402 / billing | No card, or the credits are used up | dev.meta.ai, Billing: add a card, check the credits, raise the spend limit |
 | check_keys: FAIL 403 / model not enabled | That model is not enabled for your team | dev.meta.ai, Models: note which model failed and get it enabled for the team |

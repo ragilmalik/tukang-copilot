@@ -9,7 +9,7 @@ field 5.
 Handles, checked 2026-11-01: @AIatMeta (linked from Meta's own hackathon page, twitter.com/aiatmeta) and
 @cerebral_valley (the organiser's X profile, 24K followers). Tag only these two.
 
-Attach to post 1: `docs/demo/tukang-copilot-x-vertical.mp4` (43.5 s, 1080x1920, Bahasa captions, labelled demo mode).
+Attach to post 1: `docs/demo/tukang-copilot-x-vertical.mp4` (43.5 s, 1080x1920, Bahasa captions, labelled offline sample mode).
 For an Indonesian audience the best time is 19:00 to 21:00 WIB. For US reach (Meta, Cerebral Valley) it's 08:00 to
 10:00 ET = 20:00 to 22:00 WIB. Posting at about 20:00 WIB catches both.
 

@@ -1,6 +1,6 @@
 # YouTube upload kit
 
-Upload the real-phone recording if I have one by then, otherwise `docs/demo/tukang-copilot-demo.mp4` (2:53, demo mode).
+Upload the real-phone recording if I have one by then, otherwise `docs/demo/tukang-copilot-demo.mp4` (2:53, offline sample mode).
 Unlisted is fine for judging, but Public helps with Most Viral and Community Vote. Open the link in a private window
 before pasting it into the form. For captions, upload `docs/demo/tukang-copilot-demo.en.srt` as English subtitles.
 The thumbnail is `docs/launch/thumbnail.png` (1280x720); custom thumbnails need a phone-verified YouTube account.
@@ -20,7 +20,7 @@ Point your phone at something broken and say what's wrong in Bahasa Indonesia, J
 
 I built it solo for the Meta Global AI Developer Hackathon (Indie track, Push the Frontier). Everything in this video was built during the event, Oct 26 to Nov 4, 2026.
 
-This recording runs in clearly labelled demo mode: AI-generated sample photos and recorded model answers, no API cost.
+This recording runs in clearly labelled offline sample mode: AI-generated sample photos and recorded model answers, no API cost.
 
 Try it (1-tap demo, no photo needed): [LIVE_URL]
 Code (MIT): [GITHUB_URL]

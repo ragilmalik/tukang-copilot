@@ -1,8 +1,8 @@
 # How I run it
 
-This is how I run Tukang Copilot on my laptop, switch on the real Meta models, deploy it, and run the checks. Without a key it runs in demo mode, which costs nothing and needs no account. If something breaks, look in [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
+This is how I run Tukang Copilot on my laptop, switch on the real Meta models, deploy it, and run the checks. Without a key it runs in offline sample mode, which costs nothing and needs no account. If something breaks, look in [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
-## Demo mode on a laptop (10 minutes, free)
+## Offline sample mode on a laptop (10 minutes, free)
 
 You need Python 3.11 or newer and internet for the first install.
 
@@ -11,7 +11,7 @@ You need Python 3.11 or newer and internet for the first install.
 start.bat           # Windows (double-click works too)
 ```
 
-The first start makes a `.venv`, installs `requirements.txt` (2 to 4 minutes) and copies `.env.example` to `.env`. When the window says `Open http://localhost:8000`, open that in Chrome. An orange *Demo mode* line at the top means no key is set. Tap **motor mogok**, **kran menetes** or **rice cooker mati** under the big button, answer the question, then walk through the steps. Ctrl+C stops it.
+The first start makes a `.venv`, installs `requirements.txt` (2 to 4 minutes) and copies `.env.example` to `.env`. When the window says `Open http://localhost:8000`, open that in Chrome. An orange *Offline sample mode* line at the top means no key is set. Tap **motor mogok**, **kran menetes** or **rice cooker mati** under the big button, answer the question, then walk through the steps. Ctrl+C stops it.
 
 To try it on a phone on the same Wi-Fi, open `http://<laptop-ip>:8000` (Windows: `ipconfig`, IPv4 Address). Phones only allow camera and mic on https, so over plain Wi-Fi you get the samples and gallery upload only. For the full camera, deploy it or run `cloudflared tunnel --url http://localhost:8000` and open the `https://…trycloudflare.com` link it prints.
 
@@ -21,7 +21,7 @@ To try it on a phone on the same Wi-Fi, open `http://<laptop-ip>:8000` (Windows:
 2. **API keys** → **Create key** → copy it. Don't paste it into any chat.
 3. Run `python scripts/set_keys.py` (Windows: `.venv\Scripts\python scripts\set_keys.py`), paste the key (nothing shows while you paste) and press Enter. Press Enter again to skip Baseten.
 
-`set_keys.py` writes `.env` (git ignores it), sets `MOCK=0` and checks every model the app uses: key and model list, Muse Spark 1.3 vision and structured output, SAM 3.1, the live camera guide, Muse Image, Muse Voice Transcribe and Muse Spark 1.2 audio, plus a SKIP line for open weights when there is no Baseten key. It should end with ALL GOOD, for well under $0.05. Every FAIL comes with a `fix:` line; a wrong key shows *"Meta says this key is not valid (401)"*. Restart the app and the *Demo mode* line is gone.
+`set_keys.py` writes `.env` (git ignores it), sets `OFFLINE=0` and checks every model the app uses: key and model list, Muse Spark 1.3 vision and structured output, SAM 3.1, the live camera guide, Muse Image, Muse Voice Transcribe and Muse Spark 1.2 audio, plus a SKIP line for open weights when there is no Baseten key. It should end with ALL GOOD, for well under $0.05. Every FAIL comes with a `fix:` line; a wrong key shows *"Meta says this key is not valid (401)"*. Restart the app and the *Offline sample mode* line is gone.
 
 Later checks: `set_keys.py --check-only`, or `scripts/check_keys.py --no-cost` (key and model list only, free). `scripts/check_keys.py --fake` shows what a pass looks like without a key. After the key works, `python scripts/first_live_run.py` runs one sample repair (a few US cents) and writes `docs/LIVE_RUN.md`.
 
@@ -35,7 +35,7 @@ With this on, diagnosis and planning run on Muse Spark Open (`meta-models/muse-s
 
 [DEPLOY.md](DEPLOY.md) has the Render steps (free plan). Short version: Render → New → Blueprint → repo `ragilmalik/tukang-copilot` → paste `MODEL_API_KEY` (and `BASETEN_API_KEY`) → Apply → wait for Live. Then run `python scripts/deploy_check.py https://<your-app>.onrender.com`; it should say READY, and `--live` also runs real repairs (a few cents). `https://<your-app>/health` says `"mode": "live"` with a key and `"mock"` without one.
 
-If the live API misbehaves during judging, set `MOCK` to `1` in Render's Environment. About a minute later the app runs on the recorded demo answers with no spend. Set it back to `0` afterwards.
+If the live API misbehaves during judging, set `OFFLINE` to `1` in Render's Environment. About a minute later the app runs on the recorded demo answers with no spend. Set it back to `0` afterwards.
 
 `python scripts/build_static.py` builds `dist-static/`, a server-free copy that plays the recorded demo; `--help` lists hosting steps. WhatsApp setup is in [WHATSAPP.md](WHATSAPP.md) and is optional.
 
@@ -45,7 +45,7 @@ If the live API misbehaves during judging, set `MOCK` to `1` in Render's Environ
 pip install -r requirements-dev.txt
 scripts/check_all.sh                  # ruff + mypy strict + all tests, same as CI
 python scripts/make_test_report.py    # writes docs/TEST_REPORT.md from a real run
-MOCK=1 PORT=8765 python app.py        # then, in another terminal:
+OFFLINE=1 PORT=8765 python app.py        # then, in another terminal:
 python scripts/smoke_e2e.py http://127.0.0.1:8765
 python scripts/run_eval.py            # writes docs/EVAL.md
 python scripts/record_replay.py --check
@@ -60,8 +60,8 @@ Demo assets: `python scripts/make_demo_assets.py shots|diagram|voice|video|all` 
 
 | Name | Default | Meaning |
 |---|---|---|
-| `MODEL_API_KEY` | empty | Meta key. Empty = demo mode |
-| `MOCK` / `DEMO_MODE` | 0 | 1 = force demo mode even with a key |
+| `MODEL_API_KEY` | empty | Meta key. Empty = offline sample mode |
+| `OFFLINE` / `DEMO_MODE` | 0 | 1 = force offline sample mode even with a key |
 | `USE_OPEN_WEIGHTS`, `BASETEN_API_KEY` | 0 / empty | Diagnosis + plan on Muse Spark Open |
 | `OPEN_MODEL` | meta-models/muse-spark-open | Baseten model id, only if Baseten shows another |
 | `ILLUSTRATE` | 1 | Muse Image diagrams for hidden steps |

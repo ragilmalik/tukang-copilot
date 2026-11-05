@@ -14,7 +14,7 @@ Evidence names point to tests in `api/tests/` (TEST_REPORT.md has the run) or to
 | Fits a problem statement (Push the Frontier) | ✅ | README / SUBMISSION framing: understanding + repairing physical systems |
 | New work only, Oct 26 to Nov 4 | ✅ | All files created 2026-10-30; CHANGELOG. ⬜ push to GitHub so commit dates show |
 | Public repo, open license | ⬜ | MIT LICENSE in place; repo not created yet |
-| 3-minute demo video | 🟡 | Backup cut made: docs/demo/tukang-copilot-demo.mp4, 2:53 (1080p60), demo mode, labelled. Real-phone recording per DEMO_SCRIPT.md + YouTube upload still to do |
+| 3-minute demo video | 🟡 | Backup cut made: docs/demo/tukang-copilot-demo.mp4, 2:53 (1080p60), offline sample mode, labelled. Real-phone recording per DEMO_SCRIPT.md + YouTube upload still to do |
 | No unlicensed assets | ✅ | ATTRIBUTIONS.md: Barlow (OFL) and Lucide (ISC) with their licences; the sample photos are AI-generated and labelled as such; diagrams drawn by my own code |
 | Avoid anti-projects (medical, basic RAG, simple image analyser, edu chatbot, politics) | ✅ | Medical blocked (`test_hard_stops[…luka berdarah…]`); multi-step agent with verification and re-plan, not one-shot analysis |
 
@@ -38,7 +38,7 @@ Evidence names point to tests in `api/tests/` (TEST_REPORT.md has the run) or to
 
 | Stage | Status | Evidence |
 |---|---|---|
-| 1 Listen: Voice Transcribe (id/en), Spark 1.2 audio (jv) | 🟡 | Indonesian ASR request shape + recording deletion: `test_live_path::test_live_voice_note_is_transcribed` (fake server). Javanese route only in demo mode |
+| 1 Listen: Voice Transcribe (id/en), Spark 1.2 audio (jv) | 🟡 | Indonesian ASR request shape + recording deletion: `test_live_path::test_live_voice_note_is_transcribed` (fake server). Javanese route only in offline sample mode |
 | 2 Look: Spark vision → ObjectReport | 🟡 | live-path tests; schema tests |
 | 3 SAM 3.1 masks + server overlay | 🟡 / ✅ | Overlay pixel-checked (`test_overlay`); SAM SSE parsed with Meta's parser on fake stream |
 | 4 Diagnose (+ open-weights toggle) | 🟡 | `test_live_path::test_live_open_weights_path` |
@@ -62,7 +62,7 @@ Evidence names point to tests in `api/tests/` (TEST_REPORT.md has the run) or to
 | Config via .env; cost cap; image downscale 1536 px; DEMO_MODE | ✅ | `test_overlay::test_normalize_caps_size_and_applies_exif`, `test_engine::test_budget_guard` |
 | `/health` | ✅ | `test_api::test_health` |
 | Lint (ruff) | ✅ | TEST_REPORT |
-| mypy strict / Playwright / jsdom | ✅ | `mypy api` strict: no issues in 67 files; real-Chromium tests (smoke + live camera with fake camera); jsdom UI flow (214 checks) |
+| mypy strict / Playwright / jsdom | ✅ | `mypy api` strict: no issues in 67 files; real-Chromium tests (smoke + live camera with test camera feed); jsdom UI flow (214 checks) |
 | CI on push | 🟡 | `.github/workflows/ci.yml` written; runs once the repo exists |
 | Path traversal / upload validation | ✅ | `test_api::test_not_found_and_path_traversal`, `test_bad_requests` |
 | Performance (< 25 s diagnosis on 4G, < 8 s check) | ⬜ | Measure on a real phone with real models |
@@ -94,10 +94,10 @@ Evidence names point to tests in `api/tests/` (TEST_REPORT.md has the run) or to
 
 | Feature | Status | Evidence |
 |---|---|---|
-| Live camera guide (SAM 3.1 on live frames, overlay, throttle, cap, frames not stored) | ✅ / 🟡 | `test_live_track` (12 tests incl. cost in live mode, 429 throttle, frame cap); `test_playwright_live` (real Chromium, fake camera: highlight drawn, Check now works). Real SAM quality/latency on 4G unverified |
+| Live camera guide (SAM 3.1 on live frames, overlay, throttle, cap, frames not stored) | ✅ / 🟡 | `test_live_track` (12 tests incl. cost in live mode, 429 throttle, frame cap); `test_playwright_live` (real Chromium, test camera feed: highlight drawn, Check now works). Real SAM quality/latency on 4G unverified |
 | Hands-free voice commands + push-to-talk | ✅ / 🟡 | `test_voice` (JS ↔ Python word lists and parser identical, endpoint text/audio, live ASR path on fake server); jsdom checks. Real SpeechRecognition (jv-ID on Android) unverified |
 | Bengkel hand-off (WhatsApp, Maps, mechanic brief PDF) | ✅ / 🟡 | `test_handoff` (13 tests); screenshot 18/22. WhatsApp deep link on a real phone unverified |
-| Demo fallback + deploy_check flag | ✅ | `test_demo_fallback` (7 tests); `deploy_check.py --live` against a local LIVE server with a wrong key on the fake Meta server → FAIL "LIVE repair silently used demo answers for: object_report, diagnosis"; with the right key → READY, "no smoke session needed the demo fallback" (2026-10-31) |
+| Demo fallback + deploy_check flag | ✅ | `test_demo_fallback` (7 tests); `deploy_check.py --live` against a local LIVE server with a wrong key on the Meta API test double → FAIL "LIVE repair silently used demo answers for: object_report, diagnosis"; with the right key → READY, "no smoke session needed the demo fallback" (2026-10-31) |
 | Impact trial kit | ✅ (mock data) | `test_impact` (9 tests); docs/IMPACT.md and docs/img/impact.png are MOCK-stamped |
 | Render config lists every setting | ✅ | render.yaml parses; keys incl. MAX_TRACK_FRAMES, TRACK_MIN_INTERVAL_S, DEMO_FALLBACK, IMPACT_TOKEN, PUBLIC_BASE_URL (sync:false) |
 
@@ -112,7 +112,7 @@ Evidence names point to tests in `api/tests/` (TEST_REPORT.md has the run) or to
 | 1-tap guided demo | ✅ | Playwright `test_one_tap_demo_runs_the_whole_agent_loop` (real Chromium, 390×844): button above the fold, quick answer, dark photo rejected, right photo passes, re-plan; smoke step "1-tap demo sample check photo" |
 | Compact tip bar (folds after the first step check) | ✅ / 🟡 | Playwright `test_tip_bar_is_compact_and_collapses_after_first_check`: ≤ 370 px wide, ≤ 60 px chip after the first check, aria-expanded/labels, the button under it still clickable, reopen + close. Real small phones with the keyboard open unverified |
 | Prompt-injection hardening | ✅ | `test_injection` (8 tests: invisible/bidi characters stripped, fence can't be closed from inside, id/jv/en signals, re-plan report in the user turn not the system prompt, flagged + logged + not echoed, cannot lift a hard stop, photo-text rule) |
-| Cost guards | ✅ | `test_cost_guards` (step checks capped across a re-plan, step-check spend in the session cost, follow-up rate limit in live mode, none in demo mode, oversized answer/report refused) |
+| Cost guards | ✅ | `test_cost_guards` (step checks capped across a re-plan, step-check spend in the session cost, follow-up rate limit in live mode, none in offline sample mode, oversized answer/report refused) |
 | WCAG AA contrast, model chips, elapsed timer | ✅ / 🟡 | Chips and timer covered by jsdom/Playwright checks. Contrast was fixed by hand against AA ratios; no automated contrast test |
 
 **Run numbers (2026-10-31 11:40 WIB, v1.22.0):** pytest **453 passed, 0 failed** (`make_test_report.py` one run, 152 s; also in chunks 218 + 225 fast and 10 slow with real Chromium); `ruff check .` clean; `mypy api` strict no issues in 73 files; `smoke_e2e.py` ALL PASSED (60 PASS lines) on a local demo-mode server.
@@ -126,9 +126,9 @@ Evidence names point to tests in `api/tests/` (TEST_REPORT.md has the run) or to
 | Recorded 1-tap demo when the server sleeps or the phone is offline (v1.24) | ✅ | `test_replay.py`, `test_playwright_replay.py`, `record_replay.py --check`; `27_recorded_demo.png` |
 | Laptop view: phone frame + side panel with QR code, 1-tap demo, language switch (v1.25) | ✅ / 🟡 | `test_desk.py`, `test_playwright_desk.py` (1280x800, 1440x900); `29_laptop.png`. Real laptop browsers other than Chromium unverified |
 | Static judge build `scripts/build_static.py` → `dist-static/` (v1.25) | ✅ / ⬜ | `test_build_static.py`, `test_playwright_static.py` (served under a sub-path, fails on any `/api/` request). Not hosted yet |
-| Red-team eval `scripts/run_eval.py` → docs/EVAL.md (v1.25) | ✅ (mock / fake-model) | `test_run_eval.py`. Safety-stop recall 100% on 33 cases (30 before v1.26.0 added 3 motorbike brake-failure texts), 0 false stops on 17 safe cases, 7/7 injection cases. Found 12 text-gate and 7 plan-guard misses in the v1.24 rules, fixed in `api/pipeline/safety.py`. Live run pending |
-| First live run `scripts/first_live_run.py` → docs/LIVE_RUN.md (v1.25) | ✅ (fake) / ⬜ (live) | `test_first_live_run.py` against the fake Meta server (wrong key, no key, report has no key). Real run needs the key |
-| Video re-cut: 3 s hook title card, burned-in captions, Muse Image diagram scene (v1.25) | ✅ | 2:57 (177.8 s, ffprobe), X clip 43.5 s, `docs/demo/TIMESTAMPS.txt`, `28_diagram_step.png` (diagram is a demo-mode stand-in drawing) |
+| Red-team eval `scripts/run_eval.py` → docs/EVAL.md (v1.25) | ✅ (mock / test-double) | `test_run_eval.py`. Safety-stop recall 100% on 33 cases (30 before v1.26.0 added 3 motorbike brake-failure texts), 0 false stops on 17 safe cases, 7/7 injection cases. Found 12 text-gate and 7 plan-guard misses in the v1.24 rules, fixed in `api/pipeline/safety.py`. Live run pending |
+| First live run `scripts/first_live_run.py` → docs/LIVE_RUN.md (v1.25) | ✅ (fake) / ⬜ (live) | `test_first_live_run.py` against the Meta API test double (wrong key, no key, report has no key). Real run needs the key |
+| Video re-cut: 3 s hook title card, burned-in captions, Muse Image diagram scene (v1.25) | ✅ | 2:57 (177.8 s, ffprobe), X clip 43.5 s, `docs/demo/TIMESTAMPS.txt`, `28_diagram_step.png` (diagram is a demo-mode sample drawing) |
 
 **Run numbers (2026-11-01, v1.25.0 final):** `make_test_report.py` ALL PASSED: pytest **530 passed, 0 failed, 0 skipped** (550 s, real Chromium + jsdom), ruff, check_keys --fake, smoke; `ruff check api scripts` clean; `mypy api` strict no issues in 99 files; `smoke_e2e.py` ALL PASSED (66 checks) on a local demo-mode server.
 
@@ -140,13 +140,13 @@ Evidence names point to tests in `api/tests/` (TEST_REPORT.md has the run) or to
 
 | Feature | Status | Evidence |
 |---|---|---|
-| WhatsApp channel: Cloud API webhook (Graph API v26.0) on the same engine and safety gate; photos + text or voice in; SAM-marked photo, diagnosis, step buttons, camera checks, re-plan, red stop and PDF out, in id/jv/en | ✅ (fake Graph API) / ⬜ (real number) | `test_whatsapp.py` (34 tests, incl. `X-Hub-Signature-256` check) against `api/tests/doubles/fake_graph.py`. A real WhatsApp number needs the Meta app setup in docs/WHATSAPP.md |
+| WhatsApp channel: Cloud API webhook (Graph API v26.0) on the same engine and safety gate; photos + text or voice in; SAM-marked photo, diagnosis, step buttons, camera checks, re-plan, red stop and PDF out, in id/jv/en | ✅ (Graph API test double) / ⬜ (real number) | `test_whatsapp.py` (34 tests, incl. `X-Hub-Signature-256` check) against `api/tests/doubles/fake_graph.py`. A real WhatsApp number needs the Meta app setup in docs/WHATSAPP.md |
 | WhatsApp simulator `/wa` (labelled), linked from the first screen in id/jv/en only when the server says it is on; absent from the static build | ✅ | `test_owner_token.py`, `test_playwright_owner.py` (link in 3 languages opens /wa), `test_playwright_wa.py`, `test_playwright_replay.py` (`?replay=1` sends no `/api/` request, incl. the simulator check); `30_whatsapp_*.png` |
 | Owner token: only the phone that started a repair can set the outcome or erase it; a guide-link holder gets 403 even via the API; no GET returns the token; pre-1.27 repairs still work | ✅ | `test_owner_token.py` (15 tests), `test_outcome.py`, `test_erase.py`, `test_playwright_owner.py` (second Chromium phone gets 403, owner's button works) |
 | render.yaml lists the four optional WhatsApp secrets (`sync: false`, empty keeps the channel off) | ✅ | `test_owner_token.py` (render.yaml parsed) |
 | Demo video with a 12 s WhatsApp scene in Basa Jawa at 2:16 | ✅ | 2:55 (175.7 s, ffprobe), X clip 43.5 s, `docs/demo/TIMESTAMPS.txt`, `test_demo_video.py` |
 
-**Run numbers (2026-11-02, v1.27.0):** `make_test_report.py` ALL PASSED: pytest **768 passed, 0 failed, 0 skipped** (687 s, real Chromium + jsdom), ruff, check_keys --fake, smoke; `ruff check api scripts` clean; `mypy api --strict` no issues in 132 files; `record_replay.py --check` up to date; `build_static.py --check` OK; `smoke_e2e.py` ALL PASSED (70 checks) on a `MOCK=1` server; `run_eval.py` (app 1.27.0): diagnosis 9/9, stop recall and precision 100%, injection 7/7 (mock and fake-model).
+**Run numbers (2026-11-02, v1.27.0):** `make_test_report.py` ALL PASSED: pytest **768 passed, 0 failed, 0 skipped** (687 s, real Chromium + jsdom), ruff, check_keys --fake, smoke; `ruff check api scripts` clean; `mypy api --strict` no issues in 132 files; `record_replay.py --check` up to date; `build_static.py --check` OK; `smoke_e2e.py` ALL PASSED (70 checks) on a `OFFLINE=1` server; `run_eval.py` (app 1.27.0): diagnosis 9/9, stop recall and precision 100%, injection 7/7 (offline and test-double).
 
 **Re-run for v1.27.1 (2026-11-02; docs, video captions and test file names changed, no app code):** `make_test_report.py` ALL PASSED: pytest **768 passed, 0 failed, 0 skipped** (1102 s on a busy 2-CPU box); `ruff check api scripts` clean; `mypy api --strict` no issues in 132 files; `smoke_e2e.py` ALL PASSED (70 checks); `record_replay.py --check` up to date; `build_static.py --check` OK; `run_eval.py` (app 1.27.1) gives the same results. Demo video still 2:55 (175.7 s by ffprobe), X clip 43.5 s.
 
@@ -164,7 +164,7 @@ Evidence names point to tests in `api/tests/` (TEST_REPORT.md has the run) or to
 | Accessibility: axe-core finds nothing serious or critical on the home, progress, question, result, stop, shared guide, WhatsApp simulator and laptop screens; one h1 per screen; native file inputs in the tab order | ✅ (Chromium) / 🟡 (real TalkBack) | `test_playwright_a11y.py` (needs axe-core from npm, skips without it), `test_a11y_buttons.py` |
 | No gzip for files that are already packed (fonts, photos, PNG, audio, PDF); offline cache `tukang-shell-v17` | ✅ | `test_gzip.py`, `web/sw.js` |
 
-**Run numbers (2026-11-03, v1.29.4):** `make_test_report.py` ALL PASSED: pytest **823 passed, 0 failed, 0 skipped** (818 s, real Chromium in 18 Playwright test files + jsdom), ruff, check_keys --fake, smoke; `mypy api --strict` no issues in 141 files; `smoke_e2e.py` ALL PASSED (69 checks; 70 in 1.27 with the same script, since some checks only run when a scenario has a follow-up question, a parts image or a diagram step) on a demo-mode server; `run_eval.py` (app 1.29.4): diagnosis 9/9, step and edge-case checks 6/6, stop recall and precision 100%, injection 7/7 (mock and fake-model).
+**Run numbers (2026-11-03, v1.29.4):** `make_test_report.py` ALL PASSED: pytest **823 passed, 0 failed, 0 skipped** (818 s, real Chromium in 18 Playwright test files + jsdom), ruff, check_keys --fake, smoke; `mypy api --strict` no issues in 141 files; `smoke_e2e.py` ALL PASSED (69 checks; 70 in 1.27 with the same script, since some checks only run when a scenario has a follow-up question, a parts image or a diagram step) on a demo-mode server; `run_eval.py` (app 1.29.4): diagnosis 9/9, step and edge-case checks 6/6, stop recall and precision 100%, injection 7/7 (offline and test-double).
 
 ## 5g. v1.29.6 to v1.29.13 features
 
@@ -184,14 +184,14 @@ These came from playing every flow again on a 390x844 phone and a laptop in all 
 | Basa Jawa in one register (ngoko) across the app, the PDF and the workshop sheets; "keslametan" for safety everywhere | ✅ (word lists) / 🟡 (a native speaker has not read every screen) | `test_jv_register.py`, `test_report_tried_and_jv_words.py` |
 | Screenshots, hero GIF, thumbnail, demo video and X clip re-made on these screens; offline cache `tukang-shell-v21` | ✅ | `docs/demo/`, `web/sw.js` |
 
-**Run numbers (2026-11-04, v1.29.13, commit 6ad8f0a):** `make_test_report.py` ALL PASSED: pytest **894 passed, 0 failed, 0 skipped** (961 s, real Chromium in 21 Playwright test files + jsdom), ruff, check_keys --fake, smoke; `mypy api --strict` no issues in 150 files; `smoke_e2e.py` ALL PASSED (69 checks) on a demo-mode server; `run_eval.py` (app 1.29.13): diagnosis 9/9, stop recall and precision 100%, injection 7/7 (mock and fake-model), the same results as 1.29.4. Demo video 2:53 (173.5 s by ffprobe, 1920x1080 at 60 fps, scene times unchanged), X clip 43.5 s.
+**Run numbers (2026-11-04, v1.29.13, commit 6ad8f0a):** `make_test_report.py` ALL PASSED: pytest **894 passed, 0 failed, 0 skipped** (961 s, real Chromium in 21 Playwright test files + jsdom), ruff, check_keys --fake, smoke; `mypy api --strict` no issues in 150 files; `smoke_e2e.py` ALL PASSED (69 checks) on a demo-mode server; `run_eval.py` (app 1.29.13): diagnosis 9/9, stop recall and precision 100%, injection 7/7 (offline and test-double), the same results as 1.29.4. Demo video 2:53 (173.5 s by ffprobe, 1920x1080 at 60 fps, scene times unchanged), X clip 43.5 s.
 
 ## 6. What is not verified yet
 
-1. No live Meta model answer has been verified yet (no API key so far; `scripts/set_keys.py` then `scripts/first_live_run.py` is the one-command fix). The real api.meta.ai endpoint was reached and correctly rejected a dummy key (401). Everything else uses a stand-in server built from the documented shapes, so real outputs, latency, error bodies and rate limits are unconfirmed. → `scripts/set_keys.py`, then `deploy_check.py --live`.
+1. No live Meta model answer has been verified yet (no API key so far; `scripts/set_keys.py` then `scripts/first_live_run.py` is the one-command fix). The real api.meta.ai endpoint was reached and correctly rejected a dummy key (401). Everything else uses a test double built from the documented shapes, so real outputs, latency, error bodies and rate limits are unconfirmed. → `scripts/set_keys.py`, then `deploy_check.py --live`.
 2. Real-photo quality: SAM hit rate on real bikes/pumps, diagnosis accuracy, step-check judgement, live-tracking quality. → real photos + 5 user trials (docs/USER_TRIAL_KIT.md).
 3. Real phones: rear camera over https (iOS needs playsinline + https), SpeechRecognition with jv-ID, WhatsApp deep link, HEIC upload, TalkBack, airplane mode. So far I've only used headless Chromium and jsdom.
 4. The Render deployment and GitHub CI have not run. The container was only emulated (no Docker on the test machine).
 5. The impact numbers are mock until the real trials run.
-6. The demo video shows demo mode (AI-generated sample photos, recorded answers, fake camera). It is labelled on screen.
-7. The WhatsApp channel has only run against a fake Graph API and in the `/wa` simulator; no real WhatsApp number has sent or received a message (needs the Meta app setup in docs/WHATSAPP.md).
+6. The demo video shows offline sample mode (AI-generated sample photos, recorded answers, test camera feed). It is labelled on screen.
+7. The WhatsApp channel has only run against a Graph API test double and in the `/wa` simulator; no real WhatsApp number has sent or received a message (needs the Meta app setup in docs/WHATSAPP.md).

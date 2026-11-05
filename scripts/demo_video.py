@@ -816,7 +816,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
         def motor_to_result() -> None:
             settings.mock_pace_s = 0.0
             pg.goto(base + "/")
-            pg.wait_for_selector("#modeBadge:not(.hidden)")
+            pg.wait_for_selector("#goBtn")
             pg.set_input_files("#photo", str(FIX / "sample_motor_plug_area.jpg"))
             pg.fill("#text", "Motor saya Honda Beat susah hidup, distarter cuma bunyi tapi mesin nggak nyala.")
             pg.click("#goBtn")
@@ -830,7 +830,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
 
         if group == "motor":
             pg.goto(base + "/")
-            pg.wait_for_selector("#modeBadge:not(.hidden)")
+            pg.wait_for_selector("#goBtn")
             pg.wait_for_timeout(600)
             logo = pg.locator(".brand .plate").first
             logo.screenshot(path=str(CLIPS / "logo.png"))

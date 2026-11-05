@@ -66,7 +66,7 @@ a webhook that answers too slowly (it retries later, and the channel handles a r
 | `WA_VERIFY_TOKEN` | (empty) | Your own word, also typed into the Meta webhook form. |
 | `WA_APP_SECRET` | (empty) | App secret, used to check `X-Hub-Signature-256` on every POST. Secret. |
 | `WA_GRAPH_VERSION` | `v26.0` | Graph API version in every call. |
-| `WA_GRAPH_BASE` | `https://graph.facebook.com` | Only changed by the tests (fake Graph API). |
+| `WA_GRAPH_BASE` | `https://graph.facebook.com` | Only changed by the tests (Graph API test double). |
 | `WA_DEBOUNCE_S` | `2` | Wait after the last album photo before starting. |
 | `WA_SIM` | `0` | 1 = the `/wa` simulator also works with a live Meta key. |
 | `WA_SIM_RATE_PER_HOUR` | `120` | Simulator messages per visitor per hour. |
@@ -105,5 +105,5 @@ Graph API v26.0, the version used in every current example on these pages (read 
 ## Honest status
 
 Tested end to end against `api/tests/doubles/fake_graph.py` (real HTTP, real multipart uploads, the two-step media
-download) and in the simulator, in demo mode. It has not been run against a real WhatsApp number yet;
+download) and in the simulator, in offline sample mode. It has not been run against a real WhatsApp number yet;
 that needs the 10 setup steps above.

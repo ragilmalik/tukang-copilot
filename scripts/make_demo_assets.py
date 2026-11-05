@@ -185,7 +185,6 @@ def shots() -> None:
     from playwright.sync_api import sync_playwright
 
     import demo_video as dv
-    from api.settings import settings
 
     SHOTS.mkdir(parents=True, exist_ok=True)
     base, srv = _server()
@@ -226,7 +225,7 @@ def shots() -> None:
             pg.wait_for_timeout(200)
 
         for attempt in range(3):  # live: the model asks a follow-up only when unsure, and the screenshots need one
-            pg.goto(base + "/"); pg.wait_for_selector("#modeBadge:not(.hidden)")
+            pg.goto(base + "/"); pg.wait_for_selector("#goBtn")
             pg.set_input_files("#photo", str(FIX / "sample_motor_plug_area.jpg"))
             pg.fill("#text", "Motor saya Honda Beat susah hidup, distarter cuma bunyi tapi mesin nggak nyala.")
             pg.evaluate("document.activeElement && document.activeElement.blur(); window.scrollTo(0, 0)")
@@ -323,10 +322,6 @@ def shots() -> None:
         go_sample("tire", "jv"); pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
         pg.evaluate("window.scrollTo(0,0)"); snap("20_javanese_result")
         pg.goto(base + "/"); pg.select_option("#lang", "jv"); pg.wait_for_timeout(300); snap("14_garage_jv", full=True)
-        # open-weights badge: what the header shows when USE_OPEN_WEIGHTS=1 + a Baseten key (still demo answers here)
-        settings.use_open_weights, settings.baseten_api_key = True, "stand-in-not-a-key"
-        pg.goto(base + "/"); pg.select_option("#lang", "en"); pg.wait_for_selector("#owBadge:not(.hidden)", timeout=5000); snap("21_open_weights")
-        settings.use_open_weights, settings.baseten_api_key = False, ""
         # recorded demo: what a visitor sees when the server sleeps (forced here with ?replay=1)
         pg.goto(base + "/?replay=1"); pg.select_option("#lang", "en"); pg.click("#demoBtn")
         pg.wait_for_selector("#question:not(.hidden)", timeout=20000); pg.click('#quickAns button[data-q="qNo"]')

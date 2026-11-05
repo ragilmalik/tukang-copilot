@@ -187,9 +187,9 @@ Sources: official page https://dev.meta.ai/events/global-hackathon (fetched 2026
 |---|---|
 | Impact 30% | 4 Indonesian scenarios incl. **water pump no-flow** (spec §8 #2); **PDF repair report** + **"My garage" history** (proves real reuse); money-saved estimate vs bengkel visit; Bahasa/Jawa strings everywhere |
 | Meta tools 25% | Spark vision → SAM 3.1 masks → Spark plan → Muse Image diagram → Spark verify loop; **open-weights badge** (visible "Muse Spark Open" chip when `USE_OPEN_WEIGHTS=true`); per-stage model chips in the UI and report |
-| Demo 25% | **Mock/demo mode that works** end to end (no key needed); scripted 2-3 min **video with captions + voiceover** generated from the real UI; screenshots; vertical 30-45 s clip for X |
+| Demo 25% | **Mock/offline sample mode that works** end to end (no key needed); scripted 2-3 min **video with captions + voiceover** generated from the real UI; screenshots; vertical 30-45 s clip for X |
 | Technical depth 20% | mypy strict clean, ruff, pytest, **Playwright smoke** of the main flow, CI, one-step real-key swap with `scripts/set_keys.py` + `scripts/check_keys.py`, safety gate in code (3 layers) |
-| "Whether it works" | Safety escalation polish (red stop screen with service-centre advice), PWA installable, **video capture → 3 frames**, ~10 clearly labelled stand-in photo fixtures for tests |
+| "Whether it works" | Safety escalation polish (red stop screen with service-centre advice), PWA installable, **video capture → 3 frames**, ~10 clearly labelled sample photo fixtures for tests |
 
 ### Build order (top items first)
 1. Checks green incl. mypy strict (CI enforces). 2. Water pump flow. 3. PDF report + garage. 4. Open-weights badge. 5. Fixtures + Playwright smoke. 6. Demo assets (video, captions, voiceover, screenshots, diagram), write-up, setup guide, submission checklist. 7. PWA, video capture, id/jv strings, safety polish.
