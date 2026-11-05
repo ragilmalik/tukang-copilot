@@ -11,6 +11,7 @@
   <meta name="theme-color" content="#E8E9E5" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1D2024" media="(prefers-color-scheme: dark)">
   <link rel="preload" href="/static/fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/static/fonts/barlow-600.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/static/fonts/barlow-condensed-800.woff2" as="font" type="font/woff2" crossorigin>
 </head>
 <body>
@@ -18,11 +19,13 @@
 <div class="phone" id="phone"><div class="screen" id="screen">
 <header class="top">
   <div class="brand"><span class="plate" aria-hidden="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-wrench"></use></svg></span><b>Tukang Copilot</b></div>
+  <!-- the select is the real control; under 400 px a short "ID / JV / EN" pill is drawn behind it so the name still fits -->
+  <label class="langPick"><span class="langShort" aria-hidden="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-languages"></use></svg><b id="langCode">ID</b></span>
   <select id="lang" aria-label="Language">
     <option value="id">Bahasa Indonesia</option>
     <option value="jv">Basa Jawa</option>
     <option value="en">English</option>
-  </select>
+  </select></label>
 </header>
 <aside class="notes" aria-label="Status">
 <div id="offlineBar" class="badge hidden" role="status"></div>
@@ -38,7 +41,7 @@
     <p class="muted lede" data-t="heroSub">Foto barangnya, ceritakan masalahnya, dapat panduan perbaikan.</p>
     <ol class="how" aria-label="Cara kerjanya" data-ta="howLabel"><li data-t="how1">📷 Foto + cerita</li><li data-t="how2">🎯 AI tandai bagiannya</li><li data-t="how3">✅ Tiap langkah dicek kamera</li></ol>
     <div class="demoPlate">
-      <figure class="demoFig"><img class="demoThumb" src="/static/demo-thumb.jpg" alt="" width="640" height="320" data-testid="demo-thumb"><figcaption data-t="thumbCap">Foto contoh (dibuat AI), mode demo. Bagian yang ditandai SAM 3.1</figcaption></figure>
+      <figure class="demoFig"><img class="demoThumb" src="/static/demo-thumb.jpg" alt="" width="640" height="320" fetchpriority="high" decoding="async" data-testid="demo-thumb"><figcaption data-t="thumbCap">Foto contoh (dibuat AI), mode demo. Bagian yang ditandai SAM 3.1</figcaption></figure>
       <button id="demoBtn" class="btn demo big" type="button" data-testid="demo-btn" data-t="demoBtn">▶ Coba demo 1 ketuk</button>
       <p class="demoSub" data-t="demoSub">Tanpa foto, tanpa akun: lihat AI memperbaiki motor mogok dari awal sampai cek kamera.</p>
       <p id="wakeNote" class="wakeNote hidden" role="status"></p>
@@ -119,7 +122,7 @@
       <p id="planBanner" class="planBanner hidden" role="status" tabindex="-1" data-testid="plan-banner"></p>
       <p class="dxMeta muted small"><span data-t="diagnosis">Diagnosa</span> <span id="safetyBadge" class="level"></span></p>
       <h1 id="dxObject"></h1>
-      <div id="partsWrap" class="hidden"><img id="partsImg" alt="Foto dengan bagian yang ditandai" class="partsImg"><ul id="partsList" class="legend"></ul></div>
+      <div id="partsWrap" class="hidden"><img id="partsImg" alt="Foto dengan bagian yang ditandai" class="partsImg" decoding="async"><ul id="partsList" class="legend"></ul></div>
       <p id="dxSummary"></p>
       <ul id="dxCauses" class="causes"></ul>
     </div>
@@ -145,8 +148,9 @@
     <div class="card" id="stepCard">
       <div class="stepHead"><span id="stepNo" class="stepNo"></span><h3 id="stepTitle"></h3></div>
       <div id="stepBar" class="stepBar" aria-hidden="true"></div>
-      <img id="stepImg" class="stepImg hidden" alt="">
+      <img id="stepImg" class="stepImg hidden" alt="" decoding="async">
       <p id="stepText" class="stepText"></p>
+      <p id="stepStatus" class="sr-only" aria-live="polite"></p>
       <p id="stepCaution" class="caution hidden"></p>
       <p id="stepWhy" class="muted small"></p>
       <div id="stepTimer" class="timer hidden" role="timer" aria-live="off"><b id="timerLabel"></b> <span id="timerClock" class="clock" aria-live="polite"></span> <button id="timerBtn" class="btn" type="button"></button></div>
@@ -242,7 +246,7 @@
 </aside>
 </div><!-- /desk -->
 <audio id="player"></audio>
-<script src="/static/replay.js"></script>
-<script src="/static/app.js"></script>
+<script src="/static/replay.js" defer></script>
+<script src="/static/app.js" defer></script>
 </body>
 </html>

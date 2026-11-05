@@ -37,7 +37,11 @@
 }
 
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;
+  /* anything scrolled into view lands under the sticky header, not behind it */
+  scroll-padding-top:calc(76px + env(safe-area-inset-top));scroll-padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+/* during a repair a pull-down must not reload the page (Chrome's pull-to-refresh); the first screen keeps it */
+html.inRepair{overscroll-behavior-y:contain}
 body{margin:0;font:400 var(--fs-b)/1.45 var(--font);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 img{max-width:100%}
 p{margin:.5em 0}
@@ -58,13 +62,26 @@ a{color:var(--blue);text-underline-offset:3px}
   padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top));
   background:color-mix(in srgb,var(--bg) 84%,transparent);-webkit-backdrop-filter:saturate(1.5) blur(16px);backdrop-filter:saturate(1.5) blur(16px);
   border-bottom:1px solid var(--line)}
-.brand{display:flex;align-items:center;gap:10px;min-width:0}
-.brand b{font-family:var(--font-d);font-weight:800;font-size:24px;letter-spacing:0;white-space:nowrap}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto}
+.brand b{font-family:var(--font-d);font-weight:800;font-size:24px;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .plate{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--o);color:var(--on-o);flex:none;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
 .plate .ic{margin:0;width:21px;height:21px;stroke-width:2.4}
-.top select{appearance:none;-webkit-appearance:none;font:600 var(--fs-s) var(--font);color:var(--ink);background:var(--plate) no-repeat right 12px center/14px 14px;
+.top select{appearance:none;-webkit-appearance:none;font:600 16px var(--font);color:var(--ink);background:var(--plate) no-repeat right 12px center/14px 14px;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234F565E' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   border:1.5px solid var(--line-2);border-radius:999px;padding:0 34px 0 14px;max-width:52vw;cursor:pointer}
+/* 16 px in the picker: iOS zooms the page into any form field set smaller */
+.langPick{position:relative;display:block;flex:none}
+.langShort{display:none}
+/* a container query on the header, so the laptop's phone frame (392 px inside) gets the same pill as a real phone */
+.top{container-type:inline-size;container-name:tctop}
+@container tctop (max-width:367px){  /* header content box under 368 px (a viewport under 400 px): "Bahasa Indonesia" no longer fits next to the name: a short pill, the real select laid over it */
+  .langShort{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 30px 0 12px;border-radius:999px;font:600 16px var(--font);
+    background:var(--plate) no-repeat right 11px center/14px 14px;border:1.5px solid var(--line-2);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234F565E' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")}
+  .langShort .ic{margin:0;width:18px;height:18px;color:var(--o-text)}
+  .langPick select{position:absolute;inset:0;width:100%;max-width:none;opacity:0}
+  .langPick:has(select:focus-visible) .langShort{outline:3px solid var(--blue);outline-offset:2px}
+}
 
 /* status strips under the header */
 .badge{max-width:600px;margin:10px 20px 0;padding:9px 14px;border-radius:12px;background:var(--plate);color:var(--mut);font-size:var(--fs-s);line-height:1.35;box-shadow:inset 3px 0 0 var(--blue)}
@@ -72,7 +89,7 @@ a{color:var(--blue);text-underline-offset:3px}
 .badge.replay{color:var(--ink);box-shadow:inset 3px 0 0 var(--o)}
 #offlineBar{box-shadow:inset 3px 0 0 var(--yel);color:var(--ink)}
 
-main{max-width:640px;margin:0 auto;padding:4px 20px 28px}
+main{max-width:640px;margin:0 auto;padding:4px max(20px,env(safe-area-inset-right)) 28px max(20px,env(safe-area-inset-left))}
 .card{background:var(--plate);border-radius:var(--r-plate);padding:20px;margin:14px 0;box-shadow:var(--lift)}
 
 /* ---------- capture (first screen) ---------- */
@@ -164,10 +181,11 @@ textarea:focus,input:focus{outline:none;box-shadow:inset 0 0 0 2px var(--blue)}
 
 /* ---------- progress ---------- */
 #progTitle{font-size:var(--fs-xl)}
-#elapsed{font-variant-numeric:tabular-nums;margin:0 0 4px}
-#elapsed:empty{display:none}
+#elapsed{font-variant-numeric:tabular-nums;margin:0 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}  /* one line: its text changes every second and must never push the list down */
+#elapsed:empty{visibility:hidden}  /* keeps its line, so the list does not jump up when the clock stops */
+#elapsed{min-height:1.45em}
 .stages{list-style:none;padding:0;margin:8px 0}
-.stages li{position:relative;padding:11px 0 11px 34px;border-bottom:1px solid var(--line);font-size:var(--fs-b);line-height:1.35}
+.stages li{position:relative;padding:11px 52px 11px 34px;border-bottom:1px solid var(--line);font-size:var(--fs-b);line-height:1.35}
 .stages li:last-child{border-bottom:0}
 .stages li::before{content:"";position:absolute;left:2px;top:13px;width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--line-2);background:center/12px no-repeat}
 .stages li.running{font-weight:600}
@@ -306,7 +324,8 @@ code.tool.code{background:var(--grn-tint);color:var(--grn-text)}
 .stepBar i{flex:1;height:6px;border-radius:3px;background:var(--line-2)}
 .stepBar i.ok{background:var(--grn)}
 .stepBar i.now{background:var(--o)}
-.stepImg{display:block;width:calc(100% + 40px);max-width:none;height:auto;max-height:300px;object-fit:contain;margin:0 -20px 14px;background:var(--dark)}
+/* a fixed 4:3 box: moving between steps (photo, part close-up or diagram) never changes the card's height */
+.stepImg{display:block;width:calc(100% + 40px);max-width:none;height:auto;aspect-ratio:4/3;max-height:300px;object-fit:contain;margin:0 -20px 14px;background:var(--dark)}
 .stepText{font:600 var(--fs-m)/1.35 var(--font);margin:0 0 10px}
 .caution{background:var(--red-tint);color:var(--red-text);padding:10px 12px;border-radius:12px;font-weight:600}
 .timer{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--blue-tint);color:var(--ink);padding:12px 14px;border-radius:14px;margin:10px 0}
@@ -320,7 +339,7 @@ code.tool.code{background:var(--grn-tint);color:var(--grn-text)}
 #liveBtn{width:100%;margin:0 0 4px}
 #liveBtn[aria-pressed="true"]{box-shadow:inset 0 0 0 2.5px var(--o)}
 .sampleCheck{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:var(--plate-2)}
-.sampleCheck .btn{min-height:44px;margin:6px 6px 0 0;font-size:var(--fs-s);background:var(--plate)}
+.sampleCheck .btn{min-height:44px;margin:6px 6px 0 0;font-size:var(--fs-s);background:var(--plate);justify-content:flex-start;text-align:left;padding:6px 16px}  /* a long label wraps under its text, not centred away from the icon */
 .sampleNote{margin:0 0 10px;font-weight:600}
 #checkResult{margin:12px 0;padding:12px 14px;border-radius:14px;background:var(--plate-2);font-size:var(--fs-b)}
 #checkResult p{margin:4px 0}
@@ -330,8 +349,10 @@ code.tool.code{background:var(--grn-tint);color:var(--grn-text)}
 .pass{color:var(--grn-text)}.fail{color:var(--red-text)}
 #checkResult .caution{margin-top:8px}
 @media (prefers-reduced-motion:no-preference){#checkResult.isPass,#checkResult.isFail{animation:sheetUp .35s var(--ease)}@keyframes sheetUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}}
-.nav{display:grid;grid-template-columns:58px 1fr 1.3fr;gap:8px;margin:14px 0 10px}
-.nav .btn{min-height:56px;padding:0 12px}
+/* minmax(0, ...) so a long label (Dengarkan, Rungokna) can never push Next past the card */
+.nav{display:grid;grid-template-columns:58px minmax(0,1fr) minmax(0,1.3fr);gap:8px;margin:14px 0 10px}
+.nav .btn{min-height:56px;padding:0 12px;min-width:0}
+.nav .btn span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #prevBtn .ic{margin:0;width:24px;height:24px}
 #nextBtn{background:var(--ink);color:var(--bg);box-shadow:none}
 #nextBtn .ic{margin:0 0 0 .4em}
@@ -345,7 +366,12 @@ code.tool.code{background:var(--grn-tint);color:var(--grn-text)}
 .vdot{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--mut);vertical-align:-1px;margin-right:6px}
 .vdot.on{background:var(--red);box-shadow:0 0 0 0 rgba(200,32,30,.6);animation:vpulse 1.4s infinite}
 @keyframes vpulse{0%{box-shadow:0 0 0 0 rgba(200,32,30,.6)}70%{box-shadow:0 0 0 12px rgba(200,32,30,0)}100%{box-shadow:0 0 0 0 rgba(200,32,30,0)}}
+/* hands-free: bigger targets for wet or greasy hands; Back and Listen become square icon buttons so Next gets the room */
+body.handsfree .nav{grid-template-columns:68px 68px minmax(0,1fr)}
 body.handsfree .nav .btn{min-height:68px;font-size:1.2em}
+body.handsfree #playBtn{padding:0}
+body.handsfree #playBtn .ic{margin:0;width:26px;height:26px}
+body.handsfree #playBtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
 #pttBtn{width:100%;margin:6px 0}
 #pttBtn[aria-pressed="true"]{background:var(--red);color:#fff}
 
@@ -428,7 +454,7 @@ details.agent{margin-top:12px;padding:2px 14px 8px;border-radius:14px;background
 .garage .level{margin-left:4px}
 .garage .gMeta{display:block}
 
-footer{text-align:center;padding:8px 20px 28px;max-width:600px;margin:0 auto}
+footer{text-align:center;padding:8px 20px calc(28px + env(safe-area-inset-bottom));max-width:600px;margin:0 auto}
 footer p{margin:0 0 8px}
 #disclaimer{max-width:600px;margin:0 auto 8px}
 #disclaimer:empty{display:none}
@@ -454,9 +480,12 @@ input.pick{position:absolute;left:0;top:0;width:1px;height:1px;opacity:0;pointer
 label:has(>input.pick:focus-visible){outline:3px solid var(--blue);outline-offset:2px}
 h1:focus,h2:focus{outline:none}
 .btn,.chip,select{min-height:44px}
+/* no double-tap zoom (and no 300 ms wait for it) on anything you tap */
+button,.btn,.chip,select,label,a,summary,input{touch-action:manipulation}
 .chip.sm,.specs .chip{min-height:0}
 .hood summary,details.agent summary{padding:10px 0;min-height:24px}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
 
 .deskNote{display:none}
 @media (min-width:1000px){.deskNote{display:block;max-width:640px;margin:10px auto 0;padding:9px 14px;border-radius:12px;background:var(--plate);color:var(--mut);text-align:center}}
@@ -471,7 +500,7 @@ h1:focus,h2:focus{outline:none}
   .phone{position:relative;flex:0 0 auto;width:414px;height:min(868px,calc(100vh - 48px));border:11px solid #17191C;border-radius:54px;background:var(--bg);
     box-shadow:0 0 0 2px #3A3F46,0 40px 80px -30px rgba(26,29,33,.55),0 12px 24px -12px rgba(26,29,33,.3);overflow:hidden;transform:translateZ(0)}
   .phone::before{content:"";position:absolute;top:9px;left:50%;width:98px;height:27px;margin-left:-49px;border-radius:999px;background:#17191C;z-index:40;pointer-events:none}
-  .screen{height:100%;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;border-radius:43px}
+  .screen{height:100%;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;border-radius:43px;scroll-padding-top:112px}
   .screen::-webkit-scrollbar{display:none}
   .screen .top{padding-top:46px}
   .screen main{max-width:none}
@@ -514,3 +543,44 @@ h1:focus,h2:focus{outline:none}
 .goneLang{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .goneLang .chip{display:inline-flex;align-items:center;min-height:44px;text-decoration:none;font-size:var(--fs-xs);padding:0 10px}
 .goneLang .chip[aria-current="true"]{background:var(--ink);color:var(--bg);box-shadow:none}
+
+/* ---------- 1.31.0: smoother screens, instant feedback ---------- */
+/* Screen changes use a same-document View Transition (web/app.js swapView): the header and the laptop side panel stay
+   put, the content slides a little in the direction you are going. Short on purpose (200 ms) and skipped on the first
+   tap or key during it, so nothing ever waits for an animation. Off under prefers-reduced-motion (JS and CSS). */
+.top{view-transition-name:tc-top}
+.side{view-transition-name:tc-side}
+::view-transition-group(root){animation-duration:.2s;animation-timing-function:var(--ease)}
+::view-transition-old(root){animation:tcVtOut .16s var(--ease) both}
+::view-transition-new(root){animation:tcVtIn .2s var(--ease) both}
+html[data-vt-dir="back"]::view-transition-old(root){animation-name:tcVtOutBack}
+html[data-vt-dir="back"]::view-transition-new(root){animation-name:tcVtInBack}
+::view-transition-group(tc-top),::view-transition-group(tc-side){animation:none}
+@keyframes tcVtOut{to{opacity:0;transform:translateX(-18px)}}
+@keyframes tcVtIn{from{opacity:0;transform:translateX(24px)}}
+@keyframes tcVtOutBack{to{opacity:0;transform:translateX(18px)}}
+@keyframes tcVtInBack{from{opacity:0;transform:translateX(-24px)}}
+
+/* a button that is working keeps its label, gets a small spinner and ignores more taps */
+.btn.isBusy,.chip.isBusy,label.btn.isBusy{position:relative;pointer-events:none;cursor:progress}
+.btn.isBusy::after,.chip.isBusy::after{content:"";flex:none;width:1em;height:1em;margin-inline-start:.55em;border-radius:50%;
+  border:2.5px solid currentColor;border-top-color:transparent;opacity:.85}
+@media (prefers-reduced-motion:no-preference){.btn.isBusy::after,.chip.isBusy::after{animation:tcspin .8s linear infinite}}
+.chip:active{transform:scale(.97)}
+.chip{transition:transform .12s var(--ease),background-color .15s}
+
+/* progress: how long the stage that is running has taken so far (counted on this phone, not a guess of what is left) */
+.stT{position:absolute;right:0;top:12px;font-variant-numeric:tabular-nums;color:var(--mut);font-weight:400;font-size:var(--fs-s)}  /* out of the text flow: the counter never re-wraps the row */
+#progress.isStop .stT{color:#FFE4E1}
+
+/* skeletons: a stage that has been running for 200 ms gets a placeholder the same size as its result, so the result
+   drops into place without moving anything. Only for a stage that is really running; never a fake percentage. */
+.lfSk{display:block}
+.skLine{display:block;height:14px;border-radius:7px;background:var(--line-2);width:70%;margin:5px 0 6px}  /* 25 px: one line of body text */
+.skLine.short{width:42%}
+.skChips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.skChips i{display:block;width:96px;height:27px;border-radius:999px;background:var(--line)}  /* the row of part chips */
+.skImg{display:block;width:100%;aspect-ratio:4/3;max-height:240px;margin-top:8px;border-radius:12px;background:var(--line)}
+.skRun .skLine,.skRun .skImg{background-image:linear-gradient(90deg,transparent 0,rgba(255,255,255,.35) 50%,transparent 100%);background-size:200% 100%;background-repeat:no-repeat}
+@media (prefers-color-scheme:dark){.skRun .skLine,.skRun .skImg{background-image:linear-gradient(90deg,transparent 0,rgba(255,255,255,.08) 50%,transparent 100%)}}
+@media (prefers-reduced-motion:no-preference){.skRun .skLine,.skRun .skImg{animation:tcShimmer 1.3s linear infinite}}
+@keyframes tcShimmer{from{background-position:150% 0}to{background-position:-50% 0}}

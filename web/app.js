@@ -188,6 +188,14 @@ const T_REPLAY = {
 const T_GARAGE = { id: { gCam: "dicek kamera", gPlan: "rencana {n}" }, jv: { gCam: "wis dicek kamera", gPlan: "rencana {n}" },
   en: { gCam: "camera-checked", gPlan: "plan {n}" } };
 ["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_GARAGE[k]));
+/* I18N_UI:start (1.31.0: progress line while a stage runs, the step announced to screen readers). api/tests/test_ui_motion.py checks all three. */
+const T_UI = {
+  id: { liveUsual: "perbaikan live biasanya 1 sampai 2 menit", stepSay: "Langkah {n} dari {m}: {text}" },
+  jv: { liveUsual: "ndandani live biasane 1 nganti 2 menit", stepSay: "Langkah {n} saka {m}: {text}" },
+  en: { liveUsual: "a live repair usually takes 1 to 2 minutes", stepSay: "Step {n} of {m}: {text}" },
+};
+/* I18N_UI:end */
+["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_UI[k]));
 
 /* I18N_DESK:start (laptop view side panel). api/tests/test_desk.py checks all three. */
 const T_DESK = {
@@ -353,8 +361,9 @@ function applyLang() {
   if ($("partsImg")) $("partsImg").alt = t("partsAlt");
   qrLabel();
   if ($("lang")) $("lang").value = lang;
+  if ($("langCode")) $("langCode").textContent = lang.toUpperCase();
   if (S) { renderProgress(S); if (S.plan) render(S); }
-  if ($("garage") && !$("capture").classList.contains("hidden")) renderGarage();
+  if ($("garage") && view === "capture") renderGarage();
   badges(); markLang();
   if (window.__offlineRefresh) window.__offlineRefresh();
 }
@@ -431,6 +440,72 @@ function setupOffline() {
   window.__offlineRefresh = upd; upd();
 }
 
+/* ---------------- motion, feedback and screen changes (1.31.0) ----------------
+   Screens change through a same-document View Transition where the browser has one (Chrome, Edge, Safari 18) and
+   instantly elsewhere. `view` says which screen is showing and is set at once, because the transition runs its DOM
+   update a frame later: code that asks "is the progress screen up?" reads `view`, never the .hidden class.
+   Step cards change synchronously (taps, voice commands and timers count steps) and slide with the Web Animations
+   API. Any tap or key finishes a running animation first, and prefers-reduced-motion turns all of it off. */
+let view = "capture";
+const SCREEN_ORDER = { capture: 0, progress: 1, result: 2 };
+const reduceMotion = () => !!(typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+let vt = null, stepAnims = [];
+function swapView(update, dir) {
+  const run = () => { try { update(); } catch (e) { setTimeout(() => { throw e; }, 0); } };  // a bug still surfaces as a page error
+  if (typeof document.startViewTransition !== "function" || reduceMotion() || document.visibilityState === "hidden") { run(); return; }
+  if (vt) { try { vt.skipTransition(); } catch (_) { /* already done */ } }
+  document.documentElement.dataset.vtDir = dir || "forward";
+  try {
+    const tr = document.startViewTransition(run);
+    vt = tr;
+    tr.ready.catch(() => {}); tr.updateCallbackDone.catch(() => {});  // a skipped transition rejects these: not an error
+    tr.finished.catch(() => {}).then(() => { if (vt === tr) { vt = null; delete document.documentElement.dataset.vtDir; } });
+  } catch (_) { vt = null; run(); }
+}
+function finishMotion() {
+  if (vt) { try { vt.skipTransition(); } catch (_) { /* already done */ } }
+  stepAnims.forEach((a) => { try { a.finish(); } catch (_) { /* gone */ } }); stepAnims = [];
+}
+// The first touch or key wins over any animation still running: nothing ever waits for one. While a view transition
+// draws, the browser sends a tap to <html> (the transition's snapshot covers the page), so that tap would be lost:
+// remember where it was and, once the transition is skipped, hand the click to the real control under the finger.
+let lostTap = null;
+document.addEventListener("keydown", finishMotion, { capture: true, passive: true });
+document.addEventListener("pointerdown", (e) => {
+  lostTap = vt ? { x: e.clientX, y: e.clientY, at: Date.now() } : null;
+  finishMotion();
+}, { capture: true, passive: true });
+document.addEventListener("click", (e) => {
+  const tap = lostTap; lostTap = null;
+  if (!tap || e.target !== document.documentElement || Date.now() - tap.at > 1500) return;
+  const under = document.elementFromPoint(tap.x, tap.y);
+  const hit = under && under.closest("button, a[href], label, input, select, textarea, summary, [role=button]");
+  if (!hit || hit.disabled) return;
+  e.stopPropagation();
+  if (/^(SELECT|TEXTAREA)$/.test(hit.tagName) || (hit.tagName === "INPUT" && !["checkbox", "radio", "file", "button", "submit"].includes(hit.type))) hit.focus();
+  else hit.click();
+}, true);
+// A button that is working keeps its label and shows a small spinner (CSS .isBusy); it ignores taps until done.
+function busy(el, onb) {
+  if (!el) return;
+  el.classList.toggle("isBusy", !!onb);
+  if (onb) el.setAttribute("aria-busy", "true"); else el.removeAttribute("aria-busy");
+}
+const isBusy = (el) => !!(el && el.classList.contains("isBusy"));
+// A short buzz on phones that have one (Android Chrome; iOS Safari has no Vibration API). Never before a first tap.
+function buzz(pattern) {
+  try {
+    const ua = navigator.userActivation;
+    if (typeof navigator.vibrate === "function" && (!ua || ua.hasBeenActive)) navigator.vibrate(pattern);
+  } catch (_) { /* not allowed here */ }
+}
+// Wait (at most ms) until a picture is decoded, so a screen never opens with an empty box that then jumps.
+function imgReady(img, ms) {
+  if (!img || !img.getAttribute("src") || (img.complete && img.naturalWidth)) return Promise.resolve();
+  const dec = typeof img.decode === "function" ? img.decode().catch(() => {}) : new Promise((res) => { img.onload = img.onerror = res; });
+  return Promise.race([dec, new Promise((res) => setTimeout(res, ms))]);
+}
+
 /* ---------------- capture ---------------- */
 function isPhotoFile(f) {
   return /^image\//i.test(f.type || "") || /\.(jpe?g|png|webp|gif|bmp|heic|heif|jfif)$/i.test(f.name || "");
@@ -465,17 +540,17 @@ function setupCapture() {
   const arm = () => setTimeout(() => { if ($("capture")) $("capture").classList.toggle("armed", !!(photoFiles.length || videoFile || audioBlob || category || ($("text") && $("text").value.trim()))); }, 0);
   ["change", "input", "click"].forEach((ev) => { if ($("capture")) $("capture").addEventListener(ev, arm); });
   on("micBtn", "click", toggleRec);
-  on("goBtn", "click", () => submit(""));
-  document.querySelectorAll(".sample").forEach((b) => b.addEventListener("click", () => submit(b.dataset.sample)));
-  on("answerBtn", "click", sendAnswer);
+  on("goBtn", "click", () => submit("", $("goBtn")));
+  document.querySelectorAll(".sample").forEach((b) => b.addEventListener("click", () => submit(b.dataset.sample, b)));
+  on("answerBtn", "click", () => sendAnswer());
   on("retryBtn", "click", async () => {
-    $("retryBtn").disabled = true;
+    $("retryBtn").disabled = true; busy($("retryBtn"), true);
     try {
       const r = await fetch(`/api/sessions/${S.id}/retry`, { method: "POST" });
       if (r.ok) { $("jobErr").textContent = ""; $("retryBtn").classList.add("hidden"); follow(S.id); }
       else $("jobErr").textContent = (await r.json()).detail || "";
     } catch (e) { $("jobErr").textContent = netMsg(e);
-    } finally { $("retryBtn").disabled = false; }
+    } finally { $("retryBtn").disabled = false; busy($("retryBtn"), false); }
   });
 }
 
@@ -514,12 +589,14 @@ async function shrinkImage(file, maxSide = 1600, quality = 0.85) {
   } catch (_) { return file; }
 }
 
-async function submit(sample) {
+let submitting = false;
+async function submit(sample, btn) {
+  if (submitting) return "busy";  // a second tap while the first repair is being created
   $("formErr").textContent = "";
   const text = $("text").value.trim();
   if (!sample && !photoFiles.length && !videoFile) return ($("formErr").textContent = t("needPhoto"));
   if (!sample && !text && !audioBlob && !videoFile) return ($("formErr").textContent = t("needDesc"));
-  $("goBtn").disabled = true;
+  $("goBtn").disabled = true; submitting = true; busy(btn || $("goBtn"), true);
   try {
     const fd = new FormData();
     fd.append("language", lang); fd.append("text", sample ? "" : text); fd.append("category", category);
@@ -541,7 +618,7 @@ async function submit(sample) {
   } catch (e) {
     $("formErr").textContent = netMsg(e);
     return e && e.name === "TypeError" ? "net" : "err";  // "net": the request never reached the server
-  } finally { $("goBtn").disabled = false; }
+  } finally { $("goBtn").disabled = false; submitting = false; busy(btn || $("goBtn"), false); }
 }
 
 let firstShow = true;
@@ -551,15 +628,36 @@ function toTop() {
   const sc = $("screen"); if (sc && sc.scrollHeight > sc.clientHeight) sc.scrollTop = 0;
 }
 function show(which) {
-  ["capture", "progress", "result"].forEach((s) => $(s) && $(s).classList.toggle("hidden", s !== which));
-  // Move focus to the new section's heading so screen-reader and keyboard users land on it (not on first load).
-  if (!firstShow) {
-    const h = $(which) && $(which).querySelector("h1, h2");
-    if (h) { h.tabIndex = -1; try { h.focus({ preventScroll: true }); } catch (_) { /* old browsers */ } }
-  }
-  if (!firstShow) { toTop(); if (typeof requestAnimationFrame === "function") requestAnimationFrame(toTop); }  // a new screen starts at its top (the result opened half-way down); the second call stops a smooth scroll still running from the question
-  firstShow = false;
-  if ($("garage")) $("garage").classList.toggle("hidden", which !== "capture" || !loadGarage().length);
+  const from = view, first = firstShow;
+  view = which; firstShow = false;
+  document.documentElement.classList.toggle("inRepair", which !== "capture");  // no pull-to-refresh mid-repair (style.css)
+  const update = () => {
+    ["capture", "progress", "result"].forEach((s) => $(s) && $(s).classList.toggle("hidden", s !== which));
+    // Move focus to the new section's heading so screen-reader and keyboard users land on it (not on first load).
+    if (!first) {
+      const h = $(which) && $(which).querySelector("h1, h2");
+      if (h) { h.tabIndex = -1; try { h.focus({ preventScroll: true }); } catch (_) { /* old browsers */ } }
+      toTop(); if (typeof requestAnimationFrame === "function") requestAnimationFrame(toTop);  // a new screen starts at its top; the second call stops a smooth scroll still running from the question
+    }
+    if ($("garage")) $("garage").classList.toggle("hidden", which !== "capture" || !loadGarage().length);
+  };
+  if (first || from === which) { update(); return; }
+  swapView(update, (SCREEN_ORDER[which] || 0) < (SCREEN_ORDER[from] || 0) ? "back" : "forward");
+}
+// Back, Forward or a reload in the middle of a repair returns to the step the owner was on (this tab only).
+function savedStep(s) {
+  try {
+    const v = JSON.parse(sessionStorage.getItem("tc_step_" + s.id) || "null");
+    const n = ((s.plan || {}).steps || []).length;
+    if (v && v.c === (Number(s.cause_index) || 0) && Number.isInteger(v.i) && v.i >= 0 && v.i < n) return v.i;
+  } catch (_) { /* storage blocked */ }
+  return 0;
+}
+// The result opens once its marked photo is decoded (at most 1.2 s), so the screen does not jump as it loads.
+async function openResult(id) {
+  stepIdx = savedStep(S); render(S);
+  await imgReady($("partsImg"), 1200);
+  if (S && S.id === id && view === "progress") show("result");
 }
 
 /* ---------------- progress (SSE, falls back to polling) ---------------- */
@@ -569,7 +667,7 @@ function follow(id) {
   if (es) es.close();
   const settle = async () => {
     S = await fetchSession(id); renderProgress(S);
-    if (S.status === "ready") { stepIdx = 0; render(S); show("result"); }
+    if (S.status === "ready") await openResult(id);
   };
   if (window.EventSource) {
     es = new EventSource(`/api/sessions/${id}/events`);
@@ -585,14 +683,18 @@ function poll(id) {
   fetchSession(id).then((s) => {
     S = s; renderProgress(s);
     if (["created", "running"].includes(s.status)) setTimeout(() => poll(id), 1200);
-    else if (s.status === "ready") { stepIdx = 0; render(s); show("result"); }
+    else if (s.status === "ready") openResult(id);
   }).catch(() => setTimeout(() => poll(id), 2500));
 }
 
+// When this phone first saw each stage running: the running row counts up from there (an honest "so far", not an ETA).
+const stageSeen = { sid: "", t0: {} };
 function renderProgress(s) {
   if (!$("stageList") || !s.stages) return;
+  if (stageSeen.sid !== String(s.id || "")) { stageSeen.sid = String(s.id || ""); stageSeen.t0 = {}; }
+  Object.entries(s.stages).forEach(([k, v]) => { if (v.status === "running" && !stageSeen.t0[k]) stageSeen.t0[k] = Date.now(); if (v.status !== "running") delete stageSeen.t0[k]; });
   $("stageList").innerHTML = Object.entries(s.stages).map(([k, v]) =>
-    `<li id="st-${esc(k)}" class="${esc(v.status)}">${esc(t("stages")[k] || k)}${v.status === "skipped" ? "" : ` <code class="tool">${esc(stageTool(s, k))}</code>`}<span class="note">${esc(stageNote(v.note))}</span></li>`).join("");
+    `<li id="st-${esc(k)}" class="${esc(v.status)}">${esc(t("stages")[k] || k)}${v.status === "skipped" ? "" : ` <code class="tool">${esc(stageTool(s, k))}</code>`}${v.status === "running" ? `<span class="stT" data-st="${esc(k)}"></span>` : ""}<span class="note">${esc(stageNote(v.note))}</span></li>`).join("");
   renderAgentLog(s, "agentLive"); renderPartial(s); reflash(); tickElapsed(); updateTour();
   if ($("progressStatus")) {  // short screen-reader status instead of re-announcing the whole list
     const run = Object.entries(s.stages).find(([, v]) => v.status === "running");
@@ -618,19 +720,22 @@ function renderProgress(s) {
   if (stopped) {
     const fresh = $("stopBox").classList.contains("hidden") || !$("stopBox").innerHTML;
     renderStop(s); saveGarage(s);
-    if (fresh) toTop();  // the STOP card sits right under the heading
+    if (fresh) { toTop(); if (s.status === "stopped") buzz([90, 60, 90]); }  // the STOP card sits right under the heading
   }
   $("jobErr").textContent = s.status === "error" ? s.error : "";
   if ($("retryBtn")) $("retryBtn").classList.toggle("hidden", !(s.status === "error" && s.error_kind !== "budget"));
 }
 
-async function sendAnswer() {
-  const v = $("answerText").value.trim(); if (!v) return;
+async function sendAnswer(btn) {
+  const v = $("answerText").value.trim(); if (!v || isBusy($("answerBtn"))) return;
   const fd = new FormData(); fd.append("text", v);
+  const tapped = btn && btn.nodeType === 1 ? btn : $("answerBtn");
+  busy($("answerBtn"), true); busy(tapped, true);
   try {
     const r = await fetch(`/api/sessions/${S.id}/answer`, { method: "POST", body: fd });
     if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || t("netErr"));
-  } catch (e) { $("jobErr").textContent = netMsg(e); return; }
+  } catch (e) { $("jobErr").textContent = netMsg(e); return;
+  } finally { busy($("answerBtn"), false); busy(tapped, false); }
   $("jobErr").textContent = ""; $("answerText").value = ""; startElapsed(); follow(S.id);
 }
 
@@ -778,9 +883,27 @@ function stepImage(st) {
 }
 
 let advT = 0;  // the 1.5 s auto-advance after a passed check; any other move to a step cancels it
+// Move to step i (Next, Back, voice, auto-advance). The DOM changes at once; the card's head, picture and text slide
+// in from the side you are going, the new step is announced, and the card is brought up if its top is off screen.
+function goStep(i) {
+  if (!S || !S.plan || i < 0 || i >= S.plan.steps.length) return;
+  const dir = i >= stepIdx ? 1 : -1;
+  stepIdx = i; renderStep();
+  const st = S.plan.steps[stepIdx];
+  if ($("stepStatus")) $("stepStatus").textContent = t("stepSay").replace("{n}", String(st.n)).replace("{m}", String(S.plan.steps.length)).replace("{text}", st.instruction || "");
+  finishMotion();
+  if (!reduceMotion() && typeof Element !== "undefined" && typeof Element.prototype.animate === "function") {
+    stepAnims = ["#stepCard .stepHead", "#stepImg", "#stepText"].map((q) => document.querySelector(q)).filter(Boolean)
+      .map((el, k) => el.animate([{ opacity: 0.3, transform: `translateX(${dir * 22}px)` }, { opacity: 1, transform: "none" }],
+        { duration: 210, delay: k * 30, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" }));
+  }
+  const card = $("stepCard"), head = card && card.querySelector(".stepHead");
+  if (head && head.getBoundingClientRect().top < 64 && card.scrollIntoView) card.scrollIntoView({ block: "start", behavior: reduceMotion() ? "auto" : "smooth" });
+}
 function renderStep() {
   clearTimeout(advT);
   const st = S.plan.steps[stepIdx];
+  if (!sharedView()) { try { sessionStorage.setItem("tc_step_" + S.id, JSON.stringify({ c: Number(S.cause_index) || 0, i: stepIdx })); } catch (_) { /* storage blocked */ } }
   $("stepNo").textContent = st.n; $("stepTitle").textContent = `${st.n} / ${S.plan.steps.length}`;
   if ($("stepBar")) $("stepBar").innerHTML = S.plan.steps.map((x, i) => `<i class="${((S.checks || {})[String(x.n)] || {}).passed ? "ok" : i === stepIdx ? "now" : ""}"></i>`).join("");
   $("stepText").textContent = st.instruction; $("stepWhy").textContent = st.why || "";
@@ -904,16 +1027,20 @@ async function sendOutcome(result) {
 async function checkPhoto(f) {
   const st = S.plan.steps[stepIdx], fd = new FormData(); fd.append("photo", f, f.name || "check.jpg");
   $("checkResult").classList.remove("hidden", "isPass", "isFail"); $("checkResult").textContent = t("checking");
+  const pickers = [$("stepPhotoLabel"), $("sampleBad"), $("sampleGood"), $("liveCheck")];
+  pickers.forEach((b) => busy(b, true));
   try {
     const r = await fetch(`/api/sessions/${S.id}/steps/${st.n}/check`, { method: "POST", body: fd });
     const j = await r.json();
     if (!r.ok) { $("checkResult").textContent = j.detail; return null; }
     S = await fetchSession(S.id); showCheck(j); renderVerified(); renderAgentLog(S, "agent"); saveGarage(S);  // garage shows the new "n/m ✓"
+    buzz(j.passed ? 35 : [40, 70, 40]);
     if ($("stepBar")) { const k = $("stepBar").children[stepIdx]; if (k && j.passed) k.className = "ok"; }
-    if (j.passed && stepIdx < S.plan.steps.length - 1) advT = setTimeout(() => { if (S && S.plan && stepIdx < S.plan.steps.length - 1) { stepIdx++; renderStep(); } }, 1500);
+    if (j.passed && stepIdx < S.plan.steps.length - 1) advT = setTimeout(() => { if (S && S.plan && stepIdx < S.plan.steps.length - 1) goStep(stepIdx + 1); }, 1500);
     else if (j.passed && S.plan.steps.every((x) => ((S.checks || {})[String(x.n)] || {}).passed) && !(S.outcome || {}).result) advT = setTimeout(askOutcome, 1500);
     return j;
-  } catch (err) { $("checkResult").textContent = "⚠️ " + netMsg(err); return null; }
+  } catch (err) { $("checkResult").textContent = "⚠️ " + netMsg(err); return null;
+  } finally { pickers.forEach((b) => busy(b, false)); }
 }
 
 /* ---------------- live guide: SAM 3.1 highlight over the live rear camera ----------------
@@ -1014,15 +1141,16 @@ function renderVerified() {
 }
 
 function setupResult() {
-  on("prevBtn", "click", () => { if (stepIdx > 0) { stepIdx--; renderStep(); } });
-  on("nextBtn", "click", () => { if (stepIdx < S.plan.steps.length - 1) { stepIdx++; renderStep(); } });
+  on("prevBtn", "click", () => { if (stepIdx > 0) goStep(stepIdx - 1); });
+  on("nextBtn", "click", () => { if (stepIdx < S.plan.steps.length - 1) goStep(stepIdx + 1); });
   on("playBtn", "click", play);
   on("handsFree", "change", (e) => setHandsFree(e.target.checked));
-  on("mechBtn", "click", () => showHandoff("handoff"));
+  on("mechBtn", "click", async () => { if (isBusy($("mechBtn"))) return; busy($("mechBtn"), true); try { await showHandoff("handoff"); } finally { busy($("mechBtn"), false); } });
   on("pttBtn", "click", pushToTalk);
   if ($("player")) $("player").addEventListener("ended", () => { voice.quietUntil = Date.now() + 800; });
-  on("fixedBtn", "click", () => sendOutcome("fixed"));
-  on("proBtn", "click", () => sendOutcome("pro"));
+  const outcomeTap = (b, result) => async () => { if (isBusy(b)) return; busy(b, true); try { await sendOutcome(result); } finally { busy(b, false); } };
+  on("fixedBtn", "click", outcomeTap($("fixedBtn"), "fixed"));
+  on("proBtn", "click", outcomeTap($("proBtn"), "pro"));
   on("stepPhoto", "change", async (e) => {
     const f0 = e.target.files[0]; if (!f0) return;
     const f = await shrinkImage(f0); e.target.value = "";
@@ -1039,7 +1167,7 @@ function setupResult() {
   };
   on("stuckBtn", "click", async () => {
     const fd = new FormData(); fd.append("report", $("stuckText").value.trim());
-    $("stuckBtn").disabled = true; $("stuckMsg").textContent = t("working");
+    $("stuckBtn").disabled = true; busy($("stuckBtn"), true); $("stuckMsg").textContent = t("working");
     try {
       const r = await fetch(`/api/sessions/${S.id}/replan`, { method: "POST", body: fd });
       const j = await r.json();
@@ -1048,9 +1176,14 @@ function setupResult() {
       if (S.status === "ready") { stepIdx = 0; render(S); $("stuckMsg").textContent = t("newPlan"); $("stuckText").value = ""; toTop(); focusBanner(); }
       else { $("stuckMsg").textContent = "⛔ " + (S.stop_reason || S.error || ""); showHandoff("handoff"); }
     } catch (err) { $("stuckMsg").textContent = "⚠️ " + netMsg(err);
-    } finally { $("stuckBtn").disabled = false; }
+    } finally { $("stuckBtn").disabled = false; busy($("stuckBtn"), false); }
   });
   on("shareBtn", "click", async () => {
+    if (isBusy($("shareBtn"))) return;
+    busy($("shareBtn"), true);
+    try { await shareGuide(); } finally { busy($("shareBtn"), false); }
+  });
+  async function shareGuide() {
     // a recording has no shared guide page; in the static build the page may live under a sub-path
     const url = replayOn() ? location.origin + homePath() + "?replay=1" : location.origin + "/guide/" + S.id;
     const dx = (S && S.diagnosis) || {}, c = (dx.causes || [])[S.cause_index || 0] || (dx.causes || [])[0];
@@ -1074,7 +1207,7 @@ function setupResult() {
       msg.append(label + " ", u); msg.classList.remove("hidden");
     };
     try { await navigator.clipboard.writeText(url); say("✅ " + t("copied") + ":"); } catch (_) { say(t("linkLabel") + ":"); }
-  });
+  }
   on("eraseBtn", "click", () => {
     if (!S || !S.id || !confirm(t("eraseAsk"))) return;
     const id = S.id;
@@ -1187,8 +1320,8 @@ function doCommand(cmd, heard) {
   if (vs) vs.textContent = heard ? t("vHeard").replace("{text}", heard) : "";
   if (cmd === "stop") { setHandsFree(false); return cmd; }
   if (!S || !S.plan || $("stepCard").classList.contains("locked")) return null;
-  if (cmd === "next") { if (stepIdx < S.plan.steps.length - 1) { stepIdx++; renderStep(); } else play(); }
-  else if (cmd === "back") { if (stepIdx > 0) { stepIdx--; renderStep(); } else play(); }
+  if (cmd === "next") { if (stepIdx < S.plan.steps.length - 1) goStep(stepIdx + 1); else play(); }
+  else if (cmd === "back") { if (stepIdx > 0) goStep(stepIdx - 1); else play(); }
   else if (cmd === "repeat") play();
   else if (cmd === "check") { if (live.stream) liveCheckNow(); else if ($("liveBtn")) openLive(); else if ($("stepPhoto")) $("stepPhoto").click(); }
   else if (cmd === "broken") { if ($("stuckBtn")) $("stuckBtn").click(); }
@@ -1256,7 +1389,7 @@ function renderGarage() {
     $("garageSaved").textContent = sum > 0 ? `💰 ${t("savedTotal")} ${rupiah(sum)} ${t("savedFrom")} ${fixed.length} ${t(fixed.length === 1 && T[lang] && T[lang].savedUnit1 ? "savedUnit1" : "savedUnit")}` : "";
     $("garageSaved").classList.toggle("hidden", !(sum > 0));
   }
-  $("garage").classList.toggle("hidden", !g.length || ($("capture") && $("capture").classList.contains("hidden")));
+  $("garage").classList.toggle("hidden", !g.length || view !== "capture");
   $("garageList").innerHTML = g.map((e) => {
     const day = new Date(e.at).toLocaleDateString(lang === "en" ? "en-GB" : "id-ID", { day: "numeric", month: "short" });
     const lvl = ["green", "amber", "red"].includes(e.level) ? e.level : "";
@@ -1383,18 +1516,58 @@ function partialRows(s) {
   return rows;
 }
 function fillRaw(key, vals) { return t(key).replace(/\{(\w+)\}/g, (m, k) => (vals[k] !== undefined ? String(vals[k]) : m)); }
+// Skeletons: when a repair's progress screen opens, "Found so far" lays out one placeholder row per finding
+// still to come (what it saw, the SAM 3.1 photo box, the top cause, the step count), each the size of its result.
+// The real row then takes over the same <li>, so the agent log below never jumps as findings stream in. Only the
+// stage that is really running shimmers; a placeholder never shows a number. Once shown, a placeholder stays at least
+// SK_MIN so it does not blink; a skipped or stopped stage takes its placeholder away.
+const SK_DELAY = 200, SK_MIN = 400, SK_STAGES = ["look", "segment", "diagnose", "plan"];
+const sk = { sid: "", t0: 0, showT: 0, swapT: 0 };
+const skHtml = (k) => (k === "segment" ? '<span class="lfSk"><span class="skLine"></span><span class="skImg"></span></span>'
+  : k === "look" ? '<span class="lfSk"><span class="skLine"></span><span class="skChips"><i></i><i></i><i></i></span></span>'
+    : k === "diagnose" ? '<span class="lfSk"><span class="skLine"></span><span class="skLine short"></span></span>'
+      : '<span class="lfSk"><span class="skLine"></span></span>');
 function renderPartial(s) {
   const box = $("liveFind"); if (!box) return;
   const list = box.querySelector(".lfList");
-  if (box.dataset.sid !== String(s.id || "")) { list.innerHTML = ""; box.dataset.sid = String(s.id || ""); }
-  const rows = partialRows(s);
-  box.classList.toggle("hidden", !rows.length);
+  const sid = String(s.id || "");
+  if (box.dataset.sid !== sid) { list.innerHTML = ""; box.dataset.sid = sid; }
+  // The first render of a repair lays the placeholders out with the screen itself (the screen is new anyway, and the
+  // agent log must not appear first and then be pushed down). Later, the delay keeps a quick re-run from flashing them.
+  if (sk.sid !== sid) { sk.sid = sid; sk.t0 = Date.now() - (view === "progress" && !list.children.length ? SK_DELAY : 0); clearTimeout(sk.showT); clearTimeout(sk.swapT); }
+  const rows = new Map(partialRows(s)), st = s.stages || {};
+  const going = ["created", "running", "needs_answer"].includes(s.status);
+  const skOn = going && Date.now() - sk.t0 >= SK_DELAY - 5;
+  if (going && !skOn) { clearTimeout(sk.showT); sk.showT = setTimeout(() => { if (S && String(S.id) === sid) renderPartial(S); }, SK_DELAY); }
   let added = null;
-  for (const [k, html] of rows) {
+  SK_STAGES.forEach((k, idx) => {
     let li = list.querySelector(`li[data-k="${k}"]`);
-    if (!li) { li = document.createElement("li"); li.dataset.k = k; li.className = "pop"; li.id = "lf-" + k; list.appendChild(li); added = li; }
+    const html = rows.get(k), state = (st[k] || {}).status || "";
+    if (html === undefined) {  // no finding yet: a placeholder while the stage is still to come, nothing otherwise
+      const coming = skOn && !["skipped", "error", "stopped", "done"].includes(state);
+      if (li && li.dataset.sk && !coming) li.remove();
+      else if (li && li.dataset.sk) li.classList.toggle("skRun", state === "running");
+      else if (!li && coming) {
+        li = document.createElement("li"); li.dataset.k = k; li.dataset.sk = String(Date.now());
+        li.setAttribute("aria-hidden", "true"); li.innerHTML = skHtml(k); li.classList.toggle("skRun", state === "running");
+        const next = SK_STAGES.slice(idx + 1).map((x) => list.querySelector(`li[data-k="${x}"]`)).find(Boolean);
+        list.insertBefore(li, next || null); added = added || li;
+      }
+      return;
+    }
+    if (li && li.dataset.sk) {  // the finding arrived: it takes over its placeholder's row
+      const left = SK_MIN - (Date.now() - Number(li.dataset.sk));
+      if (left > 0) { clearTimeout(sk.swapT); sk.swapT = setTimeout(() => { if (S && String(S.id) === sid) renderPartial(S); }, left); return; }
+      delete li.dataset.sk; li.removeAttribute("aria-hidden"); li.classList.remove("skRun"); li.dataset.h = ""; li.id = "lf-" + k;
+    }
+    if (!li) {
+      li = document.createElement("li"); li.dataset.k = k; li.className = "pop"; li.id = "lf-" + k;
+      const next = SK_STAGES.slice(idx + 1).map((x) => list.querySelector(`li[data-k="${x}"]`)).find(Boolean);
+      list.insertBefore(li, next || null); added = li;
+    }
     if (li.dataset.h !== html) { li.innerHTML = html; li.dataset.h = html; }
-  }
+  });
+  box.classList.toggle("hidden", !list.children.length);
   if (added) keepAboveTourBar(added);
 }
 // In the 1-tap demo the tip bar is fixed at the bottom, right where "Found so far" grows on a phone:
@@ -1421,10 +1594,23 @@ function stageTool(s, k) {
   return k === "narrate" ? "edge-tts" : t("agCode");
 }
 let progT0 = 0, progTimer = null;
+// "⏱ 34 s · Diagnosing (muse-spark-1.3)": the whole wait, the stage that is working and the model doing it, plus how
+// long a live repair usually takes (only on the live server). The running row in the list counts its own seconds.
 function tickElapsed() {
   const el = $("elapsed"); if (!el) return;
-  const running = S && ["created", "running"].includes(S.status) && !$("progress").classList.contains("hidden");
-  el.textContent = running ? "⏱ " + t("elapsed").replace("{n}", String(Math.round((Date.now() - progT0) / 1000))) : "";
+  const running = S && ["created", "running"].includes(S.status) && view === "progress";
+  let line = "";
+  if (running) {
+    line = "⏱ " + t("elapsed").replace("{n}", String(Math.round((Date.now() - progT0) / 1000)));
+    const cur = Object.entries(S.stages || {}).find(([, v]) => v && v.status === "running");
+    if (cur) { const tool = stageTool(S, cur[0]); line += " · " + (t("stages")[cur[0]] || cur[0]) + (tool ? ` (${tool})` : ""); }
+    if (HEALTH && HEALTH.mode === "live") line += " · " + t("liveUsual");
+  }
+  el.textContent = line;
+  document.querySelectorAll("#stageList .stT").forEach((x) => {
+    const t0 = stageSeen.t0[x.dataset.st];
+    x.textContent = t0 ? t("elapsed").replace("{n}", String(Math.round((Date.now() - t0) / 1000))) : "";
+  });
   if (!running && progTimer) { clearInterval(progTimer); progTimer = null; }
 }
 function startElapsed() { progT0 = Date.now(); if (progTimer) clearInterval(progTimer); progTimer = setInterval(tickElapsed, 1000); tickElapsed(); }
@@ -1497,21 +1683,25 @@ async function sampleCheck(kind) {
 }
 function setupDemo() {
   on("demoBtn", "click", async () => {
-    setTour(true);
-    if (await useReplay()) { await window.TCReplay.start(lang); wakeNote(false); await health(); }
-    const res = await submit("motor");
-    // The page loaded but the server stopped answering (it fell asleep, the connection dropped): play the
-    // recorded demo instead of leaving the visitor on "No connection".
-    if (res === "net" && window.TCReplay && !replayOn() && await window.TCReplay.start(lang)) {
-      $("formErr").textContent = ""; wakeNote(false); await health(); submit("motor");
-    }
+    const btn = $("demoBtn"); if (isBusy(btn)) return;  // a double tap must not start two repairs
+    busy(btn, true);
+    try {
+      setTour(true);
+      if (await useReplay()) { await window.TCReplay.start(lang); wakeNote(false); await health(); }
+      const res = await submit("motor", btn);
+      // The page loaded but the server stopped answering (it fell asleep, the connection dropped): play the
+      // recorded demo instead of leaving the visitor on "No connection".
+      if (res === "net" && window.TCReplay && !replayOn() && await window.TCReplay.start(lang)) {
+        $("formErr").textContent = ""; wakeNote(false); await health(); await submit("motor", btn);
+      }
+    } finally { busy(btn, false); }
   });
   on("tourClose", "click", () => setTour(false));
   on("tourToggle", "click", toggleTour);
   on("sampleBad", "click", () => sampleCheck("dark"));
   on("sampleGood", "click", () => sampleCheck("ok"));
   document.querySelectorAll("#quickAns button").forEach((b) => b.addEventListener("click", () => {
-    $("answerText").value = t(b.dataset.q); sendAnswer();
+    $("answerText").value = t(b.dataset.q); sendAnswer(b);
   }));
   if ($("preList")) $("preList").addEventListener("change", () => setTimeout(updateTour, 0));
 }
@@ -1553,7 +1743,7 @@ function loadQr() {
 }
 function setupDesk() {
   if (!$("side")) return;
-  on("sideDemo", "click", () => { const b = $("demoBtn"); if (b && !$("capture").classList.contains("hidden")) b.click(); else location.href = location.pathname + location.search; });
+  on("sideDemo", "click", () => { const b = $("demoBtn"); if (b && view === "capture") b.click(); else location.href = location.pathname + location.search; });
   document.querySelectorAll("[data-setlang]").forEach((b) => b.addEventListener("click", () => {
     const sel = $("lang"); if (!sel) return;
     sel.value = b.dataset.setlang; sel.dispatchEvent(new Event("change"));
@@ -1606,6 +1796,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   if (location.hash.startsWith("#replay-")) history.replaceState(null, "", location.pathname + location.search);  // a recording does not survive a reload
   else if (location.hash.length > 1) { show("progress"); startElapsed(); follow(location.hash.slice(1)); }
+  firstShow = false;  // from here on every screen change is the owner's: it animates and moves focus to the new heading
 });
 
 // PWA: install to home screen. The worker only caches the app shell; it fails quietly when sw.js is absent.

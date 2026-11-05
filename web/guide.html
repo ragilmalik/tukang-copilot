@@ -14,11 +14,13 @@
 <body data-sid="{{SID}}">
 <header class="top">
   <div class="brand"><span class="plate" aria-hidden="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-wrench"></use></svg></span><b>Tukang Copilot</b></div>
+  <!-- the select is the real control; under 400 px a short "ID / JV / EN" pill is drawn behind it so the name still fits -->
+  <label class="langPick"><span class="langShort" aria-hidden="true"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-languages"></use></svg><b id="langCode">ID</b></span>
   <select id="lang" aria-label="Language">
     <option value="id">Bahasa Indonesia</option>
     <option value="jv">Basa Jawa</option>
     <option value="en">English</option>
-  </select>
+  </select></label>
 </header>
 <aside class="notes" aria-label="Status">
 <div id="offlineBar" class="badge hidden" role="status"></div>
@@ -80,7 +82,7 @@
       <p id="planBanner" class="planBanner hidden" role="status" tabindex="-1" data-testid="plan-banner"></p>
       <p class="dxMeta muted small"><span data-t="diagnosis">Diagnosa</span> <span id="safetyBadge" class="level"></span></p>
       <h1 id="dxObject"></h1>
-      <div id="partsWrap" class="hidden"><img id="partsImg" alt="Foto dengan bagian yang ditandai" class="partsImg"><ul id="partsList" class="legend"></ul></div>
+      <div id="partsWrap" class="hidden"><img id="partsImg" alt="Foto dengan bagian yang ditandai" class="partsImg" decoding="async"><ul id="partsList" class="legend"></ul></div>
       <p id="dxSummary"></p>
       <ul id="dxCauses" class="causes"></ul>
     </div>
@@ -100,8 +102,9 @@
     <div class="card" id="stepCard">
       <div class="stepHead"><span id="stepNo" class="stepNo"></span><h3 id="stepTitle"></h3></div>
       <div id="stepBar" class="stepBar" aria-hidden="true"></div>
-      <img id="stepImg" class="stepImg hidden" alt="">
+      <img id="stepImg" class="stepImg hidden" alt="" decoding="async">
       <p id="stepText" class="stepText"></p>
+      <p id="stepStatus" class="sr-only" aria-live="polite"></p>
       <p id="stepCaution" class="caution hidden"></p>
       <p id="stepWhy" class="muted small"></p>
       <div id="stepTimer" class="timer hidden" role="timer" aria-live="off"><b id="timerLabel"></b> <span id="timerClock" class="clock" aria-live="polite"></span> <button id="timerBtn" class="btn" type="button"></button></div>
@@ -156,6 +159,6 @@
 <p data-t="footer">Hanya untuk perbaikan ringan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.</p>
 </footer>
 <audio id="player"></audio>
-<script src="/static/app.js"></script>
+<script src="/static/app.js" defer></script>
 </body>
 </html>
