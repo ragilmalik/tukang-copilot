@@ -40,7 +40,9 @@ FIX = ROOT / "api" / "tests" / "fixtures"
 ARCH = ROOT / "docs" / "img" / "architecture.png"
 W, H = 1920, 1080
 ORANGE, INK, BG, MUTED = (255, 122, 0), (29, 35, 43), (246, 243, 238), (107, 116, 128)
-VOICE_NAME = "en-US-AndrewNeural"
+VOICE_NAME = "en-US-AndrewMultilingualNeural"  # the most natural-sounding English narrator edge-tts has
+VOICE_RATE = "-4%"                              # a touch slower than default, like someone explaining, not reading
+PAUSE_S = 0.45                                  # gap between an owner's line and the narrator
 
 
 def font(size: int, bold: bool = True) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
@@ -62,6 +64,7 @@ class Scene:
     min_s: float = 5.0
     head: str = ""        # short headline over the caption, in the video's side panel
     tone: str = "act"     # safety colour of the panel accent: act (orange), check (yellow), ok (green), stop (red), info (blue)
+    pre: tuple[str, str] = ("", "")   # (edge-tts voice, line) spoken first by an owner, in Bahasa or Basa Jawa
 
 
 WA_LABELS = ["Cause on your photo", "Tap a step button", "Gas leak: red stop"]
@@ -74,55 +77,55 @@ SCENES: list[Scene] = [
     Scene("hook", "title:Motor mogok. Bengkelnya tutup.|Bike won't start. The repair shop is closed.",
           "139 million motorbikes in Indonesia (BPS 2024), plus water pumps.",
           "In Indonesia, a small fault on a motorbike or a water pump can cost a day's wage. "
-          "Repair videos can't see your problem, and most of them aren't in your language.", 7),
+          "Repair videos can't see your problem, and most aren't in your language.", 7,
+          pre=("id-ID-ArdiNeural", "Aduh, motorku mogok. Bengkelnya tutup lagi.")),
     Scene("intro", "01_home", "Photo + voice in Bahasa, Javanese or English. No photo? 1-tap demo.",
-          "Take a photo and say what's wrong. Every answer in this video is live from Meta's models; the photos are AI-generated samples.", 5,
+          "Take a photo and say what's wrong. Every answer here is live from Meta's models. The photos are AI-generated samples.", 5,
           "Snap it, say it"),
     Scene("progress", "02_progress", "Results stream in as each Meta model finishes: what it saw, SAM 3.1's outlines, the likely cause.",
-          "Each stage shows its result as soon as it finishes: what Muse Spark saw, "
-          "the parts SAM 3.1 outlined, then the likely cause.", 6, "Watch it work", "info"),
+          "Each result shows up as soon as it's ready: what Muse Spark saw, the parts SAM outlined, then the likely cause.", 6, "Watch it work", "info"),
     Scene("question", "03_question", "Unsure? It asks one question instead of guessing.",
-          "When the evidence is ambiguous, it asks one short question instead of guessing.", 4, "One question"),
+          "If it isn't sure, it asks one short question instead of guessing.", 4, "One question"),
     Scene("diagnosis", "04_diagnosis", "Likely causes with confidence, safety level, tools, time, cost vs bengkel price.",
-          "Then the diagnosis: likely causes with confidence, a safety level, tools, time, and the parts cost next to the repair-shop price.", 6,
+          "Then the diagnosis. Likely causes with confidence, a safety level, tools and time, and the parts cost next to the bengkel price.", 6,
           "The likely cause", "check"),
     Scene("parts", "05_parts", "SAM 3.1 masks the real parts on your own photo, numbered.",
-          "SAM 3.1 masks and numbers the parts on your own photo, not on a generic diagram.", 5, "Parts on your photo"),
+          "SAM 3.1 marks the parts on your own photo, not on some generic diagram.", 5, "Parts on your photo"),
     Scene("preflight", "15_preflight", "Safety first: the steps stay locked until every check is ticked.",
-          "Before step one there's a short safety checklist. The steps stay locked until every item is ticked.", 5,
+          "Before step one, there's a short safety checklist. The steps stay locked until it's done.", 5,
           "Safety first", "check"),
     Scene("live", "16_live_guide", "Live camera guide: SAM 3.1 outlines the part to touch, on the live camera.",
-          "The live camera guide: point the phone and SAM 3.1 outlines the part to touch, about once a second. "
-          "Here the camera is Chromium's fake camera playing a sample photo.", 9, "Live camera guide"),
+          "Point the camera, and SAM 3.1 outlines the part to touch, about once a second. "
+          "Here it's Chromium's test camera playing a sample photo.", 8, "Live camera guide"),
     Scene("check_fail", "07_check_fail", "Check my step: the photo is verified. A correction when it's wrong.",
-          "After each step, Check my step. Muse Spark compares the photo with the expected state. "
-          "This one is too dark, so it says what to retake instead of guessing.", 7, "Check my step", "check"),
+          "After each step, you send a photo, and Muse Spark compares it with what it should look like. "
+          "This one's too dark, so it asks for a retake.", 7, "Check my step", "check"),
     Scene("check_pass", "08_check_pass", "A clear photo of the finished step passes.",
-          "A clear photo of the plug cap pushed back on passes, and the guide moves on.", 4, "Verified", "ok"),
+          "A clear photo of the plug cap back on passes, and it moves on.", 4, "Verified", "ok"),
     Scene("handsfree", "17_hands_free", "Hands-free: steps read aloud, voice commands like “lanjut”, “ulang”, “cek”.",
-          "Hands dirty? Turn on hands-free. Each step is read aloud, and the phone listens for lanjut, ulang or cek.", 6, "Hands-free"),
+          "Hands dirty? Turn on hands-free. It reads each step out loud and listens for simple voice commands.", 6, "Hands-free"),
     Scene("replan", "09_replan", "Still broken? The agent re-plans to the next likely cause.",
-          "Still broken? Say what happened, and it re-plans to the next most likely cause. Plan, act, verify, re-plan.", 6, "Re-plan"),
+          "Still broken? Tell it what happened, and it moves on to the next likely cause. Plan, act, check, re-plan.", 6, "Re-plan"),
     Scene("diagram", "28_diagram_step", "No photo can show it? Muse Image draws a diagram for the step, reviewed by Muse Spark.",
-          "When a photo can't show a step, like the washer inside a tap, Muse Image draws a diagram and Muse Spark checks it.", 5,
+          "When a photo can't show a step, like the washer inside a tap, Muse Image draws one, and Muse Spark checks the drawing.", 5,
           "A diagram for the step", "info"),
     Scene("agent", "23_agent_log", "“What the AI did”: every decision, the model that made it, and why it asked.",
-          "Every decision is on screen: what it saw, why it asked, each photo check, each re-plan, and which Meta model did it.", 6,
+          "Every decision stays on screen: what it saw, why it asked, each photo check, and which model did it.", 6,
           "What the AI did", "info"),
     Scene("handoff", "18_handoff", "Hand-off to a bengkel: WhatsApp summary, nearest workshop, PDF with a mechanic brief.",
-          "When it's a job for a pro, one tap hands it off: a WhatsApp summary of what was found and tried, "
-          "a search for the nearest bengkel, and a PDF brief for the mechanic.", 8, "Hand-off to a bengkel"),
+          "When it's a job for a pro, one tap hands it over: a WhatsApp summary, the nearest bengkel, and a PDF brief for the mechanic.", 7, "Hand-off to a bengkel"),
     Scene("rice", "11_rice_stop", "Red stop: opening 220 V internals → take it to a service centre.",
-          "It also knows when to say no. Fixing a rice cooker that won't heat means opening 220 volt internals, "
-          "so the safety gate stops the guide.", 7, "Red stop", "stop"),
+          "And it knows when to say no. A rice cooker that won't heat means opening 220 volt parts, "
+          "so it stops and sends you to a service centre.", 7, "Red stop", "stop"),
     # no share, language or stop-PDF scenes: the cut has to stay under 3:00, and WhatsApp shows the Javanese
     Scene("wa", "wa:30_whatsapp_jv_diagnosis,30_whatsapp_jv_steps,30_whatsapp_jv_redstop",
           "Also works in WhatsApp, in Basa Jawa. Same agent, same safety gate.",
-          "It works in WhatsApp too, in Javanese. Send a photo and the same agent replies with the marked photo, "
-          "the diagnosis and a button for each step. A gas leak still gets a red stop.", 6, "WhatsApp, in Basa Jawa"),
+          "It works in WhatsApp too, in Javanese. Send a photo, and the same agent replies with the marked photo, "
+          "the diagnosis, and a button for each step. A gas leak still gets a red stop.", 6, "WhatsApp, in Basa Jawa",
+          pre=("jv-ID-SitiNeural", "Kran pawonku netes terus, piye iki?")),
     Scene("arch", "arch", "Meta models: Voice Transcribe · Muse Spark · SAM 3.1 · Muse Image (Muse Spark Open optional).",
           "Under the hood: Voice Transcribe, Muse Spark to see, reason and check, SAM 3.1 for masks and live tracking, "
-          "and Muse Image for diagrams. The safety rules are enforced in code.", 9, "Meta models"),
+          "and Muse Image for diagrams. The safety rules live in code.", 9, "Meta models"),
     Scene("close", "title:Tukang Copilot|Every phone becomes a mechanic's apprentice.",
           "Open source, MIT licence, built during the Meta AI Developer Hackathon.",
           "Tukang Copilot. Every phone becomes a mechanic's apprentice.", 5),
@@ -462,25 +465,46 @@ def voice() -> None:
     said_file = VOICE / "script.json"  # the text each mp3 was made from: a changed line is re-recorded
     said: dict[str, str] = json.loads(said_file.read_text()) if said_file.exists() else {}
 
+    async def tts(text: str, name: str, out: Path) -> None:
+        """One line, with the half second of dead air edge-tts leaves at each end cut off (the scene adds its own beat)."""
+        raw = Path(str(out) + ".part.mp3")
+        await edge_tts.Communicate(text, name, rate=VOICE_RATE, proxy=proxy).save(str(raw))
+        trim = "silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.06"
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-af", f"{trim},areverse,{trim},areverse",
+                        "-c:a", "libmp3lame", "-b:a", "64k", str(out)], check=True)
+        raw.unlink()
+
     async def run() -> None:
         for sc in SCENES:
             out = VOICE / f"{sc.key}.mp3"
-            if out.exists() and out.stat().st_size > 1000 and said.get(sc.key) == sc.say:
+            said_as = json.dumps([VOICE_NAME, VOICE_RATE, "trimmed", sc.pre, sc.say], ensure_ascii=False)
+            if out.exists() and out.stat().st_size > 1000 and said.get(sc.key) == said_as:
                 continue
-            said[sc.key] = sc.say
+            said[sc.key] = said_as
             if not sc.say:  # silent card (the title): a quiet track keeps every segment's audio the same shape
                 subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-t", f"{sc.min_s - 0.7:.2f}", "-i",
                                 "anullsrc=r=24000:cl=mono", "-c:a", "libmp3lame", "-b:a", "48k", str(out)], check=True)
                 continue
-            await edge_tts.Communicate(sc.say, VOICE_NAME, rate="+4%", proxy=proxy).save(str(out) + ".part")
-            os.replace(str(out) + ".part", out)
+            pre_mp3 = VOICE / f"{sc.key}.pre.mp3"
+            if not sc.pre[1]:
+                pre_mp3.unlink(missing_ok=True)
+                await tts(sc.say, VOICE_NAME, out)
+            else:  # owner's line, a short pause, then the narrator, joined into one clip
+                body = VOICE / f"{sc.key}.body.mp3"
+                await tts(sc.pre[1], sc.pre[0], pre_mp3)
+                await tts(sc.say, VOICE_NAME, body)
+                subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(pre_mp3), "-f", "lavfi", "-t", f"{PAUSE_S}",
+                                "-i", "anullsrc=r=24000:cl=mono", "-i", str(body), "-filter_complex",
+                                "[0:a]aresample=24000,aformat=channel_layouts=mono[a];[2:a]aresample=24000,aformat=channel_layouts=mono[c];"
+                                "[a][1:a][c]concat=n=3:v=0:a=1[o]", "-map", "[o]", "-c:a", "libmp3lame", "-b:a", "64k", str(out)], check=True)
+                body.unlink()
             said_file.write_text(json.dumps(said, indent=1, ensure_ascii=False) + "\n")
             print("voice", sc.key, out.stat().st_size)
 
     asyncio.run(run())
     said_file.write_text(json.dumps(said, indent=1, ensure_ascii=False) + "\n")
     for old in VOICE.glob("*.mp3"):  # clips of scenes that were cut
-        if old.stem not in {sc.key for sc in SCENES}:
+        if old.stem.split(".")[0] not in {sc.key for sc in SCENES}:
             old.unlink()
 
 
@@ -658,6 +682,11 @@ def _shot(sc: Scene, dur: float, spoken: float) -> Any:
     sents = _sentences(sc.say) if sc.say else []
     total = sum(len(x) for x in sents) or 1
     subs, acc = [], 0.0
+    pre_mp3 = VOICE / f"{sc.key}.pre.mp3"
+    if sc.pre[1] and pre_mp3.exists():  # the owner's own words first, quoted, then the narrator's sentences
+        lead = _dur(pre_mp3) + PAUSE_S
+        subs.append((0.0, lead, f"“{sc.pre[1]}”"))
+        acc, spoken = lead, max(0.1, spoken - lead)
     for j, sent in enumerate(sents):  # one caption per spoken sentence, timed by its share of the characters
         sd = spoken * len(sent) / total
         end = dur if j == len(sents) - 1 else acc + sd
