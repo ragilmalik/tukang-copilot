@@ -1,8 +1,9 @@
-"""Record the 1-tap demo (motorbike, demo mode) into a static fixture the front end can replay.
+"""Record the 1-tap demo (motorbike sample photo) from the REAL Meta Model API into a fixture the front end can replay.
 
 A free Render service sleeps and needs ~50 s to wake. When the server is slow or unreachable, web/replay.js plays
-this RECORDED run instead (clearly labelled "Recorded demo" on screen): same screens, same agent log, same marked photo,
-no server and no model calls. Nothing here is a live answer; it is the demo-mode (MOCK) pipeline, recorded once.
+this RECORDED run instead (labelled "Recorded live run" on screen): same screens, same agent log, same marked photo,
+no server and no model calls at replay time. Every answer in it came from the real models (Muse Spark 1.3, SAM 3.1,
+Muse Image) on the date stored in demo.json; only the photo is a labelled AI-generated sample photo.
 
 Output (all under web/replay/, served at /static/replay/):
   demo.json          per language (id, jv, en): progress snapshots, the follow-up question, the ready session, and one
@@ -12,9 +13,10 @@ Output (all under web/replay/, served at /static/replay/):
   check_ok.jpg, check_dark.jpg   the two labelled sample "check my step" photos
   card-<lang>.png, report-<lang>.pdf   share card and PDF report
 
-Regenerate after changing the mock answers, the session shape or the UI flow:
-    python scripts/record_replay.py            # writes web/replay/
-    python scripts/record_replay.py --check    # exit 1 if the committed fixture is out of date (shape only)
+Regenerate after changing the prompts, the session shape or the UI flow (needs the Meta key, costs about $0.60):
+    python scripts/record_replay.py            # live run, writes web/replay/
+    python scripts/record_replay.py --check    # exit 1 if the committed fixture no longer has the app's shape
+                                               # (compares against an offline run, free, no key needed)
 """
 from __future__ import annotations
 
@@ -31,7 +33,6 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-os.environ["MOCK"] = "1"
 os.environ.setdefault("NARRATION_VOICE", "0")
 
 OUT = ROOT / "web" / "replay"
@@ -48,11 +49,11 @@ APPEND_KEYS = {"agent_log"}
 SKIP_KEYS = {"updated", "created"}
 
 
-def _setup(tmp: Path) -> Any:
+def _setup(tmp: Path, live: bool = False) -> Any:
     from api.settings import settings
 
     settings.data_dir = tmp
-    settings.mock = True
+    settings.mock = not live
     settings.narration_voice = False
     settings.mock_pace_s = 0.0
     settings.demo_fallback = False
@@ -131,10 +132,14 @@ def record_lang(c: Any, lang: str, photos: dict[str, bytes], files_dir: Path, ou
 
     from api.settings import settings
 
-    settings.mock_pace_s = pace  # demo pacing so the stream has one snapshot per stage, like the real demo
-    sid = c.post("/api/sessions", data={"sample": "motor", "language": lang}).json()["id"]
+    settings.mock_pace_s = pace  # offline only: pacing so the stream has one snapshot per stage (live has real timing)
     rid = f"replay-motor-{lang}"
-    ask = _settled(c, sid)
+    for attempt in range(2):  # live: the model asks a follow-up question when unsure; the recording needs one
+        sid = c.post("/api/sessions", data={"sample": "motor", "language": lang}).json()["id"]
+        ask = _settled(c, sid)
+        if ask["session"]["status"] == "needs_answer" or attempt:
+            break
+        print(f"{lang}: no follow-up question this time ({ask['session']['status']}), recording once more", flush=True)
     assert ask["session"]["status"] == "needs_answer", ask["session"]["status"]
     assert c.post(f"/api/sessions/{sid}/answer", data={"text": ANSWER[lang]}).status_code == 200
     ready = _settled(c, sid)
@@ -185,7 +190,7 @@ def _shrink(out_dir: Path) -> None:
             q.save(f, "PNG", optimize=True)
 
 
-def build(out_dir: Path, pace: float = PACE_S) -> dict[str, Any]:
+def build(out_dir: Path, pace: float = PACE_S, live: bool = False) -> dict[str, Any]:
     from api.main import _dark_photo, __version__
 
     samples = ROOT / "samples"
@@ -193,14 +198,17 @@ def build(out_dir: Path, pace: float = PACE_S) -> dict[str, Any]:
     photos = {"ok": (ok_path if ok_path.exists() else samples / "motor.jpg").read_bytes(), "dark": _dark_photo("motor")}
     tmp = Path(tempfile.mkdtemp(prefix="tc-replay-"))
     try:
-        c = _setup(tmp)
+        c = _setup(tmp, live)
         if out_dir.exists():
             shutil.rmtree(out_dir)
         files_dir = out_dir / "files"
         files_dir.mkdir(parents=True)
         (out_dir / "check_ok.jpg").write_bytes(photos["ok"])
         (out_dir / "check_dark.jpg").write_bytes(photos["dark"])
-        langs = {lang: record_lang(c, lang, photos, files_dir, out_dir, pace) for lang in LANGS}
+        langs = {}
+        for lang in LANGS:
+            langs[lang] = record_lang(c, lang, photos, files_dir, out_dir, pace)
+            print(f"recorded {lang}", flush=True)
         health = c.get("/api/health").json()
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -209,33 +217,86 @@ def build(out_dir: Path, pace: float = PACE_S) -> dict[str, Any]:
 
     assets = sorted(f"/static/replay/{f.relative_to(out_dir).as_posix()}" for f in out_dir.rglob("*")
                     if f.is_file() and f.suffix in {".jpg", ".png"})  # the service worker keeps these for offline use (no PDFs)
+    from datetime import datetime, timedelta, timezone
+
+    when = datetime.now(timezone(timedelta(hours=7))).strftime("%Y-%m-%d %H:%M WIB")
+    cost = round(sum(float(((L["ready"]["session"].get("cost") or {}).get("spent_usd")) or 0) for L in langs.values()), 4)
+    note = (f"RECORDED live run: every answer came from the real Meta Model API on {when}. Replaying it makes no model calls. "
+            "The photos are labelled AI-generated sample photos." if live else
+            "OFFLINE shape check (canned answers, no Meta key). Never shipped to judges.")
     data = {"format": FORMAT, "kind": "recorded-demo", "recorded_with": __version__, "sample": "motor",
+            "source": "meta-api-live" if live else "offline", "recorded_at": when if live else "",
+            "pipeline_cost_usd": cost if live else 0,
             "max_check_fails": settings.max_check_fails, "assets": assets,
-            "note": "RECORDED demo-mode run (MOCK answers, labelled AI-generated sample photos). Not a live model answer.",
-            "models": health.get("models"), "langs": langs}
+            "note": note, "models": health.get("models"), "langs": langs}
     (out_dir / "demo.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     return data
 
 
-def shape(data: dict[str, Any]) -> str:
-    """A fingerprint of the fixture's structure: keys, value types and step counts, not timestamps, ids or how many
-    progress snapshots the stream happened to produce (only the last one, the settled state, counts)."""
-    def walk(o: Any) -> Any:
+IGNORE = {"recorded_with", "recorded_at", "source", "note", "pipeline_cost_usd", "ms", "updated", "created",
+          "elapsed_ms", "t", "at"}
+SKIP_TREES = {"delta", "outcome", "replan"}  # what changes depends on the model's answer (a step can pass or fail)
+_ID_KEY = __import__("re").compile(r"^[A-Za-z_]{0,8}\d+$")
+
+
+def key_paths(data: Any) -> tuple[set[str], set[str]]:
+    """Every key path in the fixture (list items and id-keyed maps such as steps "1", "2" or parts "c1" collapsed to
+    one), plus the paths that hold an empty or null container. Values, list lengths and model wording do not count:
+    a live recording and an offline run of the same app have the same paths."""
+    paths: set[str] = set()
+    empty: set[str] = set()
+
+    def walk(o: Any, p: str) -> None:
+        paths.add(p)
         if isinstance(o, dict):
-            return {k: (walk(v[-1:]) if k == "snaps" and isinstance(v, list) else walk(v)) for k, v in sorted(o.items())
-                    if k not in {"recorded_with", "ms", "updated", "created", "elapsed_ms", "t", "at"}}
-        if isinstance(o, list):
-            return [walk(v) for v in o]
-        return type(o).__name__
-    return hashlib.sha256(json.dumps(walk(data), sort_keys=True).encode()).hexdigest()[:16]
+            if not o:
+                empty.add(p)
+            idmap = bool(o) and all(_ID_KEY.match(str(k)) for k in o)
+            for k, v in o.items():
+                if k in IGNORE or k in SKIP_TREES:
+                    continue
+                if k == "snaps" and isinstance(v, list):
+                    v = v[-1:]
+                walk(v, f"{p}/*" if idmap else f"{p}/{k}")
+        elif isinstance(o, list):
+            if not o:
+                empty.add(p)
+            for v in o:
+                walk(v, f"{p}/[]")
+        elif o is None or o == "":
+            empty.add(p)
+
+    walk(data, "")
+    return paths, empty
 
 
-def is_current() -> bool:
-    """True when web/replay/demo.json still has the shape the app produces today (used by the tests)."""
+def shape_diff(a: dict[str, Any], b: dict[str, Any]) -> list[str]:
+    """Key paths only one side has, ignoring anything under a container that is empty on the other side."""
+    pa, ea = key_paths(a)
+    pb, eb = key_paths(b)
+
+    def under(p: str, empties: set[str]) -> bool:
+        return any(p.startswith(e + "/") for e in empties)
+
+    return sorted([f"only in recording: {p}" for p in pa - pb if not under(p, eb)] +
+                  [f"only in app today: {p}" for p in pb - pa if not under(p, ea)])
+
+
+def shape(data: dict[str, Any]) -> str:
+    """A fingerprint of the fixture's key paths (see key_paths)."""
+    return hashlib.sha256(json.dumps(sorted(key_paths(data)[0])).encode()).hexdigest()[:16]
+
+
+def is_current(verbose: bool = False) -> bool:
+    """True when web/replay/demo.json still has the key paths the app produces today (used by the tests). The app side
+    is an offline run (free, no key), so this works in CI."""
     cur = json.loads((OUT / "demo.json").read_text(encoding="utf-8"))
     tmp = Path(tempfile.mkdtemp(prefix="tc-replay-check-"))
     try:
-        return shape(cur) == shape(build(tmp / "replay", pace=0.0))
+        diff = shape_diff(cur, build(tmp / "replay", pace=0.0))
+        if verbose:
+            print("\n".join(diff[:40]))
+        return not diff
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -245,10 +306,15 @@ def main() -> int:
     ap.add_argument("--check", action="store_true", help="exit 1 if web/replay/demo.json no longer matches the app's shape")
     a = ap.parse_args()
     if a.check:
-        same = is_current()
+        same = is_current(verbose=True)
         print("replay fixture up to date" if same else "replay fixture OUT OF DATE: run python scripts/record_replay.py")
         return 0 if same else 1
-    data = build(OUT)
+    from api.settings import settings
+
+    if not settings.meta_api_key:
+        print("No Meta key: the recording must come from the real API. Run python scripts/set_keys.py first.")
+        return 2
+    data = build(OUT, pace=0.0, live=True)
     size = sum(f.stat().st_size for f in OUT.rglob("*") if f.is_file())
     print(f"wrote {OUT.relative_to(ROOT)}/ ({size // 1024} KB) for {', '.join(data['langs'])}")
     return 0

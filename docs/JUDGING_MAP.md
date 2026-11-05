@@ -48,7 +48,7 @@ The times are the scene starts in `docs/demo/TIMESTAMPS.txt`; if the video is re
 | Unexpected capability: Muse Spark 1.2 audio transcribes Javanese, which Voice Transcribe does not list | `meta_client.transcribe_with_spark_audio` |
 | Muse Image edits the user's photo into a diagram; Spark reviews it and a bad one is redrawn once | `engine.make_diagram`, `28_diagram_step.png`, video 1:36 (demo: placeholder drawing) |
 | Muse Spark Open (open weights) on Baseten behind one switch, with a visible badge | `USE_OPEN_WEIGHTS`, `21_open_weights.png`, video 2:25 |
-| Meta's WhatsApp Cloud API (Graph v26.0) as a second channel into the same agent loop: signed webhook (`X-Hub-Signature-256`), two-step media download, reply buttons per step, PDF as a document. Tested against a fake Graph API (`api/testing/fake_graph.py`), not yet on a real number | `api/channels/whatsapp.py`, `test_whatsapp.py`, `test_playwright_wa.py`, docs/WHATSAPP.md, video 2:13 |
+| Meta's WhatsApp Cloud API (Graph v26.0) as a second channel into the same agent loop: signed webhook (`X-Hub-Signature-256`), two-step media download, reply buttons per step, PDF as a document. Tested against a fake Graph API (`api/tests/doubles/fake_graph.py`), not yet on a real number | `api/channels/whatsapp.py`, `test_whatsapp.py`, `test_playwright_wa.py`, docs/WHATSAPP.md, video 2:13 |
 | One-command first live run: after `set_keys.py`, `scripts/first_live_run.py` runs one sample repair on the real API and writes `docs/LIVE_RUN.md` with models, timings and cost; `--fake` rehearses it against the stand-in server | `scripts/first_live_run.py`, `test_first_live_run.py` |
 | **Still open (me), top priority:** no live Meta answer is verified yet, and Stage 1 is pass/fail on whether the project "reasonably used Meta Model API". Running `python scripts/set_keys.py` then `python scripts/first_live_run.py` closes it, and one live clip in the video would help. | docs/VERIFICATION_REPORT.md |
 
@@ -65,7 +65,7 @@ The times are the scene starts in `docs/demo/TIMESTAMPS.txt`; if the video is re
 | Strict JSON schemas with tolerant repair and one retry; per-repair and per-day cost caps; rate limits | `api/schemas.py`, `api/coerce.py`, `api/cost.py`, `api/guard.py` |
 | Safety in code (3 layers) and prompt-injection fencing | `api/pipeline/safety.py`, `api/untrusted.py`, `test_security.py`, `test_injection.py` |
 | Resilience: retries, friendly errors, a labelled demo fallback, and a recorded demo when the server sleeps | `api/errors.py`, `test_demo_fallback.py`, `test_replay.py`, `27_recorded_demo.png` |
-| Live path tested against a stand-in server built from the official API docs | `api/testing/fake_meta.py`, `test_live_path.py` |
+| Live path tested against a stand-in server built from the official API docs | `api/tests/doubles/fake_meta.py`, `test_live_path.py` |
 | Fixture eval: 10/10 photos and 5/5 step checks met expectations (mock mode, labelled AI-generated sample photos) | docs/EVAL_REPORT.md |
 | Red-team eval: safety-stop recall 100% on 33 dangerous cases (23 owner texts, 10 plan steps), 0 false stops on 17 safe cases, 7/7 prompt-injection cases resisted, plus latency and cost per repair. Labelled mock / fake-model; the live run is pending. Run against the v1.24 rules, it found 12 of 20 red-team texts and 7 of 10 dangerous plan steps slipping through, and I fixed those gaps in 1.25 | docs/EVAL.md, `scripts/run_eval.py`, `test_run_eval.py` |
 

@@ -7,7 +7,7 @@
 Two modes, both FREE and OFFLINE, and neither is a real model:
   mock  the app's built-in demo answers (MOCK=1), no HTTP at all.
   fake  the REAL live code path (meta_client over HTTP, multipart, SSE, SAM masks, cost meter) against
-        api/testing/fake_meta.py, a stand-in Meta server that answers with the same recorded fixtures.
+        api/tests/doubles/fake_meta.py, a stand-in Meta server that answers with the same recorded fixtures.
 So the diagnosis numbers test the pipeline and its code gates, NOT Muse Spark's accuracy. The safety and injection
 numbers are meaningful for the code layers (text gate, plan guard, red override), which do not trust the model.
 A live run (scripts/first_live_run.py, then this eval against real photos) is still pending.
@@ -113,7 +113,7 @@ def _mode(mode: str, data: Path) -> Iterator[Any]:
     settings.data_dir, settings.narration_voice, settings.mock_pace_s, settings.demo_fallback = data, False, 0.0, False
     fm = None
     if mode == "fake":
-        from api.testing import fake_meta as fm
+        from api.tests.doubles import fake_meta as fm
 
         settings.mock, settings.meta_api_key = False, fm.TEST_KEY
         settings.meta_api_base = _fake_base()
@@ -132,7 +132,7 @@ _FAKE_BASE: str | None = None
 def _fake_base() -> str:
     global _FAKE_BASE
     if _FAKE_BASE is None:
-        from api.testing import fake_meta
+        from api.tests.doubles import fake_meta
 
         _FAKE_BASE = fake_meta.serve_in_thread()
     return _FAKE_BASE
@@ -305,7 +305,7 @@ def render(results: list[dict[str, Any]], when: str) -> str:
          "prompts, the safety gate or the pipeline; `api/tests/test_run_eval.py` runs the same eval on every test run.", "",
          "> No real Meta model was called. `mock` uses the app's built-in demo answers; `fake` runs",
          "> the real live code path (HTTP client, multipart, SSE, SAM mask decoding, cost meter) against a stand-in Meta",
-         "> server (`api/testing/fake_meta.py`) that answers with the same recorded fixtures. Photos are labelled",
+         "> server (`api/tests/doubles/fake_meta.py`) that answers with the same recorded fixtures. Photos are labelled",
          "> AI-generated samples, not real repairs. So the diagnosis numbers test the plumbing, not Muse Spark's accuracy. The safety and",
          "> injection numbers are real measurements of the code layers (text gate before any model call, plan guard",
          "> on every generated step, red override), which hold whatever the model says. Latency here has no real",

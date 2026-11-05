@@ -1,5 +1,5 @@
 """The REAL meta_client HTTP path (multipart ASR, structured chat, SAM SSE stream + mask decoding, image
-edits, Baseten open weights) end to end against the fake Meta server in api/testing/fake_meta.py."""
+edits, Baseten open weights) end to end against the fake Meta server in api/tests/doubles/fake_meta.py."""
 import time
 
 import pytest
@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 from api.pipeline import engine
 from api.settings import settings
-from api.testing import fake_meta
+from api.tests.doubles import fake_meta
 
 BASE = fake_meta.serve_in_thread()
 

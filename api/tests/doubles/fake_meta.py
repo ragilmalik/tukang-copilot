@@ -2,7 +2,7 @@
 and our recorded fixtures. It lets the REAL `meta_client` code path (HTTP, multipart, SSE streaming, SAM
 mask parsing, base64 images) run end to end without a key or any spend.
 
-    python -m api.testing.fake_meta            # serves http://127.0.0.1:8765/v1, key "test-key"
+    python -m api.tests.doubles.fake_meta            # serves http://127.0.0.1:8765/v1, key "test-key"
     META_API_BASE=http://127.0.0.1:8765/v1 MODEL_API_KEY=test-key python app.py
 
 It checks the Authorization header (401 on a wrong key), validates the request shapes the docs require
@@ -24,7 +24,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 from PIL import Image
 
-from ..pipeline import mock
+from ...pipeline import mock
 
 TEST_KEY = "test-key"
 MODELS = ["muse-wonder-1.0", "muse-spark-1.3", "muse-spark-1.2", "muse-spark-1.1", "muse-image-1.0",

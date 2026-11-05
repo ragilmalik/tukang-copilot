@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from api import errors, meta_client
 from api.pipeline import engine
 from api.settings import settings
-from api.testing import fake_meta
+from api.tests.doubles import fake_meta
 
 BASE = fake_meta.serve_in_thread()
 

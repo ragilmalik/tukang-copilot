@@ -15,7 +15,7 @@ CI (`.github/workflows/ci.yml`) runs the same thing on every push. The browser t
 | `test_overlay.py` | Box-local SAM masks land in the right pixels; out-of-bounds clipped; only masked area tinted; EXIF rotation + size cap |
 | `test_engine.py` | Full pipeline per scenario: green faucet, amber motor with follow-up/resume, red rice cooker, gate stop, 3 languages, step check pass/fail/escalate, re-plan → exhaust, audio deleted, path-safe ids, 24 h cleanup, budget guard |
 | `test_api.py` | HTTP: health, pages, multi-photo upload, files, guide, report, answer, check, replan, SSE stream, 7 bad-request cases, 404s and path traversal |
-| `test_live_path.py` | The real `meta_client` (HTTP, multipart ASR, structured output, SAM SSE + mask parsing, image edits, Baseten) against `api/testing/fake_meta.py`; wrong key → clean 401 |
+| `test_live_path.py` | The real `meta_client` (HTTP, multipart ASR, structured output, SAM SSE + mask parsing, image edits, Baseten) against `api/tests/doubles/fake_meta.py`; wrong key → clean 401 |
 | `test_fixtures.py` | All 16 sample fixtures (AI-generated photos) carry the "Sample photo (AI-generated), demo mode" corner tag and EXIF label, and each runs end to end with the expected safety level; step-check photos accepted |
 | `test_video.py` | Video → 3 frames from different moments; sharper frame wins; >30 s and garbage rejected with 400; video-only session uses the clip's sound; photos + video capped at 3 |
 | `test_playwright_smoke.py` | Real Chromium, phone viewport: faucet flow + check-my-step, motor follow-up question, rice STOP card (3 actions, maps link, PDF works, 112), PWA manifest, open-weights badge (+ language switch), video capture; fails on any JS error |
@@ -41,7 +41,7 @@ CI (`.github/workflows/ci.yml`) runs the same thing on every push. The browser t
 - `test_playwright_replay.py`: with every `/api` call hanging (a sleeping server), the 1-tap demo still runs end to end from the recording and says so on screen. A visitor's own photo is refused instead of faked, and `?replay=1` sends nothing to the server.
 
 ## Fake Meta server
-`python -m api.testing.fake_meta` serves `http://127.0.0.1:8765/v1` with key `test-key`. I built it from the documented request/response shapes. To run the app against it:
+`python -m api.tests.doubles.fake_meta` serves `http://127.0.0.1:8765/v1` with key `test-key`. I built it from the documented request/response shapes. To run the app against it:
 ```bash
 META_API_BASE=http://127.0.0.1:8765/v1 MODEL_API_KEY=test-key NO_PROXY=127.0.0.1,localhost python app.py
 ```

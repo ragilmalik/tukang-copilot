@@ -39,7 +39,7 @@ flowchart TB
 
 How it hangs together:
 
-- The phone app and the WhatsApp channel (`api/channels/whatsapp.py`) share one engine. Both call `engine.create` / `engine.run` and go through the same safety gate; WhatsApp only changes how messages come in and go out (docs/WHATSAPP.md). The `/wa` simulator feeds the same handler with Cloud-API-shaped messages in demo mode, and the tests use a fake Graph API (`api/testing/fake_graph.py`).
+- The phone app and the WhatsApp channel (`api/channels/whatsapp.py`) share one engine. Both call `engine.create` / `engine.run` and go through the same safety gate; WhatsApp only changes how messages come in and go out (docs/WHATSAPP.md). The `/wa` simulator feeds the same handler with Cloud-API-shaped messages in demo mode, and the tests use a fake Graph API (`api/tests/doubles/fake_graph.py`).
 - `POST /api/sessions` returns an `owner_token` once. The owner's browser keeps it in localStorage and sends it as `X-Owner-Token` to set the outcome or erase the repair. A shared guide link (`/guide/{id}`) doesn't carry it, so a viewer gets 403, and no GET ever returns it.
 - Only `api/meta_client.py` talks to Meta: auth header, retries with backoff on 429/5xx, timeouts, cost charging. Nothing else imports `httpx` for Meta.
 - A pydantic schema (`api/schemas.py`) validates every model output, and a failed validation is retried once with the error attached.

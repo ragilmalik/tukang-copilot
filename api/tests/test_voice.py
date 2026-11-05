@@ -116,7 +116,7 @@ def test_command_endpoint_errors():
 
 def test_command_audio_live_path(monkeypatch):
     from api.pipeline import mock
-    from api.testing import fake_meta
+    from api.tests.doubles import fake_meta
 
     base = fake_meta.serve_in_thread()
     s = _ready("faucet", "id")

@@ -116,7 +116,7 @@ def render(r: dict[str, Any], sample: str, lang: str, fake: bool, missing: list[
          f"Made by `python scripts/first_live_run.py{' --fake' if fake else ''}` on {when} (app {__version__}), "
          f"sample `{sample}`, language `{lang}`, server `{_host(settings.meta_api_base)}`. No key is stored in this file.", ""]
     if fake:
-        L += ["> This is a rehearsal: `api/testing/fake_meta.py` answered with recorded demo fixtures, so the words",
+        L += ["> This is a rehearsal: `api/tests/doubles/fake_meta.py` answered with recorded demo fixtures, so the words",
               "> below are the demo answers and the timings are local. Run it again without `--fake` after set_keys.py.", ""]
     fb = s.get("fallback") or []
     L += ["## Result", "",
@@ -165,7 +165,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--fake", action="store_true", help="rehearse against the built-in stand-in Meta server (free)")
     a = ap.parse_args(argv)
     if a.fake:
-        from api.testing import fake_meta
+        from api.tests.doubles import fake_meta
 
         settings.meta_api_base, settings.meta_api_key, settings.mock = fake_meta.serve_in_thread(), fake_meta.TEST_KEY, False
         settings.narration_voice = False

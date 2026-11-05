@@ -80,7 +80,7 @@ the same agent also runs as a WhatsApp Cloud API webhook (`api/channels/whatsapp
 Javanese voice note go in; the SAM-marked photo, the diagnosis and reply buttons per step (Done / Problem / Stop) come
 out, with the same camera checks, re-plan, red stop and PDF. It calls the same engine and the same code safety gate as
 the web app, and every webhook POST is signature-checked. Honest status: I tested it end to end against a fake Graph
-API (`api/testing/fake_graph.py`) and in the `/wa` simulator (`30_whatsapp_*.png`, video 2:13). A real WhatsApp number
+API (`api/tests/doubles/fake_graph.py`) and in the `/wa` simulator (`30_whatsapp_*.png`, video 2:13). A real WhatsApp number
 isn't connected yet; that needs a Meta app setup (docs/WHATSAPP.md).
 
 ---

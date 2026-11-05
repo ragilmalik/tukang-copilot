@@ -9,7 +9,7 @@ from api import guard
 from api.main import app
 from api.pipeline import engine
 from api.settings import settings
-from api.testing import fake_meta
+from api.tests.doubles import fake_meta
 
 client = TestClient(app)
 

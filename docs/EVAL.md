@@ -5,7 +5,7 @@ prompts, the safety gate or the pipeline; `api/tests/test_run_eval.py` runs the 
 
 > No real Meta model was called. `mock` uses the app's built-in demo answers; `fake` runs
 > the real live code path (HTTP client, multipart, SSE, SAM mask decoding, cost meter) against a stand-in Meta
-> server (`api/testing/fake_meta.py`) that answers with the same recorded fixtures. Photos are labelled
+> server (`api/tests/doubles/fake_meta.py`) that answers with the same recorded fixtures. Photos are labelled
 > AI-generated samples, not real repairs. So the diagnosis numbers test the plumbing, not Muse Spark's accuracy. The safety and
 > injection numbers are real measurements of the code layers (text gate before any model call, plan guard
 > on every generated step, red override), which hold whatever the model says. Latency here has no real

@@ -6,7 +6,7 @@ so the safety gate, the Meta models (Muse Spark, SAM 3.1, Muse Voice Transcribe)
 report are all the same. Only the way messages come in and go out is different.
 
 Code: `api/channels/whatsapp.py` (webhook + chat), `api/channels/wa_text.py` (id/jv/en texts, language guess),
-`api/channels/wa_sim.py` (simulator), `web/wa.html` (simulator page), `api/testing/fake_graph.py` (fake Graph
+`api/channels/wa_sim.py` (simulator), `web/wa.html` (simulator page), `api/tests/doubles/fake_graph.py` (fake Graph
 API for tests), tests in `api/tests/test_whatsapp.py`.
 
 ## What it does
@@ -104,6 +104,6 @@ Graph API v26.0, the version used in every current example on these pages (read 
 
 ## Honest status
 
-Tested end to end against `api/testing/fake_graph.py` (real HTTP, real multipart uploads, the two-step media
+Tested end to end against `api/tests/doubles/fake_graph.py` (real HTTP, real multipart uploads, the two-step media
 download) and in the simulator, in demo mode. It has not been run against a real WhatsApp number yet;
 that needs the 10 setup steps above.

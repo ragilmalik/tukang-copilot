@@ -133,7 +133,7 @@ def main() -> int:
     ap.add_argument("--fake-bad-key", action="store_true", help="dry run with a wrong key, to see the failure message")
     args = ap.parse_args()
     if args.fake or args.fake_bad_key:
-        from api.testing import fake_meta
+        from api.tests.doubles import fake_meta
 
         base = fake_meta.serve_in_thread()
         settings.meta_api_base = base

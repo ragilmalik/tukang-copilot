@@ -156,7 +156,7 @@ def test_mask_polygon_shapes():
 
 
 def test_track_cost_is_added_in_live_mode(monkeypatch):
-    from api.testing import fake_meta
+    from api.tests.doubles import fake_meta
 
     base = fake_meta.serve_in_thread()
     s = _ready("faucet")  # made in mock mode, then tracked through the real HTTP client
