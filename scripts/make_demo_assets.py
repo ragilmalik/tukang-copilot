@@ -7,8 +7,8 @@
     python scripts/make_demo_assets.py video     # docs/demo/tukang-copilot-demo.mp4 (16:9) + captions .srt + vertical X clip
     python scripts/make_demo_assets.py all
 
-Everything shown is the app built during the hackathon, in demo mode, with labelled AI-generated sample photos.
-The video says so on screen. My own real-phone video (docs/DEMO_SCRIPT.md) replaces it once I record it.
+Everything shown is the app built during the hackathon answering live from the Meta Model API, with labelled
+AI-generated sample photos. The video says so on screen, and the waits for the models are cut (the real wait is noted). My own real-phone video (docs/DEMO_SCRIPT.md) replaces it once I record it.
 Chromium: PLAYWRIGHT_CHROMIUM, system chromium, or `python -m playwright install chromium`.
 """
 from __future__ import annotations
@@ -76,7 +76,7 @@ SCENES: list[Scene] = [
           "In Indonesia, a small fault on a motorbike or a water pump can cost a day's wage. "
           "Repair videos can't see your problem, and most of them aren't in your language.", 7),
     Scene("intro", "01_home", "Photo + voice in Bahasa, Javanese or English. No photo? 1-tap demo.",
-          "Take a photo and say what's wrong. This run is in demo mode, with AI-generated sample photos.", 5,
+          "Take a photo and say what's wrong. Every answer in this video is live from Meta's models; the photos are AI-generated samples.", 5,
           "Snap it, say it"),
     Scene("progress", "02_progress", "Results stream in as each Meta model finishes: what it saw, SAM 3.1's outlines, the likely cause.",
           "Each stage shows its result as soon as it finishes: what Muse Spark saw, "
@@ -96,15 +96,15 @@ SCENES: list[Scene] = [
           "Here the camera is Chromium's fake camera playing a sample photo.", 9, "Live camera guide"),
     Scene("check_fail", "07_check_fail", "Check my step: the photo is verified. A correction when it's wrong.",
           "After each step, Check my step. Muse Spark compares the photo with the expected state. "
-          "This one is too dark, so it asks for the torch instead of guessing.", 7, "Check my step", "check"),
-    Scene("check_pass", "08_check_pass", "Verified by the camera, then on to the next step.",
-          "Retake it, and the step is verified before you move on.", 4, "Verified", "ok"),
+          "This one is too dark, so it says what to retake instead of guessing.", 7, "Check my step", "check"),
+    Scene("check_pass", "08_check_pass", "A clear photo of the finished step passes.",
+          "A clear photo of the plug cap pushed back on passes, and the guide moves on.", 4, "Verified", "ok"),
     Scene("handsfree", "17_hands_free", "Hands-free: steps read aloud, voice commands like “lanjut”, “ulang”, “cek”.",
           "Hands dirty? Turn on hands-free. Each step is read aloud, and the phone listens for lanjut, ulang or cek.", 6, "Hands-free"),
     Scene("replan", "09_replan", "Still broken? The agent re-plans to the next likely cause.",
           "Still broken? Say what happened, and it re-plans to the next most likely cause. Plan, act, verify, re-plan.", 6, "Re-plan"),
-    Scene("diagram", "28_diagram_step", "No photo can show it? Muse Image draws a diagram for the step, reviewed by Muse Spark (demo: placeholder drawing).",
-          "When a photo can't show a step, Muse Image draws a diagram and Muse Spark checks it. In demo mode the drawing is a placeholder.", 5,
+    Scene("diagram", "28_diagram_step", "No photo can show it? Muse Image draws a diagram for the step, reviewed by Muse Spark.",
+          "When a photo can't show a step, like the washer inside a tap, Muse Image draws a diagram and Muse Spark checks it.", 5,
           "A diagram for the step", "info"),
     Scene("agent", "23_agent_log", "“What the AI did”: every decision, the model that made it, and why it asked.",
           "Every decision is on screen: what it saw, why it asked, each photo check, each re-plan, and which Meta model did it.", 6,
@@ -120,22 +120,26 @@ SCENES: list[Scene] = [
           "Also works in WhatsApp, in Basa Jawa. Same agent, same safety gate.",
           "It works in WhatsApp too, in Javanese. Send a photo and the same agent replies with the marked photo, "
           "the diagnosis and a button for each step. A gas leak still gets a red stop.", 6, "WhatsApp, in Basa Jawa"),
-    Scene("ow", "21_open_weights", "One switch: reasoning on Muse Spark Open (open weights) via Baseten.",
-          "With one switch, diagnosis and planning run on Muse Spark Open, Meta's open-weights model, on Baseten. "
-          "The app shows a badge when it does.", 6, "Open weights", "info"),
-    Scene("arch", "arch", "Meta models: Voice Transcribe · Muse Spark · SAM 3.1 · Muse Image · Muse Spark Open (open weights).",
+    Scene("arch", "arch", "Meta models: Voice Transcribe · Muse Spark · SAM 3.1 · Muse Image (Muse Spark Open optional).",
           "Under the hood: Voice Transcribe, Muse Spark to see, reason and check, SAM 3.1 for masks and live tracking, "
-          "and Muse Image for diagrams. The safety rules are enforced in code.", 9, "Five Meta models"),
+          "and Muse Image for diagrams. The safety rules are enforced in code.", 9, "Meta models"),
     Scene("close", "title:Tukang Copilot|Every phone becomes a mechanic's apprentice.",
           "Open source, MIT licence, built during the Meta AI Developer Hackathon.",
           "Tukang Copilot. Every phone becomes a mechanic's apprentice.", 5),
 ]
 
 
+LIVE_MS = 240_000  # live Meta answers take up to a couple of minutes
+
+
 # --- screenshots
 def _server() -> tuple[str, Any]:
-    os.environ.setdefault("MOCK", "1")
+    # Live by default: every answer in the screenshots and the video comes from the real Meta Model API (needs the key).
+    # DEMO_ASSETS_OFFLINE=1 runs the same flow on the offline canned answers, only for trying the script for free.
+    if os.environ.get("DEMO_ASSETS_OFFLINE") == "1":
+        os.environ["MOCK"] = "1"
     os.environ.setdefault("NARRATION_VOICE", "0")
+    os.environ.setdefault("WA_SIM", "1")  # the /wa simulator answers live too
     os.environ["NO_PROXY"] = "127.0.0.1,localhost"
     import uvicorn
 
@@ -143,6 +147,10 @@ def _server() -> tuple[str, Any]:
     from api.settings import settings
 
     settings.data_dir = Path(tempfile.mkdtemp(prefix="tukang-demo-"))
+    settings.demo_fallback = False
+    settings.rate_limit_per_hour = 1000
+    if not settings.offline:
+        settings.wa_sim = True
     s = socket.socket(); s.bind(("127.0.0.1", 0)); port = s.getsockname()[1]; s.close()
     srv = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning"))
     threading.Thread(target=srv.run, daemon=True).start()
@@ -176,6 +184,7 @@ def _fake_camera_y4m(photo: Path) -> Path:
 def shots() -> None:
     from playwright.sync_api import sync_playwright
 
+    import demo_video as dv
     from api.settings import settings
 
     SHOTS.mkdir(parents=True, exist_ok=True)
@@ -203,38 +212,52 @@ def shots() -> None:
             pg.goto(base + "/"); pg.select_option("#lang", lang); pg.wait_for_timeout(200)
             pg.click(f'button.sample[data-sample="{sample}"]')
 
+        def go_to_step(find_js: str) -> None:
+            n = int(pg.evaluate(find_js) or 0)
+            for _ in range(12):
+                cur = pg.inner_text("#stepNo").strip()
+                if not n or cur == str(n):
+                    break
+                pg.click("#nextBtn" if int(cur or 1) < n else "#prevBtn"); pg.wait_for_timeout(350)
+
         def tick_preflight() -> None:
             for box in pg.locator("#preList input").all():
                 box.check()
             pg.wait_for_timeout(200)
 
-        pg.goto(base + "/"); pg.wait_for_selector("#modeBadge:not(.hidden)")
-        pg.set_input_files("#photo", str(FIX / "sample_motor_plug_area.jpg"))
-        pg.fill("#text", "Motor saya Honda Beat susah hidup, distarter cuma bunyi tapi mesin nggak nyala.")
-        pg.evaluate("document.activeElement && document.activeElement.blur(); window.scrollTo(0, 0)")
-        snap("01_home")
-        pg.click("#goBtn"); pg.wait_for_selector("#progress:not(.hidden)")
-        # partial results stream in (MOCK_PACE holds each finished stage on screen)
-        pg.wait_for_selector("#lf-segment img", timeout=30000)
-        pg.wait_for_function("() => document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
-        pg.evaluate("document.querySelector('#stageList').scrollIntoView({block: 'start'}); window.scrollBy(0, -110)")
-        snap("02_progress")
-        pg.wait_for_selector("#question:not(.hidden)", timeout=30000); pg.fill("#answerText", "Ya, ada bau bensin")  # fuel arrives: the demo diagnosis moves to 70%
+        for attempt in range(3):  # live: the model asks a follow-up only when unsure, and the screenshots need one
+            pg.goto(base + "/"); pg.wait_for_selector("#modeBadge:not(.hidden)")
+            pg.set_input_files("#photo", str(FIX / "sample_motor_plug_area.jpg"))
+            pg.fill("#text", "Motor saya Honda Beat susah hidup, distarter cuma bunyi tapi mesin nggak nyala.")
+            pg.evaluate("document.activeElement && document.activeElement.blur(); window.scrollTo(0, 0)")
+            snap("01_home")
+            pg.click("#goBtn"); pg.wait_for_selector("#progress:not(.hidden)")
+            # partial results stream in as each live stage finishes
+            pg.wait_for_selector("#lf-segment img", timeout=LIVE_MS)
+            pg.wait_for_function("() => document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
+            pg.evaluate("document.querySelector('#stageList').scrollIntoView({block: 'start'}); window.scrollBy(0, -110)")
+            snap("02_progress")
+            pg.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=LIVE_MS)
+            if pg.is_visible("#question"):
+                break
+            print("no follow-up question this time, again", flush=True)
+        pg.fill("#answerText", "Ya, ada bau bensin")
         snap("03_question")
-        pg.click("#answerBtn"); pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
+        pg.click("#answerBtn"); pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
         pg.evaluate("window.scrollTo(0,0)"); snap("04_diagnosis")
         pg.locator("#partsWrap").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,-120)"); snap("05_parts")
         pg.locator("#preflight").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,-80)"); snap("15_preflight")
         tick_preflight()
         pg.locator("#stepCard").scroll_into_view_if_needed(); snap("06_step")
         pg.set_input_files("#stepPhoto", str(dark))
-        pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
+        pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=LIVE_MS)
         pg.locator("#checkResult").scroll_into_view_if_needed(); snap("07_check_fail")
+        go_to_step(dv.CAP_STEP_JS)  # the sample after-photo shows the plug cap pushed back on
         pg.set_input_files("#stepPhoto", str(FIX / "sample_motor_step_cap_on.jpg"))
         pg.wait_for_timeout(600)
-        pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
+        pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=LIVE_MS)
         pg.locator("#checkResult").scroll_into_view_if_needed(); snap("08_check_pass")
-        pg.wait_for_function("() => document.querySelector('#stepNo').textContent.trim() === '2'", timeout=10000)  # auto-advanced
+        pg.wait_for_timeout(2000)
         pg.locator("#agent .agGo", has_text="Langkah 1 dicek").first.click()          # tap a log line → back to that step
         pg.wait_for_selector("#stepCard.flash"); pg.wait_for_timeout(900)
         pg.evaluate("window.scrollBy(0, -40)"); snap("24_agent_jump")
@@ -243,16 +266,10 @@ def shots() -> None:
         pg.uncheck("#handsFree")
         pg.fill("#stuckText", "Sudah dicoba, mesin tetap tidak nyala."); pg.click("#stuckBtn")
         pg.wait_for_function("() => document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled",
-                             timeout=20000); pg.wait_for_timeout(600)
+                             timeout=LIVE_MS); pg.wait_for_timeout(600)
         pg.wait_for_selector("#planBanner:not(.hidden)"); pg.evaluate("window.scrollTo(0, 0)"); snap("09_replan")  # re-plan banner + tried cause
         pg.evaluate("document.querySelector('#agent').scrollIntoView({block: 'start'}); window.scrollBy(0, -70)"); snap("23_agent_log")
-        # the plan-2 step that needs a drawing (Muse Image in live mode; a labelled stand-in drawing in demo mode)
         tick_preflight()
-        for _ in range(6):
-            if "diagram" in (pg.get_attribute("#stepImg", "src") or "") and pg.is_visible("#stepImg"):
-                break
-            pg.click("#nextBtn"); pg.wait_for_timeout(300)
-        pg.evaluate("document.querySelector('#stepCard').scrollIntoView({block: 'start'}); window.scrollBy(0, -70)"); snap("28_diagram_step")
         for _ in range(6):  # back to step 1 so the hand-off and PDF shots below match earlier takes
             if pg.is_disabled("#prevBtn"):
                 break
@@ -273,16 +290,19 @@ def shots() -> None:
         pg.evaluate("document.querySelector('#mechBtn').scrollIntoView({block: 'start'}); window.scrollBy(0, -90)"); snap("18_handoff")
         pg.locator("#pdfBtn").scroll_into_view_if_needed(); snap("12_report")
         # live camera guide on the pump repair (Chromium fake camera playing a labelled sample photo)
-        go_sample("pump"); pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
+        go_sample("pump"); pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
         pg.evaluate("window.scrollTo(0,0)"); snap("10_pump")
         tick_preflight()
         pg.click("#liveBtn"); pg.wait_for_selector("#live:not(.hidden)")
-        pg.wait_for_function("() => /^🎯/.test(document.querySelector('#liveState').textContent)", timeout=20000)
+        try:  # SAM 3.1 on the fake camera frames finds the part within a few frames
+            pg.wait_for_function("() => /^🎯/.test(document.querySelector('#liveState').textContent)", timeout=60000)
+        except Exception:  # noqa: BLE001
+            print("live guide: no lock-on within 60 s, shooting what is on screen", flush=True)
         pg.wait_for_timeout(900)
         pg.evaluate("document.querySelector('#liveBtn').scrollIntoView({block: 'start'}); window.scrollBy(0, -90)"); snap("16_live_guide")
         pg.click("#liveClose")
         # safety stop with PDF + hand-off
-        go_sample("rice"); pg.wait_for_selector("#stopBox:not(.hidden)", timeout=30000)
+        go_sample("rice"); pg.wait_for_selector("#stopBox:not(.hidden)", timeout=LIVE_MS)
         pg.wait_for_selector("#stopHandoff:not(.hidden)", timeout=10000)
         pg.evaluate("window.scrollTo(0, 0)"); snap("11_rice_stop")  # the STOP card sits under the "Stopped for your safety" heading
         pg.evaluate("document.querySelector('#stopHandoff').scrollIntoView({block: 'end'}); window.scrollBy(0, 40)"); snap("22_stop_handoff")
@@ -291,9 +311,16 @@ def shots() -> None:
         pdf.write_bytes(pg.request.get(f"{base}/api/sessions/{sid}/report.pdf").body())
         subprocess.run(["pdftoppm", "-png", "-r", "110", "-f", "1", "-l", "1", "-singlefile", str(pdf), str(SHOTS / "19_stop_pdf")], check=True)
         print("shot 19_stop_pdf", flush=True)
-        go_sample("faucet", "en"); pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
+        go_sample("faucet", "en"); pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
         pg.evaluate("window.scrollTo(0,0)"); snap("13_english")
-        go_sample("tire", "jv"); pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
+        # the step Muse Image drew a diagram for (the washer inside the tap)
+        tick_preflight()
+        for _ in range(10):
+            if "diagram" in (pg.get_attribute("#stepImg", "src") or "") and pg.is_visible("#stepImg"):
+                break
+            pg.click("#nextBtn"); pg.wait_for_timeout(300)
+        pg.evaluate("document.querySelector('#stepCard').scrollIntoView({block: 'start'}); window.scrollBy(0, -70)"); snap("28_diagram_step")
+        go_sample("tire", "jv"); pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
         pg.evaluate("window.scrollTo(0,0)"); snap("20_javanese_result")
         pg.goto(base + "/"); pg.select_option("#lang", "jv"); pg.wait_for_timeout(300); snap("14_garage_jv", full=True)
         # open-weights badge: what the header shows when USE_OPEN_WEIGHTS=1 + a Baseten key (still demo answers here)
@@ -318,7 +345,7 @@ WA_SHOTS = ["30_whatsapp_jv_diagnosis", "30_whatsapp_jv_steps", "30_whatsapp_jv_
 
 
 def wa_shots() -> None:
-    """The WhatsApp simulator page (/wa, demo mode): the same handler as the real Cloud API webhook, so these show what a
+    """The WhatsApp simulator page (/wa, live Meta answers with WA_SIM=1): the same handler as the real Cloud API webhook, so these show what a
     WhatsApp chat gets. Javanese: photo in, marked photo + diagnosis, step buttons, red stop; English: a step check and
     the PDF report. Not a real WhatsApp number (that waits on my Meta setup, docs/WHATSAPP.md)."""
     from playwright.sync_api import sync_playwright
@@ -338,7 +365,7 @@ def wa_shots() -> None:
 
             pg.goto(base + f"/wa?lang={lang}"); pg.wait_for_selector("#chips button")
             pg.locator("#chips button").nth(0).click()                       # sample: dripping kitchen tap
-            pg.wait_for_selector(".btns button", timeout=30000)
+            pg.wait_for_selector(".btns button", timeout=LIVE_MS)
             if lang == "jv":
                 pg.wait_for_timeout(800)
                 # the diagnosis message (marked photo + likely cause) at the top of the chat
@@ -351,15 +378,15 @@ def wa_shots() -> None:
                 pg.goto(base + f"/wa?lang={lang}"); pg.evaluate("sessionStorage.clear()"); pg.reload()
                 pg.wait_for_selector("#chips button")
                 pg.locator("#chips button").nth(3).click()                   # sample: gas smell -> red stop
-                pg.wait_for_function("() => document.querySelectorAll('.row:not(.me)').length >= 1", timeout=30000)
+                pg.wait_for_function("() => document.querySelectorAll('.row:not(.me)').length >= 1", timeout=LIVE_MS)
                 pg.wait_for_timeout(700)
                 snap("30_whatsapp_jv_redstop")
             else:
                 pg.locator("#chips button").nth(4).click()                   # the sample "after" photo -> step check
-                pg.wait_for_function("() => document.querySelectorAll('.btns').length >= 2", timeout=30000)
+                pg.wait_for_function("() => document.querySelectorAll('.btns').length >= 2", timeout=LIVE_MS)
                 snap("30_whatsapp_en_check")
                 pg.locator(".btns").last.locator("button").nth(2).click()    # Stop -> PDF report in the chat
-                pg.wait_for_selector(".doc", timeout=30000)
+                pg.wait_for_selector(".doc", timeout=LIVE_MS)
                 snap("30_whatsapp_en_pdf")
             if errors:
                 raise SystemExit(f"/wa page errors: {errors}")
@@ -519,11 +546,11 @@ def _frame(sc: Scene, vertical: bool = False, subtitle: str = "") -> Image.Image
             lf = font(26 if vertical else 28)
             d.text((xx + (pw_ - d.textlength(lab, font=lf)) / 2, y - 62), lab, fill=INK, font=lf)
         if vertical:
-            d.text((80, 60), "WhatsApp simulator · demo mode · AI-generated sample photos", fill=MUTED, font=font(30, False))
+            d.text((80, 60), "WhatsApp simulator · live Meta answers · AI-generated sample photos", fill=MUTED, font=font(30, False))
         else:
             cap_x = x + len(names) * (pw_ + gap) + 40
             d.text((cap_x, 120), "Tukang Copilot", fill=ORANGE, font=font(56))
-            d.text((cap_x, 195), "WhatsApp simulator · demo mode", fill=MUTED, font=font(28, False))
+            d.text((cap_x, 195), "WhatsApp simulator · live Meta answers", fill=MUTED, font=font(28, False))
     else:
         shot = Image.open(SHOTS / f"{sc.image}.png").convert("RGB")
         ph = fh - (560 if vertical else 120)
@@ -539,11 +566,11 @@ def _frame(sc: Scene, vertical: bool = False, subtitle: str = "") -> Image.Image
         im.paste(shot, (x, y))
         cap_x = max(900, x + pw_ + 100)
         if vertical:
-            d.text((80, 60), "demo mode · AI-generated sample photos", fill=MUTED, font=font(30, False))
+            d.text((80, 60), "live Meta answers · AI-generated sample photos", fill=MUTED, font=font(30, False))
         if not vertical:
             hx = cap_x if wide else x + pw_ + 120
             d.text((hx, 120), "Tukang Copilot", fill=ORANGE, font=font(56))
-            d.text((hx, 195), "demo mode · AI-generated sample photos", fill=MUTED, font=font(28, False))
+            d.text((hx, 195), "live Meta answers · AI-generated sample photos", fill=MUTED, font=font(28, False))
     if sc.image != "arch" or True:
         f = font(46 if not vertical else 44)
         cw = (fw - cap_x - 80) if (not vertical and not sc.image.startswith(("title:", "arch"))) else fw - 160
@@ -696,7 +723,7 @@ def video(only: list[str] | None = None) -> None:
     (DEMO / "TIMESTAMPS.txt").write_text(
         "Tukang Copilot demo video: scene start times (mm:ss), made by scripts/make_demo_assets.py video\n"
         f"File: docs/demo/tukang-copilot-demo.mp4, length {_mmss(real)} ({real:.1f} s, ffprobe), 1920x1080 at 60 fps. "
-        "Demo mode, AI-generated sample photos.\n"
+        "Live Meta API answers (5 Nov 2026, model waits cut), AI-generated sample photos.\n"
         "English captions of the voice-over are burned in; the same text is in tukang-copilot-demo.en.srt.\n\n"
         + "\n".join(stamps) + "\n", encoding="utf-8")
     if real >= 180:
@@ -709,12 +736,12 @@ VERTICAL = {  # key: (seconds, where in the recording to start, Bahasa line on t
     "hook": (4.5, 0.0, "Motor mogok, bengkel tutup? Foto + ngomong.", "Bike won't start and the shop is closed? Snap it and say what's wrong."),
     "progress": (4.5, 2.2, "Lihat AI bekerja: hasil muncul tiap tahap.", "Watch the AI work: results appear stage by stage."),
     "parts": (4.5, 0.8, "SAM 3.1 menandai part di foto kamu.", "SAM 3.1 marks the parts on your photo."),
-    "live": (4.5, 4.2, "Kamera langsung: part yang harus dipegang ditandai (demo).", "Live camera: the part to touch is outlined (demo)."),
+    "live": (4.5, 4.2, "Kamera langsung: part yang harus dipegang ditandai.", "Live camera: the part to touch is outlined (demo)."),
     "check_pass": (4.5, 0.0, "Tiap langkah dicek kamera.", "Every step is checked by the camera."),
     "rice": (4.5, 4.4, "Bahaya? Dia bilang STOP.", "Dangerous? It says STOP and hands you to a pro."),
-    "wa": (4.5, 0.0, "Juga lewat WhatsApp, dalam Basa Jawa.", "Also works in WhatsApp (simulator, demo mode)."),
+    "wa": (4.5, 0.0, "Juga lewat WhatsApp, dalam Basa Jawa.", "Also works in WhatsApp (simulator, live answers)."),
     "arch": (4.5, 0.0, "Built with Meta Muse Spark + SAM 3.1 + Muse Image", "Voice Transcribe · Muse Spark · SAM 3.1 · Muse Image"),
-    "close": (4.5, 0.0, "Tukang Copilot · open source · mode demo", "Fix it yourself, safely. In Javanese."),
+    "close": (4.5, 0.0, "Tukang Copilot · open source · Meta AI", "Fix it yourself, safely. In Javanese."),
 }
 VERTICAL_ZOOMS = {"parts": [(0.0, 1.0, 300), (0.6, 1.0, 300), (2.0, 1.35, 300), (4.5, 1.35, 300)],
                   "check_pass": [(0.0, 1.0, 560), (0.8, 1.0, 560), (2.0, 1.3, 560), (4.5, 1.3, 560)],

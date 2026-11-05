@@ -228,6 +228,19 @@ def _image_bytes(r: httpx.Response) -> bytes:
     raise MetaAPIError("Muse Image response had neither b64_json nor url")
 
 
+def _image_post(kind: str, body: dict[str, Any]) -> httpx.Response:
+    """Muse Image can't stream, and in my live runs a high-effort image sometimes came back as 504 (the gateway's
+    deadline). So: one retry at high effort, then the same request at low effort, which finishes well inside it."""
+    url = f"{settings.meta_api_base}/images/{kind}"
+    try:
+        return _post(url, headers=_headers(), json=body, timeout=600, retries=1)
+    except MetaAPIError as e:
+        if body.get("reasoning_strength") != "high" or not str(e).startswith(("504", "502", "503")):
+            raise
+        log.warning("Muse Image at high effort timed out, trying low effort")
+        return _post(url, headers=_headers(), json=body | {"reasoning_strength": "low"}, timeout=600, retries=2)
+
+
 def generate_image(prompt: str, out: Path, size: str = "1536x1024", fast: bool = False) -> Path:
     cost.check(cost.IMAGE_USD)
     body = {
@@ -236,7 +249,7 @@ def generate_image(prompt: str, out: Path, size: str = "1536x1024", fast: bool =
         # Instruction cards: allow image search for tool/part references, no web search or shell.
         "tool_enablement": {"enable_web_search": False, "enable_shell": False, "enable_image_search": True},
     }
-    r = _post(f"{settings.meta_api_base}/images/generations", headers=_headers(), json=body, timeout=600)
+    r = _image_post("generations", body)
     out.write_bytes(_image_bytes(r))
     cost.charge(settings.image_model, cost.IMAGE_USD)
     return out
@@ -251,7 +264,7 @@ def edit_image(prompt: str, refs: list[Path], out: Path, fast: bool = False) -> 
         "reasoning_strength": "low" if fast else "high",
         "tool_enablement": {"enable_web_search": False, "enable_shell": False},
     }
-    r = _post(f"{settings.meta_api_base}/images/edits", headers=_headers(), json=body, timeout=600)
+    r = _image_post("edits", body)
     out.write_bytes(_image_bytes(r))
     cost.charge(settings.image_model, cost.IMAGE_USD)
     return out

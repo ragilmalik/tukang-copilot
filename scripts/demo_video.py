@@ -1,4 +1,4 @@
-"""The demo video, shot from the real app in demo mode: screen recordings of the phone UI, put in a phone frame on the
+"""The demo video, shot from the real app answering live from the Meta Model API: screen recordings of the phone UI, put in a phone frame on the
 app's own concrete background, with Barlow captions, crossfades and a few slow zooms on the moments that matter.
 
 Two halves, both driven by scripts/make_demo_assets.py:
@@ -10,7 +10,8 @@ Two halves, both driven by scripts/make_demo_assets.py:
   render          60 fps frames composed with Pillow and piped to ffmpeg, one cached segment per scene (with its
                   voice-over), then joined. The vertical X clip reuses the same recordings.
 
-Everything on screen is demo mode: sample answers and AI-generated sample photos, said in the corner of every frame.
+Every answer on screen is a live Meta API answer (waits for the models are cut and the real wait is noted); the
+photos are AI-generated sample photos, said in the corner of every frame.
 """
 from __future__ import annotations
 
@@ -42,7 +43,7 @@ XFADE = 0.45  # crossfade at the start of every scene, from the last frame of th
 CONCRETE, PLATE, INK, MUTED = (232, 233, 229), (255, 255, 255), (26, 29, 33), (79, 86, 94)
 ASPHALT, ASPHALT2, ON_DARK, ON_DARK_MUTED = (29, 32, 36), (39, 43, 48), (238, 240, 242), (169, 176, 184)
 TONE = {"act": (255, 106, 19), "stop": (200, 32, 30), "check": (255, 194, 26), "ok": (18, 128, 74), "info": (29, 79, 145)}
-DEMO_NOTE = "Demo mode · sample answers · AI-generated sample photos"
+DEMO_NOTE = "Live Meta API answers · 5 Nov 2026 · AI-generated sample photos"
 
 
 # --- fonts and text
@@ -442,7 +443,7 @@ def card(sc: Any, t: float, shot: Shot, size: tuple[int, int], vertical: bool) -
         yy = y + 170
         yy = text_block(d, (x, yy + 18 * (1 - k2)), small.replace("'", "’"), font("black", 84 if not vertical else 92), lw, ON_DARK + (int(255 * k2),), 86)
         yy = text_block(d, (x, yy + 36), sc.caption, font("body", 32 if not vertical else 38), lw - 20, ON_DARK_MUTED + (int(255 * k3),), 44)
-        text_block(d, (x, yy + 18), "Recorded in demo mode: sample answers, AI-generated sample photos.", font("body", 26 if not vertical else 32),
+        text_block(d, (x, yy + 18), "Recorded live on the Meta Model API, 5 Nov 2026. Model waits are cut; photos are AI-generated samples.", font("body", 26 if not vertical else 32),
                    lw, ON_DARK_MUTED + (int(200 * k3),), 36)
     else:  # opening title
         brand_row(layer, x, int(y - 40 + 18 * (1 - k1)), dark=True, size=110 if not vertical else 120)
@@ -478,7 +479,7 @@ def _title_photo(layer: Image.Image, t: float) -> None:
     m = _round_mask(*plate.size, 26)
     plate.paste(im, (12, 12))
     d = ImageDraw.Draw(plate)
-    d.text((16, im.height + 22), "SAM 3.1 outlines (demo mode) on an AI-generated sample photo", font=font("body", 21), fill=ON_DARK_MUTED + (int(255 * k),))
+    d.text((16, im.height + 22), "Live SAM 3.1 masks on an AI-generated sample photo", font=font("body", 21), fill=ON_DARK_MUTED + (int(255 * k),))
     plate.putalpha(ImageChops.multiply(m, Image.new("L", plate.size, int(255 * k))))
     layer.alpha_composite(plate, (1180, int(250 + 20 * (1 - k))))
 
@@ -544,7 +545,7 @@ def hook_card(shot: Shot, t: float, size: tuple[int, int], vertical: bool) -> Im
     yy = text_block(d, (x, yy + 34), small, font("body", 40), 900, ON_DARK + (int(235 * k2),), 52)
     d.rectangle([x, yy + 34, x + 10, yy + 34 + 44], fill=TONE["act"] + (int(255 * k3),))
     text_block(d, (x + 28, yy + 34), shot.sc.caption, font("semi", 32), 860, ON_DARK + (int(255 * k3),), 44)
-    pill(layer, (w - 470 if not vertical else 60, h - 70 if not vertical else 120), "Sample photo (AI-generated), demo mode", font("body", 22),
+    pill(layer, (w - 470 if not vertical else 60, h - 70 if not vertical else 120), "Sample photo (AI-generated)", font("body", 22),
          ON_DARK, (20, 22, 26, 170))
     im.paste(layer, (0, 0), layer)
     sub = _sub_at(shot, t) if not vertical else ""
@@ -579,7 +580,7 @@ def wa_card(shot: Shot, t: float, size: tuple[int, int], vertical: bool) -> Imag
         lf = font("semi", 26 if not vertical else 24)
         d.text((cx - d.textlength(lab, font=lf) / 2, top - 52), lab, font=lf, fill=INK + (int(255 * k),))
     if not vertical:
-        d.text((x_start, top + (906 * scale) + 30), "WhatsApp simulator (/wa) · same handler as the Cloud API webhook · demo mode",
+        d.text((x_start, top + (906 * scale) + 30), "WhatsApp simulator (/wa) · same handler as the Cloud API webhook · live Meta answers",
                font=font("body", 22), fill=MUTED)
     return im
 
@@ -682,6 +683,8 @@ class Recorder:
         self.frames: list[tuple[float, bytes]] = []
         self.t0 = 0.0
         self.marks: dict[str, float] = {}
+        self.cuts: list[tuple[float, float]] = []
+        self.waits: list[float] = []
         self.cdp.on("Page.screencastFrame", self._on)
 
     def _on(self, ev: dict[str, Any]) -> None:
@@ -694,13 +697,29 @@ class Recorder:
     def start(self) -> None:
         self.frames = []
         self.marks = {}
+        self.cuts = []
+        self.waits = []
         first = self.pg.screenshot(type="jpeg", quality=92)
         self.t0 = time.time()
         self.frames.append((self.t0, first))
         self.cdp.send("Page.startScreencast", {"format": "jpeg", "quality": 92, "maxWidth": 780, "maxHeight": 1688, "everyNthFrame": 1})
 
     def mark(self, name: str) -> None:
-        self.marks[name] = time.time() - self.t0
+        self.marks[name] = self.now()
+
+    def now(self) -> float:
+        """Scene clock: wall time since start minus the model waits cut out so far."""
+        return time.time() - self.t0 - sum(b - a for a, b in self.cuts)
+
+    def cut(self, wait: Callable[[], Any], keep: float = 0.8) -> None:
+        """Run a wait for a live model answer and cut it from the clip, keeping `keep` seconds of the spinner at each
+        end. The real wait is printed and kept in index.json ("cuts"), so the video can say how long it really took."""
+        a = time.time()
+        wait()
+        b = time.time()
+        if b - a > 2 * keep + 0.5:
+            self.cuts.append((a + keep, b - keep))
+            self.waits.append(round(b - a, 1))
 
     def stop(self, key: str, length: float) -> None:
         self.cdp.send("Page.stopScreencast")
@@ -708,13 +727,16 @@ class Recorder:
         shutil.rmtree(out, ignore_errors=True)
         out.mkdir(parents=True)
         rows = []
+        cuts = sorted(self.cuts)
         for i, (ts, data) in enumerate(sorted(self.frames, key=lambda f: f[0])):
-            t = max(0.0, ts - self.t0)
+            if any(a < ts < b for a, b in cuts):
+                continue  # inside a cut-out model wait
+            t = max(0.0, ts - self.t0 - sum(b - a for a, b in cuts if b <= ts))
             name = f"f{i:05}.jpg"
             (out / name).write_bytes(data)
             rows.append([round(t, 4), name])
-        (out / "index.json").write_text(json.dumps({"frames": rows, "length": length, "marks": self.marks}))
-        print(f"clip {key}: {len(rows)} frames, {length:.1f}s", flush=True)
+        (out / "index.json").write_text(json.dumps({"frames": rows, "length": length, "marks": self.marks, "live_waits_s": self.waits}))
+        print(f"clip {key}: {len(rows)} frames, {length:.1f}s, live model waits cut: {self.waits}", flush=True)
 
 
 def run_scene(rec: Recorder, key: str, length: float, actions: Callable[[Callable[[float], None]], None]) -> None:
@@ -722,7 +744,7 @@ def run_scene(rec: Recorder, key: str, length: float, actions: Callable[[Callabl
     rec.start()
 
     def wait_until(t: float) -> None:
-        left = t - (time.time() - rec.t0)
+        left = t - rec.now()
         if left > 0:
             rec.pg.wait_for_timeout(int(left * 1000))
 
@@ -731,10 +753,16 @@ def run_scene(rec: Recorder, key: str, length: float, actions: Callable[[Callabl
     rec.stop(key, length)
 
 
+LIVE_MS = 240_000  # live Meta answers take up to a couple of minutes; the wait is cut from the clip (Recorder.cut)
+# the plan step whose finished state the sample after-photo shows (spark plug cap pushed back on)
+CAP_STEP_JS = """(() => { const st = (S && S.plan && S.plan.steps) || [];
+  const hit = st.find((x) => /cop busi|plug cap|cap/i.test(x.instruction) && /(dorong|pasang|tancap|push|refit|klik)/i.test(x.instruction));
+  return hit ? hit.n : 0; })()"""
+
 # --- what each recorded scene does (scene clock in seconds; lengths come from the voice-over)
 GROUPS = {"motor": ["intro", "progress", "question", "diagnosis", "parts"],
-          "steps": ["preflight", "check_fail", "check_pass", "handsfree", "replan", "diagram", "agent", "handoff"],
-          "other": ["live", "rice", "ow"]}
+          "steps": ["preflight", "check_fail", "check_pass", "handsfree", "replan", "agent", "handoff"],
+          "other": ["live", "rice", "diagram"]}
 
 
 def capture(group: str, lengths: dict[str, float]) -> None:
@@ -776,6 +804,15 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 box.check()
                 pg.wait_for_timeout(gap)
 
+        def go_to_step(find_js: str) -> None:
+            """Walk the step card to the step `find_js` picks from the live plan (1-based; 0 = stay)."""
+            n = int(pg.evaluate(find_js) or 0)
+            for _ in range(12):
+                if not n or pg.inner_text("#stepNo").strip() == str(n):
+                    break
+                pg.click("#nextBtn" if int(pg.inner_text("#stepNo").strip() or 1) < n else "#prevBtn")
+                pg.wait_for_timeout(350)
+
         def motor_to_result() -> None:
             settings.mock_pace_s = 0.0
             pg.goto(base + "/")
@@ -783,10 +820,11 @@ def capture(group: str, lengths: dict[str, float]) -> None:
             pg.set_input_files("#photo", str(FIX / "sample_motor_plug_area.jpg"))
             pg.fill("#text", "Motor saya Honda Beat susah hidup, distarter cuma bunyi tapi mesin nggak nyala.")
             pg.click("#goBtn")
-            pg.wait_for_selector("#question:not(.hidden)", timeout=30000)
-            pg.fill("#answerText", "Ya, ada bau bensin")
-            pg.click("#answerBtn")
-            pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
+            pg.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=LIVE_MS)
+            if pg.is_visible("#question"):
+                pg.fill("#answerText", "Ya, ada bau bensin")
+                pg.click("#answerBtn")
+            pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
             pg.evaluate("window.scrollTo(0, 0)")
             settings.mock_pace_s = 0.6
 
@@ -816,14 +854,16 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 pg.wait_for_selector("#progress:not(.hidden)")
                 at(0.9)
                 scroll_to("#stageList", -110, 800)
-                pg.wait_for_selector("#lf-segment img", timeout=30000)
+                rec.cut(lambda: pg.wait_for_selector("#lf-segment img", timeout=LIVE_MS))
                 pg.wait_for_function("() => document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
                 rec.mark("sam")
                 pg.wait_for_timeout(700)
                 scroll_by(330, 1100)
 
             def question(at: Callable[[float], None]) -> None:
-                pg.wait_for_selector("#question:not(.hidden)", timeout=30000)
+                rec.cut(lambda: pg.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=LIVE_MS))
+                if not pg.is_visible("#question"):
+                    raise SystemExit("this live run did not ask a follow-up question: run `capture motor` again")
                 scroll_to("#question", -120, 700)
                 at(1.6)
                 pg.click("#answerText")
@@ -832,7 +872,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
             def diagnosis(at: Callable[[float], None]) -> None:
                 at(0.3)
                 pg.click("#answerBtn")
-                pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
+                rec.cut(lambda: pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS))
                 pg.evaluate("window.scrollTo(0, 0)")
                 rec.mark("result")
                 at(4.2)
@@ -863,19 +903,19 @@ def capture(group: str, lengths: dict[str, float]) -> None:
             def check_fail(at: Callable[[float], None]) -> None:
                 at(0.6)
                 pg.set_input_files("#stepPhoto", str(dark))
-                pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
+                rec.cut(lambda: pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=LIVE_MS))
                 at(2.0)
                 scroll_to("#checkResult", -330, 900)
 
             def check_pass(at: Callable[[float], None]) -> None:
                 at(0.2)
+                go_to_step(CAP_STEP_JS)  # the after-photo shows the plug cap pushed back on: check it on that step
                 pg.set_input_files("#stepPhoto", str(FIX / "sample_motor_step_cap_on.jpg"))
                 pg.wait_for_timeout(500)
-                pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=20000)
+                rec.cut(lambda: pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=LIVE_MS))
                 rec.mark("pass")
 
             def handsfree(at: Callable[[float], None]) -> None:
-                pg.wait_for_function("() => document.querySelector('#stepNo').textContent.trim() === '2'", timeout=10000)
                 at(0.8)
                 scroll_to("#handsFree", -420, 900)
                 at(2.0)
@@ -893,25 +933,11 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 pg.keyboard.type("Sudah dicoba, mesin tetap tidak nyala.", delay=26)
                 at(3.2)
                 pg.click("#stuckBtn")
-                pg.wait_for_function("() => document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled",
-                                     timeout=20000)
+                rec.cut(lambda: pg.wait_for_function(
+                    "() => document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled", timeout=LIVE_MS))
                 pg.wait_for_selector("#planBanner:not(.hidden)")
                 at(4.6)
                 scroll_top(1200)
-
-            def diagram(at: Callable[[float], None]) -> None:
-                for box in pg.locator("#preList input").all():
-                    box.check()
-                at(0.2)
-                scroll_to("#stepCard", -70, 1000)
-                at(1.4)
-                for _ in range(6):
-                    if "diagram" in (pg.get_attribute("#stepImg", "src") or "") and pg.is_visible("#stepImg"):
-                        break
-                    pg.click("#nextBtn")
-                    pg.wait_for_timeout(650)
-                pg.wait_for_timeout(300)
-                scroll_to("#stepCard", -70, 700)
 
             def agent(at: Callable[[float], None]) -> None:
                 at(0.2)
@@ -932,7 +958,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 scroll_by(320, 2200)
 
             plan = {"preflight": preflight, "check_fail": check_fail, "check_pass": check_pass, "handsfree": handsfree,
-                    "replan": replan, "diagram": diagram, "agent": agent, "handoff": handoff}
+                    "replan": replan, "agent": agent, "handoff": handoff}
             for key in GROUPS["steps"]:
                 run_scene(rec, key, lengths[key], plan[key])
 
@@ -940,7 +966,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
             settings.mock_pace_s = 0.0
             pg.goto(base + "/")
             pg.click('button.sample[data-sample="pump"]')
-            pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
+            pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
             for box in pg.locator("#preList input").all():
                 box.check()
             pg.evaluate("document.querySelector('#stepCard').scrollIntoView({block: 'start'}); window.scrollBy(0, -70)")
@@ -959,13 +985,21 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 settings.mock_pace_s = 0.35
                 at(0.4)
                 pg.click('button.sample[data-sample="rice"]')
-                pg.wait_for_selector("#stopBox:not(.hidden)", timeout=30000)
+                rec.cut(lambda: pg.wait_for_selector("#stopBox:not(.hidden)", timeout=LIVE_MS))
                 pg.evaluate("window.scrollTo(0, 0)")
                 rec.mark("stop")
 
-            def ow(at: Callable[[float], None]) -> None:
-                at(6.8)
-                scroll_by(260, 1600)
+            def diagram(at: Callable[[float], None]) -> None:
+                at(0.2)
+                scroll_to("#stepCard", -70, 900)
+                at(1.2)
+                for _ in range(10):  # walk to the step Muse Image drew a diagram for
+                    if "diagram" in (pg.get_attribute("#stepImg", "src") or "") and pg.is_visible("#stepImg"):
+                        break
+                    pg.click("#nextBtn")
+                    pg.wait_for_timeout(500)
+                pg.wait_for_timeout(300)
+                scroll_to("#stepCard", -70, 700)
 
             run_scene(rec, "live", lengths["live"], live)
             pg.click("#liveClose")
@@ -973,12 +1007,15 @@ def capture(group: str, lengths: dict[str, float]) -> None:
             pg.evaluate("document.querySelector('button.sample[data-sample=\"rice\"]').scrollIntoView({block: 'center'})")
             pg.wait_for_timeout(400)
             run_scene(rec, "rice", lengths["rice"], rice)
-            settings.use_open_weights, settings.baseten_api_key = True, "placeholder-not-a-key"
+            # diagram: the English faucet repair, where Muse Image draws the washer swap
             pg.goto(base + "/")
             pg.select_option("#lang", "en")
-            pg.wait_for_selector("#owBadge:not(.hidden)", timeout=5000)
-            pg.wait_for_timeout(500)
-            run_scene(rec, "ow", lengths["ow"], ow)
-            settings.use_open_weights, settings.baseten_api_key = False, ""
+            pg.wait_for_timeout(300)
+            pg.click('button.sample[data-sample="faucet"]')
+            pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
+            for box in pg.locator("#preList input").all():
+                box.check()
+            pg.evaluate("window.scrollTo(0, 0)")
+            run_scene(rec, "diagram", lengths["diagram"], diagram)
         b.close()
     srv.should_exit = True

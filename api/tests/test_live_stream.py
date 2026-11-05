@@ -136,3 +136,37 @@ def test_plain_json_answer_is_still_read(monkeypatch: pytest.MonkeyPatch, no_sle
                        "usage": {"prompt_tokens": 1, "completion_tokens": 1}})
     monkeypatch.setattr(httpx, "stream", lambda *a, **k: _Resp(200, [], "application/json", body))
     assert meta_client.chat_json([], json_schema(DiagramReview), "diagram_review")["problems"] == ["x"]
+
+
+def test_muse_image_falls_back_to_low_effort_after_a_gateway_timeout(monkeypatch: pytest.MonkeyPatch, tmp_path: Any,
+                                                                      no_sleep: list[float]) -> None:
+    import base64
+
+    sent: list[str] = []
+    png = base64.b64encode(b"\x89PNG fake").decode()
+
+    def post(url: str, **kw: Any) -> httpx.Response:
+        sent.append(kw["json"]["reasoning_strength"])
+        req = httpx.Request("POST", url)
+        if kw["json"]["reasoning_strength"] == "high":
+            return httpx.Response(504, text="upstream request deadline exceeded", request=req)
+        return httpx.Response(200, json={"data": [{"b64_json": png}]}, request=req)
+
+    monkeypatch.setattr(httpx, "post", post)
+    ref = tmp_path / "ref.png"
+    ref.write_bytes(b"\x89PNG ref")
+    out = meta_client.edit_image("draw it", [ref], tmp_path / "out.png")
+    assert out.read_bytes() == b"\x89PNG fake" and sent == ["high", "high", "low"]
+
+
+def test_muse_image_does_not_retry_a_bad_request(monkeypatch: pytest.MonkeyPatch, tmp_path: Any, no_sleep: list[float]) -> None:
+    sent: list[str] = []
+
+    def post(url: str, **kw: Any) -> httpx.Response:
+        sent.append(kw["json"]["reasoning_strength"])
+        return httpx.Response(400, text="bad prompt", request=httpx.Request("POST", url))
+
+    monkeypatch.setattr(httpx, "post", post)
+    with pytest.raises(meta_client.MetaAPIError, match="400"):
+        meta_client.generate_image("x", tmp_path / "o.png")
+    assert sent == ["high"]
