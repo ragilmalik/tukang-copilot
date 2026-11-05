@@ -43,7 +43,26 @@ XFADE = 0.45  # crossfade at the start of every scene, from the last frame of th
 CONCRETE, PLATE, INK, MUTED = (232, 233, 229), (255, 255, 255), (26, 29, 33), (79, 86, 94)
 ASPHALT, ASPHALT2, ON_DARK, ON_DARK_MUTED = (29, 32, 36), (39, 43, 48), (238, 240, 242), (169, 176, 184)
 TONE = {"act": (255, 106, 19), "stop": (200, 32, 30), "check": (255, 194, 26), "ok": (18, 128, 74), "info": (29, 79, 145)}
-DEMO_NOTE = "Live Meta API answers · 5 Nov 2026 · AI-generated sample photos"
+
+
+def recorded_on() -> str:
+    """The day the clips were recorded (written by `capture`, WIB), like "6 Nov 2026"; today when there are none."""
+    p = CLIPS / "recorded.json"
+    if p.exists():
+        return str(json.loads(p.read_text())["date"])
+    return _today_wib()
+
+
+def _today_wib() -> str:
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    d = datetime.now(ZoneInfo("Asia/Jakarta"))
+    return f"{d.day} {d:%b %Y}"
+
+
+def demo_note() -> str:
+    return f"Live Meta API answers · {recorded_on()} · AI-generated sample photos"
 
 
 # --- fonts and text
@@ -324,7 +343,7 @@ def _panel(sc: Any, sub: str, size: tuple[int, int]) -> Image.Image:
     d = ImageDraw.Draw(im)
     x, width = 1010, 790
     brand_row(im, x, 92, size=50)
-    pill(im, (x, 168), DEMO_NOTE, font("body", 22), MUTED, PLATE)
+    pill(im, (x, 168), demo_note(), font("body", 22), MUTED, PLATE)
     head = sc.head or sc.caption
     hf = font("black", 92)
     lines = wrap(head, hf, width)
@@ -394,9 +413,10 @@ class Renderer:
     def frame(self, t: float) -> Image.Image:
         img = self.sc.image
         if img.startswith("title:"):
-            if self.sc.key != "hook" and t > 2.2:  # every fade is done: the card no longer changes
-                if self._last is None or self._last[0] != "card":
-                    self._last = ("card", card(self.sc, t, self.shot, self.size, self.vertical))
+            if self.sc.key != "hook" and t > 2.2:  # every fade is done: the card only changes with the caption
+                key = ("card", "" if self.vertical else _sub_at(self.shot, t))
+                if self._last is None or self._last[0] != key:
+                    self._last = (key, card(self.sc, t, self.shot, self.size, self.vertical))
                 return self._last[1]
             return card(self.sc, t, self.shot, self.size, self.vertical)
         if img == "arch":
@@ -404,6 +424,8 @@ class Renderer:
         if img.startswith("wa:"):
             return wa_card(self.shot, t, self.size, self.vertical)
         sub = self.shot.subs and (self.shot.subs[0][2] if self.vertical else _sub_at(self.shot, t)) or ""
+        if self.vertical:
+            return self._vframe(t, sub)
         key, screen = self._screen(t)
         z, fy = zoom_at(self.sc.key, t, self.zooms)
         cache_key = (key, sub, round(z, 4), round(fy, 1))
@@ -415,6 +437,28 @@ class Renderer:
         k = min(1.0, (z - 1) / 0.35) if z > 1 else 0.0
         mid = (ph.top + ph.h / 2) if not self.vertical else (ph.top + ph.h / 2)
         draw_phone(im, ph, screen, z, (fx, fyc), (fx, fyc + (mid - fyc) * k))
+        self._last = (cache_key, im)
+        return im
+
+    def _vframe(self, t: float, sub: str) -> Image.Image:
+        """Vertical phone scene: background, the (maybe zoomed) phone, then the header band and the caption on top,
+        so a zoom never covers the words."""
+        key, screen = self._screen(t)
+        z, fy = zoom_at(self.sc.key, t, self.zooms)
+        cache_key = (key, sub, round(z, 4), round(fy, 1))
+        if self._last is not None and self._last[0] == cache_key:
+            return self._last[1]
+        bg = self._bg("")
+        im = bg.copy()
+        ph = VERT_PHONE
+        fx, fyc = ph.css_to_canvas(195, fy)
+        k = min(1.0, (z - 1) / 0.35) if z > 1 else 0.0
+        mid = ph.top + ph.h / 2
+        draw_phone(im, ph, screen, z, (fx, fyc), (fx, fyc + (mid - fyc) * k))
+        band = int(ph.top - 12)
+        im.paste(bg.crop((0, 0, im.width, band)), (0, 0))
+        if sub:
+            vsubtitle(im, sub)
         self._last = (cache_key, im)
         return im
 
@@ -443,7 +487,7 @@ def card(sc: Any, t: float, shot: Shot, size: tuple[int, int], vertical: bool) -
         yy = y + 170
         yy = text_block(d, (x, yy + 18 * (1 - k2)), small.replace("'", "’"), font("black", 84 if not vertical else 92), lw, ON_DARK + (int(255 * k2),), 86)
         yy = text_block(d, (x, yy + 36), sc.caption, font("body", 32 if not vertical else 38), lw - 20, ON_DARK_MUTED + (int(255 * k3),), 44)
-        text_block(d, (x, yy + 18), "Recorded live on the Meta Model API, 5 Nov 2026. Model waits are cut; photos are AI-generated samples.", font("body", 26 if not vertical else 32),
+        text_block(d, (x, yy + 18), f"Recorded live on the Meta Model API, {recorded_on()}. Model waits are cut; photos are AI-generated samples.", font("body", 26 if not vertical else 32),
                    lw, ON_DARK_MUTED + (int(200 * k3),), 36)
     else:  # opening title
         brand_row(layer, x, int(y - 40 + 18 * (1 - k1)), dark=True, size=110 if not vertical else 120)
@@ -458,6 +502,11 @@ def card(sc: Any, t: float, shot: Shot, size: tuple[int, int], vertical: bool) -
     if sc.key == "close":
         _close_phones(im, t, vertical)
     im.paste(layer, (0, 0), layer)
+    if vertical:
+        if shot.subs:
+            vsubtitle(im, shot.subs[0][2])
+    elif _sub_at(shot, t):  # the narrator speaks on the title and end cards too: burn in the caption like every other scene
+        _subtitle(im, _sub_at(shot, t), 260, h - 40, w - 520)
     return im
 
 
@@ -548,9 +597,11 @@ def hook_card(shot: Shot, t: float, size: tuple[int, int], vertical: bool) -> Im
     pill(layer, (w - 470 if not vertical else 60, h - 70 if not vertical else 120), "Sample photo (AI-generated)", font("body", 22),
          ON_DARK, (20, 22, 26, 170))
     im.paste(layer, (0, 0), layer)
-    sub = _sub_at(shot, t) if not vertical else ""
-    if sub:
-        _subtitle(im, sub, x - 10, h - 110, 1000)
+    if vertical:
+        if shot.subs:
+            vsubtitle(im, shot.subs[0][2])
+    elif _sub_at(shot, t):
+        _subtitle(im, _sub_at(shot, t), x - 10, h - 110, 1000)
     return im
 
 
@@ -607,7 +658,15 @@ def arch_card(shot: Shot, t: float, size: tuple[int, int], vertical: bool) -> Im
 
 
 # --- vertical (9:16) layout
-VERT_PHONE = Phone(cx=540, top=430, scale=1.3)
+VERT_PHONE = Phone(cx=540, top=430, scale=1.18)
+# X / Reels / Shorts draw their own buttons and text over the edges of a 9:16 video: captions stay inside this box
+VERT_SAFE_BOTTOM = 1920 - 250
+VERT_SAFE_SIDE = 60
+
+
+def vsubtitle(im: Image.Image, text: str) -> None:
+    """The English caption of the vertical clip, drawn last (over the phone) and inside the safe area."""
+    _subtitle(im, text, VERT_SAFE_SIDE, VERT_SAFE_BOTTOM, im.width - 2 * VERT_SAFE_SIDE, size=40)
 
 
 def _vpanel(sc: Any, sub: str, size: tuple[int, int]) -> Image.Image:
@@ -615,7 +674,7 @@ def _vpanel(sc: Any, sub: str, size: tuple[int, int]) -> Image.Image:
     im = concrete(w, h).copy()
     d = ImageDraw.Draw(im)
     brand_row(im, 80, 70, size=56)
-    pill(im, (80, 150), DEMO_NOTE, font("body", 24), MUTED, PLATE)
+    pill(im, (80, 150), demo_note(), font("body", 24), MUTED, PLATE)
     hf = font("black", 74)
     y = 225
     lines = wrap(sc.caption, hf, w - 180)[:3]
@@ -624,7 +683,7 @@ def _vpanel(sc: Any, sub: str, size: tuple[int, int]) -> Image.Image:
         draw_text(d, (90, y), ln, hf, INK)
         y += 72
     if sub:
-        _subtitle(im, sub, 60, h - 80, w - 120, size=40)
+        vsubtitle(im, sub)
     return im
 
 
@@ -749,15 +808,15 @@ def run_scene(rec: Recorder, key: str, length: float, actions: Callable[[Callabl
             rec.pg.wait_for_timeout(int(left * 1000))
 
     actions(wait_until)
+    late = [m for m, t in rec.marks.items() if t > length - 1.0]
+    if late:
+        raise SystemExit(f"scene {key}: {late} happened at {[round(rec.marks[m], 1) for m in late]} s, after its "
+                         f"{length:.1f} s end (less than 1 s on screen): shorten the scene's actions")
     wait_until(length)
     rec.stop(key, length)
 
 
 LIVE_MS = 240_000  # live Meta answers take up to a couple of minutes; the wait is cut from the clip (Recorder.cut)
-# the plan step whose finished state the sample after-photo shows (spark plug cap pushed back on)
-CAP_STEP_JS = """(() => { const st = (S && S.plan && S.plan.steps) || [];
-  const hit = st.find((x) => /cop busi|plug cap|cap/i.test(x.instruction) && /(dorong|pasang|tancap|push|refit|klik)/i.test(x.instruction));
-  return hit ? hit.n : 0; })()"""
 
 # --- what each recorded scene does (scene clock in seconds; lengths come from the voice-over)
 GROUPS = {"motor": ["intro", "progress", "question", "diagnosis", "parts"],
@@ -774,6 +833,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
 
     CLIPS.mkdir(parents=True, exist_ok=True)
     base, srv = mda._server()
+    (CLIPS / "recorded.json").write_text(json.dumps({"date": _today_wib()}))
     settings.mock_pace_s = 0.6
     dark = Path(tempfile.mkdtemp()) / "dark.jpg"
     dark.write_bytes(_dark_photo("motor"))
@@ -782,11 +842,15 @@ def capture(group: str, lengths: dict[str, float]) -> None:
         args.append(f"--use-file-for-fake-video-capture={mda._fake_camera_y4m(FIX / 'sample_pump_overview.jpg')}")
     with sync_playwright() as p:
         b = p.chromium.launch(executable_path=mda._chromium(), args=args)
-        ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, locale="id-ID")
+        ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, locale="id-ID",
+                            timezone_id=mda.TZ)
         ctx.grant_permissions(["camera", "microphone"], origin=base)
         ctx.add_init_script(mda.SR_STUB)
         ctx.add_init_script(TAP_JS)
+        mda.public_links(ctx, base)  # the hand-off message links read like the public site's, not 127.0.0.1
         pg = ctx.new_page()
+        page_errors: list[str] = []
+        mda._console_watch(pg, page_errors)
         rec = Recorder(ctx, pg)
 
         def scroll_to(sel: str, off: int = -80, ms: int = 900) -> None:
@@ -804,9 +868,8 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 box.check()
                 pg.wait_for_timeout(gap)
 
-        def go_to_step(find_js: str) -> None:
-            """Walk the step card to the step `find_js` picks from the live plan (1-based; 0 = stay)."""
-            n = int(pg.evaluate(find_js) or 0)
+        def go_to_step(n: int) -> None:
+            """Walk the step card to step n of the live plan (0 = stay)."""
             for _ in range(12):
                 if not n or pg.inner_text("#stepNo").strip() == str(n):
                     break
@@ -822,7 +885,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
             pg.click("#goBtn")
             pg.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=LIVE_MS)
             if pg.is_visible("#question"):
-                pg.fill("#answerText", "Ya, ada bau bensin")
+                pg.fill("#answerText", mda.ANSWER)
                 pg.click("#answerBtn")
             pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
             pg.evaluate("window.scrollTo(0, 0)")
@@ -867,7 +930,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 scroll_to("#question", -120, 700)
                 at(1.6)
                 pg.click("#answerText")
-                pg.keyboard.type("Ya, ada bau bensin", delay=60)
+                pg.keyboard.type(mda.ANSWER, delay=110)
 
             def diagnosis(at: Callable[[float], None]) -> None:
                 at(0.3)
@@ -908,11 +971,20 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 scroll_to("#checkResult", -330, 900)
 
             def check_pass(at: Callable[[float], None]) -> None:
+                # the step card is already on the step the photo shows (moved between the scenes, under the crossfade),
+                # so the short scene has room for the check and its result
+                # the upload and the live check are one cut: the clip keeps 0.8 s of "Checking photo…" and then the
+                # verdict, so it lands early in this short scene. The verdict is the isPass/isFail class the app sets
+                # when the answer arrives (cleared before the scene, so a class left from check_fail cannot count).
                 at(0.2)
-                go_to_step(CAP_STEP_JS)  # the after-photo shows the plug cap pushed back on: check it on that step
-                pg.set_input_files("#stepPhoto", str(FIX / "sample_motor_step_cap_on.jpg"))
-                pg.wait_for_timeout(500)
-                rec.cut(lambda: pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=LIVE_MS))
+
+                def upload_and_check() -> None:
+                    pg.set_input_files("#stepPhoto", str(FIX / "sample_motor_step_cap_on.jpg"))
+                    pg.wait_for_function("() => { const el = document.querySelector('#checkResult');"
+                                         " return (el.classList.contains('isPass') || el.classList.contains('isFail'))"
+                                         " && !el.textContent.includes('…'); }", timeout=LIVE_MS)
+
+                rec.cut(upload_and_check)
                 rec.mark("pass")
 
             def handsfree(at: Callable[[float], None]) -> None:
@@ -960,17 +1032,28 @@ def capture(group: str, lengths: dict[str, float]) -> None:
             plan = {"preflight": preflight, "check_fail": check_fail, "check_pass": check_pass, "handsfree": handsfree,
                     "replan": replan, "agent": agent, "handoff": handoff}
             for key in GROUPS["steps"]:
+                if key == "check_pass":  # the after-photo shows the plug cap pushed back on: check it on that step
+                    go_to_step(mda.sample_step_n(pg, "motor"))
+                    pg.evaluate("() => { const el = document.querySelector('#stepPhotoLabel');"
+                                " window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + scrollY - 330));"
+                                " document.querySelector('#checkResult').classList.remove('isPass', 'isFail'); }")
+                    pg.wait_for_timeout(400)
                 run_scene(rec, key, lengths[key], plan[key])
 
-        else:  # live camera on the pump, red stop on the rice cooker, open-weights badge
-            settings.mock_pace_s = 0.0
-            pg.goto(base + "/")
-            pg.click('button.sample[data-sample="pump"]')
-            pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
-            for box in pg.locator("#preList input").all():
-                box.check()
-            pg.evaluate("document.querySelector('#stepCard').scrollIntoView({block: 'start'}); window.scrollBy(0, -70)")
-            settings.mock_pace_s = 0.6
+        else:  # live camera on the pump, red stop on the rice cooker, the Muse Image diagram on the faucet
+            # DEMO_ONLY=diagram (comma list) re-records only those scenes of this group, so one bad take costs one scene
+            only = {k.strip() for k in os.environ.get("DEMO_ONLY", "").split(",") if k.strip()} or set(GROUPS["other"])
+
+            def setup_live() -> None:
+                settings.mock_pace_s = 0.0
+                pg.goto(base + "/")
+                pg.click('button.sample[data-sample="pump"]')
+                pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
+                for box in pg.locator("#preList input").all():
+                    box.check()
+                go_to_step(mda.live_step_n(pg))  # aim the live guide at the pump's electric motor (or the pump body)
+                pg.evaluate("document.querySelector('#stepCard').scrollIntoView({block: 'start'}); window.scrollBy(0, -70)")
+                settings.mock_pace_s = 0.6
 
             def live(at: Callable[[float], None]) -> None:
                 at(0.3)
@@ -1001,21 +1084,22 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 pg.wait_for_timeout(300)
                 scroll_to("#stepCard", -70, 700)
 
-            run_scene(rec, "live", lengths["live"], live)
-            pg.click("#liveClose")
-            pg.goto(base + "/")
-            pg.evaluate("document.querySelector('button.sample[data-sample=\"rice\"]').scrollIntoView({block: 'center'})")
-            pg.wait_for_timeout(400)
-            run_scene(rec, "rice", lengths["rice"], rice)
-            # diagram: the English faucet repair, where Muse Image draws the washer swap
-            pg.goto(base + "/")
-            pg.select_option("#lang", "en")
-            pg.wait_for_timeout(300)
-            pg.click('button.sample[data-sample="faucet"]')
-            pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
-            for box in pg.locator("#preList input").all():
-                box.check()
-            pg.evaluate("window.scrollTo(0, 0)")
-            run_scene(rec, "diagram", lengths["diagram"], diagram)
+            if "live" in only:
+                setup_live()
+                run_scene(rec, "live", lengths["live"], live)
+                pg.click("#liveClose")
+            if "rice" in only:
+                pg.goto(base + "/")
+                pg.evaluate("document.querySelector('button.sample[data-sample=\"rice\"]').scrollIntoView({block: 'center'})")
+                pg.wait_for_timeout(400)
+                run_scene(rec, "rice", lengths["rice"], rice)
+            if "diagram" in only:  # the English faucet repair, where Muse Image draws the washer swap
+                settings.mock_pace_s = 0.0
+                mda.faucet_with_diagram(pg, base)
+                settings.mock_pace_s = 0.6
+                pg.evaluate("window.scrollTo(0, 0)")
+                run_scene(rec, "diagram", lengths["diagram"], diagram)
         b.close()
     srv.should_exit = True
+    if page_errors:
+        raise SystemExit(f"page errors while recording {group}:\n" + "\n".join(page_errors))

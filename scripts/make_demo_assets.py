@@ -10,6 +10,10 @@
 Everything shown is the app built during the hackathon answering live from the Meta Model API, with labelled
 AI-generated sample photos. The video says so on screen, and the waits for the models are cut (the real wait is noted). My own real-phone video (docs/DEMO_SCRIPT.md) replaces it once I record it.
 Chromium: PLAYWRIGHT_CHROMIUM, system chromium, or `python -m playwright install chromium`.
+
+DEMO_BASE_URL=http://127.0.0.1:8765 uses a server I already started (`PORT=8765 python app.py` with the key, plus
+WA_SIM=1 DEMO_FALLBACK=0 NARRATION_VOICE=0) instead of starting one in this process on a free port. The script checks
+that its /health says live (and the current version) before it spends anything.
 """
 from __future__ import annotations
 
@@ -72,13 +76,14 @@ HACKATHON_LINE = "Built during the Meta AI Developer Hackathon, Oct 26 to Nov 4,
 
 SCENES: list[Scene] = [
     # 3-second silent title card, then the story. The voice-over captions are burned in (English).
+    # a short spoken line on the title card too, so the film never opens on dead air
     Scene("title", "title:Fix it yourself, safely. In Javanese.|" + HACKATHON_LINE,
-          "Tukang Copilot · Muse Spark + SAM 3.1 + Muse Image", "", 3),
+          "Tukang Copilot · Muse Spark + SAM 3.1 + Muse Image", "This is Tukang Copilot. Fix it yourself, safely, even in Javanese.", 3),
     Scene("hook", "title:Motor mogok. Bengkelnya tutup.|Bike won't start. The repair shop is closed.",
           "139 million motorbikes in Indonesia (BPS 2024), plus water pumps.",
           "In Indonesia, a small fault on a motorbike or a water pump can cost a day's wage. "
           "Repair videos can't see your problem, and most aren't in your language.", 7,
-          pre=("id-ID-ArdiNeural", "Aduh, motorku mogok. Bengkelnya tutup lagi.")),
+          pre=("id-ID-ArdiNeural", "Aduh motorku mogok, bengkelnya tutup lagi.")),
     Scene("intro", "01_home", "Photo + voice in Bahasa, Javanese or English. No photo? 1-tap demo.",
           "Take a photo and say what's wrong. Every answer here is live from Meta's models. The photos are AI-generated samples.", 5,
           "Snap it, say it"),
@@ -107,7 +112,7 @@ SCENES: list[Scene] = [
     Scene("replan", "09_replan", "Still broken? The agent re-plans to the next likely cause.",
           "Still broken? Tell it what happened, and it moves on to the next likely cause. Plan, act, check, re-plan.", 6, "Re-plan"),
     Scene("diagram", "28_diagram_step", "No photo can show it? Muse Image draws a diagram for the step, reviewed by Muse Spark.",
-          "When a photo can't show a step, like the washer inside a tap, Muse Image draws one, and Muse Spark checks the drawing.", 5,
+          "When a photo can't show a step, like the washer inside a tap, Muse Image draws a diagram, and Muse Spark checks it.", 5,
           "A diagram for the step", "info"),
     Scene("agent", "23_agent_log", "“What the AI did”: every decision, the model that made it, and why it asked.",
           "Every decision stays on screen: what it saw, why it asked, each photo check, and which model did it.", 6,
@@ -133,12 +138,37 @@ SCENES: list[Scene] = [
 
 
 LIVE_MS = 240_000  # live Meta answers take up to a couple of minutes
+ANSWER = "Ya"      # the owner's answer to the follow-up (one yes/no question since 1.30.0)
 
 
 # --- screenshots
+class _External:
+    """Stand-in for the uvicorn server when DEMO_BASE_URL points at one I started myself (nothing to stop here)."""
+    should_exit = False
+
+
+def _check_external(base: str) -> None:
+    """The external server must answer live (no offline badge in any frame) on the version in this checkout."""
+    import httpx
+
+    from api import __version__
+
+    h = httpx.get(base.rstrip("/") + "/health", timeout=10, trust_env=False).json()
+    want_offline = os.environ.get("DEMO_ASSETS_OFFLINE") == "1"
+    if (h.get("mode") == "offline") != want_offline or h.get("version") != __version__:
+        raise SystemExit(f"{base}/health says mode={h.get('mode')} version={h.get('version')}: start the server live on {__version__}")
+    if h.get("demo_fallback"):
+        raise SystemExit(f"{base} has DEMO_FALLBACK on: a failed live call would show a demo answer. Start it with DEMO_FALLBACK=0")
+
+
 def _server() -> tuple[str, Any]:
     # Live by default: every answer in the screenshots and the video comes from the real Meta Model API (needs the key).
     # DEMO_ASSETS_OFFLINE=1 runs the same flow on the offline canned answers, only for trying the script for free.
+    os.environ["NO_PROXY"] = "127.0.0.1,localhost"
+    if os.environ.get("DEMO_BASE_URL"):
+        base = os.environ["DEMO_BASE_URL"].rstrip("/")
+        _check_external(base)
+        return base, _External()
     if os.environ.get("DEMO_ASSETS_OFFLINE") == "1":
         os.environ["OFFLINE"] = "1"
     os.environ.setdefault("NARRATION_VOICE", "0")
@@ -178,16 +208,105 @@ SR_STUB = """(() => {  // headless Chromium has no working speech service: a sil
 def _fake_camera_y4m(photo: Path) -> Path:
     """Chromium's fake camera plays a .y4m file: a few seconds of a labelled sample photo with a slow drift."""
     out = Path(tempfile.mkdtemp()) / "cam.y4m"
+    # the drift stays within 10 px of the top-left corner, so the "Sample photo (AI-generated)" tag is never cut off
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-i", str(photo), "-t", "4", "-r", "10",
-                    "-vf", "scale=1024:768,crop=984:738:20+16*sin(t):15+12*cos(t),scale=640:480,format=yuv420p",
+                    "-vf", "scale=1024:768,crop=1000:750:5+5*sin(t):4+4*cos(t),scale=640:480,format=yuv420p",
                     "-f", "yuv4mpegpipe", str(out)], check=True)
     return out
 
 
+def sample_step_n(pg: Any, sample: str) -> int:
+    """The step the labelled sample after-photo shows in the live plan on screen, picked by the app's own rule
+    (api/sample_step.py, the same pick the "Sample photo" button uses). 0 when the plan has no steps."""
+    from api import sample_step
+
+    pick = sample_step.pick(sample, pg.evaluate("(S && S.plan && S.plan.steps) || []"))
+    if pick and not pick["shows"]:
+        print(f"sample step: no step of this live plan names what the {sample} after-photo shows, using the last step", flush=True)
+    return int(pick["n"]) if pick else 0
+
+
+# the live camera guide aims at a big, plain part of the pump photo: SAM 3.1 finds "electric pump motor" on the fake
+# camera frames at once (about 0.66 confidence, tested 6 Nov 2026), while the small brass priming plug is often missed
+LIVE_PART = ("motor", "pump")
+
+
+def live_step_n(pg: Any) -> int:
+    """The step of the live pump plan whose part is the first LIVE_PART word found in the parts' SAM phrases
+    (the blue electric motor of the pump, else the pump body). 0 when no step names one."""
+    comps = pg.evaluate("((S && S.object_report && S.object_report.components) || []).map((c) => [c.id, c.sam_phrase || ''])")
+    steps = pg.evaluate("((S && S.plan && S.plan.steps) || []).map((x) => [x.n, x.component_id || ''])")
+    phrase = {str(cid): str(ph).lower() for cid, ph in comps}
+    for word in LIVE_PART:
+        for n, cid in steps:
+            if word in phrase.get(str(cid), ""):
+                return int(n)
+    return 0
+
+
+PUBLIC_BASE = os.environ.get("DEMO_PUBLIC_BASE", "https://tukang-copilot.onrender.com").rstrip("/")
+
+
+def public_links(ctx: Any, base: str) -> None:
+    """Links in the hand-off message read like the public site's, never like this machine's address.
+
+    The app builds them from PUBLIC_BASE_URL, else from the request host, so a server on this machine writes
+    "http://127.0.0.1:8765/guide/..." into the WhatsApp summary. Here the hand-off answer is passed through and only
+    that host is swapped for PUBLIC_BASE: the same text the deployed site (PUBLIC_BASE_URL set) sends. The model
+    answers in it are untouched."""
+    local = base.rstrip("/")
+
+    def swap(route: Any) -> None:
+        resp = route.fetch()
+        route.fulfill(response=resp, body=resp.text().replace(local, PUBLIC_BASE))
+
+    ctx.route("**/api/sessions/*/handoff*", swap)
+
+
+TZ = "Asia/Jakarta"  # the browser clock of every shot and clip: WIB, where the app's owners are (chat times, garage dates)
+
+
+def serve_as_public(ctx: Any, base: str) -> None:
+    """Requests to PUBLIC_BASE are answered by the server at `base`, so a page can be opened at the public address."""
+    local = base.rstrip("/")
+
+    def relay(route: Any) -> None:
+        route.fulfill(response=route.fetch(url=route.request.url.replace(PUBLIC_BASE, local, 1)))
+
+    ctx.route(PUBLIC_BASE + "/**", relay)
+
+
+DIAGRAM_TRIES = 3  # live plans differ run to run: the faucet plan asks Muse Image for a diagram most times, not every time
+
+
+def faucet_with_diagram(pg: Any, base: str) -> None:
+    """Open the English faucet sample until its live plan has a step with a Muse Image diagram (at most DIAGRAM_TRIES
+    live runs), so the diagram shot and scene always have one to show. Ticks the safety list on the way."""
+    for attempt in range(DIAGRAM_TRIES):
+        pg.goto(base + "/")
+        pg.select_option("#lang", "en")
+        pg.wait_for_timeout(300)
+        pg.click('button.sample[data-sample="faucet"]')
+        pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
+        has = pg.evaluate("Object.values((S && S.diagrams) || {}).some((d) => d && d.file)")  # the app's own stepImage() rule
+        if has:
+            break
+        print(f"faucet plan {attempt + 1} has no diagram step, asking again", flush=True)
+    else:
+        raise SystemExit(f"no Muse Image diagram in {DIAGRAM_TRIES} live faucet plans")
+    for box in pg.locator("#preList input").all():
+        box.check()
+    pg.wait_for_timeout(200)
+
+
+def _console_watch(pg: Any, errors: list[str]) -> None:
+    """Collect JS errors and console errors: the finished shots and clips must not come from a page that broke."""
+    pg.on("pageerror", lambda e: errors.append(f"pageerror: {e}"))
+    pg.on("console", lambda m: errors.append(f"console.{m.type}: {m.text}") if m.type == "error" else None)
+
+
 def shots() -> None:
     from playwright.sync_api import sync_playwright
-
-    import demo_video as dv
 
     SHOTS.mkdir(parents=True, exist_ok=True)
     base, srv = _server()
@@ -200,22 +319,38 @@ def shots() -> None:
         b = p.chromium.launch(executable_path=_chromium(), args=[
             "--no-proxy-server", "--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream",
             f"--use-file-for-fake-video-capture={cam}"])
-        ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, locale="id-ID")
+        ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, locale="id-ID",
+                            timezone_id=TZ)
         ctx.grant_permissions(["camera", "microphone"], origin=base)
         ctx.add_init_script(SR_STUB)
+        public_links(ctx, base)
         pg = ctx.new_page()
+        page_errors: list[str] = []
+        _console_watch(pg, page_errors)
 
         def snap(name: str, full: bool = False) -> None:
             pg.wait_for_timeout(350)
             pg.screenshot(path=str(SHOTS / f"{name}.png"), full_page=full)
             print("shot", name, flush=True)
 
+        def top_at(sel: str, y: int = 80) -> None:
+            """Scroll so `sel` starts just under the sticky header (65 px): no half-hidden line at the top of a shot.
+            Measured again after each scroll until it holds, since a late image or a re-render above can shift it."""
+            for _ in range(5):
+                pg.evaluate("([s, y]) => { const el = document.querySelector(s);"
+                            " window.scrollTo({top: Math.max(0, el.getBoundingClientRect().top + scrollY - y), behavior: 'instant'}); }", [sel, y])
+                pg.wait_for_timeout(250)
+                off = pg.evaluate("([s, y]) => document.querySelector(s).getBoundingClientRect().top - y", [sel, y])
+                at_end = pg.evaluate("scrollY <= 0 || innerHeight + scrollY >= document.documentElement.scrollHeight - 1")
+                if abs(off) < 2 or at_end:
+                    break
+
         def go_sample(sample: str, lang: str = "id") -> None:
             pg.goto(base + "/"); pg.select_option("#lang", lang); pg.wait_for_timeout(200)
             pg.click(f'button.sample[data-sample="{sample}"]')
 
-        def go_to_step(find_js: str) -> None:
-            n = int(pg.evaluate(find_js) or 0)
+        def go_to_step(n: int) -> None:
+            """Walk the step card to step n of the plan on screen (0 = stay)."""
             for _ in range(12):
                 cur = pg.inner_text("#stepNo").strip()
                 if not n or cur == str(n):
@@ -237,34 +372,35 @@ def shots() -> None:
             # partial results stream in as each live stage finishes
             pg.wait_for_selector("#lf-segment img", timeout=LIVE_MS)
             pg.wait_for_function("() => document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
-            pg.evaluate("document.querySelector('#stageList').scrollIntoView({block: 'start'}); window.scrollBy(0, -110)")
+            top_at("#progress", 72)
             snap("02_progress")
             pg.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=LIVE_MS)
             if pg.is_visible("#question"):
                 break
             print("no follow-up question this time, again", flush=True)
-        pg.fill("#answerText", "Ya, ada bau bensin")
-        snap("03_question")
+        pg.fill("#answerText", ANSWER)  # one yes/no question since 1.30.0: a plain yes, like the quick "Ya" chip
+        pg.evaluate("document.activeElement && document.activeElement.blur()")
+        top_at("#question"); snap("03_question")
         pg.click("#answerBtn"); pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
-        pg.evaluate("window.scrollTo(0,0)"); snap("04_diagnosis")
-        pg.locator("#partsWrap").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,-120)"); snap("05_parts")
-        pg.locator("#preflight").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,-80)"); snap("15_preflight")
+        top_at("#dxSummary"); snap("04_diagnosis")       # the likely causes with their confidence
+        top_at("#partsWrap", 72); snap("05_parts")       # the SAM 3.1 masks on the photo, numbered
+        top_at("#result .safety", 84); snap("15_preflight")
         tick_preflight()
-        pg.locator("#stepCard").scroll_into_view_if_needed(); snap("06_step")
+        top_at("#stepCard", 72); snap("06_step")
         pg.set_input_files("#stepPhoto", str(dark))
         pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=LIVE_MS)
-        pg.locator("#checkResult").scroll_into_view_if_needed(); snap("07_check_fail")
-        go_to_step(dv.CAP_STEP_JS)  # the sample after-photo shows the plug cap pushed back on
+        top_at("#stepPhotoLabel"); snap("07_check_fail")
+        go_to_step(sample_step_n(pg, "motor"))  # the sample after-photo shows the plug cap pushed back on
         pg.set_input_files("#stepPhoto", str(FIX / "sample_motor_step_cap_on.jpg"))
         pg.wait_for_timeout(600)
         pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=LIVE_MS)
-        pg.locator("#checkResult").scroll_into_view_if_needed(); snap("08_check_pass")
+        top_at("#stepPhotoLabel"); snap("08_check_pass")
         pg.wait_for_timeout(2000)
         pg.locator("#agent .agGo", has_text="Langkah 1 dicek").first.click()          # tap a log line → back to that step
         pg.wait_for_selector("#stepCard.flash"); pg.wait_for_timeout(900)
         pg.evaluate("window.scrollBy(0, -40)"); snap("24_agent_jump")
         pg.check("#handsFree"); pg.wait_for_selector("#voiceBar:not(.hidden)", timeout=5000); pg.wait_for_timeout(600)
-        pg.locator("#voiceBar").scroll_into_view_if_needed(); pg.evaluate("window.scrollBy(0,180)"); snap("17_hands_free")
+        top_at("#prevBtn"); snap("17_hands_free")
         pg.uncheck("#handsFree")
         pg.fill("#stuckText", "Sudah dicoba, mesin tetap tidak nyala."); pg.click("#stuckBtn")
         pg.wait_for_function("() => document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled",
@@ -287,54 +423,69 @@ def shots() -> None:
         print("shot 25_pdf_agent (page", page_no, ")", flush=True)
         (SHOTS / "26_share_card.png").write_bytes(pg.request.get(f"{base}/api/sessions/{msid}/card.png").body())
         print("shot 26_share_card", flush=True)
+        top_at("#result .actions", 72); snap("12_report")  # the share and report buttons, starting under the header
         pg.click("#mechBtn"); pg.wait_for_selector("#handoff:not(.hidden)", timeout=10000)
         pg.evaluate("document.querySelector('#handoff details') && (document.querySelector('#handoff details').open = true)")
-        pg.evaluate("document.querySelector('#mechBtn').scrollIntoView({block: 'start'}); window.scrollBy(0, -90)"); snap("18_handoff")
-        pg.locator("#pdfBtn").scroll_into_view_if_needed(); snap("12_report")
+        top_at("#mechBtn"); snap("18_handoff")
         # live camera guide on the pump repair (Chromium fake camera playing a labelled sample photo)
         go_sample("pump"); pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
         pg.evaluate("window.scrollTo(0,0)"); snap("10_pump")
         tick_preflight()
+        go_to_step(live_step_n(pg))
         pg.click("#liveBtn"); pg.wait_for_selector("#live:not(.hidden)")
-        try:  # SAM 3.1 on the fake camera frames finds the part within a few frames
-            pg.wait_for_function("() => /^🎯/.test(document.querySelector('#liveState').textContent)", timeout=60000)
-        except Exception:  # noqa: BLE001
-            print("live guide: no lock-on within 60 s, shooting what is on screen", flush=True)
-        pg.wait_for_timeout(900)
-        pg.evaluate("document.querySelector('#liveBtn').scrollIntoView({block: 'start'}); window.scrollBy(0, -90)"); snap("16_live_guide")
+        top_at("#liveBtn")
+        locked = "() => /^🎯/.test(document.querySelector('#liveState').textContent)"
+        for _ in range(4):  # the fake camera drifts, so the outline comes and goes: shoot while it is on screen
+            try:  # SAM 3.1 on the fake camera frames finds the part within a few frames (each frame is a paid SAM call)
+                pg.wait_for_function(locked, timeout=20000)
+            except Exception:  # noqa: BLE001
+                print("live guide: no lock-on within 20 s", flush=True)
+                continue
+            pg.screenshot(path=str(SHOTS / "16_live_guide.png"))
+            if pg.evaluate(locked):
+                break
+        print("shot 16_live_guide", flush=True)
         pg.click("#liveClose")
         # safety stop with PDF + hand-off
         go_sample("rice"); pg.wait_for_selector("#stopBox:not(.hidden)", timeout=LIVE_MS)
         pg.wait_for_selector("#stopHandoff:not(.hidden)", timeout=10000)
         pg.evaluate("window.scrollTo(0, 0)"); snap("11_rice_stop")  # the STOP card sits under the "Stopped for your safety" heading
-        pg.evaluate("document.querySelector('#stopHandoff').scrollIntoView({block: 'end'}); window.scrollBy(0, 40)"); snap("22_stop_handoff")
+        top_at("#stopBox > p:nth-of-type(3)"); snap("22_stop_handoff")  # "Do this now", the service buttons, the hand-off
         sid = pg.evaluate("S && S.id")
         pdf = Path(tempfile.mkdtemp()) / "stop.pdf"
         pdf.write_bytes(pg.request.get(f"{base}/api/sessions/{sid}/report.pdf").body())
         subprocess.run(["pdftoppm", "-png", "-r", "110", "-f", "1", "-l", "1", "-singlefile", str(pdf), str(SHOTS / "19_stop_pdf")], check=True)
         print("shot 19_stop_pdf", flush=True)
-        go_sample("faucet", "en"); pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
+        faucet_with_diagram(pg, base)
         pg.evaluate("window.scrollTo(0,0)"); snap("13_english")
         # the step Muse Image drew a diagram for (the washer inside the tap)
-        tick_preflight()
         for _ in range(10):
             if "diagram" in (pg.get_attribute("#stepImg", "src") or "") and pg.is_visible("#stepImg"):
                 break
             pg.click("#nextBtn"); pg.wait_for_timeout(300)
-        pg.evaluate("document.querySelector('#stepCard').scrollIntoView({block: 'start'}); window.scrollBy(0, -70)"); snap("28_diagram_step")
+        top_at("#stepCard", 72); snap("28_diagram_step")
         go_sample("tire", "jv"); pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
         pg.evaluate("window.scrollTo(0,0)"); snap("20_javanese_result")
         pg.goto(base + "/"); pg.select_option("#lang", "jv"); pg.wait_for_timeout(300); snap("14_garage_jv", full=True)
         # recorded demo: what a visitor sees when the server sleeps (forced here with ?replay=1)
         pg.goto(base + "/?replay=1"); pg.select_option("#lang", "en"); pg.click("#demoBtn")
         pg.wait_for_selector("#question:not(.hidden)", timeout=20000); pg.click('#quickAns button[data-q="qNo"]')
-        pg.wait_for_selector("#result:not(.hidden)", timeout=20000); pg.evaluate("window.scrollTo(0, 0)"); snap("27_recorded_demo")
+        pg.wait_for_selector("#result:not(.hidden)", timeout=20000)
+        if pg.is_visible("#tourClose"):
+            pg.click("#tourClose")  # the tip bar would sit over the diagnosis in a still
+        pg.evaluate("window.scrollTo(0, 0)"); snap("27_recorded_demo")
         # laptop view: phone frame + side panel (QR code, 1-tap demo, language switch)
-        lap = b.new_page(viewport={"width": 1280, "height": 800})
-        lap.goto(base + "/"); lap.select_option("#lang", "en"); lap.wait_for_selector("#qrBox svg", timeout=5000); lap.wait_for_timeout(400)
+        # opened at the public address (served by this server), so the QR code and its caption show what a visitor of
+        # the deployed site sees, not this machine's "127.0.0.1 only works on this computer"
+        lap_ctx = b.new_context(viewport={"width": 1280, "height": 800}, timezone_id=TZ)
+        serve_as_public(lap_ctx, base)
+        lap = lap_ctx.new_page()
+        lap.goto(PUBLIC_BASE + "/"); lap.select_option("#lang", "en"); lap.wait_for_selector("#qrBox svg", timeout=5000); lap.wait_for_timeout(400)
         lap.screenshot(path=str(SHOTS / "29_laptop.png")); print("shot 29_laptop", flush=True)
         b.close()
     srv.should_exit = True
+    if page_errors:
+        raise SystemExit("page errors while shooting:\n" + "\n".join(page_errors))
     print("screenshots ->", SHOTS, sorted(p.name for p in SHOTS.glob("*.png")))
 
 
@@ -353,9 +504,9 @@ def wa_shots() -> None:
     with sync_playwright() as p:
         b = p.chromium.launch(executable_path=_chromium(), args=["--no-sandbox", "--no-proxy-server"])
         for lang in ("jv", "en"):
-            pg = b.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2)
+            pg = b.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2, timezone_id=TZ)
             errors: list[str] = []
-            pg.on("pageerror", lambda e: errors.append(str(e)))
+            _console_watch(pg, errors)
 
             def snap(name: str) -> None:
                 pg.wait_for_timeout(800)
@@ -380,11 +531,20 @@ def wa_shots() -> None:
                 pg.wait_for_timeout(700)
                 snap("30_whatsapp_jv_redstop")
             else:
-                pg.locator("#chips button").nth(4).click()                   # the sample "after" photo -> step check
-                pg.wait_for_function("() => document.querySelectorAll('.btns').length >= 2", timeout=LIVE_MS)
+                # the sample "after" photo (dry spout): checked on the step it shows, with a line saying which one.
+                # A pass on the plan's last step ends the guide (PDF in the chat); on an earlier step the next step follows.
+                pg.locator("#chips button").nth(4).click()
+                pg.wait_for_function("() => [...document.querySelectorAll('.row:not(.me)')].some((r) => /sample photo/.test(r.textContent))"
+                                     " && (document.querySelector('.doc') || document.querySelectorAll('.btns').length >= 2)", timeout=LIVE_MS)
+                pg.wait_for_timeout(800)
+                pg.evaluate("""(() => { const log = document.getElementById('log');
+                  const row = [...log.querySelectorAll('.row:not(.me)')].reverse().find((r) => /sample photo/.test(r.textContent));
+                  log.scrollTop += row.getBoundingClientRect().top - log.getBoundingClientRect().top - 120; })()""")
                 snap("30_whatsapp_en_check")
-                pg.locator(".btns").last.locator("button").nth(2).click()    # Stop -> PDF report in the chat
+                if not pg.locator(".doc").count():
+                    pg.locator(".btns").last.locator("button").nth(2).click()  # Stop -> PDF report in the chat
                 pg.wait_for_selector(".doc", timeout=LIVE_MS)
+                pg.evaluate("document.getElementById('log').scrollTop = 1e9")
                 snap("30_whatsapp_en_pdf")
             if errors:
                 raise SystemExit(f"/wa page errors: {errors}")
@@ -452,8 +612,29 @@ def diagram() -> None:
 
 
 # --- voice-over
+LUFS = -16.0      # loudness of every voice clip (and of the finished video), the usual target for online video
+TRUE_PEAK = -1.5
+TIMING = VOICE / "timing.json"   # where each owner's line ends in its scene clip (the caption switches to the narrator there)
+
+
+def _loudnorm(src: Path, out: Path) -> None:
+    """Two-pass EBU R128 loudness normalisation (linear, so short clips are not pumped) to LUFS / TRUE_PEAK."""
+    probe = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-i", str(src), "-af",
+                            f"loudnorm=I={LUFS}:TP={TRUE_PEAK}:LRA=11:print_format=json", "-f", "null", "-"],
+                           capture_output=True, text=True, check=True).stderr
+    m = json.loads(probe[probe.rindex("{"):probe.rindex("}") + 1])
+    af = (f"loudnorm=I={LUFS}:TP={TRUE_PEAK}:LRA=11:measured_I={m['input_i']}:measured_TP={m['input_tp']}:"
+          f"measured_LRA={m['input_lra']}:measured_thresh={m['input_thresh']}:offset={m['target_offset']}:linear=true")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(src), "-af", f"{af},aresample=24000",
+                    "-ac", "1", "-c:a", "libmp3lame", "-b:a", "96k", str(out)], check=True)
+
+
 def voice() -> None:
-    """edge-tts (Microsoft neural voices, free, needs internet). Set EDGE_TTS_PROXY if the network needs a proxy."""
+    """edge-tts (Microsoft neural voices, free, needs internet). Set EDGE_TTS_PROXY if the network needs a proxy.
+
+    One mp3 per scene in docs/demo/voice: the owner's line (Bahasa or Basa Jawa) when the scene has one, a short
+    pause, then the narrator, joined and loudness-normalised. Only the finished clips stay in the folder: the
+    owner's part is a temporary file, and where it ends is kept in timing.json for the captions."""
     import edge_tts
 
     VOICE.mkdir(parents=True, exist_ok=True)
@@ -464,48 +645,75 @@ def voice() -> None:
 
     said_file = VOICE / "script.json"  # the text each mp3 was made from: a changed line is re-recorded
     said: dict[str, str] = json.loads(said_file.read_text()) if said_file.exists() else {}
+    timing: dict[str, float] = json.loads(TIMING.read_text()) if TIMING.exists() else {}
+    import demo_video as dv
+
+    tmp = dv.WORK / "voice-parts"  # the owner's and narrator's parts before joining: build folder, outside the repo
+    tmp.mkdir(parents=True, exist_ok=True)
 
     async def tts(text: str, name: str, out: Path) -> None:
-        """One line, with the half second of dead air edge-tts leaves at each end cut off (the scene adds its own beat)."""
-        raw = Path(str(out) + ".part.mp3")
-        await edge_tts.Communicate(text, name, rate=VOICE_RATE, proxy=proxy).save(str(raw))
-        trim = "silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.06"
-        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-af", f"{trim},areverse,{trim},areverse",
-                        "-c:a", "libmp3lame", "-b:a", "64k", str(out)], check=True)
-        raw.unlink()
+        """One line as a wav, with the dead air edge-tts leaves at each end cut off (the scene adds its own beat).
+        The cut keeps 80 ms before the first sound and after the last, so no word loses its first or last sound."""
+        raw = tmp / (out.stem + ".raw.mp3")
+        for attempt in range(4):  # the free service sometimes answers with no audio: wait a little and ask again
+            try:
+                await edge_tts.Communicate(text, name, rate=VOICE_RATE, proxy=proxy).save(str(raw))
+                break
+            except edge_tts.exceptions.NoAudioReceived:
+                if attempt == 3:
+                    raise
+                print(f"edge-tts sent no audio for {out.stem}, trying again", flush=True)
+                await asyncio.sleep(2 + 3 * attempt)
+        trim = "silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.08"
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(raw), "-af", f"{trim},areverse,{trim},areverse,aresample=24000",
+                        "-ac", "1", str(out)], check=True)
 
     async def run() -> None:
         for sc in SCENES:
             out = VOICE / f"{sc.key}.mp3"
-            said_as = json.dumps([VOICE_NAME, VOICE_RATE, "trimmed", sc.pre, sc.say], ensure_ascii=False)
-            if out.exists() and out.stat().st_size > 1000 and said.get(sc.key) == said_as:
+            said_as = json.dumps([VOICE_NAME, VOICE_RATE, "trimmed", LUFS, sc.pre, sc.say], ensure_ascii=False)
+            if out.exists() and out.stat().st_size > 1000 and said.get(sc.key) == said_as and (sc.key in timing or not sc.pre[1]):
                 continue
-            said[sc.key] = said_as
-            if not sc.say:  # silent card (the title): a quiet track keeps every segment's audio the same shape
+            if not sc.say:  # silent card: a quiet track keeps every segment's audio the same shape
                 subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-t", f"{sc.min_s - 0.7:.2f}", "-i",
                                 "anullsrc=r=24000:cl=mono", "-c:a", "libmp3lame", "-b:a", "48k", str(out)], check=True)
-                continue
-            pre_mp3 = VOICE / f"{sc.key}.pre.mp3"
-            if not sc.pre[1]:
-                pre_mp3.unlink(missing_ok=True)
-                await tts(sc.say, VOICE_NAME, out)
-            else:  # owner's line, a short pause, then the narrator, joined into one clip
-                body = VOICE / f"{sc.key}.body.mp3"
-                await tts(sc.pre[1], sc.pre[0], pre_mp3)
+                timing.pop(sc.key, None)
+            elif not sc.pre[1]:
+                body = tmp / f"{sc.key}.body.wav"
                 await tts(sc.say, VOICE_NAME, body)
-                subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(pre_mp3), "-f", "lavfi", "-t", f"{PAUSE_S}",
+                _loudnorm(body, out)
+                timing.pop(sc.key, None)
+            else:  # owner's line, a short pause, then the narrator, joined into one clip
+                pre, body, joined = tmp / f"{sc.key}.pre.wav", tmp / f"{sc.key}.body.wav", tmp / f"{sc.key}.joined.wav"
+                await tts(sc.pre[1], sc.pre[0], pre)
+                await tts(sc.say, VOICE_NAME, body)
+                subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(pre), "-f", "lavfi", "-t", f"{PAUSE_S}",
                                 "-i", "anullsrc=r=24000:cl=mono", "-i", str(body), "-filter_complex",
-                                "[0:a]aresample=24000,aformat=channel_layouts=mono[a];[2:a]aresample=24000,aformat=channel_layouts=mono[c];"
-                                "[a][1:a][c]concat=n=3:v=0:a=1[o]", "-map", "[o]", "-c:a", "libmp3lame", "-b:a", "64k", str(out)], check=True)
-                body.unlink()
+                                "[0:a]aformat=sample_rates=24000:channel_layouts=mono[a];[2:a]aformat=sample_rates=24000:channel_layouts=mono[c];"
+                                "[a][1:a][c]concat=n=3:v=0:a=1[o]", "-map", "[o]", str(joined)], check=True)
+                _loudnorm(joined, out)
+                timing[sc.key] = round(_dur(pre) + PAUSE_S, 3)
+            said[sc.key] = said_as
             said_file.write_text(json.dumps(said, indent=1, ensure_ascii=False) + "\n")
-            print("voice", sc.key, out.stat().st_size)
+            TIMING.write_text(json.dumps(timing, indent=1, sort_keys=True) + "\n")
+            print("voice", sc.key, out.stat().st_size, flush=True)
 
     asyncio.run(run())
+    keys = {sc.key for sc in SCENES}
+    said = {k: v for k, v in said.items() if k in keys}
     said_file.write_text(json.dumps(said, indent=1, ensure_ascii=False) + "\n")
-    for old in VOICE.glob("*.mp3"):  # clips of scenes that were cut
-        if old.stem.split(".")[0] not in {sc.key for sc in SCENES}:
-            old.unlink()
+    TIMING.write_text(json.dumps({k: v for k, v in timing.items() if k in keys}, indent=1, sort_keys=True) + "\n")
+    for old in VOICE.glob("*.mp3"):  # clips of scenes that were cut, and parts left by older versions of this script
+        if old.stem not in keys:
+            _to_trash(old)
+
+
+def _to_trash(p: Path) -> None:
+    """Never delete for good: unwanted generated files go to the trash folder (AI_TRASH, default /workspace/.ai-trash)."""
+    trash = Path(os.environ.get("AI_TRASH", "/workspace/.ai-trash")) / "tukang-copilot" / time.strftime("%Y%m%d-%H%M%S")
+    trash.mkdir(parents=True, exist_ok=True)
+    shutil.move(str(p), str(trash / p.name))
+    print("moved to trash:", p.name, "->", trash, flush=True)
 
 
 def _dur(p: Path) -> float:
@@ -658,12 +866,13 @@ def _srt_time(t: float) -> str:
 
 
 def scene_lengths() -> dict[str, float]:
-    """Each scene lasts its voice-over plus 0.7 s (at least min_s); the close card gets a beat more to read."""
+    """Each scene lasts its voice-over plus 0.7 s (at least min_s); the close card gets half a second more to read
+    (more would leave dead air at the end)."""
     out = {}
     for sc in SCENES:
         mp3 = VOICE / f"{sc.key}.mp3"
         spoken = _dur(mp3) if (sc.say and mp3.exists()) else 0.0
-        out[sc.key] = round(max(sc.min_s, (spoken + 0.7) if spoken else sc.min_s) + (1.2 if sc.key == "close" else 0.0), 3)
+        out[sc.key] = round(max(sc.min_s, (spoken + 0.7) if spoken else sc.min_s) + (0.5 if sc.key == "close" else 0.0), 3)
     return out
 
 
@@ -682,9 +891,9 @@ def _shot(sc: Scene, dur: float, spoken: float) -> Any:
     sents = _sentences(sc.say) if sc.say else []
     total = sum(len(x) for x in sents) or 1
     subs, acc = [], 0.0
-    pre_mp3 = VOICE / f"{sc.key}.pre.mp3"
-    if sc.pre[1] and pre_mp3.exists():  # the owner's own words first, quoted, then the narrator's sentences
-        lead = _dur(pre_mp3) + PAUSE_S
+    timing = json.loads(TIMING.read_text()) if TIMING.exists() else {}
+    if sc.pre[1] and sc.key in timing:  # the owner's own words first, quoted, then the narrator's sentences
+        lead = float(timing[sc.key])
         subs.append((0.0, lead, f"“{sc.pre[1]}”"))
         acc, spoken = lead, max(0.1, spoken - lead)
     for j, sent in enumerate(sents):  # one caption per spoken sentence, timed by its share of the characters
@@ -695,14 +904,25 @@ def _shot(sc: Scene, dur: float, spoken: float) -> Any:
     return dv.Shot(sc, dur, subs)
 
 
-def _join(lst: Path, out: Path) -> None:
+def _join(lst: Path, out: Path, loudness: bool = False) -> None:
     """Join the cached segments. +faststart rewrites the file in place, which fails on some synced folders,
-    so the join happens in the build folder and the finished file is copied over."""
+    so the join happens in the build folder and the finished file is moved over. With loudness=True the joined
+    soundtrack gets one more two-pass loudnorm to LUFS (the picture is copied, not re-encoded)."""
     tmp = lst.with_suffix(".mp4")
+    joined = lst.with_suffix(".joined.mp4") if loudness else tmp
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", "-movflags", "+faststart",
-                    str(tmp)], check=True)
-    shutil.copyfile(tmp, out)
-    tmp.unlink()
+                    str(joined)], check=True)
+    if loudness:
+        probe = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-i", str(joined), "-vn", "-af",
+                                f"loudnorm=I={LUFS}:TP={TRUE_PEAK}:LRA=11:print_format=json", "-f", "null", "-"],
+                               capture_output=True, text=True, check=True).stderr
+        m = json.loads(probe[probe.rindex("{"):probe.rindex("}") + 1])
+        af = (f"loudnorm=I={LUFS}:TP={TRUE_PEAK}:LRA=11:measured_I={m['input_i']}:measured_TP={m['input_tp']}:"
+              f"measured_LRA={m['input_lra']}:measured_thresh={m['input_thresh']}:offset={m['target_offset']}:linear=true,aresample=48000")
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(joined), "-map", "0:v", "-map", "0:a", "-c:v", "copy",
+                        "-af", af, "-c:a", "aac", "-b:a", "160k", "-ar", "48000", "-ac", "2", "-movflags", "+faststart", str(tmp)], check=True)
+        # the un-normalised join stays in the build folder (a cache outside the repo, overwritten next time)
+    shutil.move(str(tmp), str(out))
 
 
 def video(only: list[str] | None = None) -> None:
@@ -741,13 +961,13 @@ def video(only: list[str] | None = None) -> None:
     lst = work / "list.txt"
     lst.write_text("".join(f"file '{p}'\n" for p in parts))
     out = DEMO / "tukang-copilot-demo.mp4"
-    _join(lst, out)
+    _join(lst, out, loudness=True)
     (DEMO / "tukang-copilot-demo.en.srt").write_text("\n".join(srt))
     real = _dur(out)
     (DEMO / "TIMESTAMPS.txt").write_text(
         "Tukang Copilot demo video: scene start times (mm:ss), made by scripts/make_demo_assets.py video\n"
         f"File: docs/demo/tukang-copilot-demo.mp4, length {_mmss(real)} ({real:.1f} s, ffprobe), 1920x1080 at 60 fps. "
-        "Live Meta API answers (5 Nov 2026, model waits cut), AI-generated sample photos.\n"
+        f"Live Meta API answers ({dv.recorded_on()}, model waits cut), AI-generated sample photos.\n"
         "English captions of the voice-over are burned in; the same text is in tukang-copilot-demo.en.srt.\n\n"
         + "\n".join(stamps) + "\n", encoding="utf-8")
     if real >= 180:
@@ -803,18 +1023,31 @@ GIF_SHOTS = ["01_home", "02_progress", "03_question", "05_parts", "23_agent_log"
              "16_live_guide", "09_replan", "28_diagram_step", "11_rice_stop", "20_javanese_result", "30_whatsapp_jv_diagnosis"]
 
 
+GIF_W, GIF_H = 640, 1200  # README shows it 320 px wide: 2x so it stays sharp on a phone or a retina screen
+GIF_MAX_BYTES = 6 * 1024 * 1024
+
+
 def gif() -> None:
-    """README hero: the phone flow as a small looping GIF (~1.4 s per screen, 320 px wide) from the screenshots."""
-    work = Path(tempfile.mkdtemp())
+    """README hero: the phone flow as a looping GIF (~1.6 s per screen) from the screenshots, at 2x the size the
+    README shows it. One palette for the whole loop (no colour shimmer between screens); fewer colours if it is too big."""
+    import demo_video as dv
+
+    work = dv.WORK / "gif"  # frames in the build folder (outside the repo), overwritten each time
+    work.mkdir(parents=True, exist_ok=True)
     for i, name in enumerate(GIF_SHOTS):
         im = Image.open(SHOTS / f"{name}.png").convert("RGB")
-        im = im.resize((320, int(im.height * 320 / im.width)), Image.Resampling.LANCZOS).crop((0, 0, 320, 600))
+        im = im.resize((GIF_W, int(im.height * GIF_W / im.width)), Image.Resampling.LANCZOS).crop((0, 0, GIF_W, GIF_H))
         im.save(work / f"{i:02}.png")
     out = DEMO / "hero.gif"
-    vf = "fps=10,split[a][b];[a]palettegen=max_colors=96:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=4"
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", "1/1.4", "-i", str(work / "%02d.png"), "-vf", vf,
-                    "-loop", "0", str(out)], check=True)
-    print("gif ->", out, f"{out.stat().st_size // 1024} KB")
+    colors = 128
+    for colors in (128, 96, 64):
+        vf = (f"split[a][b];[a]palettegen=max_colors={colors}:stats_mode=full[p];"
+              "[b][p]paletteuse=dither=sierra2_4a:diff_mode=rectangle")
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", "1/1.6", "-i", str(work / "%02d.png"),
+                        "-frames:v", str(len(GIF_SHOTS)), "-vf", vf, "-loop", "0", str(out)], check=True)
+        if out.stat().st_size <= GIF_MAX_BYTES:
+            break
+    print("gif ->", out, f"{out.stat().st_size // 1024} KB, {colors} colours")
 
 
 def main() -> None:
