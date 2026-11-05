@@ -1,7 +1,7 @@
 {
  "title": "[\"en-US-AndrewMultilingualNeural\", \"-4%\", \"trimmed\", -16.0, [\"\", \"\"], \"This is Tukang Copilot. Fix it yourself, safely, even in Javanese.\"]",
  "hook": "[\"en-US-AndrewMultilingualNeural\", \"-4%\", \"trimmed\", -16.0, [\"id-ID-ArdiNeural\", \"Aduh motorku mogok, bengkelnya tutup lagi.\"], \"In Indonesia, a small fault on a motorbike or a water pump can cost a day's wage. Repair videos can't see your problem, and most aren't in your language.\"]",
- "intro": "[\"en-US-AndrewMultilingualNeural\", \"-4%\", \"trimmed\", -16.0, [\"\", \"\"], \"Take a photo and say what's wrong. Every answer here is live from Meta's models. The photos are AI-generated samples.\"]",
+ "intro": "[\"en-US-AndrewMultilingualNeural\", \"-4%\", \"trimmed\", -16.0, [\"\", \"\"], \"Take a photo and say what's wrong. These are real answers from Meta's models, recorded on a live run. The photos are AI-generated samples.\"]",
  "progress": "[\"en-US-AndrewMultilingualNeural\", \"-4%\", \"trimmed\", -16.0, [\"\", \"\"], \"Each result shows up as soon as it's ready: what Muse Spark saw, the parts SAM outlined, then the likely cause.\"]",
  "question": "[\"en-US-AndrewMultilingualNeural\", \"-4%\", \"trimmed\", -16.0, [\"\", \"\"], \"If it isn't sure, it asks one short question instead of guessing.\"]",
  "diagnosis": "[\"en-US-AndrewMultilingualNeural\", \"-4%\", \"trimmed\", -16.0, [\"\", \"\"], \"Then the diagnosis. Likely causes with confidence, a safety level, tools and time, and the parts cost next to the bengkel price.\"]",

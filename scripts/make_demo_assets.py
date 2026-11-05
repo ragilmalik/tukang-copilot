@@ -30,6 +30,7 @@ that its /health says live (and the current version) before it spends anything.
 from __future__ import annotations
 
 import asyncio
+import dataclasses
 import json
 import os
 import shutil
@@ -96,9 +97,7 @@ SCENES: list[Scene] = [
           "In Indonesia, a small fault on a motorbike or a water pump can cost a day's wage. "
           "Repair videos can't see your problem, and most aren't in your language.", 7,
           pre=("id-ID-ArdiNeural", "Aduh motorku mogok, bengkelnya tutup lagi.")),
-    Scene("intro", "01_home", "Photo + voice in Bahasa, Javanese or English. No photo? 1-tap demo.",
-          "Take a photo and say what's wrong. Every answer here is live from Meta's models. The photos are AI-generated samples.", 5,
-          "Snap it, say it"),
+    Scene("intro", "01_home", "Photo + voice in Bahasa, Javanese or English. No photo? 1-tap demo.", "", 5, "Snap it, say it"),
     Scene("progress", "02_progress", "Results stream in as each Meta model finishes: what it saw, SAM 3.1's outlines, the likely cause.",
           "Each result shows up as soon as it's ready: what Muse Spark saw, the parts SAM outlined, then the likely cause.", 6, "Watch it work", "info"),
     Scene("question", "03_question", "Unsure? It asks one question instead of guessing.",
@@ -147,6 +146,28 @@ SCENES: list[Scene] = [
           "Open source, MIT licence, built during the Meta AI Developer Hackathon.",
           "Tukang Copilot. Every phone becomes a mechanic's apprentice.", 5),
 ]
+
+
+# The intro says where the answers on screen come from, so it has one line per source of answers (see the docstring):
+# live calls while filming, or answers recorded earlier on the live API and played back (DEMO_RECORDED_DATA).
+INTRO_SAY = {
+    False: "Take a photo and say what's wrong. Every answer here is live from Meta's models. The photos are AI-generated samples.",
+    True: "Take a photo and say what's wrong. These are real answers from Meta's models, recorded on a live run. "
+          "The photos are AI-generated samples.",
+}
+
+
+def narration_recorded() -> bool:
+    """True when the narration is for played-back answers: DEMO_RECORDED_DATA is set, or the clips were captured that way."""
+    import demo_video as dv
+
+    return recorded() or dv.played_back()
+
+
+def scenes(recorded_mode: bool | None = None) -> list[Scene]:
+    """SCENES with the intro line for the source of answers in use (narration_recorded() when not given)."""
+    rec = narration_recorded() if recorded_mode is None else recorded_mode
+    return [dataclasses.replace(sc, say=INTRO_SAY[rec]) if sc.key == "intro" else sc for sc in SCENES]
 
 
 LIVE_MS = 240_000  # live Meta answers take up to a couple of minutes
@@ -840,7 +861,7 @@ def voice() -> None:
                         "-ac", "1", str(out)], check=True)
 
     async def run() -> None:
-        for sc in SCENES:
+        for sc in scenes():
             out = VOICE / f"{sc.key}.mp3"
             said_as = json.dumps([VOICE_NAME, VOICE_RATE, "trimmed", LUFS, sc.pre, sc.say], ensure_ascii=False)
             if out.exists() and out.stat().st_size > 1000 and said.get(sc.key) == said_as and (sc.key in timing or not sc.pre[1]):
@@ -870,7 +891,7 @@ def voice() -> None:
             print("voice", sc.key, out.stat().st_size, flush=True)
 
     asyncio.run(run())
-    keys = {sc.key for sc in SCENES}
+    keys = {sc.key for sc in scenes()}
     said = {k: v for k, v in said.items() if k in keys}
     said_file.write_text(json.dumps(said, indent=1, ensure_ascii=False) + "\n")
     TIMING.write_text(json.dumps({k: v for k, v in timing.items() if k in keys}, indent=1, sort_keys=True) + "\n")
@@ -1040,7 +1061,7 @@ def scene_lengths() -> dict[str, float]:
     """Each scene lasts its voice-over plus 0.7 s (at least min_s); the close card gets half a second more to read
     (more would leave dead air at the end)."""
     out = {}
-    for sc in SCENES:
+    for sc in scenes():
         mp3 = VOICE / f"{sc.key}.mp3"
         spoken = _dur(mp3) if (sc.say and mp3.exists()) else 0.0
         out[sc.key] = round(max(sc.min_s, (spoken + 0.7) if spoken else sc.min_s) + (0.5 if sc.key == "close" else 0.0), 3)
@@ -1110,7 +1131,11 @@ def video(only: list[str] | None = None) -> None:
     t, n_sub = 0.0, 0
     parts: list[Path] = []
     prev_last: Path | None = None
-    for i, sc in enumerate(SCENES):
+    said = json.loads((VOICE / "script.json").read_text()) if (VOICE / "script.json").exists() else {}
+    for sc in scenes():  # a voice clip made for the other source of answers would say something untrue: refuse it
+        if sc.say and sc.say not in said.get(sc.key, ""):
+            raise SystemExit(f"docs/demo/voice/{sc.key}.mp3 was not made from the current line: run `voice` first")
+    for i, sc in enumerate(scenes()):
         mp3 = VOICE / f"{sc.key}.mp3"
         spoken = _dur(mp3) if (sc.say and mp3.exists()) else 0.0
         dur = lengths[sc.key]
@@ -1138,7 +1163,9 @@ def video(only: list[str] | None = None) -> None:
     (DEMO / "TIMESTAMPS.txt").write_text(
         "Tukang Copilot demo video: scene start times (mm:ss), made by scripts/make_demo_assets.py video\n"
         f"File: docs/demo/tukang-copilot-demo.mp4, length {_mmss(real)} ({real:.1f} s, ffprobe), 1920x1080 at 60 fps. "
-        f"Live Meta API answers ({dv.recorded_on()}, model waits cut), AI-generated sample photos.\n"
+        + (f"Real Meta API answers recorded on a live run ({dv.recorded_on()}) and played back; the live camera guide ran live. "
+           if dv.played_back() else f"Live Meta API answers ({dv.recorded_on()}, model waits cut). ")
+        + "AI-generated sample photos.\n"
         "English captions of the voice-over are burned in; the same text is in tukang-copilot-demo.en.srt.\n\n"
         + "\n".join(stamps) + "\n", encoding="utf-8")
     if real >= 180:
@@ -1173,7 +1200,7 @@ def vertical() -> None:
     parts: list[Path] = []
     prev_last: Path | None = None
     for k, (secs, offset, bahasa, english) in VERTICAL.items():
-        sc = next(s for s in SCENES if s.key == k)
+        sc = next(s for s in scenes() if s.key == k)
         v = Scene(sc.key, sc.image, bahasa, "", secs, sc.head, sc.tone)
         shot = dv.Shot(v, secs, [(0.0, secs, english)] if english else [])
         seg, last = work / f"v_{k}.mp4", work / f"v_{k}.last.png"

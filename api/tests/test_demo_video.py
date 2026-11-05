@@ -26,13 +26,24 @@ def test_title_card_first_with_hackathon_line_and_diagram_scene():
     keys = [s.key for s in mda.SCENES]
     assert "diagram" in keys and next(s for s in mda.SCENES if s.key == "diagram").image == "28_diagram_step"
     assert (DEMO / "screenshots" / "28_diagram_step.png").exists() and (DEMO / "screenshots" / "29_laptop.png").exists()
-    assert all("image analy" not in (s.caption + s.say).lower() for s in mda.SCENES)
+    for rec in (False, True):
+        assert all("image analy" not in (s.caption + s.say).lower() for s in mda.scenes(rec))
 
 
 def test_captions_split_into_short_sentences():
-    for s in mda.SCENES:
-        for sent in mda._sentences(s.say):
-            assert len(sent) <= 140, sent
+    for rec in (False, True):
+        for s in mda.scenes(rec):
+            for sent in mda._sentences(s.say):
+                assert len(sent) <= 140, sent
+
+
+def test_intro_says_where_the_answers_come_from():
+    """Live filming says the answers are live; played-back answers are called recorded, never live."""
+    live = next(s for s in mda.scenes(False) if s.key == "intro").say
+    rec = next(s for s in mda.scenes(True) if s.key == "intro").say
+    assert "live from Meta's models" in live
+    assert "recorded on a live run" in rec and "live from" not in rec
+    assert next(s for s in mda.SCENES if s.key == "intro").say == ""  # only scenes() gives the line, so no mode is forgotten
 
 
 @pytest.mark.skipif(not shutil.which("ffprobe"), reason="ffprobe not installed")
