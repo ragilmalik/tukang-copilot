@@ -209,6 +209,7 @@ clean on {{MYPY_FILES}} files, ruff clean, and the {{SMOKE}}-check HTTP smoke te
 | [docs/METHODS.md](docs/METHODS.md) | Methods and implementation: what, where, why and how each part is tested |
 | [docs/TEST_CHECKLIST.md](docs/TEST_CHECKLIST.md) | Automated and manual checks I run before every release |
 | [docs/SUGGESTIONS.md](docs/SUGGESTIONS.md) | Ten improvements I would build next, and why |
+| [docs/REPORT.md](docs/REPORT.md) | Project report: what I built, live results, checks, what is real vs sample, known limits |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Render deploy click by click |
 | [docs/WHATSAPP.md](docs/WHATSAPP.md) | Optional WhatsApp channel: Meta app setup, settings, simulator, tests |
 | [docs/SUBMISSION.md](docs/SUBMISSION.md) and [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md) | Form text field by field, and the steps to submit |

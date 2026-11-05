@@ -1,7 +1,6 @@
 # TODO
 
-Deadline: Thu Nov 5, 2026, 09:00 WIB (Nov 4, 9 PM ET). My own target: feature-complete Nov 3, 23:59 WIB.
-Items marked (keys) need my keys or accounts.
+The entry deadline was Thu Nov 5, 2026, 09:00 WIB (Nov 4, 9 PM ET). Code is done; what is left is media, final numbers and the steps only I can do with my accounts.
 
 ## Now (1.30.0, 6 Nov)
 - [x] Sample "plug cap" photo is checked on the step it shows (`sample_step`, api/sample_step.py), with a line saying which step; buttons say what each sample photo is
@@ -11,19 +10,24 @@ Items marked (keys) need my keys or accounts.
 - [x] Commit and push (main at 9179f81 on 6 Nov)
 
 ## Must (to submit)
-Order: live run first, Baseten optional, real clip and trials, then repo/deploy, YouTube and X, submit.
-- [ ] (keys) Meta key → `python scripts/set_keys.py` → ALL GOOD (claim the credits and set a spend limit on dev.meta.ai first), then `python scripts/first_live_run.py` → DONE (writes docs/LIVE_RUN.md)
-- [ ] First live run on the 5 samples (no FALLBACK lines); fix whatever differs in the real API; update the META_API_NOTES ⚠️ items and the "Honest status" lines in WRITEUP/SUBMISSION
-- [ ] (keys) Real photos and 5 user trials (docs/USER_TRIAL_KIT.md), then `scripts/impact_report.py`, replace the MOCK impact numbers, tune prompts
-- [ ] (keys) Push to GitHub (`ragilmalik/tukang-copilot`) and deploy on Render (docs/DEPLOY.md, free plan); set `PUBLIC_BASE_URL`
-- [ ] (keys) Host the static judge build (`python scripts/build_static.py`, then GitHub Pages or a Netlify drop; see `--help`) so judges get no cold start
-- [ ] (keys) Optional, with the deploy: WhatsApp channel (docs/WHATSAPP.md: Meta app and test number, fill `WA_TOKEN`, `WA_PHONE_NUMBER_ID`, `WA_VERIFY_TOKEN`, `WA_APP_SECRET` in Render, paste the webhook URL); then one real chat test and update the "Honest status" lines
-- [ ] `deploy_check.py <url> --live` → READY
-- [ ] Phone test over 4G: camera, live guide, hands-free (Android Chrome jv-ID), WhatsApp hand-off, PDF
-- [ ] (keys) Upload the video to YouTube (real recording per DEMO_SCRIPT.md, or the 2:53 backup cut) and post the X clip
-- [ ] Fill in the links in README and SUBMISSION
-- [ ] (keys) Paste the docs/SUBMISSION.md fields into Cerebral Valley (account ragilmalika) and submit before Nov 5 09:00 WIB
-- [ ] (keys) Share docs/launch/COMMUNITY_VOTE_KIT.md when voting opens Tue Nov 10, 00:00 WIB
+Done by me (code, docs, media):
+- [x] Meta key set, `check_keys.py` passes all 5 required models (5 Nov 2026)
+- [x] Live runs on 7 scenarios and the live eval (docs/LIVE_RUN.md, docs/EVAL.md); fixes from them shipped in 1.30.0
+- [x] Public repo https://github.com/ragilmalik/tukang-copilot, history cleaned of private data
+- [x] Full doc set: TUTORIAL, HOW_TO_USE, HOW_IT_WORKS, ARCHITECTURE, METHODS, SUGGESTIONS, TEST_CHECKLIST, VERIFICATION_REPORT, REPORT, HANDOFF
+- [ ] Final media from the live API: screenshots, hero.gif, thumbnail, og image, demo video under 3:00, vertical clip (in progress)
+- [ ] Fill the measured numbers in README, SUBMISSION, WRITEUP, JUDGING_MAP, SUBMISSION_CHECKLIST
+- [ ] Rebuild the one-pager PDF and the guide bundle, fresh-clone check, Drive upload
+
+Only I can do these (my accounts):
+- [ ] Check with the organisers whether a late entry is accepted (the form closed Thu Nov 5, 09:00 WIB)
+- [ ] Upload the video to YouTube with docs/launch/YOUTUBE.md, then put the link in README and SUBMISSION
+- [ ] Post the X thread (docs/launch/X_THREAD.md) with the vertical clip
+- [ ] Paste the docs/SUBMISSION.md fields into Cerebral Valley and submit; answer the AI-tools question honestly (the sample photos are AI-generated and labelled)
+- [ ] Deploy on Render (docs/DEPLOY.md) if I want a live link, then `deploy_check.py <url> --live`
+- [ ] Rotate the Meta key after judging
+- [ ] Share docs/launch/COMMUNITY_VOTE_KIT.md when voting opens Tue Nov 10, 00:00 WIB
+- [ ] Real photos and 5 owner trials (docs/USER_TRIAL_KIT.md), then `scripts/impact_report.py`
 
 ## Should (scores better)
 - [x] Water pump mock scenario and fixtures (spec §8 case 2)
@@ -48,7 +52,7 @@ Order: live run first, Baseten optional, real clip and trials, then repo/deploy,
 - [x] New look: bengkel-sign design, Barlow, Lucide icons, light and dark theme (v1.28)
 - [x] AI-generated sample photos, labelled, in place of the flat drawings; demo video re-shot at 1080p60, 2:53, X clip 43.5 s (v1.29.0)
 - [x] PDF report, workshop sheet and share cards in the new look; friendly page for expired guide links; strict CSP and HSTS; STOP card on shared red-stop links; axe-core clean on every main screen (v1.29.1 to v1.29.4)
-- [ ] After the live run: `python scripts/run_eval.py` stays green; add the live numbers to the docs
+- [x] After the live run: eval re-run live, numbers in docs/EVAL.md (5 Nov 2026)
 - [ ] Open the live link a few minutes before judging or recording so the free server is awake (a brand-new visitor can't get the recording until the page itself loads)
 
 ## Could
