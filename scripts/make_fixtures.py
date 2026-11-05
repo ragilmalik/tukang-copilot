@@ -2,7 +2,7 @@
 send) and api/tests/fixtures/sample_*.jpg (spec §8 cases) plus manifest.json.
 
 The photos are AI-generated (an image model, prompted for a phone shot of each broken thing in an Indonesian
-home), NOT real repairs. Each copy gets a small "Sample photo (AI-generated), demo mode" tag in the corner
+home), NOT real repairs. Each copy gets a small "Sample photo (AI-generated)" tag in the corner
 and the same text in EXIF ImageDescription, so nobody takes them for evidence. My own Semarang photos go in
 api/tests/fixtures/real/ later and are never tagged like this.
 

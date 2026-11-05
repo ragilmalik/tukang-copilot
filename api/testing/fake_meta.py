@@ -134,6 +134,16 @@ async def chat(req: Request) -> Any:
         if name not in fixtures:
             return _err(400, "invalid_request", f"no fixture for schema {name}")
         content = json.dumps(fixtures[name](), ensure_ascii=False)
+    if body.get("stream"):  # the live API streams structured output the same way: content deltas, then usage
+        def sse() -> Any:
+            for i in range(0, len(content), 64):
+                yield "data: " + json.dumps({"id": "chatcmpl-fake", "object": "chat.completion.chunk", "model": model,
+                                             "choices": [{"index": 0, "delta": {"content": content[i:i + 64]}, "finish_reason": None}]}) + "\n\n"
+            yield "data: " + json.dumps({"id": "chatcmpl-fake", "object": "chat.completion.chunk", "model": model,
+                                         "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}], "usage": usage}) + "\n\n"
+            yield "data: [DONE]\n\n"
+        CALLS[-1]["stream"] = True
+        return StreamingResponse(sse(), media_type="text/event-stream")
     return {"id": "chatcmpl-fake", "object": "chat.completion", "created": int(time.time()), "model": model,
             "choices": [{"index": 0, "message": {"role": "assistant", "content": content}, "finish_reason": "stop"}], "usage": usage}
 

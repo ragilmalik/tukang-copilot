@@ -126,7 +126,11 @@ class DiagramReview(BaseModel):
 
 
 def json_schema(model: type[BaseModel]) -> dict[str, Any]:
-    """Pydantic -> plain JSON Schema with $defs inlined, so strict providers accept it."""
+    """Pydantic -> plain JSON Schema with $defs inlined, so strict providers accept it.
+
+    Every property is listed as required. On the live API the constrained decoder leaves out any field that is
+    optional in the schema (no components, no follow-up question, no needs_diagram), so the model has to fill them
+    all; the pydantic defaults still cover a reply from a looser provider."""
     schema = model.model_json_schema()
     defs = schema.pop("$defs", {})
 
@@ -134,7 +138,10 @@ def json_schema(model: type[BaseModel]) -> dict[str, Any]:
         if isinstance(node, dict):
             if "$ref" in node:
                 return inline(dict(defs[node["$ref"].split("/")[-1]]))
-            return {k: inline(v) for k, v in node.items()}
+            out = {k: inline(v) for k, v in node.items()}
+            if out.get("type") == "object" and isinstance(out.get("properties"), dict):
+                out["required"] = list(out["properties"])
+            return out
         if isinstance(node, list):
             return [inline(x) for x in node]
         return node

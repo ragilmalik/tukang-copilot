@@ -38,7 +38,7 @@ def _tagged(p: Path) -> None:
 
 def test_ten_fixtures_all_clearly_labelled():
     assert len(MANIFEST) >= 10
-    assert "AI-generated" in LABEL and "demo mode" in LABEL
+    assert "AI-generated" in LABEL and "Sample photo" in LABEL
     for item in MANIFEST:
         p = FIX / item["file"]
         assert p.name.startswith("sample_")

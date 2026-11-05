@@ -15,7 +15,7 @@ from typing import Any
 import numpy as np
 from PIL import Image, ImageDraw
 
-LABEL = "Sample photo (AI-generated), demo mode"
+LABEL = "Sample photo (AI-generated)"
 MASKS_FILE = Path(__file__).with_name("sample_masks.json")
 MAX_BITS = 70  # of 256: a resized or re-encoded copy differs by 0-5 bits, a live camera frame (cropped, drifting) by 30-66,
 # two different sample scenes by 90+ and unrelated photos by about 128

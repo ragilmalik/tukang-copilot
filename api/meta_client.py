@@ -139,20 +139,64 @@ def chat_json(messages: list[dict[str, Any]], schema: dict[str, Any], schema_nam
     else:
         model = model or settings.reason_model
         url = f"{settings.meta_api_base}/chat/completions"
-        headers = _headers()
-        body = {"model": model, "messages": messages, "reasoning_effort": reasoning_effort, "response_format": rf}
+        body = {"model": model, "messages": messages, "reasoning_effort": reasoning_effort, "response_format": rf,
+                "stream": True, "stream_options": {"include_usage": True}}
+        content, usage = _stream_chat(url, body)
+        cost.charge_tokens(model, usage)
+        return _extract_json(content)
     try:
         r = _post(url, headers=headers, json=body, timeout=600)
     except MetaAPIError as e:
-        if open_weights and "response_format" in str(e):  # provider only takes json_object
+        if "response_format" in str(e):  # provider only takes json_object
             body["response_format"] = {"type": "json_object"}
             r = _post(url, headers=headers, json=body, timeout=600)
         else:
             raise
     j = r.json()
-    if not open_weights:
-        cost.charge_tokens(model, j.get("usage"))
     return _extract_json(j["choices"][0]["message"].get("content") or "")
+
+
+def _stream_chat(url: str, body: dict[str, Any], retries: int = 3) -> tuple[str, dict[str, Any] | None]:
+    """Chat Completions with stream=true. In my live runs a plain (non-streamed) structured-output call that thought
+    for more than about 20 s came back as 504 "upstream request deadline exceeded"; the streamed call does not hit
+    that deadline. A server that answers with plain JSON instead of an event stream is read the same way."""
+    headers = _headers() | {"Accept": "text/event-stream"}
+    for attempt in range(retries + 1):
+        try:
+            with httpx.stream("POST", url, headers=headers, json=body, timeout=600) as r:
+                if r.status_code in RETRY_STATUS and attempt < retries:
+                    r.read()
+                    log.warning("HTTP %s from %s, retry in %ss", r.status_code, url, 2 ** attempt * 2)
+                    time.sleep(2 ** attempt * 2)
+                    continue
+                if r.status_code >= 400:
+                    r.read()
+                    raise MetaAPIError(f"{r.status_code} from {url}: {r.text[:600]}")
+                if "text/event-stream" not in r.headers.get("content-type", ""):
+                    r.read()
+                    j = r.json()
+                    return j["choices"][0]["message"].get("content") or "", j.get("usage")
+                parts: list[str] = []
+                usage: dict[str, Any] | None = None
+                for line in r.iter_lines():
+                    if not line.startswith("data: "):
+                        continue
+                    payload = line[6:].strip()
+                    if payload == "[DONE]":
+                        break
+                    ev = json.loads(payload)
+                    if ev.get("error"):
+                        raise MetaAPIError(f"stream error from {url}: {json.dumps(ev['error'])[:600]}")
+                    for ch in ev.get("choices") or []:
+                        parts.append((ch.get("delta") or {}).get("content") or "")
+                    if ev.get("usage"):
+                        usage = ev["usage"]
+                return "".join(parts), usage
+        except (httpx.TimeoutException, httpx.TransportError) as e:
+            if attempt >= retries:
+                raise MetaAPIError(f"Request to {url} failed: {e}") from e
+            time.sleep(2 ** attempt * 2)
+    raise MetaAPIError(f"Request to {url} failed after {retries + 1} tries")
 
 
 # --- 3/5. Muse Image
