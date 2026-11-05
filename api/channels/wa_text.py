@@ -137,7 +137,7 @@ T: dict[str, dict[str, str]] = {
         "jv": "Cek foto kanggo ndandani iki wis entek. Tutul Ana masalah utawa Mandheg.",
         "en": "This repair has used all its photo checks. Tap Problem or Stop.",
     },
-    "demo": {"id": "🧪 Mode demo (jawaban contoh)", "jv": "🧪 Mode demo (wangsulan conto)", "en": "🧪 Demo mode (sample answers)"},
+    "demo": {"id": "🧪 Mode contoh offline (jawaban contoh tertulis)", "jv": "🧪 Mode conto offline (wangsulan conto)", "en": "🧪 Offline sample mode (pre-written answers)"},
     "fallback": {"id": "Sebagian jawaban contoh (AI live tidak tersedia)", "jv": "Sapérangan wangsulan conto (AI live ora ana)",
                  "en": "Some sample answers (live AI unavailable)"},
     "safety": {"id": "Keamanan", "jv": "Keamanan", "en": "Safety"},
@@ -149,7 +149,7 @@ T: dict[str, dict[str, str]] = {
                   "en": " · workshop ~{shop} · you save ~{save}"},
     "minutes": {"id": "⏱ ~{m} menit", "jv": "⏱ ~{m} menit", "en": "⏱ ~{m} min"},
     "footer": {"id": "Tukang Copilot", "jv": "Tukang Copilot", "en": "Tukang Copilot"},
-    "footer_demo": {"id": "Tukang Copilot · mode demo", "jv": "Tukang Copilot · mode demo", "en": "Tukang Copilot · demo mode"},
+    "footer_demo": {"id": "Tukang Copilot · contoh offline", "jv": "Tukang Copilot · conto offline", "en": "Tukang Copilot · offline sample"},
 }
 
 

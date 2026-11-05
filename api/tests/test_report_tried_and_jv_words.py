@@ -15,7 +15,7 @@ def _rep(lang):
 def _session(cur):
     causes = [{"title": "Pancingan kosong", "confidence": 60}, {"title": "Foot valve bocor", "confidence": 30},
               {"title": "Kapasitor", "confidence": 10}]
-    return {"mode": "mock", "safety": {"reason": "ok"}, "diagnosis": {"causes": causes}, "cause_index": cur}
+    return {"mode": "offline", "safety": {"reason": "ok"}, "diagnosis": {"causes": causes}, "cause_index": cur}
 
 
 def _drawn(monkeypatch, tmp_path, lang, cur):

@@ -1,7 +1,7 @@
 /* Tukang Copilot: RECORDED demo replay.
    A free Render server sleeps and needs ~50 s to wake, and someone on bad Wi-Fi may not reach it at all. When the
-   server does not answer in time (or the page is opened with ?replay=1), the 1-tap demo plays a RECORDED demo-mode run
-   from /static/replay/demo.json instead: the same screens, agent log, SAM-marked photo, step checks and re-plan, with a
+   server does not answer in time (or the page is opened with ?replay=1), the 1-tap demo plays a RECORDED live run
+   (real Meta Model API answers, recorded on the date in demo.json) from /static/replay/demo.json instead: the same screens, agent log, SAM-marked photo, step checks and re-plan, with a
    "Recorded demo" badge on screen. No server, no model calls, nothing new is computed. Your own photos still need the
    live server, and the replay says so. Regenerate the recording with: python scripts/record_replay.py
    This file only answers /api/* calls while the replay is switched on; otherwise it does nothing. */

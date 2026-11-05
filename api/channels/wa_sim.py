@@ -2,7 +2,7 @@
 (api/channels/whatsapp.py: same parsing, same engine, same replies), with an in-process transport instead of the
 Graph API. Each sent message is the exact Cloud API message object the real channel would POST.
 
-On in demo mode (no Meta key or MOCK=1). With a live key it stays off unless WA_SIM=1, because then every chat
+On in offline sample mode (no Meta key or MOCK=1). With a live key it stays off unless WA_SIM=1, because then every chat
 would spend real model calls (the live-mode guard limits still apply).
 
     POST /api/wa-sim/send               chat, text | photo | audio | button   (one inbound WhatsApp message)
@@ -128,7 +128,7 @@ async def send(request: Request, chat: str = Form(...), text: str = Form(default
                photo: UploadFile | None = File(default=None), audio: UploadFile | None = File(default=None)) -> dict[str, Any]:
     """One message from the simulated owner, shaped exactly like a Cloud API webhook message."""
     _check_chat(chat)
-    try:  # costs nothing in demo mode, but keeps one visitor from filling the disk
+    try:  # costs nothing in offline sample mode, but keeps one visitor from filling the disk
         guard.check_rate("wasim:" + guard.client_key(request.headers.get("x-forwarded-for"), request.client.host if request.client else None),
                          bucket="wasim", limit=settings.wa_sim_rate_per_hour)
     except guard.Blocked as b:

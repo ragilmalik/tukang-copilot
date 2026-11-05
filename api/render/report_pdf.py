@@ -1,5 +1,5 @@
 """Printable repair report (SPEC v2: PDF repair report). Pure Pillow, no extra dependency: each A4 page is
-drawn as an image and saved as a multi-page PDF. Works the same in demo mode and live mode.
+drawn as an image and saved as a multi-page PDF. Works the same in offline sample mode and live mode.
 """
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ LABELS: dict[str, dict[str, str]] = {
            "attempts": "Percobaan", "minutes": "menit", "outcome": "Hasil", "o_fixed": "Beres: sudah jalan lagi (kata pemilik)",
            "o_pro": "Dibawa ke bengkel/teknisi", "status": "Status", "ok": "[OK]", "todo": "[  ]", "photo": "Foto dengan bagian yang ditandai (SAM 3.1)",
            "disclaimer": "Panduan ini hanya untuk perbaikan ringan. Harga adalah perkiraan. Untuk gas, listrik rumah, atau tegangan tinggi, panggil teknisi.",
-           "made": "Dibuat dengan Tukang Copilot (Meta Muse Spark + SAM 3.1)", "page": "Hal.", "demo": "Mode demo: jawaban contoh",
+           "made": "Dibuat dengan Tukang Copilot (Meta Muse Spark + SAM 3.1)", "page": "Hal.", "demo": "Mode contoh offline: jawaban contoh tertulis",
            "fallback": "Jawaban contoh (API live tidak tersedia) untuk",
            "green": "AMAN", "amber": "HATI-HATI", "red": "STOP",
            "hood": "Di balik layar: model yang dipakai", "before": "Sebelum mulai, pastikan",
@@ -38,7 +38,7 @@ LABELS: dict[str, dict[str, str]] = {
            "attempts": "Attempts", "minutes": "min", "outcome": "Result", "o_fixed": "Fixed: it works again (owner's word)",
            "o_pro": "Handed to a mechanic/professional", "status": "Status", "ok": "[OK]", "todo": "[  ]", "photo": "Photo with the parts marked (SAM 3.1)",
            "disclaimer": "Light repairs only. Prices are estimates. For gas, house wiring, or high voltage, call a professional.",
-           "made": "Made with Tukang Copilot (Meta Muse Spark + SAM 3.1)", "page": "Page", "demo": "Demo mode: sample answers",
+           "made": "Made with Tukang Copilot (Meta Muse Spark + SAM 3.1)", "page": "Page", "demo": "Offline sample mode: pre-written answers",
            "fallback": "Demo answer (live API unavailable) for",
            "green": "SAFE", "amber": "CAUTION", "red": "STOP",
            "hood": "Under the hood: models used", "before": "Before you start, make sure",
@@ -55,7 +55,7 @@ LABELS["jv"] = dict(
     attempts="Sing wis dijajal", minutes="menit", outcome="Asil", o_fixed="Rampung: wis urip maneh (jarene sing duwe)",
     o_pro="Digawa menyang bengkel/teknisi", photo="Foto karo bagean sing ditandhani (SAM 3.1)",
     disclaimer="Pandhuan iki mung kanggo ndandani sing entheng. Rega mung kira-kira. Yen ana gas, listrik omah, utawa tegangan dhuwur, celuk teknisi.",
-    made="Digawe nganggo Tukang Copilot (Meta Muse Spark + SAM 3.1)", page="Kaca", demo="Mode demo: wangsulan conto",
+    made="Digawe nganggo Tukang Copilot (Meta Muse Spark + SAM 3.1)", page="Kaca", demo="Mode conto offline: wangsulan conto",
     fallback="Wangsulan conto (API live ora kasedhiya) kanggo", green="AMAN", amber="ATI-ATI", red="MANDHEG",
     hood="Ing mburi layar: model sing dipakai", before="Sadurunge miwiti, priksa dhisik",
     st_listen="Rungokake swara", st_gate="Priksa slamet teks", st_look="Delok foto", st_segment="Tandhani bagean",
@@ -473,7 +473,7 @@ def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: 
         lang = "id"
     L = LABELS[lang]
     doc = _Doc(L["made"], L["page"])
-    doc.band(L["title"], f"#{rep.get('id', '')}" + (f"   ·   {L['demo']}" if session.get("mode") == "mock" else ""))
+    doc.band(L["title"], f"#{rep.get('id', '')}" + (f"   ·   {L['demo']}" if session.get("mode") == "offline" else ""))
     if session.get("fallback"):
         doc.text(f"{L['fallback']}: {', '.join(str(x) for x in session['fallback'])}", 22, bold=True, color=brand.ORANGE_TEXT)
 

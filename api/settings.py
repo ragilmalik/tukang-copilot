@@ -57,7 +57,7 @@ class Settings:
     # Behaviour
     mock: bool = field(default_factory=lambda: _flag("MOCK", "DEMO_MODE"))
     demo_mode: bool = field(default_factory=lambda: _flag("DEMO_MODE"))
-    # Demo mode only: canned answers arrive in milliseconds, so each finished stage is held this long on screen so
+    # Offline sample mode only: canned answers arrive in milliseconds, so each finished stage is held this long on screen so
     # a viewer can watch the object report, SAM masks and diagnosis stream in. Never applied to live Meta calls,
     # and never counted in a stage's own timing. 0 turns it off (the tests do).
     mock_pace_s: float = field(default_factory=lambda: float(_env("MOCK_PACE", default="0.6")))
@@ -91,7 +91,7 @@ class Settings:
     wa_graph_base: str = field(default_factory=lambda: _env("WA_GRAPH_BASE", default="https://graph.facebook.com").rstrip("/"))
     wa_graph_version: str = field(default_factory=lambda: _env("WA_GRAPH_VERSION", default="v26.0"))
     wa_debounce_s: float = field(default_factory=lambda: float(_env("WA_DEBOUNCE_S", default="2")))
-    # The WhatsApp simulator page (/wa) always runs in demo mode; WA_SIM=1 also allows it with a live key.
+    # The WhatsApp simulator page (/wa) runs on offline sample answers; WA_SIM=1 also allows it with a live key.
     wa_sim: bool = field(default_factory=lambda: _flag("WA_SIM"))
     wa_sim_rate_per_hour: int = field(default_factory=lambda: int(_env("WA_SIM_RATE_PER_HOUR", default="120")))
 
@@ -111,7 +111,7 @@ class Settings:
 
     @property
     def mode(self) -> str:
-        return "mock" if self.offline else "live"
+        return "offline" if self.offline else "live"
 
 
 settings = Settings()

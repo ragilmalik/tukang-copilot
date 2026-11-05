@@ -55,13 +55,13 @@ def _page(p, server, lang):
 @pytest.mark.parametrize("lang,label,first,done", [
     ("id", "Simulator, menjalankan mesin yang sama dalam mode demo", "Langkah 1 dari 4", "Selesai"),
     ("jv", "Simulator, nglakokake mesin sing padha ing mode demo", "Langkah 1 saka 4", "Rampung"),
-    ("en", "Simulator, runs the same engine in demo mode", "Step 1 of 4", "Done"),
+    ("en", "Simulator, runs the same engine on offline sample answers", "Step 1 of 4", "Done"),
 ])
 def test_simulator_repair_flow(server, lang, label, first, done):
     with pw.sync_playwright() as p:
         b, pg, errs = _page(p, server, lang)
         assert pg.inner_text("#simLabel") == label
-        assert "Simulator, runs the same engine in demo mode" in pg.inner_text(".sim")
+        assert "Simulator, runs the same engine on offline sample answers" in pg.inner_text(".sim")
         pg.locator("#chips button").nth(0).click()  # sample: dripping tap
         pg.wait_for_selector(".btns button", timeout=30000)
         assert first in pg.inner_text("#log")

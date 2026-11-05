@@ -59,7 +59,7 @@ def test_track_returns_normalised_box_and_outline():
     ref = mock._BOXES[phrase]
     assert abs(b["x1"] - ref[0]) < 0.03 and abs(b["y1"] - ref[1]) < 0.03  # jitter stays small
     assert len(j["polygon"]) > 4 and all(0 <= x <= 1 and 0 <= y <= 1 for x, y in j["polygon"])
-    assert j["frames_used"] == 1 and j["frames_left"] == settings.max_track_frames - 1 and j["mode"] == "mock"
+    assert j["frames_used"] == 1 and j["frames_left"] == settings.max_track_frames - 1 and j["mode"] == "offline"
 
 
 def test_mock_boxes_jitter_between_frames():

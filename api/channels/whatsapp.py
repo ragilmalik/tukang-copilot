@@ -624,7 +624,7 @@ def result_caption(s: dict[str, Any], lang: str) -> str:
         lines.append(line)
     if dx.get("minutes_estimate"):
         lines.append(t("minutes", lang, m=int(dx["minutes_estimate"])))
-    if s.get("mode") == "mock":
+    if s.get("mode") == "offline":
         lines.append(t("demo", lang))
     if s.get("fallback"):
         lines.append("⚠️ " + t("fallback", lang))

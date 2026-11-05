@@ -19,15 +19,15 @@ LEVEL = {"green": ((22, 120, 60), {"id": "AMAN", "jv": "AMAN", "en": "SAFE"}),
 TXT = {
     "id": {"plan": "Rencana {n} dari {m}, dicoba sekarang", "likely": "Paling mungkin", "steps": "{n} langkah", "min": "~{m} menit", "save": "hemat Rp{s}",
            "checked": "{v} dari {n} langkah lolos cek kamera", "camera": "Kamera mengecek tiap langkah",
-           "demo": "MODE DEMO: jawaban contoh, foto contoh (dibuat AI)",
+           "demo": "CONTOH OFFLINE: jawaban contoh tertulis, foto contoh (dibuat AI)",
            "tag": "Foto + cerita, dapat panduan perbaikan", "made": "Meta Muse Spark + SAM 3.1"},
     "jv": {"plan": "Rencana {n} saka {m}, dijajal saiki", "likely": "Sing paling mungkin", "steps": "{n} langkah", "min": "~{m} menit", "save": "irit Rp{s}",
            "checked": "{v} saka {n} langkah lolos priksa kamera", "camera": "Kamera mriksa saben langkah",
-           "demo": "MODE DEMO: wangsulan conto, foto conto (digawe AI)",
+           "demo": "CONTO OFFLINE: wangsulan conto, foto conto (digawe AI)",
            "tag": "Foto + crita, oleh tuntunan ndandani", "made": "Meta Muse Spark + SAM 3.1"},
     "en": {"plan": "Plan {n} of {m}, being tried now", "likely": "Most likely", "steps": "{n} steps", "min": "~{m} min", "save": "save Rp{s}",
            "checked": "{v} of {n} steps passed a camera check", "camera": "The camera checks each step",
-           "demo": "DEMO MODE: sample answers, AI-generated sample photo",
+           "demo": "OFFLINE SAMPLE: pre-written answers, AI-generated sample photo",
            "tag": "A photo and a few words, then a repair guide", "made": "Meta Muse Spark + SAM 3.1"},
 }
 def _panel(im: Image.Image, box: tuple[int, int]) -> Image.Image:
@@ -145,7 +145,7 @@ def build(s: dict[str, Any], folder: Path, out: Path) -> Path:
     line, passed = check_line(s, str(lang))
     if line and y < H - 120:
         brand.draw(d, (x, y), line, "semi", 22, brand.GREEN if passed else brand.MUTED)
-    _footer(d, x, right, tx["made"], tx["demo"] if s.get("mode") == "mock" else "")
+    _footer(d, x, right, tx["made"], tx["demo"] if s.get("mode") == "offline" else "")
     out.parent.mkdir(parents=True, exist_ok=True)
     _save(img, out)
     return out
@@ -157,7 +157,7 @@ HOME_LINES = ["Foto + cerita, dapat panduan perbaikan", "AI menandai bagiannya (
               "Bahasa Indonesia · Basa Jawa · English"]
 
 
-def build_home(photo: Path, out: Path, note: str = "Foto contoh (dibuat AI), mode demo") -> Path:
+def build_home(photo: Path, out: Path, note: str = "Foto contoh (dibuat AI)") -> Path:
     """Link preview for the app's front page: a labelled sample photo, AI-generated (ideally with SAM outlines) and a few lines.
     scripts/make_og.py renders web/og.png from a demo motorbike session; /og.png falls back to this at runtime."""
     img = Image.new("RGB", (W, H), brand.BETON)

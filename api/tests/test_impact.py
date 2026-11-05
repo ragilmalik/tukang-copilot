@@ -42,7 +42,7 @@ def test_outcome_appends_a_row():
     r = rows[0]
     assert r["session"] == s["id"] and r["fixed"] is True and r["minutes"] == 35 and r["minutes_source"] == "owner"
     assert r["tester"] == "T1" and r["scenario"] == "pump" and r["saved_idr"] == s["diagnosis"]["diy_saving_idr"] > 0
-    assert r["shop_cost_idr"] == s["diagnosis"]["shop_cost_estimate_idr"] and r["mode"] == "mock" and r["steps_total"] == 4
+    assert r["shop_cost_idr"] == s["diagnosis"]["shop_cost_estimate_idr"] and r["mode"] == "offline" and r["steps_total"] == 4
     assert rows[1]["fixed"] is False and rows[1]["saved_idr"] == 0 and rows[1]["minutes_source"] == "elapsed"
     assert set(r) >= {"ts", "lang", "object", "replans", "steps_verified", "fallback"}
     assert impact.log_path() == settings.data_dir / "impact" / "outcomes.jsonl"

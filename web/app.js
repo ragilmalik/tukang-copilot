@@ -18,7 +18,7 @@ const T = {
         stopNow_appliance: ["Cabut steker dari stopkontak dan biarkan dingin.", "Jangan buka casing: di dalamnya ada listrik 220V.", "Bawa ke servis resmi atau panggil teknisi, tunjukkan laporan ini."],
         stopNowRed: ["Matikan dan cabut dari listrik / tutup gas / matikan mesin.", "Jangan buka casing atau bagian dalamnya.", "Bawa ke servis resmi atau panggil teknisi, tunjukkan laporan ini."],
         stopNowTried: ["Biarkan dalam keadaan mati dan aman.", "Unduh laporan PDF: berisi apa saja yang sudah dicoba.", "Tunjukkan ke bengkel/servis supaya tidak mengulang dari nol."],
-        findService: "Cari servis terdekat", emergency: "Darurat (api, asap, bau gas kuat): telepon 112.", copied: "Tautan disalin", openW: "Penalaran: Muse Spark Open (open weights)", demo: "Mode demo: jawaban contoh, tanpa biaya API.",
+        findService: "Cari servis terdekat", emergency: "Darurat (api, asap, bau gas kuat): telepon 112.", copied: "Tautan disalin", openW: "Penalaran: Muse Spark Open (open weights)", demo: "Mode contoh offline: jawaban contoh tertulis, tanpa panggilan Meta API.",
         green: "AMAN", amber: "HATI-HATI", red: "STOP", pass: "✅ Langkah ini beres", fail: "⚠️ Belum pas", checking: "Memeriksa foto…",
         verified: "langkah terverifikasi kamera", allChecked: "Semua langkah sudah dicek kamera. Sudah jalan lagi?", recording: "Merekam…", recorded: "Suara terekam ✓", micErr: "Mikrofon tidak bisa dipakai. Ketik saja masalahnya.",
         netErr: "Koneksi terputus. Cek sinyal lalu coba lagi.", srvErr: "Server sedang bermasalah. Coba lagi sebentar lagi.", offline: "Tidak ada internet. Diagnosis butuh sinyal; foto kamu tetap aman di HP.",
@@ -40,7 +40,7 @@ const T = {
         stopNow_appliance: ["Unplug it from the wall socket and let it cool.", "Don't open the casing: there is 220V inside.", "Take it to a service centre or call a technician, and show them this report."],
         stopNowRed: ["Switch it off and unplug it / close the gas / stop the engine.", "Don't open the casing or the inside.", "Take it to a service centre or call a technician, and show them this report."],
         stopNowTried: ["Leave it switched off and safe.", "Download the PDF report: it lists everything already tried.", "Show it to the shop so they don't start from zero."],
-        findService: "Find a service centre nearby", emergency: "Emergency (fire, smoke, strong gas smell): call 112.", copied: "Link copied", openW: "Reasoning: Muse Spark Open (open weights)", demo: "Demo mode: sample answers, no API cost.",
+        findService: "Find a service centre nearby", emergency: "Emergency (fire, smoke, strong gas smell): call 112.", copied: "Link copied", openW: "Reasoning: Muse Spark Open (open weights)", demo: "Offline sample mode: pre-written sample answers, no Meta API calls.",
         green: "SAFE", amber: "CAUTION", red: "STOP", pass: "✅ Step looks right", fail: "⚠️ Not quite", checking: "Checking photo…",
         verified: "steps verified by camera", allChecked: "All steps checked by the camera. Does it work again?", recording: "Recording…", recorded: "Voice recorded ✓", micErr: "Microphone unavailable. Please type the problem.",
         netErr: "Connection lost. Check your signal and try again.", srvErr: "The server had a problem. Try again in a moment.", offline: "You are offline. Diagnosis needs a signal; your photos stay on your phone.",
@@ -67,7 +67,7 @@ T.jv = Object.assign({}, T.id, {
   stopNowRed: ["Pateni lan copot saka listrik / tutup gas / pateni mesin.", "Aja mbukak casing utawa jerone.", "Gawanen menyang servis resmi utawa celuk teknisi, tuduhna laporan iki."],
   stopNowTried: ["Jarna tetep mati lan aman.", "Undhuh laporan PDF: isine apa wae sing wis dijajal.", "Tuduhna menyang bengkel/servis supaya ora mbaleni saka nol."],
   findService: "Golek servis paling cedhak", emergency: "Darurat (geni, kebul, ambu gas banget): telpon 112.", copied: "Tautan wis disalin", openW: "Nalar: Muse Spark Open (open weights)",
-  demo: "Mode demo: wangsulan conto, tanpa biaya API.",
+  demo: "Mode conto offline: wangsulan conto sing wis ditulis, tanpa nyeluk Meta API.",
   green: "AMAN", amber: "ATI-ATI", red: "MANDHEG", pass: "✅ Langkah iki wis bener", fail: "⚠️ Durung pas", checking: "Mriksa foto…",
   verified: "langkah wis dicek kamera", allChecked: "Kabeh langkah wis dicek kamera. Wis urip maneh?", recording: "Ngrekam…", recorded: "Swara kerekam ✓", micErr: "Mikrofon ora bisa dienggo. Ketik wae masalahe.",
   netErr: "Sambungan megat. Priksa sinyal banjur coba maneh.", srvErr: "Server lagi ana masalah. Coba maneh sedhela engkas.", offline: "Ora ana internet. Diagnosis butuh sinyal; fotomu tetep aman ing HP.",
@@ -157,24 +157,24 @@ const T_EXTRA = {
 
 /* I18N_REPLAY:start (recorded demo when the server sleeps). api/tests/test_replay.py checks all three. */
 const T_REPLAY = {
-  id: { rpBadge: "▶ Demo rekaman: putaran mode demo yang disimpan, tanpa server", rpWake: "Server sedang bangun (hosting gratis, bisa sampai 1 menit). Tombol demo langsung memutar demo rekaman.",
+  id: { rpBadge: "▶ Demo rekaman: jawaban asli Meta API, 5 Nov 2026, diputar tanpa server", rpWake: "Server sedang bangun (hosting gratis, bisa sampai 1 menit). Tombol demo langsung memutar demo rekaman.",
         rpOwnPhoto: "Demo rekaman hanya bisa memutar dua foto contoh. Foto kamu sendiri perlu server live: muat ulang halaman sebentar lagi.",
         rpOnlyDemo: "Demo rekaman hanya berisi contoh motor. Untuk foto sendiri atau contoh lain, muat ulang saat server sudah bangun.",
         rpNoLive: "Bagian ini perlu server live; demo rekaman tidak bisa melakukannya.", rpNoMore: "Demo rekaman hanya punya satu rencana ulang.",
         planOf: "🔁 Rencana {n} dari {m}: {cause}", triedMark: "sudah dicoba", stopHead: "Dihentikan demi keselamatan", deskNote: "Dibuat untuk HP: buka halaman ini di HP untuk kamera, suara, dan cek langkah.",
-        thumbCap: "Foto contoh (dibuat AI), mode demo. Bagian yang ditandai SAM 3.1" },
-  jv: { rpBadge: "▶ Demo rekaman: puteran mode demo sing disimpen, tanpa server", rpWake: "Server lagi tangi (hosting gratis, bisa nganti 1 menit). Tombol demo langsung muter demo rekaman.",
+        thumbCap: "Foto contoh (dibuat AI). Bagian yang ditandai SAM 3.1" },
+  jv: { rpBadge: "▶ Demo rekaman: wangsulan asli Meta API, 5 Nov 2026, diputer tanpa server", rpWake: "Server lagi tangi (hosting gratis, bisa nganti 1 menit). Tombol demo langsung muter demo rekaman.",
         rpOwnPhoto: "Demo rekaman mung bisa muter loro foto conto. Fotomu dhewe butuh server live: muat maneh kaca iki sedhela engkas.",
         rpOnlyDemo: "Demo rekaman mung isi conto motor. Kanggo foto dhewe utawa conto liya, muat maneh yen server wis tangi.",
         rpNoLive: "Bagean iki butuh server live; demo rekaman ora bisa nindakake.", rpNoMore: "Demo rekaman mung duwe siji rencana anyar.",
         planOf: "🔁 Rencana {n} saka {m}: {cause}", triedMark: "wis dijajal", stopHead: "Dimandhegake supaya slamet", deskNote: "Digawe kanggo HP: bukak kaca iki ing HP kanggo kamera, swara, lan cek langkah.",
-        thumbCap: "Foto conto (digawe AI), mode demo. Bagean sing ditandhani SAM 3.1" },
-  en: { rpBadge: "▶ Recorded demo: a saved demo-mode run, no server", rpWake: "The server is waking up (free hosting, up to a minute). The demo button plays a recorded run right away.",
+        thumbCap: "Foto conto (digawe AI). Bagean sing ditandhani SAM 3.1" },
+  en: { rpBadge: "▶ Recorded demo: real Meta API answers from 5 Nov 2026, played back without a server", rpWake: "The server is waking up (free hosting, up to a minute). The demo button plays a recorded run right away.",
         rpOwnPhoto: "The recorded demo can only play the two sample photos. Your own photo needs the live server: reload the page in a moment.",
         rpOnlyDemo: "The recorded demo only has the motorbike sample. For your own photo or another sample, reload once the server is awake.",
         rpNoLive: "This part needs the live server; the recorded demo can't do it.", rpNoMore: "The recorded demo has only one re-plan.",
         planOf: "🔁 Plan {n} of {m}: {cause}", triedMark: "tried", stopHead: "Stopped for your safety", deskNote: "Made for phones: open this page on your phone for the camera, voice and step checks.",
-        thumbCap: "Sample photo (AI-generated), demo mode. Parts marked by SAM 3.1" },
+        thumbCap: "Sample photo (AI-generated). Parts marked by SAM 3.1" },
 };
 /* I18N_REPLAY:end */
 ["id", "jv", "en"].forEach((k) => Object.assign(T[k], T_REPLAY[k]));
@@ -353,17 +353,17 @@ function applyLang() {
   if (window.__offlineRefresh) window.__offlineRefresh();
 }
 
-// WhatsApp simulator link (docs/WHATSAPP.md): only when the server says /wa is on (demo mode or WA_SIM=1).
+// WhatsApp simulator link (docs/WHATSAPP.md): only when the server says /wa is on (offline sample mode or WA_SIM=1).
 // The static build has no server and no /wa (scripts/build_static.py also removes the element).
 if (!window.TC_STATIC && !(window.TCReplay && window.TCReplay.forced()) && $("waSim")) {  // ?replay=1 sends nothing to the server
   fetch("/api/wa-sim/info").then((r) => (r.ok ? r.json() : null)).then((i) => { if (i && i.enabled) ["waSim", "sideWa"].forEach((k) => $(k) && $(k).classList.remove("hidden")); }).catch(() => {});
 }
 
 let HEALTH = null;
-// Header badges: demo mode, and the open-weights brain (Muse Spark Open on Baseten) when it is really in use.
+// Header badges: offline sample mode, and the open-weights brain (Muse Spark Open on Baseten) when it is really in use.
 function badges() {
   if (!HEALTH) return;
-  if (HEALTH.mode === "mock") { $("modeBadge").textContent = t("demo"); $("modeBadge").classList.remove("hidden"); }
+  if (HEALTH.mode === "offline") { $("modeBadge").textContent = t("demo"); $("modeBadge").classList.remove("hidden"); }
   if (HEALTH.mode === "replay") { $("modeBadge").textContent = t("rpBadge"); $("modeBadge").classList.add("replay"); $("modeBadge").classList.remove("hidden"); }
   if (HEALTH.open_weights && $("owBadge")) { $("owBadge").textContent = "🔓 " + t("openW"); $("owBadge").classList.remove("hidden"); }
 }

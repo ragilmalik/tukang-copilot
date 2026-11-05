@@ -698,7 +698,7 @@ def replan(sid: str, report: str) -> dict[str, Any]:
     return s
 
 
-MOCK_COMMAND = {"id": "lanjut", "jv": "terus", "en": "next"}  # demo mode: every push-to-talk clip "says" next
+MOCK_COMMAND = {"id": "lanjut", "jv": "terus", "en": "next"}  # offline sample mode: every push-to-talk clip "says" next
 MAX_COMMAND_SECONDS = 15.0
 
 

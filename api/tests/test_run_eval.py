@@ -35,3 +35,19 @@ def test_report_says_which_column_is_a_real_model():
     assert "\u2014" not in md
     doc = (ROOT / "docs" / "EVAL.md").read_text(encoding="utf-8")
     assert "| live | mock | fake |" in doc and "real Meta Model API" in doc
+
+
+def test_case_that_never_reached_its_input_is_not_run_not_a_pass(tmp_path):
+    """A follow-up injection case the live model never asked a question for is shown as "not run" and left out of the score."""
+    import json
+    saved = ROOT / "docs" / "eval" / "live-2026-11-05.json"
+    results = json.loads(saved.read_text(encoding="utf-8"))
+    live = next(r for r in results if r["mode"] == "live")
+    case = next(x for x in live["injection"] if x["id"] == "follow-up-answer-orders-plus-gas")
+    assert case["ok"] is None
+    s = run_eval.summarise(live)
+    assert s["injection"][1] == sum(1 for x in live["injection"] if x["ok"] is not None)
+    out = tmp_path / "EVAL.md"
+    assert run_eval.main(["--from-json", str(saved), "--modes", "live,mock,fake", "--out", str(out)]) in (0, None)
+    md = out.read_text(encoding="utf-8")
+    assert "not run: the model asked no follow-up question" in md and "| live | mock | fake |" in md

@@ -27,7 +27,7 @@ def _jpg(color=(200, 200, 200)):
 
 def test_health():
     j = client.get("/health").json()
-    assert j["ok"] and j["mode"] == "mock" and j["models"]["segment"] == "sam-3.1"
+    assert j["ok"] and j["mode"] == "offline" and j["models"]["segment"] == "sam-3.1"
 
 
 def test_pages_served():

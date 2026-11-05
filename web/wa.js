@@ -1,17 +1,17 @@
-// WhatsApp simulator (/wa): the same webhook handler and engine, shown as a WhatsApp chat. Demo mode only.
+// WhatsApp simulator (/wa): the same webhook handler and engine, shown as a WhatsApp chat. Offline sample answers unless WA_SIM=1 with a key.
 "use strict";
 const L = {
-  id: { sim: "Simulator, menjalankan mesin yang sama dalam mode demo", sub: "Bukan nomor WhatsApp sungguhan. Pesan diproses oleh webhook WhatsApp Tukang Copilot yang sama.",
+  id: { sim: "Simulator, mesin yang sama dengan jawaban contoh offline", simLive: "Simulator, mesin yang sama dengan Meta API asli", sub: "Bukan nomor WhatsApp sungguhan. Pesan diproses oleh webhook WhatsApp Tukang Copilot yang sama.",
         ph: "Ketik pesan", hint: "Ketuk contoh di bawah, atau kirim foto barang yang rusak plus ceritanya (ketik atau pesan suara). Balasannya sama persis dengan di WhatsApp.", today: "Hari ini", online: "online", typing: "sedang mengetik...", photo: "Kirim foto", rec: "Rekam pesan suara", stopRec: "Kirim pesan suara",
         tap: "Keran netes", motor: "Motor mogok", rice: "Rice cooker", gas: "Bau gas", after: "Kirim foto 'sesudah'", voice: "Pesan suara", file: "Dokumen PDF", erase: "HAPUS",
         texts: { faucet: "Kran wastafel dapur netes terus walaupun sudah ditutup kencang.", motor: "Motor saya Honda Beat susah hidup dari pagi, distarter cuma bunyi tapi mesin nggak nyala.",
                  rice: "Rice cooker saya nggak panas, lampunya mati padahal sudah dicolok.", gas: "Tabung gas di dapur bocor, baunya menyengat. Harus gimana?" } },
-  jv: { sim: "Simulator, nglakokake mesin sing padha ing mode demo", sub: "Dudu nomer WhatsApp tenan. Pesen diolah webhook WhatsApp Tukang Copilot sing padha.",
+  jv: { sim: "Simulator, mesin sing padha nganggo wangsulan conto offline", simLive: "Simulator, mesin sing padha nganggo Meta API asli", sub: "Dudu nomer WhatsApp tenan. Pesen diolah webhook WhatsApp Tukang Copilot sing padha.",
         ph: "Ketik pesen", hint: "Tutul conto ing ngisor, utawa kirim foto barang sing rusak lan critane (ketik utawa pesen swara). Wangsulane padha karo ing WhatsApp.", today: "Dina iki", online: "online", typing: "lagi ngetik...", photo: "Kirim foto", rec: "Rekam pesen swara", stopRec: "Kirim pesen swara",
         tap: "Kran netes", motor: "Motor mogok", rice: "Rice cooker", gas: "Ambu gas", after: "Kirim foto 'sawise'", voice: "Pesen swara", file: "Dokumen PDF", erase: "BUSAK",
         texts: { faucet: "Kran wastafel pawon netes terus senajan wis ditutup kenceng.", motor: "Motorku Honda Beat angel urip wiwit esuk, distarter mung muni nanging mesine ora urip.",
                  rice: "Rice cookerku ora panas, lampune mati senajan wis dicolok.", gas: "Kompor gase bocor, ambune banget. Aku kudu piye?" } },
-  en: { sim: "Simulator, runs the same engine in demo mode", sub: "Not a real WhatsApp number. Messages go through the same Tukang Copilot WhatsApp webhook handler.",
+  en: { sim: "Simulator, runs the same engine on offline sample answers", simLive: "Simulator, runs the same engine on the real Meta API", sub: "Not a real WhatsApp number. Messages go through the same Tukang Copilot WhatsApp webhook handler.",
         ph: "Type a message", hint: "Tap a sample below, or send a photo of something broken and say what is wrong (typed or a voice note). The replies are exactly what WhatsApp would show.", today: "Today", online: "online", typing: "typing...", photo: "Send a photo", rec: "Record a voice note", stopRec: "Send voice note",
         tap: "Dripping tap", motor: "Bike won't start", rice: "Rice cooker", gas: "Gas smell", after: "Send 'after' photo", voice: "Voice note", file: "PDF document", erase: "DELETE",
         texts: { faucet: "The kitchen faucet keeps dripping even when closed tight.", motor: "My Honda Beat won't start since this morning, the starter turns but the engine doesn't fire.",
@@ -127,13 +127,14 @@ function chips() {
   add("✅ " + L[lang].after, afterPhoto);
   add("🗑 " + L[lang].erase, () => { bubble(esc(L[lang].erase), true); send({ text: L[lang].erase }); });
 }
+let SIM_LIVE = false;
 function applyLang(l) {
   lang = l;
   localStorage.setItem("wasim.lang", l);
   document.documentElement.lang = l === "jv" ? "jv" : l;
   document.querySelectorAll(".langs button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === l)));
-  $("simLabel").textContent = L[l].sim;
-  $("simSub").textContent = (l === "en" ? "" : L.en.sim + ". ") + L[l].sub;
+  $("simLabel").textContent = SIM_LIVE ? L[l].simLive : L[l].sim;
+  $("simSub").textContent = (l === "en" ? "" : (SIM_LIVE ? L.en.simLive : L.en.sim) + ". ") + L[l].sub;
   $("text").placeholder = L[l].ph;
   $("today").textContent = L[l].today;
   $("hint").textContent = L[l].hint;
@@ -171,5 +172,5 @@ $("form").addEventListener("submit", async (e) => {
 });
 $("sendBtn").textContent = "🎤";
 applyLang(lang);
-fetch("/api/wa-sim/info").then((r) => r.json()).then((j) => { if (j.mode !== "mock") { $("simLabel").textContent = $("simLabel").textContent.replace(/demo/i, "live"); } }).catch(() => {});
+fetch("/api/wa-sim/info").then((r) => r.json()).then((j) => { if (j.mode === "live") { SIM_LIVE = true; applyLang(lang); } }).catch(() => {});
 poll();

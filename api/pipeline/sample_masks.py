@@ -1,4 +1,4 @@
-"""Hand-drawn part outlines for the AI-generated sample photos (demo mode only).
+"""Hand-drawn part outlines for the AI-generated sample photos (offline sample mode only).
 
 Mock SAM used to return one ellipse in a fixed box per phrase, whatever the picture. With real-looking sample
 photos that looks wrong, so each sample photo has its parts outlined by hand in sample_masks.json (points in

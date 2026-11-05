@@ -157,7 +157,7 @@ def test_photo_flow_marked_photo_diagnosis_steps_and_pdf(samples):
     up = fg.uploads[img["id"]]
     assert up["mime"] == "image/jpeg" and up["data"][:2] == b"\xff\xd8"  # the SAM-marked parts.jpg
     cap = img["caption"]
-    assert "🩺" in cap and "Rp" in cap and "hemat" in cap and "Mode demo" in cap
+    assert "🩺" in cap and "Rp" in cap and "hemat" in cap and "Mode contoh offline" in cap
     inter = fg.sent[3]["interactive"]
     assert inter["type"] == "button" and "Langkah 1 dari 4" in inter["body"]["text"]
     assert [b["reply"]["title"] for b in inter["action"]["buttons"]] == ["Selesai", "Ada masalah", "Berhenti"]
@@ -182,7 +182,7 @@ def test_photo_with_caption_starts_at_once_in_english(samples):
     inter = last_interactive()
     assert "Step 1 of 4" in inter["body"]["text"]
     assert [b["reply"]["title"] for b in inter["action"]["buttons"]] == ["Done", "Problem", "Stop"]
-    assert "Demo mode" in [m for m in fg.sent if m["type"] == "image"][0]["image"]["caption"]
+    assert "Offline sample mode" in [m for m in fg.sent if m["type"] == "image"][0]["image"]["caption"]
 
 
 def _ogg(tmp_path):

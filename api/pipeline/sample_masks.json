@@ -1,5 +1,5 @@
 {
- "note": "Part outlines drawn by hand on the AI-generated sample photos (demo mode). Points are percent of width and height; type poly, hole (cut out of the shapes before it) or line (width in percent of the photo width). dhash is filled in by scripts/make_fixtures.py.",
+ "note": "Part outlines drawn by hand on the AI-generated sample photos (offline sample mode). Points are percent of width and height; type poly, hole (cut out of the shapes before it) or line (width in percent of the photo width). dhash is filled in by scripts/make_fixtures.py.",
  "photos": {
   "motor": {
    "dhash": "9206d04ec05ac0082209c4b3c5a3d483e8c2cd0e1e999c5d345d34dc39dc389c",

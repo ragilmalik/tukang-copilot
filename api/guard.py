@@ -1,6 +1,6 @@
 """Abuse guard for a public deployment: per-visitor rate limit and a rolling 24 h spend cap.
 
-Only enforced in live mode (a real Meta key is set and MOCK is off), because demo mode costs nothing.
+Only enforced in live mode (a real Meta key is set and MOCK is off), because offline sample mode costs nothing.
 Limits are env-configurable: RATE_LIMIT_PER_HOUR (default 30 new repairs per visitor per hour, 0 = off) and
 DAILY_BUDGET_USD (default 10, 0 = off). Messages come in id/jv/en so the phone shows a friendly sentence.
 """

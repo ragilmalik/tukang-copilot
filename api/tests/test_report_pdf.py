@@ -36,7 +36,7 @@ def test_pdf_paginates_long_reports(tmp_path):
     rep = {"id": "x", "lang": "en", "object": "Thing", "problem": "Broken " * 400, "fix": "Fix", "steps_total": 0, "steps_verified": 0,
            "tools": [{"name": f"Tool {i}", "est_price_idr": 1000 * i} for i in range(40)], "parts": [], "attempts": ["tried"] * 30,
            "safety_level": "green"}
-    out = report_pdf.build(rep, {"mode": "mock", "safety": {"reason": "ok"}}, tmp_path, tmp_path / "long.pdf")
+    out = report_pdf.build(rep, {"mode": "offline", "safety": {"reason": "ok"}}, tmp_path, tmp_path / "long.pdf")
     data = out.read_bytes()  # Pillow writes PDFs but cannot read them back, so count page objects
     pages = data.count(b"/Type /Page") - data.count(b"/Type /Pages")
     assert pages >= 2
@@ -140,7 +140,7 @@ def test_agent_lines_special_kinds_and_bad_entries():
 
 def test_pdf_has_more_pages_with_agent_log(tmp_path):
     rep = {"id": "x", "lang": "en", "object": "Thing", "problem": "P", "steps_total": 0, "steps_verified": 0, "safety_level": "green"}
-    base = report_pdf.build(rep, {"mode": "mock"}, tmp_path, tmp_path / "a.pdf").stat().st_size
+    base = report_pdf.build(rep, {"mode": "offline"}, tmp_path, tmp_path / "a.pdf").stat().st_size
     log = [{"t": i, "kind": "look", "object": "motor", "n": 3, "model": "muse-spark-1.3"} for i in range(60)]
-    big = report_pdf.build(rep, {"mode": "mock", "agent_log": log}, tmp_path, tmp_path / "b.pdf").stat().st_size
+    big = report_pdf.build(rep, {"mode": "offline", "agent_log": log}, tmp_path, tmp_path / "b.pdf").stat().st_size
     assert big > base
