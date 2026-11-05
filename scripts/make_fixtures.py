@@ -20,7 +20,8 @@ import json
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+import numpy as np
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -65,10 +66,32 @@ FIXTURES: list[dict[str, str]] = [
 ]
 
 
-def tag(src: Path, dst: Path, max_side: int) -> None:
-    """Copy one original with the corner tag and the EXIF label."""
+def phone_look(im: Image.Image, long_side: int, seed: int) -> Image.Image:
+    """Make a generated picture sit closer to a phone camera file: phone resolution, a little sensor grain,
+    slight corner fall-off and the light sharpening phones apply. Same seed, same file."""
+    w, h = im.size
+    k = long_side / max(w, h)
+    im = im.resize((round(w * k), round(h * k)), Image.Resampling.LANCZOS)
+    im = im.filter(ImageFilter.UnsharpMask(radius=1.4, percent=70, threshold=2))
+    a = np.asarray(im).astype(np.float32)
+    rng = np.random.default_rng(seed)
+    luma = rng.normal(0.0, 2.4, a.shape[:2]).astype(np.float32)
+    chroma = rng.normal(0.0, 1.2, a.shape).astype(np.float32)
+    a += luma[..., None] + chroma
+    yy, xx = np.mgrid[0:a.shape[0], 0:a.shape[1]].astype(np.float32)
+    r = np.hypot((xx - a.shape[1] / 2) / (a.shape[1] / 2), (yy - a.shape[0] / 2) / (a.shape[0] / 2)) / np.sqrt(2)
+    a *= (1.0 - 0.10 * r ** 2.2)[..., None]
+    return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
+
+
+def tag(src: Path, dst: Path, max_side: int, look: bool = False) -> None:
+    """Copy one original with the corner tag and the EXIF label. Only ImageDescription is written (no camera or
+    generator fields), and it says the photo is AI-generated."""
     im = Image.open(src).convert("RGB")
-    im.thumbnail((max_side, max_side))
+    if look:
+        im = phone_look(im, max_side, seed=sum(src.stem.encode()))
+    else:
+        im.thumbnail((max_side, max_side))
     w = im.width
     size = max(14, w // 52)
     font = ImageFont.truetype(str(FONT), size) if FONT.exists() else ImageFont.load_default()
@@ -82,7 +105,10 @@ def tag(src: Path, dst: Path, max_side: int) -> None:
     out = Image.alpha_composite(im.convert("RGBA"), layer).convert("RGB")
     exif = Image.Exif()
     exif[0x010E] = LABEL  # ImageDescription
-    out.save(dst, "JPEG", quality=84, exif=exif, optimize=True)
+    if look:
+        out.save(dst, "JPEG", quality=90, subsampling=2, exif=exif, optimize=True)
+    else:
+        out.save(dst, "JPEG", quality=84, exif=exif, optimize=True)
 
 
 def main() -> None:
@@ -92,7 +118,7 @@ def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     if a.src:
         for name, sample in SAMPLE_FILES.items():
-            tag(a.src / f"{name}.jpg", SAMPLES / f"{sample}.jpg", 1200)
+            tag(a.src / f"{name}.jpg", SAMPLES / f"{sample}.jpg", 1600, look=True)
         for item in FIXTURES:
             tag(a.src / f"{item['src']}.jpg", OUT / item["file"], 1024)
     masks = json.loads(MASKS_FILE.read_text())

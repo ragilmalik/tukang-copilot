@@ -2,7 +2,7 @@
  "note": "Part outlines drawn by hand on the AI-generated sample photos (offline sample mode). Points are percent of width and height; type poly, hole (cut out of the shapes before it) or line (width in percent of the photo width). dhash is filled in by scripts/make_fixtures.py.",
  "photos": {
   "motor": {
-   "dhash": "9206d04ec05ac0082209c4b3c5a3d483e8c2cd0e1e999c5d345d34dc39dc389c",
+   "dhash": "9206d04ec05ac0082209c4b3c5a3d483e8c2cd0e1e999c5d345834dc39dc389c",
    "parts": {
     "spark plug cap": [
      {
@@ -189,7 +189,7 @@
    }
   },
   "pump": {
-   "dhash": "fec9fd81b1497c215b204f29acd9c38d4634529c46596c5a786c3c3c8692874d",
+   "dhash": "f6c9fd81b1497c215b20cf29acd8c38d4634529c46596c5a786c3c3c8692874c",
    "parts": {
     "priming plug": [
      {
@@ -343,7 +343,7 @@
    }
   },
   "faucet": {
-   "dhash": "5da1f9b3b9f3b8f33cb124992699368b3812f583d388a38f870f1e1a081ed047",
+   "dhash": "5da1f9b3f9f1b8f1bcb1a4992699368bb812f583f388a38fa70f1e1a081ed047",
    "parts": {
     "faucet handle": [
      {
@@ -549,7 +549,7 @@
    }
   },
   "rice": {
-   "dhash": "ac7fac1fac4fac13ae133a4773e3f3c3d3ee138ee4dae0c6e11cf05c3e448bf8",
+   "dhash": "ac7eac1fac4fac13ae133a4773e3f3c3d3ee138ee4dae0c6e11cf05c7e44cbf0",
    "parts": {
     "cook switch": [
      {
@@ -722,7 +722,7 @@
    }
   },
   "tire": {
-   "dhash": "21b927712e7118d3331e23cd2e8e26e627670f661b2e0d9d061b41bee14ca2c5",
+   "dhash": "21b927712e7118d3331e23cd2e8e26e627670f661b2e0d9d061bc1bee14ca245",
    "parts": {
     "tyre tread": [
      {
@@ -1365,7 +1365,7 @@
    }
   },
   "check_motor": {
-   "dhash": "9206d046c05ac0002009c4b3c4a3d483e8c2cd0e1e999c5d345d34dc39dc389c",
+   "dhash": "9206d04ec05ac0002209c4b3c4a3d483e8c2cd0e1e999c5d345834dc39dc389c",
    "parts": {
     "spark plug cap": [
      {
@@ -1548,7 +1548,7 @@
    }
   },
   "check_pump": {
-   "dhash": "3e9293e6e0ff4ff06700cf1a9a1a3a9b6cdc66c66334e53ed97399782dcd2367",
+   "dhash": "3e9293e6e0ff4df06700cf1a9a1a3a9b6cdc66c66334e53ed97399782dcd2367",
    "parts": {
     "priming plug": [
      {
@@ -1787,7 +1787,7 @@
    }
   },
   "check_tire": {
-   "dhash": "637146640ecc32be32713e1f308902c706e706670367094e643e20bc30dc70ce",
+   "dhash": "637146640ecc32ae32713e1f308902c786e706670367094e643e60b830dc70ce",
    "parts": {
     "tyre tread": [
      {
@@ -2694,7 +2694,7 @@
    "parts": {}
   },
   "check_faucet": {
-   "dhash": "5da1f9b3b9f1bcf33cb124992699168b3812f583d388a38f870f1e1a081ed047",
+   "dhash": "5da1f9b3f9f1bcf13cb1a4992699368bb812f583f388a38fa70f1e1a089ad047",
    "parts": {
     "faucet handle": [
      {

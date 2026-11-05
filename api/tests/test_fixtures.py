@@ -30,7 +30,7 @@ def _tagged(p: Path) -> None:
     """EXIF label plus the dark corner tag that says the same thing on the picture itself."""
     im = Image.open(p)
     assert im.getexif().get(0x010E, "") == LABEL
-    assert max(im.size) <= 1536
+    assert max(im.size) <= 1600  # phone_look() writes 1600 px on the long side
     m = max(8, im.width // 90)
     px = im.convert("RGB").getpixel((m + 6, m + max(14, im.width // 52) // 2 + 6))
     assert isinstance(px, tuple) and max(px[:3]) < 110
