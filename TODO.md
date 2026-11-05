@@ -8,7 +8,7 @@ Items marked (keys) need my keys or accounts.
 - [x] WhatsApp simulator label reads naturally in Bahasa and Basa Jawa ("menjalankan" / "nglakokake"), tests match
 - [x] Full test run: non-browser 838/0, Playwright 127/0, ruff, mypy 162 files, offline smoke 69 checks, static build OK
 - [x] Re-record the 1-tap demo from the live API (one yes/no question in every language, the sample photo passes on its step): 6 Nov 01:23 WIB, pipeline $0.18
-- [ ] Commit and push
+- [x] Commit and push (main at 9179f81 on 6 Nov)
 
 ## Must (to submit)
 Order: live run first, Baseten optional, real clip and trials, then repo/deploy, YouTube and X, submit.
