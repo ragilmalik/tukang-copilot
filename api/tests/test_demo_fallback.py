@@ -19,6 +19,9 @@ BASE = fake_meta.serve_in_thread()
 WEB = Path(__file__).resolve().parents[2] / "web"
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 @pytest.fixture
 def live(monkeypatch):
     monkeypatch.setattr(settings, "mock", False)
@@ -35,7 +38,8 @@ def live(monkeypatch):
 
 
 def _wait(c, sid):
-    for _ in range(300):
+    deadline = time.monotonic() + WAIT_S
+    while time.monotonic() < deadline:
         s = c.get(f"/api/sessions/{sid}").json()
         if s["status"] not in ("created", "running"):
             return s

@@ -15,9 +15,13 @@ client = TestClient(app)
 WEB = Path(__file__).resolve().parents[2] / "web"
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 def _done(sample: str, lang: str = "en") -> str:
     sid = str(client.post("/api/sessions", data={"sample": sample, "language": lang}).json()["id"])
-    for _ in range(200):
+    deadline = time.monotonic() + WAIT_S
+    while time.monotonic() < deadline:
         if client.get(f"/api/sessions/{sid}").json()["status"] not in {"created", "running"}:
             return sid
         time.sleep(0.05)

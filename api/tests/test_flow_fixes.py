@@ -20,6 +20,9 @@ from api.tests.owner_auth import owner
 client = TestClient(app)
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 @pytest.mark.parametrize("text,lang", [
     ("Rem motorku blong, kampas rem arep tak ganti dhewe", "jv"),
     ("remku blong pas mudhun", "jv"),
@@ -72,7 +75,8 @@ def _jpg():
 
 
 def _wait(sid, until=("ready", "stopped", "needs_answer", "error", "exhausted")):
-    for _ in range(200):
+    deadline = time.monotonic() + WAIT_S
+    while time.monotonic() < deadline:
         s = client.get(f"/api/sessions/{sid}").json()
         if s["status"] in until:
             return s

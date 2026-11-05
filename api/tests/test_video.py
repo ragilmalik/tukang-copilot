@@ -11,6 +11,9 @@ from api.pipeline import media
 client = TestClient(app)
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 def _clip(path, seconds=6, audio=True):
     args = [media.ffmpeg_exe(), "-hide_banner", "-loglevel", "error", "-y",
             "-f", "lavfi", "-i", f"testsrc=size=640x480:rate=15:duration={seconds}"]
@@ -21,7 +24,8 @@ def _clip(path, seconds=6, audio=True):
 
 
 def _wait(sid):
-    for _ in range(200):
+    deadline = time.monotonic() + WAIT_S
+    while time.monotonic() < deadline:
         s = client.get(f"/api/sessions/{sid}").json()
         if s["status"] in ("ready", "stopped", "needs_answer", "error"):
             return s

@@ -14,6 +14,9 @@ from api.tests.doubles import fake_meta
 client = TestClient(app)
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 @pytest.fixture(autouse=True)
 def _reset_guard():
     guard.reset()
@@ -23,7 +26,8 @@ def _reset_guard():
 
 def _ready(c, sample="faucet", lang="en"):
     sid = c.post("/api/sessions", data={"sample": sample, "language": lang}).json()["id"]
-    for _ in range(200):
+    deadline = time.monotonic() + WAIT_S
+    while time.monotonic() < deadline:
         s = c.get(f"/api/sessions/{sid}").json()
         if s["status"] not in ("created", "running"):
             return sid, s

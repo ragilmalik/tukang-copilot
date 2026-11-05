@@ -23,9 +23,13 @@ import impact_report  # type: ignore[import-not-found]  # noqa: E402
 client = TestClient(app)
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 def _ready(sample: str = "pump", lang: str = "en") -> dict[str, Any]:
     sid = client.post("/api/sessions", data={"sample": sample, "language": lang}).json()["id"]
-    for _ in range(400):
+    deadline = time.monotonic() + WAIT_S
+    while time.monotonic() < deadline:
         s: dict[str, Any] = client.get(f"/api/sessions/{sid}").json()
         if s["status"] not in ("created", "running"):
             return s

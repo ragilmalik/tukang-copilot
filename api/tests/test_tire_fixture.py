@@ -16,8 +16,12 @@ TIRE = [i for i in MANIFEST if i["scenario"] == "tire"]
 client = TestClient(app)
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 def _wait(sid: str, until: tuple[str, ...] = ("ready", "stopped", "needs_answer", "error", "exhausted")) -> dict[str, Any]:
-    for _ in range(200):
+    deadline = time.monotonic() + WAIT_S
+    while time.monotonic() < deadline:
         s: dict[str, Any] = client.get(f"/api/sessions/{sid}").json()
         if s["status"] in until:
             return s

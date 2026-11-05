@@ -20,6 +20,9 @@ client = TestClient(app)
 WEB = Path(__file__).resolve().parents[2] / "web"
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 @pytest.fixture(autouse=True)
 def _fast(monkeypatch):
     monkeypatch.setattr(settings, "track_min_interval_s", 0.0)
@@ -28,7 +31,8 @@ def _fast(monkeypatch):
 
 def _ready(sample: str = "pump", lang: str = "en") -> dict[str, Any]:
     sid = client.post("/api/sessions", data={"sample": sample, "language": lang}).json()["id"]
-    for _ in range(400):
+    deadline = time.monotonic() + WAIT_S
+    while time.monotonic() < deadline:
         s: dict[str, Any] = client.get(f"/api/sessions/{sid}").json()
         if s["status"] not in ("created", "running"):
             return s

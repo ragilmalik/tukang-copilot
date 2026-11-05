@@ -11,8 +11,12 @@ from api.main import app
 client = TestClient(app)
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 def _wait(sid, until=("ready", "stopped", "needs_answer", "error", "exhausted")):
-    for _ in range(100):
+    deadline = time.monotonic() + WAIT_S
+    while time.monotonic() < deadline:
         s = client.get(f"/api/sessions/{sid}").json()
         if s["status"] in until:
             return s

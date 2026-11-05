@@ -14,9 +14,13 @@ from api.tests.owner_auth import owner
 client = TestClient(app)
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 def _done(sample, lang="en"):
     sid = client.post("/api/sessions", data={"sample": sample, "language": lang}).json()["id"]
-    for _ in range(200):
+    deadline = time.monotonic() + WAIT_S
+    while time.monotonic() < deadline:
         s = client.get(f"/api/sessions/{sid}").json()
         if s["status"] not in {"created", "running"}:
             return sid

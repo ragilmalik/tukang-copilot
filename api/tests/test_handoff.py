@@ -20,8 +20,12 @@ WEB = Path(__file__).resolve().parents[2] / "web"
 SAMPLES = Path(__file__).resolve().parents[2] / "samples"
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 def _wait(sid: str) -> dict[str, Any]:
-    for _ in range(400):
+    deadline = time.monotonic() + WAIT_S
+    while time.monotonic() < deadline:
         s: dict[str, Any] = client.get(f"/api/sessions/{sid}").json()
         if s["status"] not in ("created", "running"):
             return s

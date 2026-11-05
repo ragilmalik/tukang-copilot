@@ -13,8 +13,12 @@ from api.render import brand, report_pdf, share_card
 client = TestClient(app)
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 def _wait(sid, want=("ready", "needs_answer", "stopped", "error")):
-    for _ in range(300):
+    deadline = time.monotonic() + WAIT_S
+    while time.monotonic() < deadline:
         s = client.get(f"/api/sessions/{sid}").json()
         if s["status"] in want:
             return s

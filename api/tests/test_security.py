@@ -12,9 +12,12 @@ from api.settings import settings
 client = TestClient(app)
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 def _ready(sid: str) -> dict[str, Any]:
     t0 = time.time()
-    while time.time() - t0 < 20:
+    while time.time() - t0 < WAIT_S:
         s: dict[str, Any] = client.get(f"/api/sessions/{sid}").json()
         if s["status"] in ("ready", "stopped", "error"):
             return s

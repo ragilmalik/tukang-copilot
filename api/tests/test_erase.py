@@ -16,9 +16,12 @@ from api.tests.owner_auth import owner
 client = TestClient(app)
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 def _wait(sid: str, until: tuple[str, ...] = ("ready", "stopped", "needs_answer", "error", "exhausted")) -> dict[str, Any]:
     t0 = time.time()
-    while time.time() - t0 < 20:
+    while time.time() - t0 < WAIT_S:
         s: dict[str, Any] = client.get(f"/api/sessions/{sid}").json()
         if s["status"] in until:
             return s

@@ -41,6 +41,9 @@ CASES = [
 ]
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 @pytest.mark.parametrize("text,lang,want", CASES)
 def test_parse_command(text, lang, want):
     assert parse_command(text, lang) == want
@@ -72,7 +75,8 @@ def test_js_parse_command_matches_python():
 
 def _ready(sample: str = "pump", lang: str = "id") -> dict[str, Any]:
     sid = client.post("/api/sessions", data={"sample": sample, "language": lang}).json()["id"]
-    for _ in range(400):
+    deadline = time.monotonic() + WAIT_S
+    while time.monotonic() < deadline:
         s: dict[str, Any] = client.get(f"/api/sessions/{sid}").json()
         if s["status"] not in ("created", "running"):
             return s

@@ -993,8 +993,12 @@ def capture(group: str, lengths: dict[str, float]) -> None:
             for key in GROUPS["motor"]:
                 run_scene(recorder, key, lengths[key], plan[key])
             src = pg.evaluate("document.querySelector('#partsImg') && document.querySelector('#partsImg').src")
-            if src:
-                (CLIPS / "parts_photo.jpg").write_bytes(pg.request.get(src).body())
+            if src:  # the marked photo for the title and close cards (and web/og.png, scripts/make_og.py)
+                # page.request skips the context's routes, so a public-address URL is fetched from this server directly
+                got = pg.request.get(src.replace(mda.PUBLIC_BASE, base, 1) if rec else src)
+                if not got.ok or not got.headers.get("content-type", "").startswith("image/"):
+                    raise SystemExit(f"marked photo {src} answered {got.status} {got.headers.get('content-type')}")
+                (CLIPS / "parts_photo.jpg").write_bytes(got.body())
 
         elif group == "steps":
             motor_to_result()

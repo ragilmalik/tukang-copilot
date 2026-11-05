@@ -11,6 +11,9 @@ from PIL import Image
 from api.main import app
 
 
+WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
+
+
 def _jpg(w: int = 200, h: int = 150) -> bytes:
     b = io.BytesIO()
     Image.new("RGB", (w, h), (120, 90, 60)).save(b, "JPEG")
@@ -35,7 +38,8 @@ def c():
 
 
 def _wait(c: TestClient, sid: str) -> dict[str, Any]:
-    for _ in range(300):
+    deadline = time.monotonic() + WAIT_S
+    while time.monotonic() < deadline:
         s: dict[str, Any] = c.get(f"/api/sessions/{sid}").json()
         if s["status"] not in ("created", "running"):
             return s
