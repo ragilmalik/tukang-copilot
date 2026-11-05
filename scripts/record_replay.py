@@ -10,13 +10,16 @@ Output (all under web/replay/, served at /static/replay/):
                      "delta" per action (step check with each sample photo, re-plan, outcome) so actions can be
                      replayed in any order
   files/*.jpg        the photos the sessions show (sample photo, SAM-marked photo, part crops)
-  check_ok.jpg, check_dark.jpg   the two labelled sample "check my step" photos
+  check_ok.jpg, check_dark.jpg   the two labelled sample "check my step" photos (check_ok shows one step, stored as
+                     sample_step per plan; the dark one is checked on whatever step is on screen)
   card-<lang>.png, report-<lang>.pdf   share card and PDF report
 
 Regenerate after changing the prompts, the session shape or the UI flow (needs the Meta key, costs about $0.60):
     python scripts/record_replay.py            # live run, writes web/replay/
     python scripts/record_replay.py --check    # exit 1 if the committed fixture no longer has the app's shape
                                                # (compares against an offline run, free, no key needed)
+    python scripts/record_replay.py --resample # re-pick the sample photo's step after a change to api/sample_step.py
+                                               # (uses the recorded plans and checks, free, no key needed)
 """
 from __future__ import annotations
 
@@ -76,10 +79,11 @@ def _settled(c: Any, sid: str) -> dict[str, Any]:
     return {"snaps": snaps, "session": c.get(f"/api/sessions/{sid}").json()}
 
 
-def _scrub(obj: Any, sid: str, rid: str) -> Any:
-    """Point every session URL at the recorded copy: /files/<sid>/ -> /static/replay/files/, <sid> -> replay id."""
+def _scrub(obj: Any, sid: str, rid: str, lang: str) -> Any:
+    """Point every session URL at the recorded copy: /files/<sid>/ -> /static/replay/files/<lang>/, <sid> -> replay id.
+    Each language is its own live run, with its own marked photo and part pictures, so each gets its own folder."""
     s = json.dumps(obj, ensure_ascii=False)
-    s = s.replace(f"/files/{sid}/", FILES_BASE).replace(sid, rid)
+    s = s.replace(f"/files/{sid}/", f"{FILES_BASE}{lang}/").replace(sid, rid)
     return json.loads(s)
 
 
@@ -118,13 +122,32 @@ def _record_checks(c: Any, sid: str, photos: dict[str, bytes], files_dir: Path) 
             after = c.get(f"/api/sessions/{sid}").json()
             for tr in ((after.get("checks") or {}).get(str(n)) or {}).get("tries") or []:
                 src = engine.session_dir(sid) / str(tr.get("photo", ""))
-                if tr.get("photo") and src.is_file():  # both sample photos get the same name on the server: keep both
-                    name = f"{src.stem}_{kind}{src.suffix}"
-                    shutil.copyfile(src, files_dir / name)
+                if tr.get("photo") and src.is_file():
+                    # Every step gets the same two sample photos, so one file per kind is enough. One copy per step
+                    # and plan was 70 identical files (about 5 MB) that the service worker downloaded on install.
+                    name = f"check_{kind}{src.suffix}"
+                    if not (files_dir / name).exists():
+                        shutil.copyfile(src, files_dir / name)
                     tr["photo"] = name
             out.setdefault(str(n), {})[kind] = {"status": code, "response": resp, "delta": _delta(base_pub, after, MERGE_KEYS)}
     engine.save(copy.deepcopy(base))
     return out
+
+
+def _sample_step(server_pick: Any, checks: dict[str, Any], where: str) -> Any:
+    """The step the "Sample photo" button checks in the replay. The server's pick (api/sample_step.py: the step whose
+    expected state is what the sample after-photo shows) when the live model passed the photo there. If the model did
+    not, the first step it did pass (marked shows=False, so the UI only says which step it checks); that answer is
+    just as recorded."""
+    if not isinstance(server_pick, dict) or not checks:
+        return server_pick
+    passed = sorted(int(n) for n, rec in checks.items() if (rec.get("ok") or {}).get("response", {}).get("passed"))
+    if int(server_pick["n"]) in passed or not passed:
+        if not passed:
+            print(f"{where}: the live model passed the sample photo on no step; the replay shows that fail", flush=True)
+        return server_pick
+    print(f"{where}: the live model did not pass the sample photo on step {server_pick['n']}; using step {passed[0]}", flush=True)
+    return {"n": passed[0], "shows": False}
 
 
 def record_lang(c: Any, lang: str, photos: dict[str, bytes], files_dir: Path, out_dir: Path, pace: float = PACE_S) -> dict[str, Any]:
@@ -132,12 +155,14 @@ def record_lang(c: Any, lang: str, photos: dict[str, bytes], files_dir: Path, ou
 
     from api.settings import settings
 
+    files_dir = files_dir / lang
+    files_dir.mkdir(parents=True, exist_ok=True)
     settings.mock_pace_s = pace  # offline only: pacing so the stream has one snapshot per stage (live has real timing)
     rid = f"replay-motor-{lang}"
-    for attempt in range(2):  # live: the model asks a follow-up question when unsure; the recording needs one
+    for attempt in range(4):  # live: the model asks a follow-up question when unsure; the recording needs one
         sid = c.post("/api/sessions", data={"sample": "motor", "language": lang}).json()["id"]
         ask = _settled(c, sid)
-        if ask["session"]["status"] == "needs_answer" or attempt:
+        if ask["session"]["status"] == "needs_answer" or attempt == 3:
             break
         print(f"{lang}: no follow-up question this time ({ask['session']['status']}), recording once more", flush=True)
     assert ask["session"]["status"] == "needs_answer", ask["session"]["status"]
@@ -165,12 +190,42 @@ def record_lang(c: Any, lang: str, photos: dict[str, bytes], files_dir: Path, ou
     replanned = c.post(f"/api/sessions/{sid}/replan", data={"report": REPLAN[lang]}).json()
     replan = _delta(before, replanned, set())
     checks1 = _record_checks(c, sid, photos, files_dir) if replanned.get("status") == "ready" else {}
-    for f in engine.session_dir(sid).iterdir():  # photos the screens show (same for every language)
+    for f in engine.session_dir(sid).iterdir():  # photos the screens show
         if f.suffix.lower() in {".jpg", ".png"} and f.name != "card.png" and not f.name.startswith("check_"):
             shutil.copyfile(f, files_dir / f.name)
     rec = {"sid": rid, "ask": ask, "ready": ready, "answer": ANSWER[lang], "checks": {"0": checks0, "1": checks1},
-           "handoff": handoff, "outcome": outcome, "replan": replan, "replan_report": REPLAN[lang]}
-    return _scrub(rec, sid, rid)
+           "handoff": handoff, "outcome": outcome, "replan": replan, "replan_report": REPLAN[lang],
+           "sample_step": {}}
+    _set_sample_steps(rec, lang)
+    return _scrub(rec, sid, rid, lang)
+
+
+def _set_sample_steps(L: dict[str, Any], lang: str) -> None:
+    """Store the step each plan's sample photo is checked on (see _sample_step) where the replay reads the session:
+    the ready session (plan 1), the re-plan delta (plan 2) and L["sample_step"]. Uses only the recorded plans and
+    checks, so --resample can redo it without model calls when api/sample_step.py changes."""
+    from api import sample_step
+
+    sample = str(L["ready"]["session"].get("sample") or "motor")
+    plan0 = L["ready"]["session"].get("plan") or {}
+    step0 = _sample_step(sample_step.pick(sample, plan0.get("steps") or []), L["checks"].get("0") or {}, f"{lang} plan 1")
+    L["ready"]["session"]["sample_step"] = step0
+    L["sample_step"] = {"0": step0, "1": None}
+    plan1 = (L.get("replan") or {}).get("set", {}).get("plan")
+    if isinstance(plan1, dict):
+        step1 = _sample_step(sample_step.pick(sample, plan1.get("steps") or []), L["checks"].get("1") or {}, f"{lang} plan 2")
+        L["replan"]["set"]["sample_step"] = step1
+        L["sample_step"]["1"] = step1
+
+
+def resample() -> dict[str, Any]:
+    """Re-derive sample_step in the committed recording from its own plans and checks (no model calls, no key)."""
+    path = OUT / "demo.json"
+    data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    for lang, L in data["langs"].items():
+        _set_sample_steps(L, lang)
+    path.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    return data
 
 
 def _shrink(out_dir: Path) -> None:
@@ -304,7 +359,13 @@ def is_current(verbose: bool = False) -> bool:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--check", action="store_true", help="exit 1 if web/replay/demo.json no longer matches the app's shape")
+    ap.add_argument("--resample", action="store_true",
+                    help="re-pick the step each sample photo is checked on (api/sample_step.py) in the committed recording; no model calls")
     a = ap.parse_args()
+    if a.resample:
+        data = resample()
+        print("sample_step: " + ", ".join(f"{lang} {L['sample_step']}" for lang, L in data["langs"].items()))
+        return 0
     if a.check:
         same = is_current(verbose=True)
         print("replay fixture up to date" if same else "replay fixture OUT OF DATE: run python scripts/record_replay.py")

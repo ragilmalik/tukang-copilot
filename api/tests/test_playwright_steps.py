@@ -1,7 +1,10 @@
 """The 1.5 s auto-advance after a passed camera check never skips a step the owner chose, and never runs
 past the last step (real Chromium, 390x844)."""
+from pathlib import Path
+
 import pytest
 
+FIX = Path(__file__).parent / "fixtures"
 pytest.importorskip("playwright.sync_api")
 from api.tests.test_playwright_smoke import page, server  # noqa: E402,F401  (pytest fixtures)
 
@@ -18,7 +21,11 @@ def _open_steps(page):
 
 
 def _pass_current_step(page):
-    page.click("#sampleGood")
+    """A photo of the owner's own (offline mode passes any clear photo) on the step that is open. Not the sample photo
+    button: that one jumps to the step its photo shows."""
+    n = page.evaluate("S.plan.steps[stepIdx].n")
+    page.set_input_files("#stepPhoto", str(FIX / "sample_motor_step_cap_on.jpg"))
+    page.wait_for_function(f"() => ((S.checks || {{}})['{n}'] || {{}}).passed === true", timeout=15000)
     page.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
 
 

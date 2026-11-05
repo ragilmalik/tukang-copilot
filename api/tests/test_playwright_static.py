@@ -4,6 +4,7 @@ No backend runs: the test fails if the page asks the network for any /api/ URL o
 """
 import functools
 import http.server
+import json
 import os
 import sys
 import threading
@@ -59,9 +60,12 @@ def test_static_build_plays_recorded_demo_without_a_server(site, size):
         assert pg.evaluate("document.getElementById('partsImg').naturalWidth") > 0
         for b2 in pg.locator("#preList input").all():
             b2.check()
+        # the plug cap sample photo is checked on the step it shows (stored with the recording) and passes there
+        step = json.loads((ROOT / "web" / "replay" / "demo.json").read_text(encoding="utf-8"))["langs"]["en"]["sample_step"]["0"]["n"]
         pg.click("#sampleGood")
-        pg.wait_for_selector("#checkResult:not(.hidden)", timeout=10000)
-        assert "Looks right" in pg.inner_text("#checkResult")
+        pg.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('✅')", timeout=10000)
+        assert pg.inner_text("#stepNo").strip() == str(step)
+        assert f"Checking step {step}" in pg.inner_text("#sampleNote")
         assert "static/replay/report-en.pdf" in pg.get_attribute("#pdfBtn", "href")
         if size[0] >= 1024:
             pg.wait_for_selector("#qrBox svg", timeout=5000)

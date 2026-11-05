@@ -23,7 +23,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import __version__, errors, guard, handoff, impact, logs, shop
+from . import __version__, errors, guard, handoff, impact, logs, sample_step, shop
 from .trace import build_trace
 from .pipeline import engine, media, mock, photos, track
 from .settings import ROOT, settings
@@ -237,6 +237,8 @@ def public(s: dict[str, Any]) -> dict[str, Any]:
     out["input_guard"] = len(s.get("input_flags") or [])
     out["files_base"] = f"/files/{s['id']}/"
     out["trace"] = build_trace(s)
+    # the step the labelled sample after-photo shows (api/sample_step.py), so "Sample photo" checks that step
+    out["sample_step"] = sample_step.for_session(s)
     dx = out.get("diagnosis")
     if isinstance(dx, dict):
         out["diagnosis"] = {**dx, "tools": shop.with_links(dx.get("tools") or []), "parts": shop.with_links(dx.get("parts") or [])}

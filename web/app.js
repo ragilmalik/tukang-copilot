@@ -21,7 +21,7 @@ const T = {
         findService: "Cari servis terdekat", emergency: "Darurat (api, asap, bau gas kuat): telepon 112.", copied: "Tautan disalin", openW: "Penalaran: Muse Spark Open (open weights)", demo: "Mode contoh offline: jawaban contoh tertulis, tanpa panggilan Meta API.",
         green: "AMAN", amber: "HATI-HATI", red: "STOP", pass: "✅ Langkah ini beres", fail: "⚠️ Belum pas", checking: "Memeriksa foto…",
         verified: "langkah terverifikasi kamera", allChecked: "Semua langkah sudah dicek kamera. Sudah jalan lagi?", recording: "Merekam…", recorded: "Suara terekam ✓", micErr: "Mikrofon tidak bisa dipakai. Ketik saja masalahnya.",
-        netErr: "Koneksi terputus. Cek sinyal lalu coba lagi.", srvErr: "Server sedang bermasalah. Coba lagi sebentar lagi.", offline: "Tidak ada internet. Diagnosis butuh sinyal; foto kamu tetap aman di HP.",
+        netErr: "Koneksi terputus. Cek sinyal lalu coba lagi.", srvErr: "Server sedang bermasalah. Coba lagi sebentar lagi.", busyErr: "Server sedang sibuk. Tunggu sebentar lalu coba lagi.", offline: "Tidak ada internet. Diagnosis butuh sinyal; foto kamu tetap aman di HP.",
         exhausted: "Sudah semua", newPlan: "Rencana baru siap.", photos: "foto", videoBtn: "🎥 Atau rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar terbaik diambil otomatis)", videoBig: "Videonya terlalu besar. Rekam 5–10 detik saja.", videoBad: "Videonya tidak bisa dibaca. Coba rekam ulang 5–10 detik atau ambil foto saja.", videoShort: "Videonya terlalu pendek. Rekam 5–10 detik.", videoLong: "Videonya terlalu panjang. Rekam 5–10 detik saja.", recBad: "Rekaman suaranya tidak bisa dibaca. Rekam ulang atau ketik masalahnya.", badFile: "Berkas itu bukan foto. Pilih foto JPG, PNG, atau HEIC.", unreadPhoto: "Foto itu tidak bisa dibaca. Coba foto JPG atau PNG.", bigFile: "Berkasnya terlalu besar. Coba foto yang lebih kecil.", emptyFile: "Berkasnya kosong. Coba ambil lagi.", tooLong: "Teksnya terlalu panjang. Persingkat dulu." },
   en: { hero: "What's broken?", ownTitle: "Or check your own", heroSub: "Snap it, say what's wrong, get a step-by-step repair guide.", takePhoto: "Take photos (1–3)",
         catMotor: "Motorbike", catPump: "Water pump", catAppliance: "Home appliance", catPlumbing: "Pipes/taps", catOther: "Other",
@@ -43,7 +43,7 @@ const T = {
         findService: "Find a service centre nearby", emergency: "Emergency (fire, smoke, strong gas smell): call 112.", copied: "Link copied", openW: "Reasoning: Muse Spark Open (open weights)", demo: "Offline sample mode: pre-written sample answers, no Meta API calls.",
         green: "SAFE", amber: "CAUTION", red: "STOP", pass: "✅ Step looks right", fail: "⚠️ Not quite", checking: "Checking photo…",
         verified: "steps verified by camera", allChecked: "All steps checked by the camera. Does it work again?", recording: "Recording…", recorded: "Voice recorded ✓", micErr: "Microphone unavailable. Please type the problem.",
-        netErr: "Connection lost. Check your signal and try again.", srvErr: "The server had a problem. Try again in a moment.", offline: "You are offline. Diagnosis needs a signal; your photos stay on your phone.",
+        netErr: "Connection lost. Check your signal and try again.", srvErr: "The server had a problem. Try again in a moment.", busyErr: "The server is busy. Wait a moment and try again.", offline: "You are offline. Diagnosis needs a signal; your photos stay on your phone.",
         exhausted: "All tried", newPlan: "New plan ready.", photos: "photos", videoBtn: "🎥 Or record a 5–10 s video", videoOk: "Video ready ✓ (the 3 sharpest frames are picked for you)", videoBig: "That video is too big. Record 5–10 seconds.", videoBad: "That video could not be read. Record 5–10 seconds again, or take photos instead.", videoShort: "That video is too short. Record 5–10 seconds.", videoLong: "That video is too long. Record 5–10 seconds only.", recBad: "That voice recording could not be read. Record again or type the problem.", badFile: "That file is not a photo. Pick a JPG, PNG or HEIC picture.", unreadPhoto: "That photo could not be read. Try a JPG or PNG.", bigFile: "That file is too big. Try a smaller photo.", emptyFile: "That file is empty. Take it again.", tooLong: "That text is too long. Shorten it a little." },
 };
 // Basa Jawa (ngoko, as spoken around Semarang). Falls back to Bahasa Indonesia for any key not listed.
@@ -70,7 +70,7 @@ T.jv = Object.assign({}, T.id, {
   demo: "Mode conto offline: wangsulan conto sing wis ditulis, tanpa nyeluk Meta API.",
   green: "AMAN", amber: "ATI-ATI", red: "MANDHEG", pass: "✅ Langkah iki wis bener", fail: "⚠️ Durung pas", checking: "Mriksa foto…",
   verified: "langkah wis dicek kamera", allChecked: "Kabeh langkah wis dicek kamera. Wis urip maneh?", recording: "Ngrekam…", recorded: "Swara kerekam ✓", micErr: "Mikrofon ora bisa dienggo. Ketik wae masalahe.",
-  netErr: "Sambungan megat. Priksa sinyal banjur coba maneh.", srvErr: "Server lagi ana masalah. Coba maneh sedhela engkas.", offline: "Ora ana internet. Diagnosis butuh sinyal; fotomu tetep aman ing HP.",
+  netErr: "Sambungan megat. Priksa sinyal banjur coba maneh.", srvErr: "Server lagi ana masalah. Coba maneh sedhela engkas.", busyErr: "Server lagi rame. Ngenteni sedhela banjur jajal maneh.", offline: "Ora ana internet. Diagnosis butuh sinyal; fotomu tetep aman ing HP.",
   exhausted: "Wis kabeh dijajal", newPlan: "Rencana anyar wis siap.", photos: "foto", videoBtn: "🎥 Utawa rekam video 5–10 detik", videoOk: "Video siap ✓ (3 gambar paling cetha dijupuk otomatis)", videoBig: "Videone kegedhen. Rekam 5–10 detik wae.", videoBad: "Videone ora bisa diwaca. Rekam maneh 5–10 detik utawa jupuk foto wae.", videoShort: "Videone cendhak banget. Rekam 5–10 detik.", videoLong: "Videone dawa banget. Rekam 5–10 detik wae.", recBad: "Rekaman swarane ora bisa diwaca. Rekam maneh utawa ketik masalahe.", badFile: "Berkas iku dudu foto. Pilih foto JPG, PNG, utawa HEIC.", unreadPhoto: "Foto iku ora bisa diwaca. Jajal foto JPG utawa PNG.", bigFile: "Berkase kegedhen. Jajal foto sing luwih cilik.", emptyFile: "Berkase kosong. Jupuk maneh.", tooLong: "Tulisane kepanjangen. Cekak-ana dhisik.",
 });
 
@@ -97,9 +97,11 @@ const T_EXTRA = {
         agCode: "kode", elapsed: "{n} dtk", qYes: "Ya", qNo: "Tidak", qUnsure: "Tidak tahu",
         tourProgress: "Demo: AI sedang bekerja. Tiap baris = satu model Meta atau aturan keselamatan.", tourAsk: "AI belum yakin, jadi ia bertanya. Ketuk salah satu jawaban.",
         tourResult: "Lihat bagian yang ditandai SAM 3.1 dan log 'Yang dilakukan AI'. Lalu centang daftar keselamatan untuk membuka langkah 1.",
-        tourCheck: "Coba 'Cek langkah ini' dengan foto contoh: foto gelap ditolak, foto benar lolos.",
+        tourCheck: "Coba 'Cek langkah ini' dengan foto contoh: foto gelap ditolak, foto cop busi dicek di langkah yang ditunjukkannya.",
         tourStuck: "Lalu ketuk 'Masih rusak' di bawah untuk melihat AI menyusun ulang rencananya.", tourClose: "Tutup", tourTip: "Tampilkan tip", tourHide: "Kecilkan tip",
-        sampleTry: "Belum punya foto? Coba foto contoh:", sampleBad: "📷 Foto gelap ✗", sampleGood: "📷 Foto benar ✓",
+        sampleTry: "Belum punya foto? Coba foto contoh:", sampleBad: "📷 Foto contoh: terlalu gelap", sampleGood: "📷 Foto contoh: {what}",
+        sw_motor: "cop busi terpasang", sw_pump: "lubang pancingan terbuka", sw_tire: "paku sudah dicabut", sw_faucet: "mulut kran kering", sw_rice: "rice cooker dari depan",
+        sampleFor: "Foto contoh ini dicek untuk langkah {n}, langkah yang ditunjukkan fotonya.", sampleForLast: "Foto contoh ini dicek untuk langkah terakhir ({n}).",
         howLabel: "Cara kerjanya", partsAlt: "Foto dengan bagian yang ditandai", pv_title: "Temuan sejauh ini", pv_seen: "👁️ Terlihat: {object}", pv_parts: "🎯 SAM 3.1 menandai {found} dari {of} bagian", pv_cause: "🧠 Paling mungkin: {cause} ({conf}%)", pv_steps: "📋 {n} langkah siap", pv_img: "Foto dengan bagian yang ditandai SAM 3.1", agJump: "Tunjukkan di layar" },
   jv: { demoBtn: "▶ Jajal demo sak tutulan", demoSub: "Tanpa foto, tanpa akun: delengen AI ndandani motor mogok saka wiwitan nganti dicek kamera.",
         how1: "📷 Foto + crita", how2: "🎯 AI nandhani perangane", how3: "✅ Saben langkah dicek kamera",
@@ -122,9 +124,11 @@ const T_EXTRA = {
         agCode: "kode", elapsed: "{n} dtk", qYes: "Iya", qNo: "Ora", qUnsure: "Ora ngerti",
         tourProgress: "Demo: AI lagi nyambut gawe. Saben baris = siji model Meta utawa aturan keslametan.", tourAsk: "AI durung yakin, mula takon. Tutul salah siji wangsulan.",
         tourResult: "Delengen perangan sing ditandhani SAM 3.1 lan log 'Sing ditindakake AI'. Banjur centhang dhaptar keslametan kanggo mbukak langkah 1.",
-        tourCheck: "Jajal 'Priksa langkah iki' nganggo foto conto: foto peteng ditolak, foto bener lolos.",
+        tourCheck: "Jajal 'Priksa langkah iki' nganggo foto conto: foto peteng ditolak, foto cop busi dipriksa ing langkah sing dituduhake.",
         tourStuck: "Banjur tutul 'Isih rusak' ing ngisor kanggo ndeleng AI nyusun rencana anyar.", tourClose: "Tutup", tourTip: "Tampilake pitutur", tourHide: "Cilikna pitutur",
-        sampleTry: "Durung duwe foto? Jajal foto conto:", sampleBad: "📷 Foto peteng ✗", sampleGood: "📷 Foto bener ✓",
+        sampleTry: "Durung duwe foto? Jajal foto conto:", sampleBad: "📷 Foto conto: kepetengen", sampleGood: "📷 Foto conto: {what}",
+        sw_motor: "cop busi kepasang", sw_pump: "bolongan pancingan kebukak", sw_tire: "paku wis dicabut", sw_faucet: "cangkem kran garing", sw_rice: "rice cooker saka ngarep",
+        sampleFor: "Foto conto iki dipriksa kanggo langkah {n}, langkah sing dituduhake fotone.", sampleForLast: "Foto conto iki dipriksa kanggo langkah pungkasan ({n}).",
         howLabel: "Carane makarya", partsAlt: "Foto karo perangan sing ditandhani", pv_title: "Temuan nganti saiki", pv_seen: "👁️ Katon: {object}", pv_parts: "🎯 SAM 3.1 nandhani {found} saka {of} perangan", pv_cause: "🧠 Sing paling mungkin: {cause} ({conf}%)", pv_steps: "📋 {n} langkah wis siyap", pv_img: "Foto karo perangan sing ditandhani SAM 3.1", agJump: "Tuduhna ing layar" },
   en: { demoBtn: "▶ Try the 1-tap demo", demoSub: "No photo, no account: watch the AI fix a bike that won't start, right up to the camera check.",
         how1: "📷 Snap + say it", how2: "🎯 AI marks the part", how3: "✅ Every step camera-checked",
@@ -147,9 +151,11 @@ const T_EXTRA = {
         agCode: "code", elapsed: "{n} s", qYes: "Yes", qNo: "No", qUnsure: "Not sure",
         tourProgress: "Demo: the AI is working. Each line is one Meta model or safety rule.", tourAsk: "The AI isn't sure, so it asks. Tap an answer.",
         tourResult: "See the parts SAM 3.1 outlined and the 'What the AI did' log. Then tick the safety list to unlock step 1.",
-        tourCheck: "Try 'Check this step' with a sample photo: the dark one is rejected, the right one passes.",
+        tourCheck: "Try 'Check this step' with the sample photos: the dark one is rejected, the plug cap one is checked on the step it shows.",
         tourStuck: "Then tap 'Still broken' below to watch the AI re-plan.", tourClose: "Close", tourTip: "Show tip", tourHide: "Minimise tip",
-        sampleTry: "No photo yet? Try a sample photo:", sampleBad: "📷 Dark photo ✗", sampleGood: "📷 Right photo ✓",
+        sampleTry: "No photo yet? Try a sample photo:", sampleBad: "📷 Sample photo: too dark", sampleGood: "📷 Sample photo: {what}",
+        sw_motor: "plug cap on", sw_pump: "priming hole open", sw_tire: "nail pulled out", sw_faucet: "dry spout", sw_rice: "rice cooker, front",
+        sampleFor: "Checking step {n} with this sample photo: it is the step the photo shows.", sampleForLast: "Checking the last step ({n}) with this sample photo.",
         howLabel: "How it works", partsAlt: "Photo with the parts highlighted", pv_title: "Found so far", pv_seen: "👁️ Seen: {object}", pv_parts: "🎯 SAM 3.1 outlined {found} of {of} parts", pv_cause: "🧠 Most likely: {cause} ({conf}%)", pv_steps: "📋 {n} steps ready", pv_img: "Your photo with the parts SAM 3.1 outlined", agJump: "Show it on screen" },
 };
 /* I18N_EXTRA:end */
@@ -157,19 +163,19 @@ const T_EXTRA = {
 
 /* I18N_REPLAY:start (recorded demo when the server sleeps). api/tests/test_replay.py checks all three. */
 const T_REPLAY = {
-  id: { rpBadge: "▶ Demo rekaman: jawaban asli Meta API, 5 Nov 2026, diputar tanpa server", rpWake: "Server sedang bangun (hosting gratis, bisa sampai 1 menit). Tombol demo langsung memutar demo rekaman.",
+  id: { rpBadge: "▶ Demo rekaman: jawaban asli Meta API, 6 Nov 2026, diputar tanpa server", rpWake: "Server sedang bangun (hosting gratis, bisa sampai 1 menit). Tombol demo langsung memutar demo rekaman.",
         rpOwnPhoto: "Demo rekaman hanya bisa memutar dua foto contoh. Foto kamu sendiri perlu server live: muat ulang halaman sebentar lagi.",
         rpOnlyDemo: "Demo rekaman hanya berisi contoh motor. Untuk foto sendiri atau contoh lain, muat ulang saat server sudah bangun.",
         rpNoLive: "Bagian ini perlu server live; demo rekaman tidak bisa melakukannya.", rpNoMore: "Demo rekaman hanya punya satu rencana ulang.",
         planOf: "🔁 Rencana {n} dari {m}: {cause}", triedMark: "sudah dicoba", stopHead: "Dihentikan demi keselamatan", deskNote: "Dibuat untuk HP: buka halaman ini di HP untuk kamera, suara, dan cek langkah.",
         thumbCap: "Foto contoh (dibuat AI). Bagian yang ditandai SAM 3.1" },
-  jv: { rpBadge: "▶ Demo rekaman: wangsulan asli Meta API, 5 Nov 2026, diputer tanpa server", rpWake: "Server lagi tangi (hosting gratis, bisa nganti 1 menit). Tombol demo langsung muter demo rekaman.",
+  jv: { rpBadge: "▶ Demo rekaman: wangsulan asli Meta API, 6 Nov 2026, diputer tanpa server", rpWake: "Server lagi tangi (hosting gratis, bisa nganti 1 menit). Tombol demo langsung muter demo rekaman.",
         rpOwnPhoto: "Demo rekaman mung bisa muter loro foto conto. Fotomu dhewe butuh server live: muat maneh kaca iki sedhela engkas.",
         rpOnlyDemo: "Demo rekaman mung isi conto motor. Kanggo foto dhewe utawa conto liya, muat maneh yen server wis tangi.",
         rpNoLive: "Bagean iki butuh server live; demo rekaman ora bisa nindakake.", rpNoMore: "Demo rekaman mung duwe siji rencana anyar.",
         planOf: "🔁 Rencana {n} saka {m}: {cause}", triedMark: "wis dijajal", stopHead: "Dimandhegake supaya slamet", deskNote: "Digawe kanggo HP: bukak kaca iki ing HP kanggo kamera, swara, lan cek langkah.",
         thumbCap: "Foto conto (digawe AI). Bagean sing ditandhani SAM 3.1" },
-  en: { rpBadge: "▶ Recorded demo: real Meta API answers from 5 Nov 2026, played back without a server", rpWake: "The server is waking up (free hosting, up to a minute). The demo button plays a recorded run right away.",
+  en: { rpBadge: "▶ Recorded demo: real Meta API answers from 6 Nov 2026, played back without a server", rpWake: "The server is waking up (free hosting, up to a minute). The demo button plays a recorded run right away.",
         rpOwnPhoto: "The recorded demo can only play the two sample photos. Your own photo needs the live server: reload the page in a moment.",
         rpOnlyDemo: "The recorded demo only has the motorbike sample. For your own photo or another sample, reload once the server is awake.",
         rpNoLive: "This part needs the live server; the recorded demo can't do it.", rpNoMore: "The recorded demo has only one re-plan.",
@@ -404,7 +410,7 @@ const SERVER_MSGS = [
   [/unsupported file type/i, "badFile"], [/could not read that (photo|frame)/i, "unreadPhoto"], [/file too large/i, "bigFile"],
   [/empty file/i, "emptyFile"], [/video is too short/i, "videoShort"], [/video is too long/i, "videoLong"],
   [/could not read that video/i, "videoBad"], [/could not read the recording/i, "recBad"], [/too long/i, "tooLong"], [/describe the problem by voice or text/i, "needDesc"],
-  [/take or upload a photo/i, "needPhoto"],
+  [/take or upload a photo/i, "needPhoto"], [/^too many requests|rate limit/i, "busyErr"],
 ];
 function localServerMsg(m) {
   const hit = SERVER_MSGS.find(([re]) => re.test(m));
@@ -722,6 +728,8 @@ function render(s) {
   renderStep(); renderVerified(); renderOutcome();
   const sharedPage = !!document.body.dataset.sid && !document.body.dataset.sid.startsWith("{{");
   if ($("sampleCheckBox")) $("sampleCheckBox").classList.toggle("hidden", !s.sample || sharedPage);
+  // the sample after-photo shows one thing (the plug cap pushed on, the nail pulled out...): the button says what
+  if ($("sampleGood") && s.sample) $("sampleGood").textContent = t("sampleGood").replace("{what}", t("sw_" + s.sample));
   updateTour();
 }
 
@@ -784,6 +792,7 @@ function renderStep() {
   $("prevBtn").disabled = stepIdx === 0; $("nextBtn").disabled = stepIdx === S.plan.steps.length - 1;
   const c = (S.checks || {})[String(st.n)];
   if (c && c.tries && c.tries.length) showCheck(c.tries[c.tries.length - 1]); else $("checkResult").classList.add("hidden");
+  if ($("sampleNote")) $("sampleNote").classList.toggle("hidden", sampleNoteStep !== st.n);  // the note belongs to its step
   if (live.last && live.last.step !== st.n) { live.last = null; drawLive(null); liveSay("liveAim", ""); }
   if ($("handsFree").checked && !$("stepCard").classList.contains("locked")) play();
 }
@@ -1456,8 +1465,28 @@ function updateTour() {
   if (tg) { tg.setAttribute("aria-expanded", String(!tour.collapsed)); tg.setAttribute("aria-label", t(tour.collapsed ? "tourTip" : "tourHide")); tg.title = tg.getAttribute("aria-label"); }
   const x = $("tourClose"); if (x) { x.setAttribute("aria-label", t("tourClose")); x.title = t("tourClose"); }
 }
+// "Sample photo: plug cap on" shows ONE step, so it is checked on that step (S.sample_step, picked by the server in
+// api/sample_step.py, or the step stored with the recording), not on whatever step is open: on "turn the key off" a
+// correct model must say "not quite". The step card moves there and a line says which step is checked. The dark
+// photo is a bad photo of anything, so it is checked on the step that is open.
+let sampleNoteStep = null;
+function sampleTarget(kind) {
+  const ss = S && S.sample_step, steps = (S && S.plan && S.plan.steps) || [];
+  if (kind !== "ok" || !ss || !steps.length) return null;
+  const i = steps.findIndex((x) => x.n === ss.n);
+  return i < 0 ? null : { i, n: ss.n, shows: !!ss.shows };
+}
 async function sampleCheck(kind) {
   if (!S || !S.sample) return;
+  const tg = sampleTarget(kind);
+  sampleNoteStep = tg ? tg.n : null;
+  if (tg && tg.i !== stepIdx) { stepIdx = tg.i; renderStep(); }
+  const note = $("sampleNote");
+  if (note) {
+    note.textContent = tg ? fillT(tg.shows ? "sampleFor" : "sampleForLast", { n: tg.n }) : "";
+    note.classList.toggle("hidden", !tg);
+  }
+  if (tg && $("stepCard")) $("stepCard").scrollIntoView({ block: "nearest", behavior: "smooth" });
   try {
     const r = await fetch(`/api/demo/check-photo/${kind}?sample=${encodeURIComponent(S.sample)}`);
     if (!r.ok) throw new Error(r.statusText);

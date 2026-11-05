@@ -1,5 +1,6 @@
 """Recorded demo in real Chromium: with the server unreachable, the 1-tap demo still runs end to end from
 web/replay/demo.json, clearly labelled, and never fakes an answer for the visitor's own photo."""
+import json
 from pathlib import Path
 
 import pytest
@@ -8,6 +9,24 @@ pytest.importorskip("playwright.sync_api")
 from api.tests.test_playwright_smoke import page, server  # noqa: E402,F401  (pytest fixtures)
 
 FIX = Path(__file__).parent / "fixtures"
+DEMO = json.loads((Path(__file__).resolve().parents[2] / "web" / "replay" / "demo.json").read_text(encoding="utf-8"))
+
+
+def _sample_step(lang, plan="0"):
+    """The step the recording checks the plug cap sample photo on, and how many steps that plan has."""
+    L = DEMO["langs"][lang]
+    steps = (L["ready"]["session"] if plan == "0" else L["replan"]["set"])["plan"]["steps"]
+    return L["sample_step"][plan]["n"], len(steps)
+
+
+def _sample_photo_passes_on_its_step(page, lang, word):
+    """'Sample photo: plug cap on' moves the step card to the step the photo shows, says so, and passes there."""
+    n, total = _sample_step(lang)
+    page.click("#sampleGood")
+    page.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
+    assert page.inner_text("#stepNo").strip() == str(n)
+    assert page.is_visible("#sampleNote") and word in page.inner_text("#sampleNote") and str(n) in page.inner_text("#sampleNote")
+    return n, total
 
 
 def _api_down(page):
@@ -46,9 +65,10 @@ def test_demo_plays_the_recording_when_the_server_sleeps(page):
     assert page.evaluate("document.querySelector('#partsImg').naturalWidth") > 0   # recorded SAM-marked photo loads
     page.click("#sampleBad")
     page.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('⚠')", timeout=15000)
-    page.click("#sampleGood")
-    page.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
-    assert "1/4" in page.inner_text("#verifiedCount")
+    assert page.inner_text("#stepNo").strip() == "1"                      # the dark photo is checked on the open step
+    assert "plug cap" in page.inner_text("#sampleGood")                    # the button says what the photo shows
+    n, total = _sample_photo_passes_on_its_step(page, "en", "Checking step")
+    assert f"1/{total}" in page.inner_text("#verifiedCount")
     assert page.get_attribute("#pdfBtn", "href") == "/static/replay/report-en.pdf"
     assert not page.is_visible("#workshopBtn")                            # not recorded: hidden, not faked
     page.fill("#stuckText", "tried it, still dead")
@@ -57,7 +77,7 @@ def test_demo_plays_the_recording_when_the_server_sleeps(page):
     log = page.inner_text("#agent")
     for bit in ("muse-spark-1.3", "sam-3.1", "not yet", "correct", "Still broken: new"):
         assert bit in log, bit
-    assert "Fouled spark plug" in page.inner_text("#result")
+    assert DEMO["langs"]["en"]["replan"]["set"]["plan"]["cause_title"] in page.inner_text("#result")  # the recorded plan 2
 
 
 def test_own_photo_is_never_faked_in_the_recording(page):
@@ -74,7 +94,6 @@ def test_forced_replay_sends_nothing_to_the_server(page):
     page.on("request", lambda r: sent.append(r.url) if "/api/" in r.url else None)
     page.goto(page.base + "/?replay=1")
     _run_demo(page, "jv")
-    page.click("#sampleGood")
-    page.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('✅')", timeout=15000)
+    _sample_photo_passes_on_its_step(page, "jv", "langkah")
     assert not sent, sent
     assert "rekaman" in page.inner_text("#modeBadge").lower()

@@ -261,14 +261,14 @@ def test_agent_log_lines_jump_to_what_they_describe(page):
         b.check()
     page.click("#sampleBad")
     page.wait_for_function("() => document.querySelector('#checkResult').textContent.includes('⚠')", timeout=15000)
-    page.click("#sampleGood")
-    page.wait_for_function("() => document.querySelector('#stepNo').textContent.trim() === '2'", timeout=15000)  # auto-advance
+    page.click("#sampleGood")   # the plug cap photo is checked on the step it shows: step 3 of the offline plan
+    page.wait_for_function("() => document.querySelector('#stepNo').textContent.trim() === '4'", timeout=15000)  # auto-advance
     page.locator("#agent .agGo", has_text="Outlined").click()
     page.wait_for_selector("#partsWrap.flash", timeout=15000)
     assert _in_view(page, "#partsWrap")
-    page.locator("#agent .agGo", has_text="Step 1 checked").first.click()
+    page.locator("#agent .agGo", has_text="Step 3 checked").first.click()
     page.wait_for_selector("#stepCard.flash", timeout=15000)
-    page.wait_for_function("() => document.querySelector('#stepNo').textContent.trim() === '1'", timeout=15000)
+    page.wait_for_function("() => document.querySelector('#stepNo').textContent.trim() === '3'", timeout=15000)
     assert _in_view(page, "#stepCard")
     assert page.get_attribute("#agent .agGo", "title") == "Show it on screen"
     page.wait_for_function("() => document.activeElement && document.activeElement.id === 'stepCard'",

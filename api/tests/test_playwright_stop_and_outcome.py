@@ -9,11 +9,13 @@
 - The 1-tap demo got stuck on "No connection" when the page had loaded but the server then stopped answering;
   it now plays the recorded demo.
 """
+import json
 from pathlib import Path
 
 import pytest
 
 FIX = Path(__file__).parent / "fixtures"
+DEMO = Path(__file__).resolve().parents[2] / "web" / "replay" / "demo.json"
 pytest.importorskip("playwright.sync_api")
 from api.tests.test_playwright_smoke import page, server  # noqa: E402,F401  (pytest fixtures)
 
@@ -90,7 +92,9 @@ def test_demo_plays_the_recording_when_the_server_stops_answering(page):
     assert page.inner_text("#formErr").strip() == ""
     page.click('#quickAns button[data-q="qYes"]')
     page.wait_for_selector("#result:not(.hidden)", timeout=30000)
-    assert "70%" in page.inner_text("#dxCauses")           # the recording has the answer-aware demo diagnosis
+    top = json.loads(DEMO.read_text(encoding="utf-8"))["langs"]["en"]["ready"]["session"]["diagnosis"]["causes"][0]
+    assert f"{top['confidence']}%" in page.inner_text("#dxCauses")   # the recorded diagnosis after the answer
+    assert top["title"] in page.inner_text("#dxCauses")
 
 
 def test_shared_guide_shows_the_outcome_read_only(page):

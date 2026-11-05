@@ -154,7 +154,8 @@
       <label class="btn primary big" id="stepPhotoLabel"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-camera"></use></svg><span data-t="checkStep">Cek langkah ini</span>
         <input id="stepPhoto" type="file" accept="image/*" capture="environment" class="pick"></label>
       <p id="sampleCheckBox" class="small sampleCheck hidden" data-testid="sample-check"><span data-t="sampleTry">Belum punya foto? Coba foto contoh:</span>
-        <button id="sampleBad" class="btn" type="button" data-t="sampleBad">📷 Foto gelap ✗</button> <button id="sampleGood" class="btn" type="button" data-t="sampleGood">📷 Foto benar ✓</button></p>
+        <button id="sampleBad" class="btn" type="button" data-t="sampleBad">📷 Foto contoh: terlalu gelap</button> <button id="sampleGood" class="btn" type="button">📷 Foto contoh: cop busi terpasang</button></p>
+      <p id="sampleNote" class="small sampleNote hidden" data-testid="sample-note" aria-live="polite"></p>
       <button id="liveBtn" class="btn" type="button" aria-pressed="false"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-scan-eye"></use></svg><span data-t="liveGuide">Panduan kamera langsung</span></button>
       <div id="live" class="live hidden" data-testid="live-guide">
         <div class="liveView"><video id="liveVideo" playsinline muted autoplay></video><canvas id="liveCanvas" aria-hidden="true"></canvas></div>

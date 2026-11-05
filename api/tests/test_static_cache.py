@@ -13,7 +13,7 @@ client = TestClient(app)
     ("/static/fonts/barlow-condensed-800.woff2", LONG_CACHE),
     ("/static/icons/icon-192.png", DAY_CACHE),
     ("/static/demo-thumb.jpg", DAY_CACHE),
-    ("/static/replay/files/photo1.jpg", DAY_CACHE),
+    ("/static/replay/files/id/photo1.jpg", DAY_CACHE),
     ("/static/vendor/qrcode.js", DAY_CACHE),
     ("/static/app.js", REVALIDATE),
     ("/static/style.css", REVALIDATE),

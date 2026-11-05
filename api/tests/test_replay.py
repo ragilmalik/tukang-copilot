@@ -48,10 +48,10 @@ def test_no_live_session_ids_or_server_paths_leak_into_the_recording():
 
 
 def test_every_recorded_picture_exists_and_is_served():
-    names = set()
-    for L in DATA["langs"].values():
+    for lang, L in DATA["langs"].items():
+        names = set()
         for snap in L["ask"]["snaps"] + L["ready"]["snaps"]:
-            assert snap["files_base"] == "/static/replay/files/"
+            assert snap["files_base"] == f"/static/replay/files/{lang}/"
         s = L["ready"]["session"]
         names |= {s["parts_image"], *s["photos"], *(p["image"] for p in s["parts"].values() if p.get("image"))}
         for plan in L["checks"].values():
@@ -59,8 +59,8 @@ def test_every_recorded_picture_exists_and_is_served():
                 for kind in ("ok", "dark"):
                     for tries in rec[kind]["delta"]["merge"].get("checks", {}).values():
                         names |= {t["photo"] for t in tries["tries"]}
-    for n in names:
-        assert (REPLAY / "files" / n).is_file(), n
+        for n in names:
+            assert (REPLAY / "files" / lang / n).is_file(), (lang, n)
     for url in DATA["assets"][:5] + ["/static/replay/demo.json", "/static/replay.js", "/static/replay/report-en.pdf"]:
         assert c.get(url).status_code == 200, url
     assert all(not a.endswith(".pdf") for a in DATA["assets"])          # PDFs are not pre-cached on the phone
@@ -106,3 +106,26 @@ def test_replay_strings_in_all_three_languages():
     from datetime import date
     label = f"{date.fromisoformat(day).day} Nov {day[:4]}"
     assert all(label in keys[lang]["rpBadge"] for lang in ("id", "jv", "en")), label
+
+
+def test_recording_ships_no_duplicate_pictures() -> None:
+    """The service worker downloads every recorded picture on install, on mobile data. The step-check photos used to be
+    copied once per step and plan (70 identical files, about 5 MB); one copy per kind and language is enough."""
+    import hashlib
+
+    data = json.loads((REPLAY / "demo.json").read_text(encoding="utf-8"))
+    files = [REPLAY / u.split("/static/replay/", 1)[1] for u in data["assets"]]
+    digests = [hashlib.md5(f.read_bytes()).hexdigest() for f in files]
+    dupes = len(digests) - len(set(digests))
+    assert dupes <= 6, f"{dupes} duplicate pictures in web/replay"  # check_ok/check_dark: one per language, plus the top-level pair
+    assert sum(f.stat().st_size for f in files) < 4_500_000
+
+
+def test_sample_photo_is_checked_on_the_step_it_shows_and_passes_there() -> None:
+    """The 1-tap demo's 'Sample photo: plug cap on' is checked on the step it shows (sample_step, stored per plan),
+    and the live model passed it there: the demo never shows a fail on its own 'good' photo."""
+    for lang, L in DATA["langs"].items():
+        assert L["ready"]["session"]["sample_step"] == L["sample_step"]["0"]
+        assert L["replan"]["set"]["sample_step"] == L["sample_step"]["1"]
+        for plan, ss in L["sample_step"].items():
+            assert L["checks"][plan][str(ss["n"])]["ok"]["response"]["passed"] is True, (lang, plan, ss)
