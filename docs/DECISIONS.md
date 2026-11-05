@@ -18,7 +18,7 @@ Judges get one URL. There is no build step, no CORS, no second deploy, and less 
 
 **D8. Safety enforced in code, in three layers, on top of the prompts.** A model can ignore a prompt; it can't ignore a regex gate. False positives (e.g. "gas" in "gas pedal") are acceptable: the user can rephrase, and refusing is the safe way to fail.
 
-**D9. Offline sample mode is the same engine with mock answers.** The tests and the "Try a sample" links run the real code. A Meta API test double also tests the real HTTP client.
+**D9. Offline sample mode is the same engine with pre-written sample answers.** The tests and the "Try a sample" links run the real code. A Meta API test double also tests the real HTTP client.
 
 **D10. Standard-mode model ids only.** Contributor mode is cheaper, but it lets Meta train on users' photos. I won't accept that for a household app.
 

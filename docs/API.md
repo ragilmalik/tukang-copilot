@@ -7,7 +7,7 @@ Base: `http://localhost:8000` (or your Render URL). All responses JSON unless no
 curl localhost:8000/health
 ```
 ```json
-{"ok":true,"version":"1.0.0","mode":"mock","meta_api_key":false,"open_weights":false,
+{"ok":true,"version":"1.0.0","mode":"offline","meta_api_key":false,"open_weights":false,
  "models":{"listen":"muse-voice-transcribe-1.0","listen_javanese":"muse-spark-1.2","look":"muse-spark-1.3","segment":"sam-3.1",
            "diagnose":"muse-spark-1.3","plan":"muse-spark-1.3","illustrate":"muse-image-1.0","verify":"muse-spark-1.3"}}
 ```

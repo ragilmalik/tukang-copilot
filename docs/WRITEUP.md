@@ -102,4 +102,4 @@ I built everything here alone during the hackathon.
    for help.
 4. A self-hosted Muse Spark Open deployment for an SMK (vocational school) workshop or a bengkel co-op.
 
-Repo: [GITHUB_URL] · Live: [LIVE_URL] · Video: [YOUTUBE_URL]
+Repo: https://github.com/ragilmalik/tukang-copilot · Live: [LIVE_URL] · Video: [YOUTUBE_URL]

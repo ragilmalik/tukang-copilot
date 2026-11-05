@@ -7,7 +7,7 @@ water pump scenario, and an axe-core accessibility pass on every main screen. Wh
 
 | When | What | Why |
 |---|---|---|
-| Nov 2026 | First live run on the real Meta API, then the same eval on real Semarang photos (50 photos, 5 object types) with expected parts and causes; track SAM hit rate and top-1 diagnosis accuracy | Honest accuracy numbers |
+| Nov 2026 | The first live run on the real Meta API is done (5 Nov 2026, [EVAL.md](EVAL.md)). Next: the same eval on real Semarang photos (50 photos, 5 object types) with expected parts and causes; track SAM hit rate and top-1 diagnosis accuracy | Honest accuracy numbers |
 | Nov 2026 | Connect the WhatsApp channel to a real number and run the user trials there | Where Indonesians already are |
 | Nov 2026 | Fan, washing machine and bicycle scenarios, plus prompt tuning | Most common household faults |
 | Dec 2026 | Realtime Voice Transcribe over WebSocket for the live camera guide, and SAM video tracking instead of one frame a second | Smoother hands-free repairs |

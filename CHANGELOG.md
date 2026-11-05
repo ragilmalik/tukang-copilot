@@ -1,6 +1,22 @@
 # Changelog
 
-Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026).
+Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026); 1.30.0 is the live-API run and polish after it.
+
+## 1.30.0 (2026-11-06)
+The first release that ran on the real Meta Model API. Everything in the video, the screenshots and the recorded demo now comes from live answers.
+- Added: live runs of every scenario (docs/LIVE_RUN.md) and what the API actually did (docs/META_API_NOTES.md); the eval has a live column (docs/EVAL.md, results kept in docs/eval); the recorded 1-tap demo is recorded from the live API in all three languages.
+- Fixed (from the live runs): structured calls stream, because a plain call that reasons for more than about 20 s gets a gateway 504; every schema field is listed as required, because the decoder skipped optional ones and SAM got no parts; Muse Image gets one more try at high effort and then low effort after a 504; Meta retries honour Retry-After.
+- Changed: logs scrub secrets (configured keys and anything shaped like a token, tracebacks too), one access line per request with a request id, no query strings or owner text. The canned-answer fallback is off by default. Offline mode is called "offline sample mode" everywhere and `OFFLINE=1` switches it on (`MOCK=1` still works). CORS is off unless `CORS_ORIGINS` names a site, and there is no Server header.
+- Fixed: a red stop's PDF report no longer lists tools and parts to buy (live, the rice cooker stop listed a thermal fuse and a multimeter under the STOP card).
+- Fixed: names from the model start with a capital in the PDF, the mechanic brief, the share card, My garage and WhatsApp, not only in the app heading. A diagnosis without tools or parts no longer fails validation and costs a retry.
+- Fixed: number badges on the marked photo never sit on top of each other (on the live tap photo, badge 2 was hidden under badge 4).
+- Fixed: the follow-up question asks one thing that fits the Yes / No / Not sure buttons (live, the motorbike question asked three things at once).
+- Fixed: the recorded demo shipped 70 identical copies of the two step-check photos, about 5 MB the offline cache downloaded on install; now one copy per language. Offline cache v23.
+- Fixed: the WhatsApp reply in Basa Jawa said "Keamanan" for safety; it says "Keslametan" like the app.
+- Fixed: the 1-tap demo's "Right photo ✓" (a close-up of the plug cap pushed back on) was checked against the step on screen, step 1 "turn the key off", and the live model rightly said "Not quite", so the good sample photo failed on screen. The sample photo is now checked on the step it shows: the server picks it (`sample_step`, api/sample_step.py, matching the step's expected state in all three languages), the recording stores it per plan, the step card moves there and a line says "Checking step N with this sample photo". The buttons say what the photos are ("Sample photo: plug cap on", "Sample photo: too dark"); the dark one is still checked on the open step. `python scripts/record_replay.py --resample` re-picks that step in the committed recording from its own plans and checks, with no model calls. The demo was recorded again from the live API on 6 Nov (01:23 WIB): the follow-up question is one yes/no question in all three languages, and the plug cap photo passes on its step in every plan.
+- Changed: the WhatsApp simulator label reads "Simulator, menjalankan mesin yang sama dengan jawaban contoh offline" (Basa Jawa: "nglakokake mesin sing padha"), matching the English line.
+- Changed: the sample photos are 1600 px with the light sharpening, grain and corner fall-off of a phone camera file, still labelled "Sample photo (AI-generated)" in the corner and in EXIF.
+- Changed: demo video, X clip, screenshots, GIF, link preview image and thumbnail re-made from live answers; the narration uses a more natural voice at an easier pace, and the owners' lines are spoken in Bahasa and Basa Jawa.
 
 ## 1.29.13 (2026-11-04)
 Docs, screenshots and video brought up to date. No app behaviour changed.

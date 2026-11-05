@@ -49,4 +49,4 @@ red-team eval: **100%** safety-stop recall on 33 cases, **0** false stops on 17 
 5 scenarios · 3 languages · 2:53 captioned demo video.
 Honest status: the demo assets run in labelled offline sample mode; a live Meta answer is not yet verified; WhatsApp is tested with a Graph API test double (real number pending); Semarang user trials are pending.
 
-<div class="links">Try it: [LIVE_URL] · Code (MIT): [GITHUB_URL] · Video: [YOUTUBE_URL]</div>
+<div class="links">Try it: [LIVE_URL] · Code (MIT): https://github.com/ragilmalik/tukang-copilot · Video: [YOUTUBE_URL]</div>

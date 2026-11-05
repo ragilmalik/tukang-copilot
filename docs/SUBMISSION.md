@@ -5,7 +5,7 @@ Deadline as published: Wed Nov 4, 2026, 9:00 PM ET = Thu Nov 5, 2026, 09:00 WIB.
 The fields below follow the form's order and use its exact labels. I read the form on 2026-11-01 without typing or
 submitting anything, and no field shows a character limit. Nothing goes in until I click Submit.
 
-Links to fill before pasting: `[GITHUB_URL]` `[LIVE_URL]` `[YOUTUBE_URL]` `[X_POST_URL]`, and `[STATIC_URL]` only if
+Links to fill before pasting: `[LIVE_URL]` `[YOUTUBE_URL]` `[X_POST_URL]`, and `[STATIC_URL]` only if
 the static build is hosted.
 
 ---
@@ -69,7 +69,7 @@ Try it: [LIVE_URL] (tap "Try the 1-tap demo"; no photo needed).
 
 ### 7. Public GitHub Repository*
 ```
-[GITHUB_URL]
+https://github.com/ragilmalik/tukang-copilot
 ```
 Expected: `https://github.com/ragilmalik/tukang-copilot`. The rules say "Repositories must be public", so check it
 opens while logged out.

@@ -20,7 +20,7 @@ built solo in Semarang during the hackathon (first commit 30 Oct 2026).
 |---|---|
 | Live app | [LIVE_URL] |
 | 3-min video | [YOUTUBE_URL] · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) ({{VIDEO_LEN}}, real Meta API answers, captions + voice-over; chapters in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt)) |
-| Code | [GITHUB_URL] (MIT) |
+| Code | https://github.com/ragilmalik/tukang-copilot (MIT) |
 | Live results | [docs/LIVE_RUN.md](docs/LIVE_RUN.md) (seven scenarios on the real API) · [docs/EVAL.md](docs/EVAL.md) (eval with a live column) |
 | For judges | [Judging map](docs/JUDGING_MAP.md) · [Judge FAQ](docs/launch/JUDGE_FAQ.md) · [One-pager PDF](docs/launch/one-pager.pdf) |
 | Write-up | [docs/WRITEUP.md](docs/WRITEUP.md) · form copy: [docs/SUBMISSION.md](docs/SUBMISSION.md) |
@@ -204,6 +204,11 @@ clean on {{MYPY_FILES}} files, ruff clean, and the {{SMOKE}}-check HTTP smoke te
 | [docs/TESTING.md](docs/TESTING.md) and [docs/TEST_REPORT.md](docs/TEST_REPORT.md) | How to test, and the latest full run |
 | [docs/VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md) | Each requirement and its evidence, and what is still unverified |
 | [docs/HOW_TO_USE.md](docs/HOW_TO_USE.md) | Using the app (English + Bahasa) |
+| [docs/TUTORIAL.md](docs/TUTORIAL.md) | First repair from zero: offline run, real models, phone, in 15 minutes |
+| [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) | What happens behind each screen, in plain words, and what is real vs sample |
+| [docs/METHODS.md](docs/METHODS.md) | Methods and implementation: what, where, why and how each part is tested |
+| [docs/TEST_CHECKLIST.md](docs/TEST_CHECKLIST.md) | Automated and manual checks I run before every release |
+| [docs/SUGGESTIONS.md](docs/SUGGESTIONS.md) | Ten improvements I would build next, and why |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Render deploy click by click |
 | [docs/WHATSAPP.md](docs/WHATSAPP.md) | Optional WhatsApp channel: Meta app setup, settings, simulator, tests |
 | [docs/SUBMISSION.md](docs/SUBMISSION.md) and [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md) | Form text field by field, and the steps to submit |

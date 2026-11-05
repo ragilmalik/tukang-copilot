@@ -186,9 +186,20 @@ These came from playing every flow again on a 390x844 phone and a laptop in all 
 
 **Run numbers (2026-11-04, v1.29.13, commit 6ad8f0a):** `make_test_report.py` ALL PASSED: pytest **894 passed, 0 failed, 0 skipped** (961 s, real Chromium in 21 Playwright test files + jsdom), ruff, check_keys --fake, smoke; `mypy api --strict` no issues in 150 files; `smoke_e2e.py` ALL PASSED (69 checks) on a demo-mode server; `run_eval.py` (app 1.29.13): diagnosis 9/9, stop recall and precision 100%, injection 7/7 (offline and test-double), the same results as 1.29.4. Demo video 2:53 (173.5 s by ffprobe, 1920x1080 at 60 fps, scene times unchanged), X clip 43.5 s.
 
+## 5h. v1.30.0: sample step check and the live recording
+
+| Feature | Status | Evidence |
+|---|---|---|
+| "Sample photo: plug cap on" is checked on the step the photo shows (`sample_step` from api/sample_step.py, stored per plan in the recording), the step card moves there and a line says "Checking step N with this sample photo"; "Sample photo: too dark" is checked on the open step | ✅ | `test_sample_step.py`, `test_replay.py`, `test_playwright_replay.py`, `test_playwright_static.py` |
+| In the live recording (6 Nov 2026, 01:23 WIB) the plug cap photo passes on its step in every language and plan: id steps 6 and 5, jv steps 6 and 5, en steps 5 and 4; the dark photo fails on every step | ✅ | `web/replay/demo.json`, `test_replay.py` |
+| The follow-up question asks one yes/no thing (live): id "Apakah suara starter terdengar lemah atau lambat dibanding biasanya?", jv "Sawise distarter bola-bali, knalpot mambu bensin mentah ora?", en "Is there petrol in the tank above empty?" | ✅ | `web/replay/demo.json` |
+| WhatsApp simulator label in Bahasa and Basa Jawa matches the English line ("menjalankan" / "nglakokake mesin ...") | ✅ | `test_playwright_wa.py` |
+
+**Run numbers (2026-11-06, v1.30.0):** pytest without a browser **838 passed, 0 failed** (97 files, one by one), Playwright **127 passed, 0 failed** (22 files, real Chromium), ruff clean, `mypy api --strict` no issues in 162 files, `smoke_e2e.py` ALL PASSED (69 checks) on an `OFFLINE=1` server, `build_static.py` and `--check` OK, `record_replay.py --check` up to date. The live recording cost $0.70 by the app's own meter (pipelines, re-plans and 66 step checks in three languages).
+
 ## 6. What is not verified yet
 
-1. No live Meta model answer has been verified yet (no API key so far; `scripts/set_keys.py` then `scripts/first_live_run.py` is the one-command fix). The real api.meta.ai endpoint was reached and correctly rejected a dummy key (401). Everything else uses a test double built from the documented shapes, so real outputs, latency, error bodies and rate limits are unconfirmed. → `scripts/set_keys.py`, then `deploy_check.py --live`.
+1. Live Meta answers: the sample scenarios ran on the real API on 5 November 2026 (docs/LIVE_RUN.md) and the recorded 1-tap demo was recorded live on 6 November 2026. Real-photo quality is still item 2.
 2. Real-photo quality: SAM hit rate on real bikes/pumps, diagnosis accuracy, step-check judgement, live-tracking quality. → real photos + 5 user trials (docs/USER_TRIAL_KIT.md).
 3. Real phones: rear camera over https (iOS needs playsinline + https), SpeechRecognition with jv-ID, WhatsApp deep link, HEIC upload, TalkBack, airplane mode. So far I've only used headless Chromium and jsdom.
 4. The Render deployment and GitHub CI have not run. The container was only emulated (no Docker on the test machine).

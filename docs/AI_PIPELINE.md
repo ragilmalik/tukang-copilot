@@ -42,7 +42,7 @@ Muse Spark Open (open weights) can take over the two reasoning stages through Ba
 User-facing text is in the chosen language (`{lang_name}`), while SAM phrases and diagram briefs stay in English. No stage gives medical advice or bypasses a safety device, and gas, mains, high voltage, brake hydraulics, fuel and airbags are always red. Prices are labelled estimates in whole rupiah.
 
 ## Cost guard
-`api/cost.py` meters every call (Spark tokens at $1.25/$4.25 per 1M, Muse Image $0.01, SAM $0.0025/image, ASR $0.18/h) and raises `BudgetExceeded` before a call that would pass `MAX_COST_PER_SESSION_USD`. A typical repair in the fake-server run cost $0.008 to $0.024.
+`api/cost.py` meters every call (Spark tokens at $1.25/$4.25 per 1M, Muse Image $0.01, SAM $0.0025/image, ASR $0.18/h) and raises `BudgetExceeded` before a call that would pass `MAX_COST_PER_SESSION_USD`. On the live API (5 Nov 2026) the median repair cost $0.044 and took 83 s from photo to plan; the dearest of the seven runs was $0.072 (a motorbike repair with a re-plan).
 
 ## Demo / offline mode
-With `OFFLINE=1` or no key, `mock.py` answers each stage for three scenarios (motorbike amber with follow-up, faucet green with one diagram, rice cooker red). Step checks fail on dark or blank photos, so I can demo the ⚠️ path.
+With `OFFLINE=1` or no key, `api/pipeline/mock.py` answers each stage with pre-written sample answers for five scenarios (motorbike amber with a follow-up, water pump, faucet green with one diagram, rice cooker red, flat tyre). Step checks fail on dark or blank photos, so I can demo the ⚠️ path.

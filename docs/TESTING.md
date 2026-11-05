@@ -37,7 +37,7 @@ CI (`.github/workflows/ci.yml`) runs the same thing on every push. The browser t
 | `test_jv_register.py` | Basa Jawa stays in ngoko: no "sampeyan", "antosna" or other krama words in the app, PDF or workshop sheets |
 
 ## Recorded demo (v1.24)
-- `python scripts/record_replay.py` re-records `web/replay/` after a change to the mock answers, the session shape or the demo flow; `--check` exits 1 when the recording no longer matches (also a test in `test_replay.py`).
+- `python scripts/record_replay.py` re-records `web/replay/` from the live API (about $0.60) after a change to the prompts, the session shape or the demo flow; `--check` exits 1 when the recording no longer matches (also a test in `test_replay.py`).
 - `test_playwright_replay.py`: with every `/api` call hanging (a sleeping server), the 1-tap demo still runs end to end from the recording and says so on screen. A visitor's own photo is refused instead of faked, and `?replay=1` sends nothing to the server.
 
 ## Meta API test double

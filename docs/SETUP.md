@@ -35,7 +35,7 @@ With this on, diagnosis and planning run on Muse Spark Open (`meta-models/muse-s
 
 [DEPLOY.md](DEPLOY.md) has the Render steps (free plan). Short version: Render → New → Blueprint → repo `ragilmalik/tukang-copilot` → paste `MODEL_API_KEY` (and `BASETEN_API_KEY`) → Apply → wait for Live. Then run `python scripts/deploy_check.py https://<your-app>.onrender.com`; it should say READY, and `--live` also runs real repairs (a few cents). `https://<your-app>/health` says `"mode": "live"` with a key and `"mock"` without one.
 
-If the live API misbehaves during judging, set `OFFLINE` to `1` in Render's Environment. About a minute later the app runs on the recorded demo answers with no spend. Set it back to `0` afterwards.
+If the live API misbehaves during judging, set `OFFLINE` to `1` in Render's Environment. About a minute later the app runs on the pre-written offline sample answers with no spend (the header says so). Set it back to `0` afterwards.
 
 `python scripts/build_static.py` builds `dist-static/`, a server-free copy that plays the recorded demo; `--help` lists hosting steps. WhatsApp setup is in [WHATSAPP.md](WHATSAPP.md) and is optional.
 

@@ -16,7 +16,7 @@ only takes text and links (no file uploads), and every field is written out in d
 | 6 | Phone test over 4G: camera, live camera guide, hands-free, check-my-step, hand-off (WhatsApp opens), PDF, install to home screen | my phone | Every row of the manual QA in docs/TESTING.md ticked | open |
 | 7 | Upload docs/demo/tukang-copilot-demo.mp4 ({{VIDEO_LEN}}) to YouTube with docs/launch/YOUTUBE.md | my YouTube | Opens logged out, under 3:00 | open |
 | 8 | Post on X with docs/demo/tukang-copilot-x-vertical.mp4 ({{VERT_S}} s) and docs/launch/X_THREAD.md | my X | Post link copied | open |
-| 9 | Fill in `[GITHUB_URL]`, `[LIVE_URL]`, `[YOUTUBE_URL]`, `[X_POST_URL]` in README, docs/SUBMISSION.md and docs/launch | nothing | `grep -rn "_URL\]" README.md docs` prints only lines I chose to leave | open |
+| 9 | Fill in `[LIVE_URL]`, `[YOUTUBE_URL]`, `[X_POST_URL]` in README, docs/SUBMISSION.md and docs/launch | nothing | `grep -rn "_URL\]" README.md docs` prints only lines I chose to leave | open |
 | 10 | Submit on Cerebral Valley (account ragilmalika): paste the SUBMISSION.md fields in order | my account | Confirmation shown or emailed | open |
 | 11 | Optional: one real Muse Spark Open run on Baseten before claiming the open-weights prize | Baseten key | Header badge on and a logged repair in docs/LIVE_RUN.md | open |
 | 12 | Optional: real photos and user trials (docs/USER_TRIAL_KIT.md), then `scripts/impact_report.py` | me + testers | docs/IMPACT.md shows real repairs | open |

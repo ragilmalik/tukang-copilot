@@ -65,7 +65,7 @@ Send a photo and a Javanese voice note and you get the marked photo, the diagnos
 I built this solo for the Meta Global AI Developer Hackathon with @cerebral_valley. Free 1-tap demo, no photo needed:
 [LIVE_URL]
 
-Code (MIT): [GITHUB_URL]
+Code (MIT): https://github.com/ragilmalik/tukang-copilot
 Full 3-min demo: [YOUTUBE_URL]
 
 A like or repost helps a lot 🙏

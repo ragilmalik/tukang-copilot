@@ -23,7 +23,7 @@ I built it solo for the Meta Global AI Developer Hackathon (Indie track, Push th
 This recording runs in clearly labelled offline sample mode: AI-generated sample photos and recorded model answers, no API cost.
 
 Try it (1-tap demo, no photo needed): [LIVE_URL]
-Code (MIT): [GITHUB_URL]
+Code (MIT): https://github.com/ragilmalik/tukang-copilot
 
 Chapters
 [paste the chapter block for the cut you upload, from below]
@@ -83,7 +83,7 @@ Tukang Copilot, Meta AI, Muse Spark, SAM 3.1, Segment Anything, Meta Model API, 
 ```
 
 ## Upload checklist
-- [ ] Title option 1, description with [LIVE_URL] and [GITHUB_URL] filled
+- [ ] Title option 1, description with [LIVE_URL] filled (repo link is already in)
 - [ ] Chapters block matching the uploaded cut
 - [ ] English subtitles from the `.srt`
 - [ ] Thumbnail `docs/launch/thumbnail.png`
