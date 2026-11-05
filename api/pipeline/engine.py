@@ -28,6 +28,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, TypeVar, cast
 
+import numpy as np
 from PIL import Image
 from pydantic import BaseModel, ValidationError
 
@@ -307,6 +308,10 @@ def stage_segment(s: dict[str, Any], rep: ObjectReport) -> None:
 
     with ThreadPoolExecutor(max_workers=3) as ex:
         results = list(ex.map(one, rep.components))
+    if not settings.offline:
+        with Image.open(photo) as im:
+            size = im.size
+        results = [clip_to_box(segs, c.prompt_box, size) for c, segs in zip(rep.components, results)]
     found = []
     for i, (c, segs) in enumerate(zip(rep.components, results), 1):
         segs = sorted(segs, key=lambda x: -(x.get("confidence") or 0))
@@ -321,6 +326,34 @@ def stage_segment(s: dict[str, Any], rep: ObjectReport) -> None:
     hit = sum(1 for v in s["parts"].values() if v["found"])
     _event(s, "segment", model=s["models"]["segment"], found=hit, of=len(found), ms=int((time.time() - t0) * 1000))
     _stage(s, "segment", "done", f"{hit}/{len(found)}", int((time.time() - t0) * 1000))
+
+
+def clip_to_box(segs: list[dict[str, Any]], box: list[float] | None, size: tuple[int, int]) -> list[dict[str, Any]]:
+    """Keep each SAM mask near the box Muse Spark put the part in. Live, a thin "spark plug cable" mask once spread
+    over the whole wall behind the bike. Pixels further out than the box plus a generous margin are dropped; a
+    mask with nothing left inside is dropped too. Masks already inside the margin are returned untouched."""
+    if not box or not segs:
+        return segs
+    w, h = size
+    x1, y1, x2, y2 = box
+    mx, my = max(0.08, (x2 - x1) * 0.35), max(0.08, (y2 - y1) * 0.35)
+    l, t = max(0, int((x1 - mx) * w)), max(0, int((y1 - my) * h))
+    r, b = min(w, int((x2 + mx) * w) + 1), min(h, int((y2 + my) * h) + 1)
+    out = []
+    for seg in segs:
+        if seg["left"] >= l and seg["top"] >= t and seg["right"] <= r and seg["bottom"] <= b:
+            out.append(seg)
+            continue
+        full = overlay.full_mask(seg, w, h)
+        keep = np.zeros_like(full)
+        keep[t:b, l:r] = full[t:b, l:r]
+        ys, xs = np.nonzero(keep)
+        if not len(xs):
+            continue
+        nl, nt, nr, nb = int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1
+        out.append({**seg, "left": nl, "top": nt, "right": nr, "bottom": nb, "mask": keep[nt:nb, nl:nr].astype(np.uint8),
+                    "mw": nr - nl, "mh": nb - nt, "clipped": True})
+    return out
 
 
 def box_prompt(size: tuple[int, int], rep: ObjectReport) -> tuple[str, dict[int, str]]:
@@ -780,6 +813,10 @@ def report(sid: str) -> dict[str, Any]:
     plan, dx = s.get("plan") or {}, s.get("diagnosis") or {}
     steps = plan.get("steps", [])
     verified = sum(1 for st in steps if s["checks"].get(str(st["n"]), {}).get("passed"))
+    if s["safety"]["level"] == "red":
+        # A red stop means "don't open it, take it in". The live model still fills tools and parts (a thermal fuse
+        # for a rice cooker), and a shopping list in the owner's PDF would say the opposite of the STOP card.
+        dx = {**dx, "tools": [], "parts": [], "cost_estimate_idr": 0, "shop_cost_estimate_idr": 0, "diy_saving_idr": 0}
     return {"id": sid, "object": (s.get("object_report") or {}).get("object", ""), "problem": dx.get("problem_summary", ""),
             "fix": plan.get("cause_title", ""), "steps_total": len(steps), "steps_verified": verified,
             "tools": dx.get("tools", []), "parts": dx.get("parts", []), "cost_estimate_idr": dx.get("cost_estimate_idr", 0),

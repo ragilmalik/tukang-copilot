@@ -53,8 +53,8 @@ def _page(p, server, lang):
 
 
 @pytest.mark.parametrize("lang,label,first,done", [
-    ("id", "Simulator, menjalankan mesin yang sama dalam mode demo", "Langkah 1 dari 4", "Selesai"),
-    ("jv", "Simulator, nglakokake mesin sing padha ing mode demo", "Langkah 1 saka 4", "Rampung"),
+    ("id", "Simulator, menjalankan mesin yang sama dengan jawaban contoh offline", "Langkah 1 dari 4", "Selesai"),
+    ("jv", "Simulator, nglakokake mesin sing padha nganggo wangsulan conto offline", "Langkah 1 saka 4", "Rampung"),
     ("en", "Simulator, runs the same engine on offline sample answers", "Step 1 of 4", "Done"),
 ])
 def test_simulator_repair_flow(server, lang, label, first, done):

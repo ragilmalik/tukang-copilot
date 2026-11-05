@@ -120,6 +120,15 @@ def _strs(v: Any) -> Any:
     return v
 
 
+def _cap(v: Any) -> Any:
+    """First letter upper case. Live Muse Spark sometimes starts a name lower case ("underbone motorcycle engine ...");
+    the app heading hid that with CSS, but the PDF, mechanic brief, share card and WhatsApp printed it as is."""
+    if isinstance(v, str):
+        t = v.strip()
+        return t[:1].upper() + t[1:] if t[:1].islower() else t
+    return v
+
+
 def _ids(v: Any) -> Any:
     return [str(x) for x in v] if isinstance(v, list) else v
 
@@ -127,9 +136,12 @@ def _ids(v: Any) -> Any:
 def _object_report(d: dict[str, Any]) -> dict[str, Any]:
     d["category"] = _enum(d.get("category"), ("motor", "pump", "appliance", "plumbing", "other"),
                           {"motorcycle": "motor", "motorbike": "motor", "water pump": "pump", "electrical": "appliance"})
+    d["object"] = _cap(d.get("object"))
     d["visible_issues"] = _strs(d.get("visible_issues"))
     comps = d.get("components")
-    if isinstance(comps, list):
+    if comps is None:
+        d["components"] = []
+    elif isinstance(comps, list):
         comps = [c for c in comps if isinstance(c, dict)][:5]
         for i, c in enumerate(comps, 1):
             c["id"] = str(c["id"]) if c.get("id") not in (None, "") else str(i)
@@ -144,6 +156,8 @@ def _object_report(d: dict[str, Any]) -> dict[str, Any]:
 
 
 def _items(v: Any) -> Any:
+    if v is None:   # left out by the model (open weights do this): nothing to buy, not a broken answer
+        return []
     if not isinstance(v, list):
         return v
     out = []
@@ -162,6 +176,7 @@ def _diagnosis(d: dict[str, Any]) -> dict[str, Any]:
                               {"yellow": "amber", "orange": "amber", "safe": "green", "danger": "red", "stop": "red"})
     d["difficulty"] = _int(d.get("difficulty"), 1, 5)
     d["minutes_estimate"] = _int(d.get("minutes_estimate"), 1, 600)
+    d["problem_summary"] = _cap(d.get("problem_summary"))
     shop = _price(d.get("shop_cost_estimate_idr"))
     d["shop_cost_estimate_idr"] = 0 if shop is None or d["safety_level"] == "red" else shop
     d["tools"], d["parts"] = _items(d.get("tools")), _items(d.get("parts"))
@@ -175,6 +190,7 @@ def _diagnosis(d: dict[str, Any]) -> dict[str, Any]:
             n = _num(c.get("confidence"))
             if n is not None:
                 c["confidence"] = int(round(max(0.0, min(100.0, n * 100 if 0 < n <= 1 else n))))
+            c["title"] = _cap(c.get("title"))
             c["evidence"] = _strs(c.get("evidence"))
             c["component_ids"] = _ids(c.get("component_ids", []))
         causes.sort(key=lambda c: -(c["confidence"] if isinstance(c.get("confidence"), int) else 0))
@@ -197,11 +213,13 @@ def _wait(v: Any) -> int:
 
 
 def _plan(d: dict[str, Any]) -> dict[str, Any]:
+    d["cause_title"] = _cap(d.get("cause_title"))
     steps = d.get("steps")
     if isinstance(steps, list):
         steps = [s for s in steps if isinstance(s, dict)][:10]
         for i, s in enumerate(steps, 1):
             s["n"] = i
+            s["instruction"] = _cap(s.get("instruction"))
             s["warnings"] = _strs(s.get("warnings"))
             s["needs_diagram"] = _bool(s.get("needs_diagram", False))
             s["wait_minutes"] = _wait(s.get("wait_minutes"))

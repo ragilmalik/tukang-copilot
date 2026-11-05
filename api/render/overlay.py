@@ -63,15 +63,31 @@ def draw_parts(photo: Path, found: list[dict[str, Any]], out: Path, only: str | 
         tint.paste(Image.new("RGBA", size, color + (90,)), (x0, y0), m)
         edge = m.filter(ImageFilter.FIND_EDGES).filter(ImageFilter.MaxFilter(5))
         edges.paste(Image.new("RGBA", size, color + (255,)), (x0, y0), edge)
-        k = int(np.argmin((xs - xs.min()) ** 2 + (ys - ys.min()) ** 2))  # the part pixel nearest its box corner
-        badges.append((part["label"], int(xs[k]), int(ys[k]), color))
+        # where the badge may go: the part pixel nearest its top-left box corner first, then the other corners
+        spots = []
+        for cx_, cy_ in ((xs.min(), ys.min()), (xs.max(), ys.min()), (xs.min(), ys.max()), (xs.max(), ys.max())):
+            k = int(np.argmin((xs - cx_) ** 2 + (ys - cy_) ** 2))
+            spots.append((int(xs[k]), int(ys[k])))
+        badges.append((part["label"], spots, color))
     img = Image.alpha_composite(Image.alpha_composite(base.convert("RGBA"), tint), edges)
     d = ImageDraw.Draw(img)
     r = max(14, w // 40)
     f = _font(int(r * 1.2))
-    for label, x, y, color in badges:
-        # the badge sits just above-left of the part, so it never hides a small part (a valve stem, a plug)
-        cx, cy = min(max(x - r * 3 // 4, r), w - r), min(max(y - r * 3 // 4, r), h - r)
+    placed: list[tuple[int, int]] = []
+    for label, spots, color in badges:
+        # the badge sits just above-left of the part, so it never hides a small part (a valve stem, a plug); when that
+        # spot is taken by another badge (two parts sharing a corner, as a tap body and its wall flange do), it moves
+        # to the part's next corner, so no number is ever hidden under another
+        def at(x: int, y: int) -> tuple[int, int]:
+            return min(max(x - r * 3 // 4, r), w - r), min(max(y - r * 3 // 4, r), h - r)
+
+        cands = [at(x, y) for x, y in spots]
+        free = [c for c in cands if all((c[0] - px) ** 2 + (c[1] - py) ** 2 >= (2.2 * r) ** 2 for px, py in placed)]
+        cx, cy = free[0] if free else cands[0]
+        if not free:  # every corner is taken: step down until clear of the others
+            while any((cx - px) ** 2 + (cy - py) ** 2 < (2.2 * r) ** 2 for px, py in placed) and cy < h - r:
+                cy = min(h - r, cy + r)
+        placed.append((cx, cy))
         d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color + (255,), outline=(255, 255, 255, 255), width=3)
         d.text((cx, cy), str(label), fill=(255, 255, 255, 255), font=f, anchor="mm")
     img.convert("RGB").save(out, "JPEG", quality=90)

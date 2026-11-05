@@ -21,6 +21,8 @@ Rules:
 - `before_you_start`: 1 to 3 very short things the owner must have done before step 1 (unplugged, engine off and cool,
   water valve closed, hands dry). Empty list when safety is red. Plain statements the owner can tick, not steps.
 - `difficulty` 1-5, `minutes_estimate` for a first-timer.
-- If the top cause is below 60, write ONE short `follow_up_question` that would most change the answer.
+- If the top cause is below 60, write ONE short `follow_up_question` that would most change the answer. Ask about one
+  thing the owner can answer with yes, no or not sure (the app shows those three buttons), never two or three
+  things joined with "and" / "or".
 - Never give medical advice. Never suggest bypassing a safety device or fuse.
 All user-facing text in {lang_name}. Return JSON only, matching the schema.

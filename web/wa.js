@@ -1,17 +1,20 @@
 // WhatsApp simulator (/wa): the same webhook handler and engine, shown as a WhatsApp chat. Offline sample answers unless WA_SIM=1 with a key.
 "use strict";
 const L = {
-  id: { sim: "Simulator, mesin yang sama dengan jawaban contoh offline", simLive: "Simulator, mesin yang sama dengan Meta API asli", sub: "Bukan nomor WhatsApp sungguhan. Pesan diproses oleh webhook WhatsApp Tukang Copilot yang sama.",
+  id: { off: "Simulator ini mati di server ini, karena server memakai Meta API asli. Coba Tukang Copilot di halaman utama.", busy: "Terlalu banyak pesan. Tunggu sebentar lalu coba lagi.", err: "Pesan tidak terkirim. Coba lagi sebentar lagi.",
+        sim: "Simulator, menjalankan mesin yang sama dengan jawaban contoh offline", simLive: "Simulator, menjalankan mesin yang sama dengan Meta API asli", sub: "Bukan nomor WhatsApp sungguhan. Pesan diproses oleh webhook WhatsApp Tukang Copilot yang sama.",
         ph: "Ketik pesan", hint: "Ketuk contoh di bawah, atau kirim foto barang yang rusak plus ceritanya (ketik atau pesan suara). Balasannya sama persis dengan di WhatsApp.", today: "Hari ini", online: "online", typing: "sedang mengetik...", photo: "Kirim foto", rec: "Rekam pesan suara", stopRec: "Kirim pesan suara",
         tap: "Keran netes", motor: "Motor mogok", rice: "Rice cooker", gas: "Bau gas", after: "Kirim foto 'sesudah'", voice: "Pesan suara", file: "Dokumen PDF", erase: "HAPUS",
         texts: { faucet: "Kran wastafel dapur netes terus walaupun sudah ditutup kencang.", motor: "Motor saya Honda Beat susah hidup dari pagi, distarter cuma bunyi tapi mesin nggak nyala.",
                  rice: "Rice cooker saya nggak panas, lampunya mati padahal sudah dicolok.", gas: "Tabung gas di dapur bocor, baunya menyengat. Harus gimana?" } },
-  jv: { sim: "Simulator, mesin sing padha nganggo wangsulan conto offline", simLive: "Simulator, mesin sing padha nganggo Meta API asli", sub: "Dudu nomer WhatsApp tenan. Pesen diolah webhook WhatsApp Tukang Copilot sing padha.",
+  jv: { off: "Simulator iki dipateni ing server iki, amarga servere nganggo Meta API asli. Jajal Tukang Copilot ing kaca ngarep.", busy: "Kakehan pesen. Ngenteni sedhela banjur jajal maneh.", err: "Pesen ora kekirim. Jajal maneh sedhela engkas.",
+        sim: "Simulator, nglakokake mesin sing padha nganggo wangsulan conto offline", simLive: "Simulator, nglakokake mesin sing padha nganggo Meta API asli", sub: "Dudu nomer WhatsApp tenan. Pesen diolah webhook WhatsApp Tukang Copilot sing padha.",
         ph: "Ketik pesen", hint: "Tutul conto ing ngisor, utawa kirim foto barang sing rusak lan critane (ketik utawa pesen swara). Wangsulane padha karo ing WhatsApp.", today: "Dina iki", online: "online", typing: "lagi ngetik...", photo: "Kirim foto", rec: "Rekam pesen swara", stopRec: "Kirim pesen swara",
         tap: "Kran netes", motor: "Motor mogok", rice: "Rice cooker", gas: "Ambu gas", after: "Kirim foto 'sawise'", voice: "Pesen swara", file: "Dokumen PDF", erase: "BUSAK",
         texts: { faucet: "Kran wastafel pawon netes terus senajan wis ditutup kenceng.", motor: "Motorku Honda Beat angel urip wiwit esuk, distarter mung muni nanging mesine ora urip.",
                  rice: "Rice cookerku ora panas, lampune mati senajan wis dicolok.", gas: "Kompor gase bocor, ambune banget. Aku kudu piye?" } },
-  en: { sim: "Simulator, runs the same engine on offline sample answers", simLive: "Simulator, runs the same engine on the real Meta API", sub: "Not a real WhatsApp number. Messages go through the same Tukang Copilot WhatsApp webhook handler.",
+  en: { off: "The simulator is switched off on this server because it runs on the real Meta API. Try Tukang Copilot on the home page.", busy: "Too many messages. Wait a moment and try again.", err: "The message didn't go through. Try again in a moment.",
+        sim: "Simulator, runs the same engine on offline sample answers", simLive: "Simulator, runs the same engine on the real Meta API", sub: "Not a real WhatsApp number. Messages go through the same Tukang Copilot WhatsApp webhook handler.",
         ph: "Type a message", hint: "Tap a sample below, or send a photo of something broken and say what is wrong (typed or a voice note). The replies are exactly what WhatsApp would show.", today: "Today", online: "online", typing: "typing...", photo: "Send a photo", rec: "Record a voice note", stopRec: "Send voice note",
         tap: "Dripping tap", motor: "Bike won't start", rice: "Rice cooker", gas: "Gas smell", after: "Send 'after' photo", voice: "Voice note", file: "PDF document", erase: "DELETE",
         texts: { faucet: "The kitchen faucet keeps dripping even when closed tight.", motor: "My Honda Beat won't start since this morning, the starter turns but the engine doesn't fire.",
@@ -96,8 +99,16 @@ async function send(fields, file, fileField) {
   for (const [k, v] of Object.entries(fields || {})) fd.append(k, v);
   if (file) fd.append(fileField, file, file.name || (fileField === "audio" ? "voice.webm" : "photo.jpg"));
   $("status").textContent = L[lang].typing;
-  const r = await fetch("/api/wa-sim/send", { method: "POST", body: fd });
-  if (!r.ok) bubble(esc((await r.json().catch(() => ({}))).detail || r.statusText));
+  let r;
+  try { r = await fetch("/api/wa-sim/send", { method: "POST", body: fd }); } catch (_) { r = null; }
+  if (!r || !r.ok) {  // never a raw "Not Found" or an English server line in the chat
+    const st = r ? r.status : 0;
+    const said = r ? ((await r.json().catch(() => ({}))).detail || "") : "";
+    bubble(esc(st === 404 ? L[lang].off : st === 429 ? L[lang].busy : st === 400 || st === 413 ? (said || L[lang].err) : L[lang].err));
+    $("status").textContent = L[lang].online;
+    if (st === 404) simOff();
+    return;
+  }
   poll();
 }
 async function sendPhoto(blob, caption) {
@@ -128,6 +139,15 @@ function chips() {
   add("🗑 " + L[lang].erase, () => { bubble(esc(L[lang].erase), true); send({ text: L[lang].erase }); });
 }
 let SIM_LIVE = false;
+let SIM_OFF = false;
+function simOff() {
+  // with a live key and no WA_SIM=1 the simulator API answers 404; say so instead of letting a visitor type into nothing
+  SIM_OFF = true;
+  $("simLabel").textContent = L[lang].off;
+  $("hint").textContent = L[lang].off;
+  document.querySelectorAll("#chips button, #sendBtn, #file").forEach((b) => { b.disabled = true; });
+  if ($("text")) $("text").disabled = true;
+}
 function applyLang(l) {
   lang = l;
   localStorage.setItem("wasim.lang", l);
@@ -142,6 +162,7 @@ function applyLang(l) {
   $("photoSr").textContent = L[l].photo;
   $("sendBtn").setAttribute("aria-label", $("text").value ? "Send" : L[l].rec);
   chips();
+  if (SIM_OFF) simOff();
 }
 document.querySelectorAll(".langs button").forEach((b) => b.addEventListener("click", () => applyLang(b.dataset.lang)));
 $("text").addEventListener("input", () => { $("sendBtn").textContent = $("text").value ? "➤" : "🎤"; $("sendBtn").setAttribute("aria-label", $("text").value ? "Send" : L[lang].rec); });
@@ -172,5 +193,8 @@ $("form").addEventListener("submit", async (e) => {
 });
 $("sendBtn").textContent = "🎤";
 applyLang(lang);
-fetch("/api/wa-sim/info").then((r) => r.json()).then((j) => { if (j.mode === "live") { SIM_LIVE = true; applyLang(lang); } }).catch(() => {});
+fetch("/api/wa-sim/info").then((r) => r.json()).then((j) => {
+  if (j.mode === "live") { SIM_LIVE = true; applyLang(lang); }
+  if (j.enabled === false) simOff();
+}).catch(() => {});
 poll();
