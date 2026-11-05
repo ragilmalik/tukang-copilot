@@ -57,7 +57,7 @@ def test_a_tap_during_a_transition_is_handed_to_the_control_under_it() -> None:
 
 def test_touch_rules_hands_free_nav_and_ios_zoom() -> None:
     assert "touch-action:manipulation" in CSS
-    assert "grid-template-columns:58px minmax(0,1fr) minmax(0,1.3fr)" in CSS
+    assert "grid-template-columns:58px 58px minmax(0,1fr)" in CSS
     assert "body.handsfree .nav{grid-template-columns:68px 68px minmax(0,1fr)}" in CSS
     assert ".top select{appearance:none;-webkit-appearance:none;font:600 16px" in CSS  # 16 px: no iOS zoom on focus
     assert "html.inRepair{overscroll-behavior-y:contain}" in CSS

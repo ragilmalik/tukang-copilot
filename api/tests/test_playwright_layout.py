@@ -89,6 +89,9 @@ def test_no_element_sticks_out_of_its_card(server, w, h, lang, scheme):  # noqa:
             found = pg.evaluate(OVERFLOW_JS)
             if found:
                 problems[screen] = found
+            cut = pg.evaluate("[...document.querySelectorAll('.nav .btn span, .btn > span')].filter((e) => e.getBoundingClientRect().width > 2 && e.scrollWidth > e.clientWidth + 1).map((e) => e.textContent)")
+            if cut:
+                problems.setdefault(screen, []).append(f"button labels cut short: {cut}")
             hd = pg.evaluate(HEADER_JS)
             if hd["gap"] < 4 or hd["truncated"]:
                 problems.setdefault(screen, []).append(f"header: app name and language picker collide {hd}")

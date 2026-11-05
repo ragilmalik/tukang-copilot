@@ -362,6 +362,7 @@ function applyLang() {
   qrLabel();
   if ($("lang")) $("lang").value = lang;
   if ($("langCode")) $("langCode").textContent = lang.toUpperCase();
+  if ($("playBtn")) $("playBtn").title = t("listen");  // Listen is an icon button: a tooltip with its word
   if (S) { renderProgress(S); if (S.plan) render(S); }
   if ($("garage") && view === "capture") renderGarage();
   badges(); markLang();

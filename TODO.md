@@ -18,7 +18,8 @@ The entry deadline was Thu Nov 5, 2026, 09:00 WIB (Nov 4, 9 PM ET). Code is done
 - [x] Overflow audit at 360x740, 390x844, 430x932 and 1280x800, id/jv/en, light/dark: 0 issues
 - [x] New tests: test_playwright_layout.py, test_playwright_motion.py, test_ui_motion.py
 - [x] Full checks: ruff clean, mypy strict 165 files, 853 non-browser + 145 Chromium tests passed (0 failed), jsdom and axe pass, offline smoke ALL PASSED (70 checks), static build and --check OK, replay fixture up to date
-- [ ] Before/after screenshots reviewed (phone light/dark, 360, laptop)
+- [x] Before/after screenshots reviewed (phone light/dark, 360, 430 Basa Jawa dark, laptop)
+- [ ] Watch test_playwright_motion: failed once in 4 runs on 6 Nov, passed 3 times since; find the flaky wait
 
 ## Now (1.30.0, 6 Nov)
 - [x] Sample "plug cap" photo is checked on the step it shows (`sample_step`, api/sample_step.py), with a line saying which step; buttons say what each sample photo is

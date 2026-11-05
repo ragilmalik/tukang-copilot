@@ -349,10 +349,14 @@ code.tool.code{background:var(--grn-tint);color:var(--grn-text)}
 .pass{color:var(--grn-text)}.fail{color:var(--red-text)}
 #checkResult .caution{margin-top:8px}
 @media (prefers-reduced-motion:no-preference){#checkResult.isPass,#checkResult.isFail{animation:sheetUp .35s var(--ease)}@keyframes sheetUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}}
-/* minmax(0, ...) so a long label (Dengarkan, Rungokna) can never push Next past the card */
-.nav{display:grid;grid-template-columns:58px minmax(0,1fr) minmax(0,1.3fr);gap:8px;margin:14px 0 10px}
+/* Back and Listen are square icon buttons (Listen keeps its word for screen readers), Next takes the rest of the row:
+   a long label (Dengarkan, Rungokna) used to push Next past the card, or got cut to "Rungo..." */
+.nav{display:grid;grid-template-columns:58px 58px minmax(0,1fr);gap:8px;margin:14px 0 10px}
 .nav .btn{min-height:56px;padding:0 12px;min-width:0}
 .nav .btn span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#playBtn{padding:0}
+#playBtn .ic{margin:0;width:24px;height:24px}
+#playBtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
 #prevBtn .ic{margin:0;width:24px;height:24px}
 #nextBtn{background:var(--ink);color:var(--bg);box-shadow:none}
 #nextBtn .ic{margin:0 0 0 .4em}
@@ -366,12 +370,10 @@ code.tool.code{background:var(--grn-tint);color:var(--grn-text)}
 .vdot{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--mut);vertical-align:-1px;margin-right:6px}
 .vdot.on{background:var(--red);box-shadow:0 0 0 0 rgba(200,32,30,.6);animation:vpulse 1.4s infinite}
 @keyframes vpulse{0%{box-shadow:0 0 0 0 rgba(200,32,30,.6)}70%{box-shadow:0 0 0 12px rgba(200,32,30,0)}100%{box-shadow:0 0 0 0 rgba(200,32,30,0)}}
-/* hands-free: bigger targets for wet or greasy hands; Back and Listen become square icon buttons so Next gets the room */
+/* hands-free: bigger targets for wet or greasy hands */
 body.handsfree .nav{grid-template-columns:68px 68px minmax(0,1fr)}
 body.handsfree .nav .btn{min-height:68px;font-size:1.2em}
-body.handsfree #playBtn{padding:0}
-body.handsfree #playBtn .ic{margin:0;width:26px;height:26px}
-body.handsfree #playBtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+body.handsfree #playBtn .ic{width:26px;height:26px}
 #pttBtn{width:100%;margin:6px 0}
 #pttBtn[aria-pressed="true"]{background:var(--red);color:#fff}
 
