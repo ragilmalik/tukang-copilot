@@ -111,10 +111,10 @@ async function send(fields, file, fileField) {
   }
   poll();
 }
-async function sendPhoto(blob, caption) {
+async function sendPhoto(blob, caption, extra) {
   const url = URL.createObjectURL(blob);
   bubble(`<img src="${url}" alt="">${fmt(caption || "")}`, true);
-  await send(caption ? { text: caption } : {}, new File([blob], "photo.jpg", { type: blob.type || "image/jpeg" }), "photo");
+  await send({ ...(caption ? { text: caption } : {}), ...(extra || {}) }, new File([blob], "photo.jpg", { type: blob.type || "image/jpeg" }), "photo");
 }
 async function sample(name) {
   lastSample = name;
@@ -123,9 +123,12 @@ async function sample(name) {
   const blob = await (await fetch(`/api/wa-sim/sample/${name}.jpg`)).blob();
   sendPhoto(blob, t);
 }
+// The sample "after" photo shows ONE step (the plug cap pushed back on, ...), so the server checks it on that step
+// (api/sample_step.py) and says so, like the web app's "Sample photo" button; any other photo is checked on the step
+// the chat is on.
 async function afterPhoto() {
   const s = lastSample === "rice" || lastSample === "gas" ? "faucet" : lastSample;
-  sendPhoto(await (await fetch(`/api/demo/check-photo/ok?sample=${s}`)).blob(), "");
+  sendPhoto(await (await fetch(`/api/demo/check-photo/ok?sample=${s}`)).blob(), "", { sample: s });
 }
 function chips() {
   const c = $("chips");

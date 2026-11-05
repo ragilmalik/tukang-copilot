@@ -43,8 +43,9 @@ FILES_BASE = "/static/replay/files/"
 LANGS = ("id", "jv", "en")
 FORMAT = 1
 PACE_S = 0.6
-ANSWER = {"id": "Ya, starter berbunyi tapi mesin tidak hidup", "jv": "Nggih, starter muni nanging mesin mboten urip",
-          "en": "Yes, the starter turns but the engine won't fire"}
+# The follow-up is one yes/no question since 1.30.0 (the live model picks what it asks), so the owner just answers
+# yes, the same as the app's quick "Ya" button. Recordings made before this change carry the longer answer.
+ANSWER = {"id": "Ya", "jv": "Nggih", "en": "Yes"}
 REPLAN = {"id": "Sudah dicoba, masih tidak mau hidup", "jv": "Sampun dijajal, taksih mboten purun urip", "en": "Tried it, still won't start"}
 # keys whose new value is merged into the current one (dict) or appended (list) when an action is replayed
 MERGE_KEYS = {"checks"}

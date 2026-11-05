@@ -90,3 +90,27 @@ def test_simulator_red_stop_shows_no_steps(server):
         b.close()
     assert wa.wait_idle(20)
     assert errs == []
+
+
+@pytest.mark.parametrize("lang,note", [
+    ("id", "Foto contoh ini dicek untuk langkah 4, langkah yang ditunjukkan fotonya."),
+    ("en", "Checking step 4 with this sample photo: it is the step the photo shows."),
+])
+def test_after_photo_button_checks_the_step_the_photo_shows(server, lang, note):
+    """The "after" chip sends the dry-spout sample photo: it is checked on step 4 (the step it shows), with a line
+    saying so, not on step 1 where the chat is."""
+    with pw.sync_playwright() as p:
+        b, pg, errs = _page(p, server, lang)
+        pg.evaluate("sessionStorage.clear()")
+        pg.reload()
+        pg.wait_for_selector("#chips button")
+        pg.locator("#chips button").nth(0).click()  # sample: dripping tap
+        pg.wait_for_selector(".btns button", timeout=30000)
+        pg.locator("#chips button").nth(4).click()  # the "after" photo
+        pg.wait_for_function("(n) => document.querySelector('#log').innerText.includes(n)", arg=note, timeout=30000)
+        pg.wait_for_function("() => document.querySelector('#log').innerText.includes('PDF')", timeout=30000)
+        text = pg.inner_text("#log")
+        assert "✅" in text and "❌" not in text
+        b.close()
+    assert wa.wait_idle(20)
+    assert errs == []

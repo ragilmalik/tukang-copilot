@@ -70,6 +70,18 @@ T: dict[str, dict[str, str]] = {
     "btn_problem": {"id": "Ada masalah", "jv": "Ana masalah", "en": "Problem"},
     "btn_stop": {"id": "Berhenti", "jv": "Mandheg", "en": "Stop"},
     "btn_retry": {"id": "Coba lagi", "jv": "Jajal maneh", "en": "Try again"},
+    # simulator "after photo" button: the labelled sample photo shows one step, so it is checked on that step
+    # (api/sample_step.py), the same lines as the web app's sampleFor / sampleForLast
+    "sample_for": {
+        "id": "Foto contoh ini dicek untuk langkah {n}, langkah yang ditunjukkan fotonya.",
+        "jv": "Foto conto iki dipriksa kanggo langkah {n}, langkah sing dituduhake fotone.",
+        "en": "Checking step {n} with this sample photo: it is the step the photo shows.",
+    },
+    "sample_for_last": {
+        "id": "Foto contoh ini dicek untuk langkah terakhir ({n}).",
+        "jv": "Foto conto iki dipriksa kanggo langkah pungkasan ({n}).",
+        "en": "Checking the last step ({n}) with this sample photo.",
+    },
     "check_fail_hint": {
         "id": "Coba foto lagi, atau ketuk Ada masalah.",
         "jv": "Jajal motret maneh, utawa tutul Ana masalah.",

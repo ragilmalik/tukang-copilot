@@ -12,7 +12,8 @@ The chat, one owner per phone number:
   needs_answer                   -> the follow-up question; the next text or voice note is the answer
   ready                          -> SAM-marked photo with the diagnosis and cost/saving, then step 1 with
                                     reply buttons Done / Problem / Stop
-  photo during a step            -> the step camera check (engine.check_step)
+  photo during a step            -> the step camera check (engine.check_step); the simulator's labelled sample
+                                    "after" photo is checked on the step it shows (api/sample_step.py)
   Problem (or "masih rusak")     -> re-plan to the next cause (engine.replan)
   last step done or Stop         -> the PDF repair report as a document
   HAPUS / BUSAK / DELETE         -> erase this repair now (same as the app's "Delete my photos now")
@@ -47,7 +48,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 from PIL import Image
 
-from .. import errors, guard, handoff
+from .. import errors, guard, handoff, sample_step
 from ..pipeline import engine, safety, track
 from ..settings import settings
 from ..voice import parse_command
@@ -109,6 +110,9 @@ class Inbound:
     mime: str = ""
     button_id: str = ""
     raw_type: str = ""
+    # simulator only (api/channels/wa_sim.py): this image is the labelled sample "after" photo of that sample
+    # scenario (motor, pump, ...). parse_message never sets it, so a real WhatsApp message can't.
+    sample_after: str = ""
 
 
 def parse_webhook(body: dict[str, Any], phone_number_id: str | None = None) -> list[Inbound]:
@@ -798,32 +802,37 @@ def on_guiding(conv: Conv, ev: Inbound, tr: Transport) -> None:
         p = _fetch(conv, ev, tr, MAX_PHOTO, "check", IMAGE_EXT)
         if p is None:
             return
+        note = sample_to_step(conv, s, ev.sample_after)
+
+        def said(text: str) -> str:  # the "checking step n" line goes on top of whatever the check says
+            return "\n".join(x for x in (note, text) if x)
+
         try:
             res = engine.check_step(sid, conv.step, p)
         except engine.LimitReached:
-            send_step(conv, tr, s, prefix=t("limit", conv.lang))
+            send_step(conv, tr, s, prefix=said(t("limit", conv.lang)))
             return
         except ValueError:
-            send_step(conv, tr, s)
+            send_step(conv, tr, s, prefix=note)
             return
         except OSError:
-            send_text(tr, t("bad_photo", conv.lang))
+            send_text(tr, said(t("bad_photo", conv.lang)))
             return
         except Exception as e:
             log.warning("whatsapp step check failed: %s", errors.detail(e))
-            send_step(conv, tr, s, prefix=errors.friendly(e, conv.lang))
+            send_step(conv, tr, s, prefix=said(errors.friendly(e, conv.lang)))
             return
         finally:
             p.unlink(missing_ok=True)
         s = engine.load(sid)
         if res.get("passed"):
-            advance(conv, tr, s, prefix="✅ " + str(res.get("observation") or ""))
+            advance(conv, tr, s, prefix=said("✅ " + str(res.get("observation") or "")))
         else:
             msg = ["❌ " + str(res.get("observation") or "")]
             if res.get("correction"):
                 msg.append("👉 " + str(res["correction"]))
             msg.append(str(res.get("escalate_hint") or t("check_fail_hint", conv.lang)))
-            send_step(conv, tr, s, prefix="\n".join(msg))
+            send_step(conv, tr, s, prefix=said("\n".join(msg)))
         return
     if ev.kind == "audio":
         if _blocked(conv, tr, "followup"):
@@ -848,6 +857,25 @@ def on_guiding(conv: Conv, ev: Inbound, tr: Transport) -> None:
     if cmd is None and not safety.check_text(text, s["lang"]).allowed:
         cmd = "broken"  # engine.replan runs the same text gate first and stops the guide
     _command(conv, tr, s, cmd, text)
+
+
+def sample_to_step(conv: Conv, s: dict[str, Any], sample: str) -> str:
+    """The labelled sample "after" photo shows one step (the plug cap pushed back on, the priming hole open, ...).
+    Checking it on whatever step the chat is on is not a fair test: on "turn the key off" a correct model says
+    "not quite". So, like the web app, move the chat to the step the photo shows (api/sample_step.pick on this
+    plan) and return the short line that says so. Any other photo (an owner's own, or a dark one) is checked on
+    the step the chat is on, and the line is empty."""
+    if not sample:
+        return ""
+    steps = [st for st in (s.get("plan") or {}).get("steps") or [] if isinstance(st, dict)]
+    pick = sample_step.pick(sample, steps)
+    if not pick:
+        return ""
+    index = next((i for i, st in enumerate(steps, 1) if int(st.get("n") or i) == int(pick["n"])), None)
+    if index is None:
+        return ""
+    conv.step = index
+    return t("sample_for" if pick["shows"] else "sample_for_last", conv.lang, n=pick["n"])
 
 
 def _command(conv: Conv, tr: Transport, s: dict[str, Any], cmd: str | None, text: str, voice: bool = False) -> None:

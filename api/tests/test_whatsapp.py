@@ -386,3 +386,69 @@ def test_simulator_input_checks(monkeypatch):
     monkeypatch.setattr(settings, "meta_api_key", "k")
     monkeypatch.setattr(settings, "wa_sim", False)
     assert client.post("/api/wa-sim/send", data={"chat": CHAT, "text": "x"}).status_code == 404
+
+
+def _sim_start_faucet(samples, text):
+    client.post("/api/wa-sim/send", data={"chat": CHAT, "text": text},
+                files={"photo": ("a.jpg", samples["faucet"].read_bytes(), "image/jpeg")})
+    msgs = sim_poll()["messages"]
+    assert msgs[-1]["message"]["type"] == "interactive"
+    return msgs[-1]["seq"]
+
+
+def _sim_sid() -> str:
+    sid = wa._convs[wa_sim._key(CHAT)].sid
+    assert sid
+    return sid
+
+
+@pytest.mark.parametrize("lang,text,step_word", [("id", FAUCET_ID, "Langkah"), ("jv", "Kran wastafel pawon netes terus senajan wis ditutup kenceng.", "Langkah"),
+                                                 ("en", FAUCET_EN, "Step")])
+def test_simulator_sample_after_photo_is_checked_on_the_step_it_shows(samples, lang, text, step_word):
+    """The "after" button's photo (the dry spout) shows the plan's last step: the chat moves there, says so in the
+    owner's language, and the check passes there instead of failing on step 1 (shut the valve)."""
+    seq = _sim_start_faucet(samples, text)
+    sid = _sim_sid()
+    plan = engine.load(sid)["plan"]["steps"]
+    from api import sample_step
+
+    pick = sample_step.pick("faucet", plan)
+    assert pick == {"n": len(plan), "shows": True}  # the dry spout is the last step of the demo plan
+    after = client.get("/api/demo/check-photo/ok", params={"sample": "faucet"}).content
+    r = client.post("/api/wa-sim/send", data={"chat": CHAT, "sample": "faucet"}, files={"photo": ("after.jpg", after, "image/jpeg")})
+    assert r.status_code == 200
+    first = sim_poll(seq)["messages"][0]["message"]
+    body = first["text"]["body"] if first["type"] == "text" else first["interactive"]["body"]["text"]
+    assert body.startswith(wa_text.t("sample_for", lang, n=pick["n"])) and "✅" in body
+    s = engine.load(sid)
+    assert s["checks"][str(pick["n"])]["passed"] is True and "1" not in s["checks"]
+
+
+def test_simulator_own_photo_stays_on_the_current_step(samples):
+    """Without the sample flag (an owner's own photo, or a dark one) the check runs on the step the chat is on."""
+    seq = _sim_start_faucet(samples, FAUCET_ID)
+    dark = client.get("/api/demo/check-photo/dark", params={"sample": "faucet"}).content
+    client.post("/api/wa-sim/send", data={"chat": CHAT}, files={"photo": ("dark.jpg", dark, "image/jpeg")})
+    body = sim_poll(seq)["messages"][-1]["message"]["interactive"]["body"]["text"]
+    assert body.startswith("❌") and "Langkah 1 dari 4" in body
+    assert wa_text.t("sample_for", "id", n=4) not in body
+    assert list(engine.load(_sim_sid())["checks"]) == ["1"]
+
+
+def test_simulator_sample_flag_is_checked_and_the_webhook_cannot_set_it(samples):
+    after = client.get("/api/demo/check-photo/ok", params={"sample": "faucet"}).content
+    r = client.post("/api/wa-sim/send", data={"chat": CHAT, "sample": "../secret"}, files={"photo": ("a.jpg", after, "image/jpeg")})
+    assert r.status_code == 400
+    ev = wa.parse_message({"from": PHONE, "id": "wamid.X", "type": "image", "sample": "faucet",
+                           "image": {"id": "m1", "mime_type": "image/jpeg", "sample": "faucet"}})
+    assert ev is not None and ev.sample_after == ""
+
+
+def test_sample_to_step_falls_back_to_the_last_step_and_ignores_unknown_plans():
+    conv = wa.Conv(key="k", sender="sim:k", lang="en")
+    s = {"plan": {"steps": [{"n": 1, "expected_state": "Key off."}, {"n": 2, "expected_state": "Engine runs."}]}}
+    conv.step = 1
+    assert wa.sample_to_step(conv, s, "motor") == wa_text.t("sample_for_last", "en", n=2) and conv.step == 2
+    conv.step = 1
+    assert wa.sample_to_step(conv, s, "") == "" and conv.step == 1
+    assert wa.sample_to_step(conv, {"plan": {"steps": []}}, "motor") == "" and conv.step == 1

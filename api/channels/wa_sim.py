@@ -6,6 +6,8 @@ On in offline sample mode (no Meta key or MOCK=1). With a live key it stays off 
 would spend real model calls (the live-mode guard limits still apply).
 
     POST /api/wa-sim/send               chat, text | photo | audio | button   (one inbound WhatsApp message)
+                                        + sample=<scenario> with the "after" button's photo: checked on the step
+                                        that photo shows (api/sample_step.py), like the web app's Sample photo
     GET  /api/wa-sim/poll?chat=&after=  replies with seq > after, plus busy (a reply is still being worked on)
     GET  /api/wa-sim/media/{chat}/{id}  a photo or PDF the chat sent back
     GET  /api/wa-sim/sample/{name}.jpg  the labelled sample photos (AI-generated), so the page can send one
@@ -125,9 +127,13 @@ def info() -> dict[str, Any]:
 
 @router.post("/api/wa-sim/send")
 async def send(request: Request, chat: str = Form(...), text: str = Form(default=""), button: str = Form(default=""),
-               photo: UploadFile | None = File(default=None), audio: UploadFile | None = File(default=None)) -> dict[str, Any]:
-    """One message from the simulated owner, shaped exactly like a Cloud API webhook message."""
+               photo: UploadFile | None = File(default=None), audio: UploadFile | None = File(default=None),
+               sample: str = Form(default="")) -> dict[str, Any]:
+    """One message from the simulated owner, shaped exactly like a Cloud API webhook message. `sample` names the
+    sample scenario when the photo is the page's labelled sample "after" photo (never sent by real WhatsApp)."""
     _check_chat(chat)
+    if sample and sample not in SAMPLES:
+        raise HTTPException(400, "unknown sample")
     try:  # costs nothing in offline sample mode, but keeps one visitor from filling the disk
         guard.check_rate("wasim:" + guard.client_key(request.headers.get("x-forwarded-for"), request.client.host if request.client else None),
                          bucket="wasim", limit=settings.wa_sim_rate_per_hour)
@@ -152,6 +158,8 @@ async def send(request: Request, chat: str = Form(...), text: str = Form(default
     ev = wa.parse_message(msg)
     if ev is None:
         raise HTTPException(400, "bad message")
+    if sample and ev.kind == "image":
+        ev.sample_after = sample
     wa.dispatch([ev], lambda _s: SimTransport(chat))
     return {"ok": True, "id": msg["id"]}
 
