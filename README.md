@@ -125,7 +125,7 @@ the diagnosis: a wrong guess about a spark plug costs an afternoon, a wrong gues
 9. Escalate safely. A red STOP card says why and what to do right now (its own list for gas, house wiring, brakes, and appliances or pumps), finds a service centre and gives you the PDF for the technician, plus the 112 emergency line.
 10. Show its work. "What the AI did" lists each decision and the model or code rule that made it, live while it runs and in the PDF.
 11. Fail honestly. If a Meta call still fails after retries, the repair stops with a plain error and a retry button. `DEMO_FALLBACK=1` (off by default) would finish that stage with a labelled sample answer instead, and `scripts/deploy_check.py` flags any live session that needed it.
-12. Three languages, every string: Bahasa Indonesia, Basa Jawa (everyday ngoko) and English. Installs as a PWA.
+12. Three languages, every string: Bahasa Indonesia, Basa Jawa (everyday ngoko) and English. Installs as a PWA. Screens change with a short slide (off when the phone asks for reduced motion), every button shows it is working, and the progress screen keeps its layout while results stream in.
 
 The hard safety stops (gas, house wiring, opening 220 V internals, high voltage, brake hydraulics, fuel leaks, airbags,
 anything medical) live in code as well as in the prompts, so a model answer can't switch them off. See

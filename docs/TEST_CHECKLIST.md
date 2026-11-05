@@ -15,6 +15,7 @@ Set `export NO_PROXY=127.0.0.1,localhost` if a proxy is configured, and put Chro
 - [ ] Live smoke (key set): the same smoke with the live server.
 - [ ] `python scripts/record_replay.py --check` says the recorded demo is up to date.
 - [ ] `python scripts/build_static.py --check` passes.
+- [ ] Layout and motion: `test_playwright_layout.py` (nothing sticks out of its card at 360, 390, 430 and the laptop frame) and `test_playwright_motion.py` pass.
 - [ ] `python scripts/check_keys.py` (key set) passes every required model.
 - [ ] `python scripts/run_eval.py --from-json docs/eval/live-2026-11-05.json` renders [EVAL.md](EVAL.md) without model calls.
 - [ ] No secret in the tree: `git grep -nE "sk-[A-Za-z0-9]{16}|ghp_[A-Za-z0-9]{20}"` finds nothing, and `.env` is not tracked (`test_env_not_tracked.py`).
@@ -35,6 +36,10 @@ Set `export NO_PROXY=127.0.0.1,localhost` if a proxy is configured, and put Chro
 - [ ] Erase now removes the repair.
 - [ ] Back button and refresh in the middle of a repair don't lose it.
 - [ ] Airplane mode: the recorded demo plays and is labelled as a recording.
+- [ ] Screen changes slide briefly; with "reduce motion" on in the phone settings they switch at once. A tap during a slide still works.
+- [ ] Hands-free mode on a 360 px phone: Back and Listen are square icon buttons, Next fits inside the step card.
+- [ ] On a phone under 400 px wide the header shows "ID / JV / EN" next to the full app name, and the pill opens the language list.
+- [ ] Pull down during a repair: the page does not reload. On the first screen pull-to-refresh still works.
 
 ## C. Manual, on a laptop (1280 x 800)
 

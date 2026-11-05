@@ -2,6 +2,24 @@
 
 The entry deadline was Thu Nov 5, 2026, 09:00 WIB (Nov 4, 9 PM ET). Code is done; what is left is media, final numbers and the steps only I can do with my accounts.
 
+## 1.31.0 UI pass (6 Nov)
+- [x] Screen changes through a View Transition (fallback: instant), skipped by the first tap or key, the tap still lands, off under reduced motion
+- [x] Step changes slide in (Web Animations), stay synchronous, are announced to screen readers and bring the card up under the header
+- [x] Placeholders for findings on the progress screen (sized like the result, only the running stage shimmers, 400 ms minimum), layout shift 0.23 to 0.007
+- [x] Progress line names the running stage and model, the running row counts its own seconds, live-only "usually 1 to 2 minutes"
+- [x] Busy state on every button that starts something; one repair per double tap on the demo
+- [x] Haptics on a step pass or fail and on a red stop (where the phone supports it)
+- [x] Reload, Back or Forward mid-repair returns to the same step
+- [x] Hands-free "Lanjut" no longer sticks out of the step card (360, 390, laptop frame); square icon buttons for Back and Listen in hands-free
+- [x] Language picker no longer covers the app name under 400 px or in the laptop frame (short pill, real select on top)
+- [x] Scroll targets land under the sticky header (scroll-padding), fixed 4:3 step picture box, result opens with its photo decoded
+- [x] touch-action manipulation, 16 px picker text, safe-area insets on footer and gutters, no pull-to-refresh mid-repair
+- [x] First paint: deferred scripts, Barlow 600 preloaded, high fetch priority on the landing picture, offline cache v24
+- [x] Overflow audit at 360x740, 390x844, 430x932 and 1280x800, id/jv/en, light/dark: 0 issues
+- [x] New tests: test_playwright_layout.py, test_playwright_motion.py, test_ui_motion.py
+- [x] Full checks: ruff clean, mypy strict 165 files, 853 non-browser + 145 Chromium tests passed (0 failed), jsdom and axe pass, offline smoke ALL PASSED (70 checks), static build and --check OK, replay fixture up to date
+- [ ] Before/after screenshots reviewed (phone light/dark, 360, laptop)
+
 ## Now (1.30.0, 6 Nov)
 - [x] Sample "plug cap" photo is checked on the step it shows (`sample_step`, api/sample_step.py), with a line saying which step; buttons say what each sample photo is
 - [x] WhatsApp simulator label reads naturally in Bahasa and Basa Jawa ("menjalankan" / "nglakokake"), tests match
