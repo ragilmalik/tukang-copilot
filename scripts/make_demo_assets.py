@@ -1,4 +1,4 @@
-"""Demo assets from the real app running in demo (mock) mode: screenshots, captions, voice-over, a 2-3 min video.
+"""Demo assets from the real app: screenshots, captions, voice-over, a 2-3 min video, the X clip and the README GIF.
 
     python scripts/make_demo_assets.py shots     # Playwright drives the phone UI -> docs/demo/screenshots/*.png (+ wa)
     python scripts/make_demo_assets.py wa        # only the WhatsApp simulator shots -> docs/demo/screenshots/30_whatsapp_*.png
@@ -10,6 +10,18 @@
 Everything shown is the app built during the hackathon answering live from the Meta Model API, with labelled
 AI-generated sample photos. The video says so on screen, and the waits for the models are cut (the real wait is noted). My own real-phone video (docs/DEMO_SCRIPT.md) replaces it once I record it.
 Chromium: PLAYWRIGHT_CHROMIUM, system chromium, or `python -m playwright install chromium`.
+
+Two sources of answers:
+
+  live (default)      every answer is a new call to the Meta Model API (needs the key, about $0.60 for shots + video).
+  recorded            DEMO_RECORDED_DATA=<folder> plays answers that already came from the live API, so nothing new is
+                      paid for: the motorbike repair is the app's own recorded 1-tap demo (web/replay/demo.json, the
+                      "Recorded demo" badge is on screen), and the pump, rice cooker, faucet and Basa Jawa tyre repairs
+                      are live sessions recorded by an earlier live run of this script (a copy of its DATA_DIR). Pages
+                      are opened at the public address (DEMO_PUBLIC_BASE), answered by the local server, so links and
+                      QR codes read like the deployed site. Only the live camera guide still calls SAM 3.1 live (each
+                      frame is a paid call); any other request that would start new model work is refused and fails
+                      the run. The run prints the live spend from the app's own cost meter.
 
 DEMO_BASE_URL=http://127.0.0.1:8765 uses a server I already started (`PORT=8765 python app.py` with the key, plus
 WA_SIM=1 DEMO_FALLBACK=0 NARRATION_VOICE=0) instead of starting one in this process on a free port. The script checks
@@ -180,6 +192,10 @@ def _server() -> tuple[str, Any]:
     from api.settings import settings
 
     settings.data_dir = Path(tempfile.mkdtemp(prefix="tukang-demo-"))
+    if recorded():  # a copy, so the recording itself never changes
+        shutil.copytree(Path(os.environ["DEMO_RECORDED_DATA"]) / "sessions", settings.data_dir / "sessions")
+        for f in (settings.data_dir / "sessions").glob("*/session.json"):
+            os.utime(f)  # the hourly janitor purges by file age: the copies count from now, the privacy setting stays as it is
     settings.demo_fallback = False
     settings.rate_limit_per_hour = 1000
     if not settings.offline:
@@ -227,13 +243,14 @@ def sample_step_n(pg: Any, sample: str) -> int:
 
 
 # the live camera guide aims at a big, plain part of the pump photo: SAM 3.1 finds "electric pump motor" on the fake
-# camera frames at once (about 0.66 confidence, tested 6 Nov 2026), while the small brass priming plug is often missed
-LIVE_PART = ("motor", "pump")
+# camera frames at once (about 0.66 confidence, tested 6 Nov 2026), while the small brass priming plug is often missed.
+# Plans that never name the motor get a pipe (the white suction or discharge pipe is just as easy), then the pump.
+LIVE_PART = ("motor", "pipe", "pump")
 
 
 def live_step_n(pg: Any) -> int:
     """The step of the live pump plan whose part is the first LIVE_PART word found in the parts' SAM phrases
-    (the blue electric motor of the pump, else the pump body). 0 when no step names one."""
+    (the blue electric motor of the pump, else a pipe, else the pump body). 0 when no step names one."""
     comps = pg.evaluate("((S && S.object_report && S.object_report.components) || []).map((c) => [c.id, c.sam_phrase || ''])")
     steps = pg.evaluate("((S && S.plan && S.plan.steps) || []).map((x) => [x.n, x.component_id || ''])")
     phrase = {str(cid): str(ph).lower() for cid, ph in comps}
@@ -264,6 +281,74 @@ def public_links(ctx: Any, base: str) -> None:
 
 
 TZ = "Asia/Jakarta"  # the browser clock of every shot and clip: WIB, where the app's owners are (chat times, garage dates)
+
+
+# --- recorded answers (DEMO_RECORDED_DATA): no new model work except the live camera guide
+REPLAY_JSON = ROOT / "web" / "replay" / "demo.json"
+TRACK_RE = r"/api/sessions/[^/]+/steps/\d+/track$"  # the live camera guide: the one request allowed to call a model
+
+
+def recorded() -> bool:
+    return bool(os.environ.get("DEMO_RECORDED_DATA"))
+
+
+def site(base: str) -> str:
+    """Where pages are opened: the public address in recorded mode (relayed to `base`), else the local server."""
+    return PUBLIC_BASE if recorded() else base
+
+
+def recorded_session(sample: str, lang: str, diagram: bool = False) -> str:
+    """The newest recorded live session of a sample repair in a language (with a Muse Image diagram when asked)."""
+    from api.settings import settings
+
+    best: tuple[float, str] | None = None
+    for f in (settings.data_dir / "sessions").glob("*/session.json"):
+        d = json.loads(f.read_text(encoding="utf-8"))
+        if d.get("sample") != sample or d.get("lang") != lang or d.get("mode") != "live" or d.get("status") not in ("ready", "stopped"):
+            continue
+        if diagram and not any((v or {}).get("file") for v in (d.get("diagrams") or {}).values()):
+            continue
+        if best is None or float(d.get("created") or 0) > best[0]:
+            best = (float(d.get("created") or 0), str(d["id"]))
+    if best is None:
+        raise SystemExit(f"no recorded live {sample} session in {lang} under {settings.data_dir}: record one with a live run first")
+    return best[1]
+
+
+def spent_total() -> float:
+    """Every recorded session's cost on this server (the app's own meter, api/guard.py adds it up the same way)."""
+    from api.settings import settings
+
+    total = 0.0
+    for f in (settings.data_dir / "sessions").glob("*/session.json"):
+        total += float((json.loads(f.read_text(encoding="utf-8")).get("cost") or {}).get("spent_usd") or 0.0)
+    return total
+
+
+def no_new_runs(ctx: Any, errors: list[str]) -> None:
+    """Recorded mode: a request that would start new model work (a new repair, an answer, a photo check, a re-plan,
+    a voice command, a WhatsApp message) is refused and fails the run. The recording answers those inside the page
+    (web/replay.js), so one reaching the network means the page left the recording."""
+    import re
+
+    def check(route: Any) -> None:
+        r = route.request
+        if r.method == "POST" and not re.search(TRACK_RE, r.url.split("?")[0]):
+            errors.append(f"refused a new model call in recorded mode: POST {r.url}")
+            route.abort()
+            return
+        route.fallback()
+
+    ctx.route("**/api/**", check)
+
+
+def open_recorded(pg: Any, origin: str, sid: str, lang: str) -> None:
+    """Open a recorded session the way the app reopens one after a reload (/#id), in the given UI language."""
+    pg.goto(f"{origin}/#{sid}")
+    pg.wait_for_selector("#result:not(.hidden), #stopBox:not(.hidden)", timeout=30000)
+    if pg.input_value("#lang") != lang:  # the picker remembers the last language of this browser: switch like an owner would
+        pg.select_option("#lang", lang)
+        pg.wait_for_timeout(400)
 
 
 def serve_as_public(ctx: Any, base: str) -> None:
@@ -310,6 +395,8 @@ def shots() -> None:
 
     SHOTS.mkdir(parents=True, exist_ok=True)
     base, srv = _server()
+    rec, origin = recorded(), site(base)
+    spent_before = spent_total() if rec else 0.0
     from api.main import _dark_photo
 
     dark = Path(tempfile.mkdtemp()) / "dark.jpg"
@@ -321,15 +408,23 @@ def shots() -> None:
             f"--use-file-for-fake-video-capture={cam}"])
         ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, locale="id-ID",
                             timezone_id=TZ)
-        ctx.grant_permissions(["camera", "microphone"], origin=base)
+        ctx.grant_permissions(["camera", "microphone"], origin=origin)
         ctx.add_init_script(SR_STUB)
-        public_links(ctx, base)
-        pg = ctx.new_page()
         page_errors: list[str] = []
+        if rec:
+            serve_as_public(ctx, base)    # pages at the public address, answered by this server
+            no_new_runs(ctx, page_errors)  # registered last, so it sees every /api request first
+        else:
+            public_links(ctx, base)
+        pg = ctx.new_page()
         _console_watch(pg, page_errors)
 
         def snap(name: str, full: bool = False) -> None:
             pg.wait_for_timeout(350)
+            if pg.is_visible("#tourClose"):  # the 1-tap demo's tip bar would cover the bottom of the still
+                pg.click("#tourClose"); pg.wait_for_timeout(250)
+            # never mid screen change: a view transition paints old and new screen shifted over each other
+            pg.wait_for_function("() => !document.documentElement.matches(':active-view-transition')", timeout=5000)
             pg.screenshot(path=str(SHOTS / f"{name}.png"), full_page=full)
             print("shot", name, flush=True)
 
@@ -362,39 +457,86 @@ def shots() -> None:
                 box.check()
             pg.wait_for_timeout(200)
 
-        for attempt in range(3):  # live: the model asks a follow-up only when unsure, and the screenshots need one
-            pg.goto(base + "/"); pg.wait_for_selector("#goBtn")
+        def no_tour() -> None:
+            """The 1-tap demo's tip bar would cover the bottom of a still: close it (it stays closed for the tab)."""
+            if pg.is_visible("#tourClose"):
+                pg.click("#tourClose")
+                pg.wait_for_timeout(200)
+
+        def check_done() -> None:
+            """A step check has answered: the result line has its pass or fail class and no "Checking…" left."""
+            pg.wait_for_function("() => { const el = document.querySelector('#checkResult');"
+                                 " return (el.classList.contains('isPass') || el.classList.contains('isFail'))"
+                                 " && !el.textContent.includes('…'); }", timeout=LIVE_MS)
+
+        if rec:
+            # the motorbike repair from the recorded 1-tap demo (real live answers, "Recorded demo" badge on screen)
+            pg.goto(origin + "/"); pg.wait_for_selector("#goBtn")
             pg.set_input_files("#photo", str(FIX / "sample_motor_plug_area.jpg"))
             pg.fill("#text", "Motor saya Honda Beat susah hidup, distarter cuma bunyi tapi mesin nggak nyala.")
             pg.evaluate("document.activeElement && document.activeElement.blur(); window.scrollTo(0, 0)")
-            snap("01_home")
-            pg.click("#goBtn"); pg.wait_for_selector("#progress:not(.hidden)")
-            # partial results stream in as each live stage finishes
-            pg.wait_for_selector("#lf-segment img", timeout=LIVE_MS)
+            snap("01_home")  # nothing is sent: the first screen with a photo picked and the problem typed
+            pg.goto(origin + "/?replay=1"); pg.select_option("#lang", "id"); pg.wait_for_timeout(300)
+            # the recording plays one stage a tick (0.9 s); a slower tick leaves time to shoot the progress screen
+            # before the question arrives (same recorded snapshots, only spaced out)
+            pg.evaluate("window.TCReplay._state.tick = 3000")
+            pg.click("#demoBtn"); pg.wait_for_selector("#progress:not(.hidden)")
+            no_tour()
+            pg.wait_for_selector("#lf-segment img", timeout=30000)
             pg.wait_for_function("() => document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
             top_at("#progress", 72)
             snap("02_progress")
-            pg.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=LIVE_MS)
-            if pg.is_visible("#question"):
-                break
-            print("no follow-up question this time, again", flush=True)
-        pg.fill("#answerText", ANSWER)  # one yes/no question since 1.30.0: a plain yes, like the quick "Ya" chip
-        pg.evaluate("document.activeElement && document.activeElement.blur()")
-        top_at("#question"); snap("03_question")
-        pg.click("#answerBtn"); pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
-        top_at("#dxSummary"); snap("04_diagnosis")       # the likely causes with their confidence
-        top_at("#partsWrap", 72); snap("05_parts")       # the SAM 3.1 masks on the photo, numbered
-        top_at("#result .safety", 84); snap("15_preflight")
-        tick_preflight()
-        top_at("#stepCard", 72); snap("06_step")
-        pg.set_input_files("#stepPhoto", str(dark))
-        pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=LIVE_MS)
-        top_at("#stepPhotoLabel"); snap("07_check_fail")
-        go_to_step(sample_step_n(pg, "motor"))  # the sample after-photo shows the plug cap pushed back on
-        pg.set_input_files("#stepPhoto", str(FIX / "sample_motor_step_cap_on.jpg"))
-        pg.wait_for_timeout(600)
-        pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=LIVE_MS)
-        top_at("#stepPhotoLabel"); snap("08_check_pass")
+            pg.evaluate("window.TCReplay._state.tick = 900")
+            pg.wait_for_selector("#question:not(.hidden)", timeout=30000)
+            no_tour()
+            pg.fill("#answerText", ANSWER)  # the "Ya" quick answer; the recorded answer starts with it and is in the log
+            pg.evaluate("document.activeElement && document.activeElement.blur()")
+            top_at("#question"); snap("03_question")
+            pg.click("#answerBtn"); pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
+            no_tour()
+            top_at("#dxSummary"); snap("04_diagnosis")
+            top_at("#partsWrap", 72); snap("05_parts")
+            top_at("#result .safety", 84); snap("15_preflight")
+            tick_preflight()
+            top_at("#stepCard", 72); snap("06_step")
+            pg.click("#sampleBad"); check_done()  # the recorded check of the too-dark sample photo
+            top_at("#stepPhotoLabel"); snap("07_check_fail")
+            pg.click("#sampleGood"); check_done()  # the plug cap photo, checked on the step it shows
+            top_at("#stepPhotoLabel"); snap("08_check_pass")
+        else:
+            for attempt in range(3):  # live: the model asks a follow-up only when unsure, and the screenshots need one
+                pg.goto(base + "/"); pg.wait_for_selector("#goBtn")
+                pg.set_input_files("#photo", str(FIX / "sample_motor_plug_area.jpg"))
+                pg.fill("#text", "Motor saya Honda Beat susah hidup, distarter cuma bunyi tapi mesin nggak nyala.")
+                pg.evaluate("document.activeElement && document.activeElement.blur(); window.scrollTo(0, 0)")
+                snap("01_home")
+                pg.click("#goBtn"); pg.wait_for_selector("#progress:not(.hidden)")
+                # partial results stream in as each live stage finishes
+                pg.wait_for_selector("#lf-segment img", timeout=LIVE_MS)
+                pg.wait_for_function("() => document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
+                top_at("#progress", 72)
+                snap("02_progress")
+                pg.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=LIVE_MS)
+                if pg.is_visible("#question"):
+                    break
+                print("no follow-up question this time, again", flush=True)
+            pg.fill("#answerText", ANSWER)  # one yes/no question since 1.30.0: a plain yes, like the quick "Ya" chip
+            pg.evaluate("document.activeElement && document.activeElement.blur()")
+            top_at("#question"); snap("03_question")
+            pg.click("#answerBtn"); pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
+            top_at("#dxSummary"); snap("04_diagnosis")       # the likely causes with their confidence
+            top_at("#partsWrap", 72); snap("05_parts")       # the SAM 3.1 masks on the photo, numbered
+            top_at("#result .safety", 84); snap("15_preflight")
+            tick_preflight()
+            top_at("#stepCard", 72); snap("06_step")
+            pg.set_input_files("#stepPhoto", str(dark))
+            pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=LIVE_MS)
+            top_at("#stepPhotoLabel"); snap("07_check_fail")
+            go_to_step(sample_step_n(pg, "motor"))  # the sample after-photo shows the plug cap pushed back on
+            pg.set_input_files("#stepPhoto", str(FIX / "sample_motor_step_cap_on.jpg"))
+            pg.wait_for_timeout(600)
+            pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=LIVE_MS)
+            top_at("#stepPhotoLabel"); snap("08_check_pass")
         pg.wait_for_timeout(2000)
         pg.locator("#agent .agGo", has_text="Langkah 1 dicek").first.click()          # tap a log line → back to that step
         pg.wait_for_selector("#stepCard.flash"); pg.wait_for_timeout(900)
@@ -414,40 +556,55 @@ def shots() -> None:
             pg.click("#prevBtn"); pg.wait_for_timeout(150)
         msid = pg.evaluate("S && S.id")
         mpdf = Path(tempfile.mkdtemp()) / "motor.pdf"
-        mpdf.write_bytes(pg.request.get(f"{base}/api/sessions/{msid}/report.pdf").body())
+        # recorded: the report and share card recorded with the demo (the replay serves these same files)
+        mpdf.write_bytes(pg.request.get(f"{base}/static/replay/report-id.pdf" if rec else f"{base}/api/sessions/{msid}/report.pdf").body())
         # the PDF pages are drawn as images (no text layer); in this motorbike report the agent log is on page 2
         info = subprocess.run(["pdfinfo", str(mpdf)], capture_output=True, text=True).stdout
         page_no = 2 if any(ln.startswith("Pages:") and int(ln.split()[1]) >= 2 for ln in info.splitlines()) else 1
         subprocess.run(["pdftoppm", "-png", "-r", "110", "-f", str(page_no), "-l", str(page_no), "-singlefile", str(mpdf),
                         str(SHOTS / "25_pdf_agent")], check=True)
         print("shot 25_pdf_agent (page", page_no, ")", flush=True)
-        (SHOTS / "26_share_card.png").write_bytes(pg.request.get(f"{base}/api/sessions/{msid}/card.png").body())
+        (SHOTS / "26_share_card.png").write_bytes(pg.request.get(f"{base}/static/replay/card-id.png" if rec else f"{base}/api/sessions/{msid}/card.png").body())
         print("shot 26_share_card", flush=True)
         top_at("#result .actions", 72); snap("12_report")  # the share and report buttons, starting under the header
         pg.click("#mechBtn"); pg.wait_for_selector("#handoff:not(.hidden)", timeout=10000)
         pg.evaluate("document.querySelector('#handoff details') && (document.querySelector('#handoff details').open = true)")
         top_at("#mechBtn"); snap("18_handoff")
         # live camera guide on the pump repair (Chromium fake camera playing a labelled sample photo)
-        go_sample("pump"); pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
+        if rec:
+            open_recorded(pg, origin, recorded_session("pump", "id"), "id")
+        else:
+            go_sample("pump"); pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
         pg.evaluate("window.scrollTo(0,0)"); snap("10_pump")
         tick_preflight()
         go_to_step(live_step_n(pg))
         pg.click("#liveBtn"); pg.wait_for_selector("#live:not(.hidden)")
         top_at("#liveBtn")
-        locked = "() => /^🎯/.test(document.querySelector('#liveState').textContent)"
-        for _ in range(4):  # the fake camera drifts, so the outline comes and goes: shoot while it is on screen
-            try:  # SAM 3.1 on the fake camera frames finds the part within a few frames (each frame is a paid SAM call)
-                pg.wait_for_function(locked, timeout=20000)
-            except Exception:  # noqa: BLE001
-                print("live guide: no lock-on within 20 s", flush=True)
-                continue
-            pg.screenshot(path=str(SHOTS / "16_live_guide.png"))
+        # the live line says "Found <part>" in the page's language (the 🎯 can be drawn as an icon, so match the words)
+        locked = ("() => document.querySelector('#liveState').textContent"
+                  ".includes(t('liveFound').replace('{name}', '').replace('🎯', '').trim())")
+        # Polled from here (every 250 ms, at most 30 s) instead of a page-side wait: each frame the page sends is a paid
+        # SAM 3.1 call, so the camera closes as soon as the shot is in. The outline comes and goes with the drift of the
+        # fake camera, so the shot is taken only while the line says the part is found.
+        shot_ok = False
+        for _ in range(120):
             if pg.evaluate(locked):
-                break
+                pg.wait_for_timeout(300)  # let the outline paint
+                if pg.evaluate(locked):
+                    pg.screenshot(path=str(SHOTS / "16_live_guide.png"))
+                    shot_ok = True
+                    break
+            pg.wait_for_timeout(250)
+        if not shot_ok:
+            page_errors.append("live guide: SAM 3.1 did not find the part within 30 s (16_live_guide not taken)")
         print("shot 16_live_guide", flush=True)
         pg.click("#liveClose")
         # safety stop with PDF + hand-off
-        go_sample("rice"); pg.wait_for_selector("#stopBox:not(.hidden)", timeout=LIVE_MS)
+        if rec:
+            open_recorded(pg, origin, recorded_session("rice", "id"), "id")
+        else:
+            go_sample("rice")
+        pg.wait_for_selector("#stopBox:not(.hidden)", timeout=LIVE_MS)
         pg.wait_for_selector("#stopHandoff:not(.hidden)", timeout=10000)
         pg.evaluate("window.scrollTo(0, 0)"); snap("11_rice_stop")  # the STOP card sits under the "Stopped for your safety" heading
         top_at("#stopBox > p:nth-of-type(3)"); snap("22_stop_handoff")  # "Do this now", the service buttons, the hand-off
@@ -456,7 +613,11 @@ def shots() -> None:
         pdf.write_bytes(pg.request.get(f"{base}/api/sessions/{sid}/report.pdf").body())
         subprocess.run(["pdftoppm", "-png", "-r", "110", "-f", "1", "-l", "1", "-singlefile", str(pdf), str(SHOTS / "19_stop_pdf")], check=True)
         print("shot 19_stop_pdf", flush=True)
-        faucet_with_diagram(pg, base)
+        if rec:
+            open_recorded(pg, origin, recorded_session("faucet", "en", diagram=True), "en")
+            tick_preflight()
+        else:
+            faucet_with_diagram(pg, base)
         pg.evaluate("window.scrollTo(0,0)"); snap("13_english")
         # the step Muse Image drew a diagram for (the washer inside the tap)
         for _ in range(10):
@@ -464,11 +625,14 @@ def shots() -> None:
                 break
             pg.click("#nextBtn"); pg.wait_for_timeout(300)
         top_at("#stepCard", 72); snap("28_diagram_step")
-        go_sample("tire", "jv"); pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
+        if rec:
+            open_recorded(pg, origin, recorded_session("tire", "jv"), "jv")
+        else:
+            go_sample("tire", "jv"); pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
         pg.evaluate("window.scrollTo(0,0)"); snap("20_javanese_result")
-        pg.goto(base + "/"); pg.select_option("#lang", "jv"); pg.wait_for_timeout(300); snap("14_garage_jv", full=True)
+        pg.goto(origin + "/"); pg.select_option("#lang", "jv"); pg.wait_for_timeout(300); snap("14_garage_jv", full=True)
         # recorded demo: what a visitor sees when the server sleeps (forced here with ?replay=1)
-        pg.goto(base + "/?replay=1"); pg.select_option("#lang", "en"); pg.click("#demoBtn")
+        pg.goto(origin + "/?replay=1"); pg.select_option("#lang", "en"); pg.click("#demoBtn")
         pg.wait_for_selector("#question:not(.hidden)", timeout=20000); pg.click('#quickAns button[data-q="qNo"]')
         pg.wait_for_selector("#result:not(.hidden)", timeout=20000)
         if pg.is_visible("#tourClose"):
@@ -484,6 +648,8 @@ def shots() -> None:
         lap.screenshot(path=str(SHOTS / "29_laptop.png")); print("shot 29_laptop", flush=True)
         b.close()
     srv.should_exit = True
+    if rec:
+        print(f"live spend of this run (app cost meter, live camera guide only): ${spent_total() - spent_before:.4f}", flush=True)
     if page_errors:
         raise SystemExit("page errors while shooting:\n" + "\n".join(page_errors))
     print("screenshots ->", SHOTS, sorted(p.name for p in SHOTS.glob("*.png")))
@@ -499,6 +665,11 @@ def wa_shots() -> None:
     the PDF report. Not a real WhatsApp number (that waits on my Meta setup, docs/WHATSAPP.md)."""
     from playwright.sync_api import sync_playwright
 
+    if recorded():
+        # the simulator keeps its chat in server memory only, so there is no recording to play back: these shots
+        # need live answers (`wa` without DEMO_RECORDED_DATA, about $0.15). The ones in the folder are kept.
+        print("recorded mode: WhatsApp shots kept as they are (re-make them with a live `wa` run)", flush=True)
+        return
     SHOTS.mkdir(parents=True, exist_ok=True)
     base, srv = _server()
     with sync_playwright() as p:

@@ -10,8 +10,10 @@ Two halves, both driven by scripts/make_demo_assets.py:
   render          60 fps frames composed with Pillow and piped to ffmpeg, one cached segment per scene (with its
                   voice-over), then joined. The vertical X clip reuses the same recordings.
 
-Every answer on screen is a live Meta API answer (waits for the models are cut and the real wait is noted); the
-photos are AI-generated sample photos, said in the corner of every frame.
+Every answer on screen is a real Meta API answer, said on every frame: live by default (waits for the models are
+cut and the real wait is noted), or with DEMO_RECORDED_DATA set, played back from answers recorded on the live API
+(the recorded 1-tap demo and recorded live sessions; only the live camera guide calls SAM 3.1 live). The photos are
+AI-generated sample photos, said in the corner of every frame.
 """
 from __future__ import annotations
 
@@ -46,11 +48,26 @@ TONE = {"act": (255, 106, 19), "stop": (200, 32, 30), "check": (255, 194, 26), "
 
 
 def recorded_on() -> str:
-    """The day the clips were recorded (written by `capture`, WIB), like "6 Nov 2026"; today when there are none."""
+    """The day the answers in the clips came from the live API (written by `capture`, WIB), like "6 Nov 2026"; today
+    when there are none."""
     p = CLIPS / "recorded.json"
     if p.exists():
         return str(json.loads(p.read_text())["date"])
     return _today_wib()
+
+
+def played_back() -> bool:
+    """True when the clips play recorded live answers (DEMO_RECORDED_DATA) instead of calling the models while filming."""
+    p = CLIPS / "recorded.json"
+    return p.exists() and json.loads(p.read_text()).get("source") == "recorded"
+
+
+def _replay_day() -> str:
+    """The day the recorded 1-tap demo was recorded on the live API, from web/replay/demo.json ("2026-11-06 01:23 WIB")."""
+    from datetime import date
+
+    d = date.fromisoformat(str(json.loads((ROOT / "web" / "replay" / "demo.json").read_text(encoding="utf-8"))["recorded_at"])[:10])
+    return f"{d.day} {d:%b %Y}"
 
 
 def _today_wib() -> str:
@@ -62,7 +79,17 @@ def _today_wib() -> str:
 
 
 def demo_note() -> str:
+    if played_back():
+        return f"Real Meta API answers, recorded {recorded_on()} · AI-generated sample photos"
     return f"Live Meta API answers · {recorded_on()} · AI-generated sample photos"
+
+
+def answers_note() -> str:
+    """The line on the close card that says where the answers come from."""
+    if played_back():
+        return (f"Answers recorded live on the Meta Model API, {recorded_on()}, and played back; "
+                "the live camera guide ran live. Photos are AI-generated samples.")
+    return f"Recorded live on the Meta Model API, {recorded_on()}. Model waits are cut; photos are AI-generated samples."
 
 
 # --- fonts and text
@@ -487,7 +514,7 @@ def card(sc: Any, t: float, shot: Shot, size: tuple[int, int], vertical: bool) -
         yy = y + 170
         yy = text_block(d, (x, yy + 18 * (1 - k2)), small.replace("'", "’"), font("black", 84 if not vertical else 92), lw, ON_DARK + (int(255 * k2),), 86)
         yy = text_block(d, (x, yy + 36), sc.caption, font("body", 32 if not vertical else 38), lw - 20, ON_DARK_MUTED + (int(255 * k3),), 44)
-        text_block(d, (x, yy + 18), f"Recorded live on the Meta Model API, {recorded_on()}. Model waits are cut; photos are AI-generated samples.", font("body", 26 if not vertical else 32),
+        text_block(d, (x, yy + 18), answers_note(), font("body", 26 if not vertical else 32),
                    lw, ON_DARK_MUTED + (int(200 * k3),), 36)
     else:  # opening title
         brand_row(layer, x, int(y - 40 + 18 * (1 - k1)), dark=True, size=110 if not vertical else 120)
@@ -833,7 +860,9 @@ def capture(group: str, lengths: dict[str, float]) -> None:
 
     CLIPS.mkdir(parents=True, exist_ok=True)
     base, srv = mda._server()
-    (CLIPS / "recorded.json").write_text(json.dumps({"date": _today_wib()}))
+    rec, origin = mda.recorded(), mda.site(base)
+    spent_before = mda.spent_total() if rec else 0.0
+    (CLIPS / "recorded.json").write_text(json.dumps({"date": _replay_day() if rec else _today_wib(), "source": "recorded" if rec else "live"}))
     settings.mock_pace_s = 0.6
     dark = Path(tempfile.mkdtemp()) / "dark.jpg"
     dark.write_bytes(_dark_photo("motor"))
@@ -844,14 +873,18 @@ def capture(group: str, lengths: dict[str, float]) -> None:
         b = p.chromium.launch(executable_path=mda._chromium(), args=args)
         ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, locale="id-ID",
                             timezone_id=mda.TZ)
-        ctx.grant_permissions(["camera", "microphone"], origin=base)
+        ctx.grant_permissions(["camera", "microphone"], origin=origin)
         ctx.add_init_script(mda.SR_STUB)
         ctx.add_init_script(TAP_JS)
-        mda.public_links(ctx, base)  # the hand-off message links read like the public site's, not 127.0.0.1
-        pg = ctx.new_page()
         page_errors: list[str] = []
+        if rec:
+            mda.serve_as_public(ctx, base)    # pages at the public address, answered by this server
+            mda.no_new_runs(ctx, page_errors)  # anything that would start new model work fails the take
+        else:
+            mda.public_links(ctx, base)  # the hand-off message links read like the public site's, not 127.0.0.1
+        pg = ctx.new_page()
         mda._console_watch(pg, page_errors)
-        rec = Recorder(ctx, pg)
+        recorder = Recorder(ctx, pg)
 
         def scroll_to(sel: str, off: int = -80, ms: int = 900) -> None:
             pg.evaluate("([s, o, ms]) => { const el = document.querySelector(s); const y = el.getBoundingClientRect().top + scrollY + o;"
@@ -878,11 +911,16 @@ def capture(group: str, lengths: dict[str, float]) -> None:
 
         def motor_to_result() -> None:
             settings.mock_pace_s = 0.0
-            pg.goto(base + "/")
-            pg.wait_for_selector("#goBtn")
-            pg.set_input_files("#photo", str(FIX / "sample_motor_plug_area.jpg"))
-            pg.fill("#text", "Motor saya Honda Beat susah hidup, distarter cuma bunyi tapi mesin nggak nyala.")
-            pg.click("#goBtn")
+            if rec:  # the recorded 1-tap demo: the motorbike sample, played back
+                pg.goto(origin + "/?replay=1")
+                pg.wait_for_selector("#goBtn")
+                pg.click('button.sample[data-sample="motor"]')
+            else:
+                pg.goto(base + "/")
+                pg.wait_for_selector("#goBtn")
+                pg.set_input_files("#photo", str(FIX / "sample_motor_plug_area.jpg"))
+                pg.fill("#text", "Motor saya Honda Beat susah hidup, distarter cuma bunyi tapi mesin nggak nyala.")
+                pg.click("#goBtn")
             pg.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=LIVE_MS)
             if pg.is_visible("#question"):
                 pg.fill("#answerText", mda.ANSWER)
@@ -892,13 +930,19 @@ def capture(group: str, lengths: dict[str, float]) -> None:
             settings.mock_pace_s = 0.6
 
         if group == "motor":
-            pg.goto(base + "/")
+            pg.goto(origin + ("/?replay=1" if rec else "/"))
             pg.wait_for_selector("#goBtn")
             pg.wait_for_timeout(600)
             logo = pg.locator(".brand .plate").first
             logo.screenshot(path=str(CLIPS / "logo.png"))
 
             def intro(at: Callable[[float], None]) -> None:
+                if rec:  # the form, then down to the samples: the recording starts from the motorbike sample
+                    at(0.6)
+                    scroll_to("#photoBox", -70, 1000)
+                    at(2.4)
+                    scroll_to('button.sample[data-sample="motor"]', -520, 1200)
+                    return
                 at(0.6)
                 scroll_to("#photoBox", -70, 1000)
                 at(1.8)
@@ -913,18 +957,18 @@ def capture(group: str, lengths: dict[str, float]) -> None:
 
             def progress(at: Callable[[float], None]) -> None:
                 at(0.3)
-                pg.click("#goBtn")
+                pg.click('button.sample[data-sample="motor"]' if rec else "#goBtn")
                 pg.wait_for_selector("#progress:not(.hidden)")
                 at(0.9)
                 scroll_to("#stageList", -110, 800)
-                rec.cut(lambda: pg.wait_for_selector("#lf-segment img", timeout=LIVE_MS))
+                recorder.cut(lambda: pg.wait_for_selector("#lf-segment img", timeout=LIVE_MS))
                 pg.wait_for_function("() => document.querySelector('#lf-segment img').naturalWidth > 0", timeout=10000)
-                rec.mark("sam")
+                recorder.mark("sam")
                 pg.wait_for_timeout(700)
                 scroll_by(330, 1100)
 
             def question(at: Callable[[float], None]) -> None:
-                rec.cut(lambda: pg.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=LIVE_MS))
+                recorder.cut(lambda: pg.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=LIVE_MS))
                 if not pg.is_visible("#question"):
                     raise SystemExit("this live run did not ask a follow-up question: run `capture motor` again")
                 scroll_to("#question", -120, 700)
@@ -935,9 +979,9 @@ def capture(group: str, lengths: dict[str, float]) -> None:
             def diagnosis(at: Callable[[float], None]) -> None:
                 at(0.3)
                 pg.click("#answerBtn")
-                rec.cut(lambda: pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS))
+                recorder.cut(lambda: pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS))
                 pg.evaluate("window.scrollTo(0, 0)")
-                rec.mark("result")
+                recorder.mark("result")
                 at(4.2)
                 scroll_by(420, 1500)
 
@@ -947,7 +991,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
 
             plan = {"intro": intro, "progress": progress, "question": question, "diagnosis": diagnosis, "parts": parts}
             for key in GROUPS["motor"]:
-                run_scene(rec, key, lengths[key], plan[key])
+                run_scene(recorder, key, lengths[key], plan[key])
             src = pg.evaluate("document.querySelector('#partsImg') && document.querySelector('#partsImg').src")
             if src:
                 (CLIPS / "parts_photo.jpg").write_bytes(pg.request.get(src).body())
@@ -965,8 +1009,11 @@ def capture(group: str, lengths: dict[str, float]) -> None:
 
             def check_fail(at: Callable[[float], None]) -> None:
                 at(0.6)
-                pg.set_input_files("#stepPhoto", str(dark))
-                rec.cut(lambda: pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=LIVE_MS))
+                if rec:
+                    pg.click("#sampleBad")  # the recorded check of the too-dark sample photo
+                else:
+                    pg.set_input_files("#stepPhoto", str(dark))
+                recorder.cut(lambda: pg.wait_for_function("() => !document.querySelector('#checkResult').textContent.includes('…')", timeout=LIVE_MS))
                 at(2.0)
                 scroll_to("#checkResult", -330, 900)
 
@@ -979,13 +1026,16 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 at(0.2)
 
                 def upload_and_check() -> None:
-                    pg.set_input_files("#stepPhoto", str(FIX / "sample_motor_step_cap_on.jpg"))
+                    if rec:
+                        pg.click("#sampleGood")  # the recorded check of the plug cap sample photo
+                    else:
+                        pg.set_input_files("#stepPhoto", str(FIX / "sample_motor_step_cap_on.jpg"))
                     pg.wait_for_function("() => { const el = document.querySelector('#checkResult');"
                                          " return (el.classList.contains('isPass') || el.classList.contains('isFail'))"
                                          " && !el.textContent.includes('…'); }", timeout=LIVE_MS)
 
-                rec.cut(upload_and_check)
-                rec.mark("pass")
+                recorder.cut(upload_and_check)
+                recorder.mark("pass")
 
             def handsfree(at: Callable[[float], None]) -> None:
                 at(0.8)
@@ -1005,7 +1055,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 pg.keyboard.type("Sudah dicoba, mesin tetap tidak nyala.", delay=26)
                 at(3.2)
                 pg.click("#stuckBtn")
-                rec.cut(lambda: pg.wait_for_function(
+                recorder.cut(lambda: pg.wait_for_function(
                     "() => document.querySelector('#stuckMsg').textContent.length > 3 && !document.querySelector('#stuckBtn').disabled", timeout=LIVE_MS))
                 pg.wait_for_selector("#planBanner:not(.hidden)")
                 at(4.6)
@@ -1038,7 +1088,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                                 " window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + scrollY - 330));"
                                 " document.querySelector('#checkResult').classList.remove('isPass', 'isFail'); }")
                     pg.wait_for_timeout(400)
-                run_scene(rec, key, lengths[key], plan[key])
+                run_scene(recorder, key, lengths[key], plan[key])
 
         else:  # live camera on the pump, red stop on the rice cooker, the Muse Image diagram on the faucet
             # DEMO_ONLY=diagram (comma list) re-records only those scenes of this group, so one bad take costs one scene
@@ -1046,9 +1096,12 @@ def capture(group: str, lengths: dict[str, float]) -> None:
 
             def setup_live() -> None:
                 settings.mock_pace_s = 0.0
-                pg.goto(base + "/")
-                pg.click('button.sample[data-sample="pump"]')
-                pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
+                if rec:  # a pump repair recorded on the live API; the camera guide itself runs live
+                    mda.open_recorded(pg, origin, mda.recorded_session("pump", "id"), "id")
+                else:
+                    pg.goto(base + "/")
+                    pg.click('button.sample[data-sample="pump"]')
+                    pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
                 for box in pg.locator("#preList input").all():
                     box.check()
                 go_to_step(mda.live_step_n(pg))  # aim the live guide at the pump's electric motor (or the pump body)
@@ -1067,10 +1120,14 @@ def capture(group: str, lengths: dict[str, float]) -> None:
             def rice(at: Callable[[float], None]) -> None:
                 settings.mock_pace_s = 0.35
                 at(0.4)
-                pg.click('button.sample[data-sample="rice"]')
-                rec.cut(lambda: pg.wait_for_selector("#stopBox:not(.hidden)", timeout=LIVE_MS))
+                if rec:  # the recorded rice cooker repair opens the way the app reopens one (no new model call)
+                    pg.evaluate("(sid) => { history.pushState({ tc: 1 }, '', '#' + sid); show('progress'); startElapsed(); follow(sid); }",
+                                mda.recorded_session("rice", "id"))
+                else:
+                    pg.click('button.sample[data-sample="rice"]')
+                recorder.cut(lambda: pg.wait_for_selector("#stopBox:not(.hidden)", timeout=LIVE_MS))
                 pg.evaluate("window.scrollTo(0, 0)")
-                rec.mark("stop")
+                recorder.mark("stop")
 
             def diagram(at: Callable[[float], None]) -> None:
                 at(0.2)
@@ -1086,20 +1143,27 @@ def capture(group: str, lengths: dict[str, float]) -> None:
 
             if "live" in only:
                 setup_live()
-                run_scene(rec, "live", lengths["live"], live)
+                run_scene(recorder, "live", lengths["live"], live)
                 pg.click("#liveClose")
             if "rice" in only:
-                pg.goto(base + "/")
+                pg.goto(origin + "/")
                 pg.evaluate("document.querySelector('button.sample[data-sample=\"rice\"]').scrollIntoView({block: 'center'})")
                 pg.wait_for_timeout(400)
-                run_scene(rec, "rice", lengths["rice"], rice)
+                run_scene(recorder, "rice", lengths["rice"], rice)
             if "diagram" in only:  # the English faucet repair, where Muse Image draws the washer swap
                 settings.mock_pace_s = 0.0
-                mda.faucet_with_diagram(pg, base)
+                if rec:
+                    mda.open_recorded(pg, origin, mda.recorded_session("faucet", "en", diagram=True), "en")
+                    for box in pg.locator("#preList input").all():
+                        box.check()
+                else:
+                    mda.faucet_with_diagram(pg, base)
                 settings.mock_pace_s = 0.6
                 pg.evaluate("window.scrollTo(0, 0)")
-                run_scene(rec, "diagram", lengths["diagram"], diagram)
+                run_scene(recorder, "diagram", lengths["diagram"], diagram)
         b.close()
     srv.should_exit = True
+    if rec:
+        print(f"live spend of this take (app cost meter): ${mda.spent_total() - spent_before:.4f}", flush=True)
     if page_errors:
         raise SystemExit(f"page errors while recording {group}:\n" + "\n".join(page_errors))

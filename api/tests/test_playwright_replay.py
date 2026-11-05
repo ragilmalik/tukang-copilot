@@ -97,3 +97,19 @@ def test_forced_replay_sends_nothing_to_the_server(page):
     _sample_photo_passes_on_its_step(page, "jv", "langkah")
     assert not sent, sent
     assert "rekaman" in page.inner_text("#modeBadge").lower()
+
+
+def test_recorded_hand_off_links_point_at_this_site(page):
+    """The hand-off message was recorded on a test server ("http://testserver/..."): in the replay its links must point
+    at the site the visitor is on, the guide link at the recorded demo and the PDF link at the recorded report."""
+    page.goto(page.base + "/?replay=1")
+    _run_demo(page, "id")
+    page.click("#mechBtn")
+    page.wait_for_selector("#handoff:not(.hidden)", timeout=10000)
+    text = page.text_content("#handoff .hoText") or ""  # inside a closed fold-out
+    wa = page.get_attribute("#handoff a.wa", "href") or ""
+    assert "testserver" not in text and "testserver" not in wa
+    assert page.base + "/?replay=1" in text
+    assert page.base + "/static/replay/report-id.pdf" in text
+    assert wa.startswith("https://wa.me/") and "static%2Freplay%2Freport-id.pdf" in wa
+    assert page.request.get(page.base + "/static/replay/report-id.pdf").ok      # the PDF link really opens

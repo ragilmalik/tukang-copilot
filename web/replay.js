@@ -52,6 +52,22 @@
     if (opts && opts.checksUsed) s.checks_used = (R.usedChecks = (R.usedChecks || 0) + 1);
   }
 
+  // The hand-off message was recorded on the recording machine's test server, so its links read "http://testserver/...".
+  // Here they point at this site instead: the guide link opens the recorded demo, the PDF link the recorded report.
+  function publicHandoff(h) {
+    const out = clone(h);
+    const abs = (p) => new URL(p, location.href).href;
+    const demo = STATIC ? location.href.split("#")[0] : abs("/?replay=1");
+    const pdf = abs(BASE + `report-${R.lang}.pdf`);
+    let text = String(h.text || "");
+    if (h.guide_url) text = text.split(h.guide_url).join(demo);
+    if (h.pdf_url) text = text.split(h.pdf_url).join(pdf);
+    out.text = text; out.guide_url = demo; out.pdf_url = pdf;
+    const wa = String(h.whatsapp_url || ""), at = wa.indexOf("text=");
+    if (at >= 0) out.whatsapp_url = wa.slice(0, at + 5) + encodeURIComponent(text);
+    return out;
+  }
+
   async function formOf(init) {
     const b = init && init.body;
     return b && typeof b.get === "function" ? b : null;
@@ -78,7 +94,7 @@
     if (rest === "" && method === "GET") return R.cur ? json(R.cur) : json({ detail: "Session not found" }, 404);
     if (rest === "/answer" && method === "POST") { R.phase = "ready"; return json({ ok: true }); }
     if (rest === "/retry" && method === "POST") return json({ ok: true });
-    if (rest === "/handoff") return json(L.handoff);
+    if (rest === "/handoff") return json(publicHandoff(L.handoff));
     if (rest === "/card.png") return realFetch(BASE + `card-${R.lang}.png`);
     if ((m = rest.match(/^\/steps\/(\d+)\/check$/)) && method === "POST") {
       const fd = await formOf(init), f = fd && fd.get("photo");
