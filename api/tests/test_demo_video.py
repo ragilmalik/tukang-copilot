@@ -2,6 +2,7 @@
 measured numbers and the repo link; the vertical clip has voice and music; captions, timestamps and the music credit
 are written for the docs."""
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -58,11 +59,13 @@ def test_ai_scenes_are_labelled_and_exist():
 def test_proof_numbers_match_the_reports():
     """Every number on the proof card is in the report it names."""
     ev = (ROOT / "docs" / "EVAL.md").read_text(encoding="utf-8")
-    tr = (ROOT / "docs" / "TEST_REPORT.md").read_text(encoding="utf-8")
+    # The film shows the full run of v1.32.0 (it says so on the card). TEST_REPORT.md is rewritten on every run, so
+    # that run's numbers are kept in VERIFICATION_REPORT.md's list of earlier runs (1.33.0).
+    tr = (ROOT / "docs" / "VERIFICATION_REPORT.md").read_text(encoding="utf-8")
     assert "83492.4" in ev and "$0.0437" in ev                     # median latency and cost, live column
     assert "23/23 (100%)" in ev and "10/10 (100%)" in ev           # 23 + 10 = 33 dangerous cases stopped
     assert "0 of 17 safe cases stopped" in ev
-    assert "1096 passed, 0 failed, 0 skipped" in tr
+    assert re.search(r"v1\.32\.0[^\n]*1096 passed, 0 failed, 0 skipped", tr)
     nums = [n for n, _ in mda.PROOF]
     assert nums == ["83 s", "$0.044", "33 / 33", "0 / 17", "1,096"]
     assert "earlier set" in mda.PROOF_NOTE and "earlier sample photos" in next(s for s in mda.SCENES if s.key == "proof").say

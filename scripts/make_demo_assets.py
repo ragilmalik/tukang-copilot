@@ -177,7 +177,7 @@ VSCENES: list[Scene] = [
           "Real recorded output from Meta's models. The code is on GitHub.", 4, hold=2.6),
 ]
 VCLIPS = {"v_parts": ("parts", 0.8), "v_check": ("check_pass", 0.0), "v_stop": ("rice", 2.0), "v_tyre": ("tyre", 0.0)}
-VERTICAL_ZOOMS = {"parts": [(0.0, 1.0, 300), (0.6, 1.0, 300), (2.0, 1.3, 300), (6.0, 1.3, 300)],
+VERTICAL_ZOOMS: dict[str, list[tuple[float, float, float]]] = {"parts": [(0.0, 1.0, 300), (0.6, 1.0, 300), (2.0, 1.3, 300), (6.0, 1.3, 300)],
                   "check_pass": [(0.0, 1.0, 560), (0.8, 1.0, 560), (2.0, 1.25, 560), (6.0, 1.25, 560)],
                   "rice": [(0.0, 1.1, 330), (6.0, 1.25, 330)]}
 

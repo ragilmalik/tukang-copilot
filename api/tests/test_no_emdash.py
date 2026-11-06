@@ -11,7 +11,8 @@ def test_no_em_dash_in_user_facing_files() -> None:
     assert not bad, bad
 
 
-def test_no_em_dash_in_setup_and_submission_docs() -> None:
-    files = [ROOT / "docs" / "SETUP.md", ROOT / "TODO.md", ROOT / "docs" / "SUBMISSION.md", ROOT / "docs" / "TESTING.md"]
+def test_no_em_dash_in_setup_and_main_docs() -> None:
+    files = [ROOT / "docs" / "SETUP.md", ROOT / "TODO.md", ROOT / "README.md", ROOT / "HANDOFF.md", ROOT / "docs" / "TESTING.md",
+             ROOT / "docs" / "archive" / "hackathon" / "SUBMISSION.md"]
     bad = [f.name for f in files if "\u2014" in f.read_text(encoding="utf-8")]
     assert not bad, bad

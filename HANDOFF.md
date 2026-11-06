@@ -31,7 +31,7 @@ Step by step: [docs/TUTORIAL.md](docs/TUTORIAL.md). Every setting: [docs/SETUP.m
 - Code: `api/` (engine in `api/pipeline/engine.py`, every Meta call in `api/meta_client.py`), browser app in `web/`, prompts in `prompts/`, tests in `api/tests/`, scripts in `scripts/`.
 - Understanding it: [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) (plain words), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/METHODS.md](docs/METHODS.md), [docs/AI_PIPELINE.md](docs/AI_PIPELINE.md).
 - Results: [docs/REPORT.md](docs/REPORT.md).
-- Submission text, field by field: [docs/SUBMISSION.md](docs/SUBMISSION.md); steps: [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md).
+- Submission text, field by field: [docs/SUBMISSION.md](docs/archive/hackathon/SUBMISSION.md); steps: [docs/SUBMISSION_CHECKLIST.md](docs/archive/hackathon/SUBMISSION_CHECKLIST.md).
 - Demo media: [docs/demo/](docs/demo/README.md). Launch kit: [docs/launch/](docs/launch/).
 - Copy of the deliverables (video, one-pager, guide PDF, repo zip): Google Drive folder "Meta Hackathon - Tukang Copilot" (private to my account): https://drive.google.com/drive/folders/1mxVXV1tgjCuxfKoSAHWJpc6V7Yz9vslt
 

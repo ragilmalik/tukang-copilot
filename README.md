@@ -22,8 +22,8 @@ built solo in Semarang during the hackathon (first commit 30 Oct 2026).
 | Demo video | [YOUTUBE_URL] · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:25, app screens recorded from the live Meta API on 6 Nov 2026, captions, voice-over and music; chapters in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt)) · 9:16 cut: [tukang-copilot-x-vertical.mp4](docs/demo/tukang-copilot-x-vertical.mp4) (31 s) |
 | Code | https://github.com/ragilmalik/tukang-copilot (MIT) |
 | Live results | [docs/LIVE_RUN.md](docs/LIVE_RUN.md) (seven scenarios on the real API) · [docs/EVAL.md](docs/EVAL.md) (eval with a live column) |
-| For judges | [Judging map](docs/JUDGING_MAP.md) · [Judge FAQ](docs/launch/JUDGE_FAQ.md) · [One-pager PDF](docs/launch/one-pager.pdf) |
-| Write-up | [docs/WRITEUP.md](docs/WRITEUP.md) · form copy: [docs/SUBMISSION.md](docs/SUBMISSION.md) |
+| For judges | [Judging map](docs/archive/hackathon/JUDGING_MAP.md) · [Judge FAQ](docs/archive/hackathon/JUDGE_FAQ.md) · [One-pager PDF](docs/launch/one-pager.pdf) |
+| Write-up | [docs/WRITEUP.md](docs/WRITEUP.md) · form copy: [docs/SUBMISSION.md](docs/archive/hackathon/SUBMISSION.md) |
 
 </td></tr></table>
 
@@ -219,9 +219,9 @@ strict clean on 171 files, ruff clean, and the HTTP smoke test passed with 77 ch
 | [docs/REPORT.md](docs/REPORT.md) | Project report: what I built, live results, checks, what is real vs sample, known limits |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Render deploy click by click |
 | [docs/WHATSAPP.md](docs/WHATSAPP.md) | Optional WhatsApp channel: Meta app setup, settings, simulator, tests |
-| [docs/SUBMISSION.md](docs/SUBMISSION.md) and [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md) | Form text field by field, and the steps to submit |
+| [docs/SUBMISSION.md](docs/archive/hackathon/SUBMISSION.md) and [docs/SUBMISSION_CHECKLIST.md](docs/archive/hackathon/SUBMISSION_CHECKLIST.md) | Form text field by field, and the steps to submit |
 | [docs/WRITEUP.md](docs/WRITEUP.md) | Write-up: problem, user, demo, how it works, safety, eval, status |
-| [docs/JUDGING_MAP.md](docs/JUDGING_MAP.md) | Each judging criterion and where the evidence is |
+| [docs/JUDGING_MAP.md](docs/archive/hackathon/JUDGING_MAP.md) | Each judging criterion and where the evidence is |
 | [docs/launch/](docs/launch/) | YouTube text and chapters, X thread, community vote kit, judge FAQ, one-pager, marketing images with their claims table ([ASSETS.md](docs/launch/ASSETS.md)) |
 | [docs/demo/README.md](docs/demo/README.md) | Demo video, vertical clip, screenshots, and how to make them again |
 | [docs/DECISIONS.md](docs/DECISIONS.md), [docs/ROADMAP.md](docs/ROADMAP.md), [docs/ATTRIBUTIONS.md](docs/ATTRIBUTIONS.md) | Why things are built this way, what comes next, third-party notices |

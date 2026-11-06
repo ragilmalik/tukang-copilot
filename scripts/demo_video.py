@@ -449,7 +449,7 @@ class Renderer:
         if self.clip is not None:
             return self.clip.at(t + self.offset)
         if self._still is None:
-            from make_demo_assets import SHOTS  # type: ignore[import-not-found]
+            from make_demo_assets import SHOTS
 
             self._still = Image.open(SHOTS / f"{self.sc.image}.png").convert("RGB").resize((780, 1688), Image.Resampling.LANCZOS)
         return "still", self._still
@@ -623,7 +623,7 @@ def broll_frame(shot: Shot, t: float, size: tuple[int, int], vertical: bool, sub
         im = Image.alpha_composite(im.convert("RGBA"), _left_shade(w, h))
         layer = Image.new("RGBA", size, (0, 0, 0, 0))
         d = ImageDraw.Draw(layer)
-        x, y = 120, 150
+        x, y = 120, 150.0
         if sc.head:
             y = text_block(d, (x, y + 18 * (1 - k1)), sc.head, font("black", 112), 900, ON_DARK + (int(255 * k1),), 108)
         if sc.caption:
@@ -682,7 +682,7 @@ def _vshade(w: int, h: int) -> Image.Image:
 def proof_card(shot: Shot, t: float, size: tuple[int, int], vertical: bool, sub: str) -> Image.Image:
     """The measured numbers, one row each, with where they come from in small print. Only numbers from the repo's
     own reports (make_demo_assets.PROOF)."""
-    from make_demo_assets import PROOF, PROOF_NOTE  # type: ignore[import-not-found]
+    from make_demo_assets import PROOF, PROOF_NOTE
 
     w, h = size
     im = asphalt(w, h).copy()
@@ -718,7 +718,7 @@ def proof_card(shot: Shot, t: float, size: tuple[int, int], vertical: bool, sub:
 
 def close_card(sc: Any, t: float, size: tuple[int, int], vertical: bool, sub: str) -> Image.Image:
     """End card: name, promise, the repo link (the one action), the source of the answers and the music credit."""
-    from make_demo_assets import MUSIC_CREDIT, REPO_URL  # type: ignore[import-not-found]
+    from make_demo_assets import MUSIC_CREDIT, REPO_URL
 
     w, h = size
     im = asphalt(w, h).copy()
@@ -763,7 +763,7 @@ def _close_phones(im: Image.Image, t: float, vertical: bool) -> None:
 
 @lru_cache(maxsize=8)
 def _shot_png(name: str) -> Image.Image:
-    from make_demo_assets import SHOTS  # type: ignore[import-not-found]
+    from make_demo_assets import SHOTS
 
     return Image.open(SHOTS / f"{name}.png").convert("RGB").resize((780, 1688), Image.Resampling.LANCZOS)
 
@@ -943,7 +943,7 @@ GROUPS = {"motor": ["home", "capture", "progress", "diagnosis", "parts"],
 def capture(group: str, lengths: dict[str, float]) -> None:
     from playwright.sync_api import sync_playwright
 
-    import make_demo_assets as mda  # type: ignore[import-not-found]
+    import make_demo_assets as mda
     from api.main import _dark_photo
     from api.settings import settings
 
