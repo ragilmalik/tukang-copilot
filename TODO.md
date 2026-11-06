@@ -16,8 +16,9 @@ Findings ranked by user impact, each with its test; the full audit is in CHANGEL
 - [x] Every main screen with no console error, restart recovery and slow network in Chromium (test_playwright_screens_clean.py); no English in the id/jv string tables
 - [x] CI on 17cf49a and daaf282 went red: the shared-guide re-plan test had no owner token (fixed in a454620) and the erased-spend ledger rounded the erase time up by up to 0.05 s, so a daily sum asked right after an erase missed it (fixed in 7d7969c, test_an_erase_counts_in_the_cap_at_once). CI on 7d7969c then failed the slow-connection test: the progress clock waited for the first server state; it now counts from the tap (test_the_clock_starts_before_the_first_answer_arrives)
 - [x] Writing check: `scripts/check_voice.py` + test_check_voice.py, every hit rewritten (0 hits), HANDOFF rewritten as maintainer notes
-- [ ] Full run: ruff, mypy strict, all tests through make_test_report.py, offline smoke, static build, replay check
-- [ ] Docs with the measured numbers, one-pager and guide bundle rebuilt, pushed
+- [x] Full run on 29823cd (6 Nov, 10:29 WIB): `make_test_report.py` ALL PASSED, 1096 passed, 0 failed, 0 skipped (945 without a browser in 103 files, 151 in real Chromium in 25 files); ruff clean; mypy strict 171 files; offline smoke ALL PASSED (77 checks, port 8765); check_voice 0 hits; `build_static.py --check` OK; `record_replay.py --check` up to date
+- [x] Docs filled with the measured numbers (README, HANDOFF, REPORT, JUDGING_MAP, SUBMISSION, WRITEUP, VERIFICATION_REPORT, ONE_PAGER, COMMUNITY_VOTE_KIT)
+- [ ] One-pager and guide bundle rebuilt, gate, pushed, CI green on the final commit, package and Drive copy
 - [ ] After the first Render deploy: check that `cf-connecting-ip` reaches the app (the rate limit keys on it)
 
 ## 1.31.1 media and docs (6 Nov)

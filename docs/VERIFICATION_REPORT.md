@@ -229,7 +229,7 @@ These came from playing every flow again on a 390x844 phone and a laptop in all 
 | test_doc_counts.py had stopped checking (3-digit pattern, 4-digit count) | ✅ | `test_doc_counts.py::test_the_pattern_reads_four_digit_counts` |
 | Disk full during a run leaves the repair at "running" until the next restart | ⬜ (not fixed) | Nothing can be written while the disk is full; `recover_interrupted` marks it retryable at the next start |
 
-RUN_NUMBERS_1320
+**Run numbers (2026-11-06 10:29 WIB, v1.32.0, commit 29823cd):** `make_test_report.py` ALL PASSED on the whole suite in one run: pytest **1096 passed, 0 failed, 0 skipped** (945 without a browser in 103 files, 151 in real Chromium in 25 Playwright files; the jsdom flow and the axe-core check ran, not skipped), ruff clean, `check_keys.py --fake` and the run's own demo-server smoke passed (docs/TEST_REPORT.md). Separately: `mypy api --strict` no issues in 171 files; `smoke_e2e.py` ALL PASSED (77 checks) on an `OFFLINE=1` server on port 8765; `scripts/check_voice.py` 0 hits. No live API calls in this pass.
 
 ## 6. What is not verified yet
 

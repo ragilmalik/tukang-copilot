@@ -4,7 +4,7 @@ The short version for whoever picks this up next: a judge, a contributor, or me 
 
 ## What this is
 
-Tukang Copilot 1.31.1: a phone web app that looks at a photo of a broken motorbike, pump, tap, tyre or rice cooker, marks the parts with SAM 3.1, diagnoses and plans with Muse Spark 1.3, checks each step from a photo, re-plans, and stops dangerous jobs. Bahasa Indonesia, Basa Jawa and English. Repo: https://github.com/ragilmalik/tukang-copilot
+Tukang Copilot 1.32.0: a phone web app that looks at a photo of a broken motorbike, pump, tap, tyre or rice cooker, marks the parts with SAM 3.1, diagnoses and plans with Muse Spark 1.3, checks each step from a photo, re-plans, and stops dangerous jobs. Bahasa Indonesia, Basa Jawa and English. Repo: https://github.com/ragilmalik/tukang-copilot
 
 ## Run it
 
@@ -22,9 +22,9 @@ Step by step: [docs/TUTORIAL.md](docs/TUTORIAL.md). Every setting: [docs/SETUP.m
 - **Sample:** the photos in `samples/` are AI-generated and say so on the image. Offline mode answers are pre-written. Prices are estimates.
 - **Not measured:** real owner trials.
 
-## Test results (1.31.1)
+## Test results (1.32.0)
 
-1005 automated tests passed, 0 failed, 0 skipped; mypy strict clean on 166 files; ruff clean; offline HTTP smoke ALL PASSED (69 checks); static build and recorded-demo checks pass. Details: [docs/TEST_REPORT.md](docs/TEST_REPORT.md), [docs/VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md). Re-run: [docs/TEST_CHECKLIST.md](docs/TEST_CHECKLIST.md).
+1096 automated tests passed, 0 failed, 0 skipped (945 without a browser, 151 in real Chromium); mypy strict clean on 171 files; ruff clean; offline HTTP smoke ALL PASSED (77 checks); `scripts/check_voice.py` 0 hits; static build and recorded-demo checks pass. Details: [docs/TEST_REPORT.md](docs/TEST_REPORT.md), [docs/VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md). Re-run: [docs/TEST_CHECKLIST.md](docs/TEST_CHECKLIST.md).
 
 ## Where things are
 

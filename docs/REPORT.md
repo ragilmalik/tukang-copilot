@@ -1,4 +1,4 @@
-# Project report: Tukang Copilot 1.31.1
+# Project report: Tukang Copilot 1.32.0
 
 Written 6 November 2026. This is the one document that says what I built, how well it works, what I measured, and what is still open. Every number here comes from a real run that is linked; nothing is projected.
 
@@ -45,9 +45,9 @@ From [LIVE_RUN.md](LIVE_RUN.md) and [EVAL.md](EVAL.md), 5 November 2026:
 
 ## Engineering checks (this release)
 
-- 1005 automated tests passed, 0 failed, 0 skipped ([TEST_REPORT.md](TEST_REPORT.md)).
-- mypy strict: no issues in 166 files. ruff: clean.
-- HTTP smoke on a running offline server: ALL PASSED, 69 checks.
+- 1096 automated tests passed, 0 failed, 0 skipped ([TEST_REPORT.md](TEST_REPORT.md)): 945 without a browser, 151 in real Chromium.
+- mypy strict: no issues in 171 files. ruff: clean. `scripts/check_voice.py`: 0 hits.
+- HTTP smoke on a running offline server: ALL PASSED, 77 checks.
 - Recorded demo: re-recorded live on 6 November 2026, 01:23 WIB; one yes/no question in each language; the sample photo passes on the step it shows.
 - Static judge build: builds and passes its own check.
 

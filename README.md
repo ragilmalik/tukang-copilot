@@ -189,8 +189,8 @@ pip install -r requirements-dev.txt
 scripts/check_all.sh
 ```
 
-The last full run: 1005 tests passed, 0 failed, 0 skipped ([docs/TEST_REPORT.md](docs/TEST_REPORT.md)), mypy strict
-clean on 166 files, ruff clean, and the 69-check HTTP smoke test passed on both an offline and a live server.
+The last full run (1.32.0): 1096 tests passed, 0 failed, 0 skipped ([docs/TEST_REPORT.md](docs/TEST_REPORT.md)), mypy
+strict clean on 171 files, ruff clean, and the HTTP smoke test passed with 77 checks on an offline server (its 69-check version in 1.31.1 also passed on a live server).
 
 ## Documentation map
 
@@ -229,7 +229,7 @@ clean on 166 files, ruff clean, and the 69-check HTTP smoke test passed on both 
 I wrote everything in this repository during the event; the first commit is 30 October 2026, and
 [CHANGELOG.md](CHANGELOG.md) has the dated list. The short version:
 
-- 6 Nov (v1.32): a weakness hunt. One lock per repair so two requests can no longer overwrite each other (double re-plan, a step check landing on the next plan, photo checks past their cap), a repair interrupted by a restart comes back with Try again, the shared guide link is read-only at the API too, a rate limit that can't be skipped with a made-up header, and the photo check off the event loop.
+- 6 Nov (v1.32): a weakness hunt. One lock per repair so two requests can no longer overwrite each other (double re-plan, a step check landing on the next plan, photo checks past their cap), a repair interrupted by a restart comes back with Try again, the shared guide link is read-only at the API too, a rate limit that can't be skipped with a made-up header, the photo check off the event loop, and a progress clock that counts from the tap even on a slow connection.
 - 6 Nov (v1.31): a UI pass (smoother screen changes, instant tap feedback, layout fixes at 360 px), screenshots and video re-made on it from recorded live answers, and the recorded demo's hand-off links fixed.
 - 5 Nov (v1.30): first runs on the real Meta API. Streaming structured output, all schema fields required, Muse Image retry, Retry-After, secret-scrubbed logs with request ids. Live eval column, the recorded demo, screenshots and video re-made from real answers. CORS closed by default.
 - 2 to 4 Nov (v1.27 to v1.29): WhatsApp channel, owner token for shared links, the bengkel-sign look (light and dark), AI-generated sample photos, strict Content-Security-Policy and HSTS, axe-core clean screens, kind-specific red-stop lists.
