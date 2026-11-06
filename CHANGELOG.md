@@ -12,7 +12,9 @@ Media and docs on the 1.31.0 screens, and one fix in the recorded demo. No chang
 - Fixed: CI never ran the axe-core accessibility check (the test looked for axe only in /tmp/jd and skipped). It now finds axe where it finds jsdom (JSDOM_DIR, the repo's node_modules, /tmp/jd), and CI installs it. A missing demo video now fails the video test with a clear message instead of `KeyError: 'format'`.
 - Fixed: docs/TEST_REPORT.md no longer says the live Meta models were never called ("no key yet"); it says this run is offline and points at LIVE_RUN.md and EVAL.md for the live runs.
 - Fixed: the log-scrubber test cases have short ids (bearer, graph, github, ...) so the made-up token strings no longer show up as test names in docs/TEST_REPORT.md, where the repo's own secret scan flagged them.
-- Tests: test_recorded_hand_off_links_point_at_this_site (real Chromium), test_intro_says_where_the_answers_come_from, test_launch_assets.py (3), test_axe_is_found_where_jsdom_is_found.
+- Fixed: a race in the follow-up question. The worker that asked the question wrote the session once more on its way out; an answer sent in that moment was overwritten, so the repair asked the same question again and never went on. The answer now waits for that worker to finish (the session lock), and the question is written once, with the cost line. Found by a CI run on 6 Nov; test_an_answer_waits_for_the_worker_that_asked fails on the old code.
+- Fixed: test_typed_repair_says_why_listening_was_skipped read the note from the screen, and a fast CI runner had already left the progress screen; it now reads the text from the page.
+- Tests: test_an_answer_waits_for_the_worker_that_asked, test_recorded_hand_off_links_point_at_this_site (real Chromium), test_intro_says_where_the_answers_come_from, test_launch_assets.py (3), test_axe_is_found_where_jsdom_is_found.
 
 ## 1.31.0 (2026-11-06)
 A UI pass on the phone app: smoother screen changes, instant feedback on every tap, and the layout bugs I found at 360 px. No change to the AI pipeline, the prompts, the safety rules or the recorded demo.

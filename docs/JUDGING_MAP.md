@@ -58,7 +58,7 @@ live) on labelled AI-generated sample photos.
 
 | Evidence | Where |
 |---|---|
-| 1004 automated tests, 0 failed, 0 skipped (including real-Chromium test files with a test camera feed, and jsdom) | docs/TEST_REPORT.md (v1.31.1) |
+| 1005 automated tests, 0 failed, 0 skipped (including real-Chromium test files with a test camera feed, and jsdom) | docs/TEST_REPORT.md (v1.31.1) |
 | HTTP smoke of a running server: ALL PASSED, 69 checks, on an offline server and on a live one | `scripts/smoke_e2e.py` |
 | mypy strict with no issues in 166 files; ruff clean; CI | `mypy.ini`, `.github/workflows/` |
 | Web security on the public pages: a strict Content-Security-Policy on every HTML page (scripts only from the site itself, no inline script, no eval; the WhatsApp simulator's script lives in `web/wa.js` for that reason), HSTS when the request came in over https through Render's proxy, signed WhatsApp webhooks, an owner token so a guide-link holder can't answer or erase someone else's repair | `api/main.py`, `test_csp.py`, `test_headers.py`, `test_owner_token.py`, `test_hostile_input.py` |

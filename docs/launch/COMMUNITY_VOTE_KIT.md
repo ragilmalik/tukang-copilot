@@ -104,7 +104,7 @@ Indonesia has 139 million motorbikes and millions of homes on an electric water 
 
 So I made a phone web app where you snap a photo and say what's wrong. An agent loop on Meta's models walks you through the fix and checks each step with a new photo. Muse Spark handles vision, planning and step checks, SAM 3.1 draws pixel masks of the real parts, and Voice Transcribe plus Spark audio cover Indonesian and Javanese. If the fix fails it re-plans. If the job is dangerous (gas, mains wiring, brakes), a safety gate written in plain code stops it and hands off to a workshop.
 
-Under the hood: 1004 automated tests, strict typing, prompt-injection hardening, and an open-weights path (Muse Spark Open) for self-hosting.
+Under the hood: 1005 automated tests, strict typing, prompt-injection hardening, and an open-weights path (Muse Spark Open) for self-hosting.
 
 The public Community Vote is open until Nov 16 and takes one click with a free Cerebral Valley account: [VOTE_URL]
 Try the 1-minute demo, no sign-up: [LIVE_URL]

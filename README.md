@@ -185,7 +185,7 @@ pip install -r requirements-dev.txt
 scripts/check_all.sh
 ```
 
-The last full run: 1004 tests passed, 0 failed, 0 skipped ([docs/TEST_REPORT.md](docs/TEST_REPORT.md)), mypy strict
+The last full run: 1005 tests passed, 0 failed, 0 skipped ([docs/TEST_REPORT.md](docs/TEST_REPORT.md)), mypy strict
 clean on 166 files, ruff clean, and the 69-check HTTP smoke test passed on both an offline and a live server.
 
 ## Documentation map

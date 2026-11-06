@@ -24,7 +24,7 @@ Step by step: [docs/TUTORIAL.md](docs/TUTORIAL.md). Every setting: [docs/SETUP.m
 
 ## Test results (1.31.1)
 
-1004 automated tests passed, 0 failed, 0 skipped; mypy strict clean on 166 files; ruff clean; offline HTTP smoke ALL PASSED (69 checks); static build and recorded-demo checks pass. Details: [docs/TEST_REPORT.md](docs/TEST_REPORT.md), [docs/VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md). Re-run: [docs/TEST_CHECKLIST.md](docs/TEST_CHECKLIST.md).
+1005 automated tests passed, 0 failed, 0 skipped; mypy strict clean on 166 files; ruff clean; offline HTTP smoke ALL PASSED (69 checks); static build and recorded-demo checks pass. Details: [docs/TEST_REPORT.md](docs/TEST_REPORT.md), [docs/VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md). Re-run: [docs/TEST_CHECKLIST.md](docs/TEST_CHECKLIST.md).
 
 ## Where things are
 
@@ -33,7 +33,7 @@ Step by step: [docs/TUTORIAL.md](docs/TUTORIAL.md). Every setting: [docs/SETUP.m
 - Results: [docs/REPORT.md](docs/REPORT.md).
 - Submission text, field by field: [docs/SUBMISSION.md](docs/SUBMISSION.md); steps: [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md).
 - Demo media: [docs/demo/](docs/demo/README.md). Launch kit: [docs/launch/](docs/launch/).
-- Copy of the deliverables (video, one-pager, guide PDF, repo zip): Google Drive folder `DRIVE_URL`.
+- Copy of the deliverables (video, one-pager, guide PDF, repo zip): Google Drive folder "Meta Hackathon - Tukang Copilot" (private to my account): https://drive.google.com/drive/folders/1mxVXV1tgjCuxfKoSAHWJpc6V7Yz9vslt
 
 ## Rules if you change anything
 
