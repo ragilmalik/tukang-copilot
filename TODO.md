@@ -18,7 +18,8 @@ Findings ranked by user impact, each with its test; the full audit is in CHANGEL
 - [x] Writing check: `scripts/check_voice.py` + test_check_voice.py, every hit rewritten (0 hits), HANDOFF rewritten as maintainer notes
 - [x] Full run on 29823cd (6 Nov, 10:29 WIB): `make_test_report.py` ALL PASSED, 1096 passed, 0 failed, 0 skipped (945 without a browser in 103 files, 151 in real Chromium in 25 files); ruff clean; mypy strict 171 files; offline smoke ALL PASSED (77 checks, port 8765); check_voice 0 hits; `build_static.py --check` OK; `record_replay.py --check` up to date
 - [x] Docs filled with the measured numbers (README, HANDOFF, REPORT, JUDGING_MAP, SUBMISSION, WRITEUP, VERIFICATION_REPORT, ONE_PAGER, COMMUNITY_VOTE_KIT)
-- [ ] One-pager and guide bundle rebuilt, gate, pushed, CI green on the final commit, package and Drive copy
+- [x] One-pager rebuilt (1 A4 page, 1096 tests and 77-check smoke on it, looked at) and guide bundle rebuilt (54 pages, v1.32.0)
+- [ ] Gate, push, CI green on the final commit, package and Drive copy
 - [ ] After the first Render deploy: check that `cf-connecting-ip` reaches the app (the rate limit keys on it)
 
 ## 1.31.1 media and docs (6 Nov)
