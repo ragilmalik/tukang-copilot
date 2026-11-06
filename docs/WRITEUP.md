@@ -89,7 +89,8 @@ or straight away with one tap. Spend is capped per repair and per day. Logs neve
   (docs/USER_TRIAL_KIT.md); docs/IMPACT.md stays empty until trials happen.
 
 ## Honest status
-Every answer in the video, the screenshots and the recorded 1-tap demo came from the real Meta API on 5 November 2026.
+Every answer in the video, the screenshots and the recorded 1-tap demo came from the real Meta API: live runs on 5 and 6
+November 2026, recorded and played back in the app (the live camera guide in the video ran live while I filmed).
 The photos are AI-generated samples, labelled on every image. I haven't yet run it on my own broken things or with other
 users. The WhatsApp channel is tested against a Graph API test double and in the simulator; a real number needs a Meta
 app setup (docs/WHATSAPP.md). Muse Spark Open on Baseten is behind a switch and tested against a test double only.

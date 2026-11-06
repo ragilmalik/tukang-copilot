@@ -4,9 +4,10 @@ The entry deadline was Thu Nov 5, 2026, 09:00 WIB (Nov 4, 9 PM ET). Code is done
 
 ## 1.31.1 media and docs (6 Nov)
 - [x] A. Flaky test_playwright_motion fixed (deterministic waits, 6 clean runs)
-- [ ] B. Screenshots re-shot on the 1.31.0 UI from recorded live answers (1-tap demo recording + recorded live sessions); only the live camera guide calls SAM 3.1 live
-- [ ] C. Main video re-captured and rendered (under 3:00, 1080p60, captions, loudness and silence checked)
-- [ ] D. Vertical X clip, hero GIF, thumbnail (og image and demo thumb only if stale)
+- [x] B. Screenshots re-shot on the 1.31.0 UI from recorded live answers (1-tap demo recording + recorded live sessions); only the live camera guide calls SAM 3.1 live. Recorded hand-off links point at the site you are on (were http://testserver), offline cache v25 (pushed 5dbfa8b)
+- [x] C1. Intro voice-over says where the answers come from: "recorded on a live run" when the video plays recorded answers, "live" when it films live calls; the video refuses a voice clip made for the other mode (pushed dee1364)
+- [x] C. Main video re-captured and rendered: 2:54 (174.1 s), 1080p60, captions burned in, -16.0 LUFS, true peak -3.9 dBFS, no silence of 1 s or more except the last 1.6 s on the close card; voice-over speech-to-text 402/424 script words (pushed 9901da7)
+- [x] D. Vertical X clip (43.5 s, 1080x1920, 12.1 MB), hero GIF (640x1200, 2.2 MB), YouTube thumbnail re-made (pushed 9901da7); the og image is a composed share card that does not show the 1.31.0 screens, looked at and kept
 - [ ] E. Docs: every placeholder filled with measured numbers, stale counts and wording fixed, one-pager and guide bundle rebuilt
 - [ ] F. Final full run (ruff, mypy, all tests, jsdom/axe, smoke, static build, replay check), numbers in the docs, push
 

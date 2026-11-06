@@ -1,6 +1,6 @@
 # Verification report
 
-I checked the app against SPEC.md and the hackathon rules. The first version of this report is from 2026-10-30; the latest check is 2026-11-04 WIB (v1.29.13). Section 5d covers 1.24 and 1.25, section 5e covers 1.27.0, section 5f covers 1.28 to 1.29.4, section 5g covers 1.29.6 to 1.29.13, and the earlier sections date from v1.22.0.
+I checked the app against SPEC.md and the hackathon rules. The first version of this report is from 2026-10-30; the latest check is 2026-11-06 WIB (v1.31.1). Section 5d covers 1.24 and 1.25, section 5e covers 1.27.0, section 5f covers 1.28 to 1.29.4, section 5g covers 1.29.6 to 1.29.13, section 5h covers 1.30.0, section 5i covers 1.31.0 and 1.31.1, and the earlier sections date from v1.22.0.
 
 Legend: ✅ verified by a test or run · 🟡 built, verified only offline (needs a real-key or real-phone check) · ⬜ not done yet (in TODO.md) · ↔️ done differently (see DECISIONS.md).
 
@@ -10,11 +10,11 @@ Evidence names point to tests in `api/tests/` (TEST_REPORT.md has the run) or to
 
 | Rule | Status | Evidence / note |
 |---|---|---|
-| Uses Meta models (Stage 1 pass/fail) | 🟡 | 5 Meta models wired (`meta_client.py`); real HTTP path proven against the documented shapes (`test_live_path::test_live_faucet_draws_and_reviews_diagram`). Needs one real-key run: `scripts/check_keys.py` |
+| Uses Meta models (Stage 1 pass/fail) | ✅ | 5 Meta models wired (`meta_client.py`). Live on the real API on 5 Nov 2026: `scripts/check_keys.py` passed all 5 required models, and every sample scenario ran live (docs/LIVE_RUN.md, docs/EVAL.md live column); the recorded 1-tap demo is a live run from 6 Nov 2026 |
 | Fits a problem statement (Push the Frontier) | ✅ | README / SUBMISSION framing: understanding + repairing physical systems |
-| New work only, Oct 26 to Nov 4 | ✅ | All files created 2026-10-30; CHANGELOG. ⬜ push to GitHub so commit dates show |
-| Public repo, open license | ⬜ | MIT LICENSE in place; repo not created yet |
-| 3-minute demo video | 🟡 | Backup cut made: docs/demo/tukang-copilot-demo.mp4, 2:53 (1080p60), offline sample mode, labelled. Real-phone recording per DEMO_SCRIPT.md + YouTube upload still to do |
+| New work only, Oct 26 to Nov 4 | ✅ | First commit 2026-10-30 (9c2401d), public commit history; CHANGELOG |
+| Public repo, open license | ✅ | https://github.com/ragilmalik/tukang-copilot (public), MIT LICENSE |
+| 3-minute demo video | ✅ (file) / ⬜ (YouTube) | docs/demo/tukang-copilot-demo.mp4, 2:54 (1080p60): real Meta API answers recorded on a live run on 6 Nov 2026 and played back in the app, said on every frame; the live camera guide called SAM 3.1 live while filming. A real-phone recording (DEMO_SCRIPT.md) and the YouTube upload are still mine to do |
 | No unlicensed assets | ✅ | ATTRIBUTIONS.md: Barlow (OFL) and Lucide (ISC) with their licences; the sample photos are AI-generated and labelled as such; diagrams drawn by my own code |
 | Avoid anti-projects (medical, basic RAG, simple image analyser, edu chatbot, politics) | ✅ | Medical blocked (`test_hard_stops[…luka berdarah…]`); multi-step agent with verification and re-plan, not one-shot analysis |
 
@@ -197,6 +197,17 @@ These came from playing every flow again on a 390x844 phone and a laptop in all 
 
 **Run numbers (2026-11-06, v1.30.0):** pytest without a browser **838 passed, 0 failed** (97 files, one by one), Playwright **127 passed, 0 failed** (22 files, real Chromium), ruff clean, `mypy api --strict` no issues in 162 files, `smoke_e2e.py` ALL PASSED (69 checks) on an `OFFLINE=1` server, `build_static.py` and `--check` OK, `record_replay.py --check` up to date. The live recording cost $0.70 by the app's own meter (pipelines, re-plans and 66 step checks in three languages).
 
+## 5i. v1.31.0 UI pass and v1.31.1 media
+
+| Feature | Status | Evidence |
+|---|---|---|
+| 1.31.0 UI pass (view transitions, step slide, placeholders, busy buttons, layout fixes at 360 px) | ✅ (Chromium) / 🟡 (real phones) | `test_playwright_layout.py`, `test_playwright_motion.py`, `test_ui_motion.py`; CHANGELOG 1.31.0 |
+| Recorded demo hand-off links point at the site you are on (were `http://testserver/...`); offline cache `tukang-shell-v25` | ✅ | `test_playwright_replay.py::test_recorded_hand_off_links_point_at_this_site` |
+| 28 phone screenshots re-shot on the 1.31.0 screens from recorded live answers (1-tap demo recording and live sessions recorded on 6 Nov 2026), the live camera guide shot live; every shot looked at | ✅ | `docs/demo/screenshots/`, `scripts/make_demo_assets.py` (recorded mode) |
+| Demo video and X clip re-made from the same recordings; every frame looked at (one every 2 s); loudness and silence measured | ✅ | Main video 2:54 (174.1 s by ffprobe), 1920x1080 at 60 fps, 34.2 MB; loudness -16.0 LUFS integrated, true peak -3.9 dBFS (ffmpeg ebur128); the only silence of 1 s or more below -40 dB is the last 1.6 s on the close card (ffmpeg silencedetect). A speech-to-text pass (faster-whisper tiny.en) on the voice-over found 402 of the 424 script words (94.8%); the misses are proper nouns (Tukang, bengkel, Muse Spark). X clip 43.5 s, 1080x1920, 12.1 MB, every frame of its contact sheets looked at. Live spend for making the media: about $0.34 by the app's own meter |
+
+**Run numbers ({{RUN_DATE}}, v1.31.1):** {{RUN_LINE}}
+
 ## 6. What is not verified yet
 
 1. Live Meta answers: the sample scenarios ran on the real API on 5 November 2026 (docs/LIVE_RUN.md) and the recorded 1-tap demo was recorded live on 6 November 2026. Real-photo quality is still item 2.
@@ -204,5 +215,5 @@ These came from playing every flow again on a 390x844 phone and a laptop in all 
 3. Real phones: rear camera over https (iOS needs playsinline + https), SpeechRecognition with jv-ID, WhatsApp deep link, HEIC upload, TalkBack, airplane mode. So far I've only used headless Chromium and jsdom.
 4. The Render deployment and GitHub CI have not run. The container was only emulated (no Docker on the test machine).
 5. The impact numbers are mock until the real trials run.
-6. The demo video shows offline sample mode (AI-generated sample photos, recorded answers, test camera feed). It is labelled on screen.
+6. The demo video plays real Meta API answers recorded on a live run (6 Nov 2026), not answers made while filming, on AI-generated sample photos and Chromium's test camera feed. All of it is labelled on screen.
 7. The WhatsApp channel has only run against a Graph API test double and in the `/wa` simulator; no real WhatsApp number has sent or received a message (needs the Meta app setup in docs/WHATSAPP.md).

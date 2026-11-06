@@ -1,6 +1,14 @@
 # Changelog
 
-Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026); 1.30.0 is the live-API run and polish after it, 1.31.0 a UI pass.
+Dates are WIB (UTC+7). Everything here was built during the hackathon window (Oct 26 to Nov 4, 2026); 1.30.0 is the live-API run and polish after it, 1.31.0 a UI pass, 1.31.1 media and docs on it.
+
+## 1.31.1 (2026-11-06)
+Media and docs on the 1.31.0 screens, and one fix in the recorded demo. No change to the AI pipeline, the prompts or the safety rules.
+- Fixed: in the recorded 1-tap demo the hand-off message (WhatsApp summary, guide link, PDF link) still carried the address of the machine it was recorded on ("http://testserver/..."). The links now point at the site you are on: the guide link opens the recorded demo and the PDF link the recorded report. Offline cache v25.
+- Changed: the 28 phone screenshots are re-shot on the 1.31.0 screens from recorded live answers: the motorbike flow from the recorded 1-tap demo, the pump, rice cooker, faucet and Basa Jawa screens from live sessions I recorded on 6 Nov 2026, reopened in the app. Only the live camera guide shot calls SAM 3.1 live. The 5 WhatsApp simulator shots are unchanged.
+- Changed: `scripts/make_demo_assets.py` and `scripts/demo_video.py` have a recorded mode (`DEMO_RECORDED_DATA`): pages open at the public address and any request that would start new model work fails the run, except the live camera guide. The intro voice-over says the answers were recorded on a live run when they are played back, and the video refuses a voice clip made for the other mode.
+- Changed: demo video, X clip, hero GIF and YouTube thumbnail re-made on the 1.31.0 screens (main video 2:54, 174.1 s, 1920x1080 at 60 fps, 34.2 MB, -16.0 LUFS integrated, true peak -3.9 dBFS; X clip 43.5 s, 1080x1920, 12.1 MB; hero GIF 640x1200, 2.2 MB).
+- Tests: test_recorded_hand_off_links_point_at_this_site (real Chromium), test_intro_says_where_the_answers_come_from.
 
 ## 1.31.0 (2026-11-06)
 A UI pass on the phone app: smoother screen changes, instant feedback on every tap, and the layout bugs I found at 360 px. No change to the AI pipeline, the prompts, the safety rules or the recorded demo.

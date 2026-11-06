@@ -19,7 +19,7 @@ built solo in Semarang during the hackathon (first commit 30 Oct 2026).
 | | |
 |---|---|
 | Live app | [LIVE_URL] |
-| 3-min video | [YOUTUBE_URL] · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) ({{VIDEO_LEN}}, real Meta API answers, captions + voice-over; chapters in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt)) |
+| 3-min video | [YOUTUBE_URL] · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:54, real Meta API answers, captions + voice-over; chapters in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt)) |
 | Code | https://github.com/ragilmalik/tukang-copilot (MIT) |
 | Live results | [docs/LIVE_RUN.md](docs/LIVE_RUN.md) (seven scenarios on the real API) · [docs/EVAL.md](docs/EVAL.md) (eval with a live column) |
 | For judges | [Judging map](docs/JUDGING_MAP.md) · [Judge FAQ](docs/launch/JUDGE_FAQ.md) · [One-pager PDF](docs/launch/one-pager.pdf) |
@@ -100,7 +100,7 @@ line goes through a scrubber in [`api/logs.py`](api/logs.py) and carries an `X-R
 | Live camera guide | Bengkel hand-off | Safety stop | Basa Jawa |
 | ![live](docs/demo/screenshots/16_live_guide.png) | ![hand-off](docs/demo/screenshots/18_handoff.png) | ![stop](docs/demo/screenshots/11_rice_stop.png) | ![jawa](docs/demo/screenshots/20_javanese_result.png) |
 
-<sub>All {{SHOTS_N}} screenshots are in [docs/demo/screenshots](docs/demo/screenshots). They were shot on 5 November 2026 against the real Meta API, with the labelled AI-generated sample photos. The live camera guide uses Chromium's test camera feed playing a sample photo.</sub>
+<sub>All 33 screenshots are in [docs/demo/screenshots](docs/demo/screenshots). The phone screenshots were re-shot on 6 November 2026 on the 1.31.0 screens from real Meta API answers recorded on live runs (the recorded 1-tap demo and live sessions), with the labelled AI-generated sample photos. The live camera guide called SAM 3.1 live on Chromium's test camera feed playing a sample photo.</sub>
 
 ## Why I built it
 
@@ -225,6 +225,7 @@ clean on {{MYPY_FILES}} files, ruff clean, and the {{SMOKE}}-check HTTP smoke te
 I wrote everything in this repository during the event; the first commit is 30 October 2026, and
 [CHANGELOG.md](CHANGELOG.md) has the dated list. The short version:
 
+- 6 Nov (v1.31): a UI pass (smoother screen changes, instant tap feedback, layout fixes at 360 px), screenshots and video re-made on it from recorded live answers, and the recorded demo's hand-off links fixed.
 - 5 Nov (v1.30): first runs on the real Meta API. Streaming structured output, all schema fields required, Muse Image retry, Retry-After, secret-scrubbed logs with request ids. Live eval column, the recorded demo, screenshots and video re-made from real answers. CORS closed by default.
 - 2 to 4 Nov (v1.27 to v1.29): WhatsApp channel, owner token for shared links, the bengkel-sign look (light and dark), AI-generated sample photos, strict Content-Security-Policy and HSTS, axe-core clean screens, kind-specific red-stop lists.
 - 31 Oct to 1 Nov (v1.8 to v1.26): live camera guide, hands-free voice commands, bengkel hand-off, agent log, 1-tap demo, prompt-injection fencing, red-team eval, laptop view, static build.

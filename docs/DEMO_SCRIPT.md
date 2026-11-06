@@ -18,11 +18,12 @@ bike. Voice-over in English with Bahasa on screen, or Bahasa with English subtit
 | 2:15–2:45 | Architecture slide (docs/img/architecture.png). | "Five Meta models, one agent loop: plan, act, verify, re-plan." |
 | 2:45–2:55 | Logo + repo + live link. | "Tukang Copilot. Every phone becomes a mechanic's apprentice." |
 
-The backup cut already exists: docs/demo/tukang-copilot-demo.mp4 (2:53, offline sample mode, labelled AI-generated sample photos and
-Chromium's test camera feed, English voice-over + captions .srt). It follows the same order in 21 scenes (v1.29 cut on the new UI, 1080p60, start times
-in docs/demo/TIMESTAMPS.txt): hook title card, hook, intro, progress with streaming results, question, diagnosis, parts,
-safety list, live camera, check ⚠, check ✓, hands-free, re-plan, Muse Image diagram, agent log, hand-off, rice STOP,
-WhatsApp in Basa Jawa (simulator), open weights, architecture, close.
+The backup cut already exists: docs/demo/tukang-copilot-demo.mp4 (2:54, 1080p60, on the 1.31.0 screens). Its answers are
+real Meta API answers recorded on a live run on 6 Nov 2026 and played back in the app (the live camera guide called SAM 3.1
+live while filming), on labelled AI-generated sample photos and Chromium's test camera feed, with an English voice-over and
+captions (.srt). It follows the same order in 21 scenes (start times in docs/demo/TIMESTAMPS.txt): title card, hook, intro,
+progress with streaming results, question, diagnosis, parts, safety list, live camera, check ⚠, check ✓, hands-free,
+re-plan, Muse Image diagram, agent log, hand-off, rice STOP, WhatsApp in Basa Jawa (simulator), architecture, close.
 
 ## Shot list / prep
 - [ ] Bike with the plug cap slightly pulled off (safe, engine cold) so the fix is real
@@ -39,5 +40,5 @@ WhatsApp in Basa Jawa (simulator), open weights, architecture, close.
 - If the bike won't cooperate, use the faucet scenario as the main case.
 
 ## ~45 s vertical clip for X
-Already made: docs/demo/tukang-copilot-x-vertical.mp4 (43.5 s, 1080×1920, silent, Bahasa captions, labelled offline sample mode): hook · parts on your photo · live camera · step check ✓ · hands-free "lanjut" · bengkel hand-off · STOP · Meta models · close.
+Already made: docs/demo/tukang-copilot-x-vertical.mp4 (43.5 s, 1080×1920, silent, Bahasa headlines with English captions, real Meta API answers recorded on a live run, labelled on screen): hook · streaming progress · parts on your photo · live camera · step check ✓ · STOP · WhatsApp in Basa Jawa · Meta models · close.
 Real-phone version: 0:00 bike won't start · 0:05 snap + speak · 0:10 parts light up live · 0:18 "lanjut" hands-free · 0:24 step check ✅ · 0:30 engine starts · 0:36 "Built with Meta's Muse Spark + SAM 3.1" + link.

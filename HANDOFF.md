@@ -4,7 +4,7 @@ The short version for whoever picks this up next: a judge, a contributor, or me 
 
 ## What this is
 
-Tukang Copilot 1.30.0: a phone web app that looks at a photo of a broken motorbike, pump, tap, tyre or rice cooker, marks the parts with SAM 3.1, diagnoses and plans with Muse Spark 1.3, checks each step from a photo, re-plans, and stops dangerous jobs. Bahasa Indonesia, Basa Jawa and English. Repo: https://github.com/ragilmalik/tukang-copilot
+Tukang Copilot 1.31.1: a phone web app that looks at a photo of a broken motorbike, pump, tap, tyre or rice cooker, marks the parts with SAM 3.1, diagnoses and plans with Muse Spark 1.3, checks each step from a photo, re-plans, and stops dangerous jobs. Bahasa Indonesia, Basa Jawa and English. Repo: https://github.com/ragilmalik/tukang-copilot
 
 ## Run it
 
@@ -18,11 +18,11 @@ Step by step: [docs/TUTORIAL.md](docs/TUTORIAL.md). Every setting: [docs/SETUP.m
 
 ## Real vs sample
 
-- **Real:** live mode answers, the recorded 1-tap demo (a live run from 6 Nov 2026), the live column of [docs/EVAL.md](docs/EVAL.md), [docs/LIVE_RUN.md](docs/LIVE_RUN.md), and the screenshots and video.
+- **Real:** live mode answers, the recorded 1-tap demo (a live run from 6 Nov 2026), the live column of [docs/EVAL.md](docs/EVAL.md), [docs/LIVE_RUN.md](docs/LIVE_RUN.md), and the screenshots and video (real answers recorded on live runs and played back; the live camera guide ran live while filming).
 - **Sample:** the photos in `samples/` are AI-generated and say so on the image. Offline mode answers are pre-written. Prices are estimates.
 - **Not measured:** real owner trials.
 
-## Test results (1.30.0)
+## Test results (1.31.1)
 
 {{TESTS}} automated tests passed, 0 failed, 0 skipped; mypy strict clean on {{MYPY_FILES}} files; ruff clean; offline HTTP smoke ALL PASSED ({{SMOKE}} checks); static build and recorded-demo checks pass. Details: [docs/TEST_REPORT.md](docs/TEST_REPORT.md), [docs/VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md). Re-run: [docs/TEST_CHECKLIST.md](docs/TEST_CHECKLIST.md).
 

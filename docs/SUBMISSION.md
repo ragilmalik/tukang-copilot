@@ -79,8 +79,8 @@ opens while logged out.
 [YOUTUBE_URL]
 ```
 Upload kit: docs/launch/YOUTUBE.md (chapters match docs/demo/TIMESTAMPS.txt). Current cut:
-`docs/demo/tukang-copilot-demo.mp4`, {{VIDEO_LEN}}, 1080p, English captions burned in, every answer from the real Meta
-API. Unlisted is fine; open it in a private window before submitting.
+`docs/demo/tukang-copilot-demo.mp4`, 2:54, 1080p, English captions burned in, every answer a real Meta API answer
+recorded on a live run (6 Nov 2026) and played back; the live camera guide ran live. Unlisted is fine; open it in a private window before submitting.
 
 ### 9. Describe your use of Meta products to build the submitted project*
 ```
@@ -150,7 +150,7 @@ The definitions come from the Participant Guide and the kickoff slide (see docs/
 | Prize | What I claim | Evidence |
 |---|---|---|
 | Best Agentic Use-Case (autonomy, effectiveness, practical usefulness) | A real multi-step loop on a physical object: ask when unsure, plan, gate on safety, verify each step from a photo, re-plan, escalate or hand off. Each decision is logged with the model or code rule that made it. Live: the motorbike asked a question, re-planned to cause 2 after "still won't start", and refused after-photos that showed the wrong step | `api/pipeline/engine.py`, `api/trace.py`, docs/LIVE_RUN.md; screenshots `23_agent_log.png`, `09_replan.png`, `07_check_fail.png`; docs/EVAL.md |
-| Most Viral (X engagement until Nov 8, 11:59 PM ET) | A {{VERT_S}} s vertical clip with a hook people know ("motor mogok, bengkel tutup"), captions, a thread, and share cards that unfurl with the marked photo | `docs/demo/tukang-copilot-x-vertical.mp4`, docs/launch/X_THREAD.md, `26_share_card.png` |
+| Most Viral (X engagement until Nov 8, 11:59 PM ET) | A 43.5 s vertical clip with a hook people know ("motor mogok, bengkel tutup"), captions, a thread, and share cards that unfurl with the marked photo | `docs/demo/tukang-copilot-x-vertical.mp4`, docs/launch/X_THREAD.md, `26_share_card.png` |
 | Community Vote (most votes in the public gallery) | An everyday Indonesian problem anyone can try free in a minute, with a vote kit in Indonesian, Javanese and English | docs/launch/COMMUNITY_VOTE_KIT.md |
 | Best Build on Meta Open Weights (Muse Spark Open or Glimmer, verified by the infra partner) | Diagnosis and planning on Muse Spark Open via Baseten behind one switch, with a badge. **Claim only after one real, logged Baseten run.** Until then it is tested against a test double only | `USE_OPEN_WEIGHTS`, `test_live_path.py` |
 | Best Creative Build (Muse Image or Muse Wonder) | Muse Image edits the owner's own photo into a teaching diagram, Spark reviews it, and a wrong one is redrawn once. Live: the tap repair got a cutaway of the washer step, accepted on review. A secondary claim: Muse Image supports the core flow | `engine.make_diagram`, `28_diagram_step.png`, docs/LIVE_RUN.md |

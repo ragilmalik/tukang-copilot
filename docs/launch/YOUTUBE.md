@@ -1,6 +1,6 @@
 # YouTube upload kit
 
-Upload the real-phone recording if I have one by then, otherwise `docs/demo/tukang-copilot-demo.mp4` (2:53, live Meta API answers).
+Upload the real-phone recording if I have one by then, otherwise `docs/demo/tukang-copilot-demo.mp4` (2:54, real Meta API answers recorded on a live run).
 Unlisted is fine for judging, but Public helps with Most Viral and Community Vote. Open the link in a private window
 before pasting it into the form. For captions, upload `docs/demo/tukang-copilot-demo.en.srt` as English subtitles.
 The thumbnail is `docs/launch/thumbnail.png` (1280x720); custom thumbnails need a phone-verified YouTube account.
@@ -20,7 +20,7 @@ Point your phone at something broken and say what's wrong in Bahasa Indonesia, J
 
 I built it solo for the Meta Global AI Developer Hackathon (Indie track, Push the Frontier). Everything in this video was built during the event, Oct 26 to Nov 4, 2026.
 
-Every answer in this recording comes live from the Meta Model API (recorded 6 Nov 2026, with the waits for the models cut out). The photos are AI-generated samples and say so in their corner.
+Every answer in this video is a real answer from the Meta Model API, recorded on a live run on 6 Nov 2026 and played back in the app; the live camera guide called SAM 3.1 live while I filmed. The photos are AI-generated samples and say so in their corner.
 
 Try it (1-tap demo, no photo needed): [LIVE_URL]
 Code (MIT): https://github.com/ragilmalik/tukang-copilot
@@ -46,20 +46,20 @@ Why I built it: Indonesia has 139 million motorbikes (BPS 2024) and millions of 
 
 YouTube's rules: the first chapter starts at 0:00, there are at least 3 chapters, and each one lasts at least 10 seconds.
 
-### A. Current backup cut (`tukang-copilot-demo.mp4`, 2:53, live Meta API answers recorded 6 Nov 2026, timings from `docs/demo/TIMESTAMPS.txt`)
+### A. Current backup cut (`tukang-copilot-demo.mp4`, 2:54, real Meta API answers recorded on a live run on 6 Nov 2026, timings from `docs/demo/TIMESTAMPS.txt`)
 ```
 0:00 A small fault costs a day's wage
 0:20 Photo and voice in, results stream in
-0:37 One question, diagnosis and SAM 3.1 parts
-0:57 Safety tick list and live camera guide
-1:13 Check my step: the camera verifies
-1:27 Hands-free, re-plan and a Muse Image diagram
-1:50 What the AI did and the bengkel hand-off
-2:06 Safety STOP, then WhatsApp in Basa Jawa
-2:33 How it works: the Meta models
+0:38 One question, diagnosis and SAM 3.1 parts
+0:58 Safety tick list and live camera guide
+1:14 Check my step: the camera verifies
+1:28 Hands-free, re-plan and a Muse Image diagram
+1:51 What the AI did and the bengkel hand-off
+2:07 Safety STOP, then WhatsApp in Basa Jawa
+2:34 How it works: the Meta models
 ```
 I checked each chapter against the scene starts in `docs/demo/TIMESTAMPS.txt`, and all of them are at least 10 s long
-(the shortest, 1:13 to 1:27, is 14 s). If the video gets re-cut, re-read that file and move the chapters with it.
+(the shortest, 1:14 to 1:28, is 14 s). If the video gets re-cut, re-read that file and move the chapters with it.
 
 ### B. Real-phone recording (timings from docs/DEMO_SCRIPT.md)
 ```

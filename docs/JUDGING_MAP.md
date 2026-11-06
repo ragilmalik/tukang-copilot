@@ -1,9 +1,10 @@
 # Judging map: each criterion and where the evidence is
 
 I checked the rules on 2026-11-01 (WIB) against the official sources below. The video is
-`docs/demo/tukang-copilot-demo.mp4` ({{VIDEO_LEN}}); scene start times are in `docs/demo/TIMESTAMPS.txt` and in the
-YouTube chapters (docs/launch/YOUTUBE.md). Everything the video and screenshots show is real Meta API output from
-5 Nov 2026 on labelled AI-generated sample photos.
+`docs/demo/tukang-copilot-demo.mp4` (2:54); scene start times are in `docs/demo/TIMESTAMPS.txt` and in the
+YouTube chapters (docs/launch/YOUTUBE.md). Everything the video and screenshots show is real Meta API output
+recorded on live runs (the 1-tap demo and live sessions of 6 Nov 2026, played back in the app; the live camera guide ran
+live) on labelled AI-generated sample photos.
 
 ## Official sources (I opened each one)
 
@@ -57,7 +58,7 @@ YouTube chapters (docs/launch/YOUTUBE.md). Everything the video and screenshots 
 
 | Evidence | Where |
 |---|---|
-| {{TESTS}} automated tests, 0 failed, 0 skipped (including real-Chromium test files with a test camera feed, and jsdom) | docs/TEST_REPORT.md (v1.30.0) |
+| {{TESTS}} automated tests, 0 failed, 0 skipped (including real-Chromium test files with a test camera feed, and jsdom) | docs/TEST_REPORT.md (v1.31.1) |
 | HTTP smoke of a running server: ALL PASSED, {{SMOKE}} checks, on an offline server and on a live one | `scripts/smoke_e2e.py` |
 | mypy strict with no issues in {{MYPY_FILES}} files; ruff clean; CI | `mypy.ini`, `.github/workflows/` |
 | Web security on the public pages: a strict Content-Security-Policy on every HTML page (scripts only from the site itself, no inline script, no eval; the WhatsApp simulator's script lives in `web/wa.js` for that reason), HSTS when the request came in over https through Render's proxy, signed WhatsApp webhooks, an owner token so a guide-link holder can't answer or erase someone else's repair | `api/main.py`, `test_csp.py`, `test_headers.py`, `test_owner_token.py`, `test_hostile_input.py` |
@@ -74,12 +75,12 @@ YouTube chapters (docs/launch/YOUTUBE.md). Everything the video and screenshots 
 
 | Evidence | Where |
 |---|---|
-| {{VIDEO_LEN}} video with captions and voice-over, under the 3-minute limit, every answer from the live API | `docs/demo/tukang-copilot-demo.mp4`, `.en.srt` |
+| 2:54 video with captions and voice-over, under the 3-minute limit, every answer a real Meta API answer recorded on a live run and played back (said on every frame) | `docs/demo/tukang-copilot-demo.mp4`, `.en.srt` |
 | 1-tap demo with no photo needed; a recorded demo plays if the free server is asleep | README "Try it in 60 seconds", `27_recorded_demo.png` |
 | Laptop view: on a screen 1024 px or wider the app sits in a phone frame with a side panel (QR code of the current URL, 1-tap demo, id/jv/en switch) | `29_laptop.png`, `test_playwright_desk.py` |
 | Static judge build with no server and no cold start: `scripts/build_static.py` writes `dist-static/` (recorded demo, relative paths; not hosted yet) | `scripts/build_static.py --help`, `test_playwright_static.py` |
-| 34 screenshots (5 of them from the WhatsApp simulator) and a hero GIF | `docs/demo/screenshots/`, `docs/demo/hero.gif` |
-| Every frame says offline sample mode and AI-generated sample photos | docs/demo/README.md |
+| 33 screenshots (5 of them from the WhatsApp simulator) and a hero GIF | `docs/demo/screenshots/`, `docs/demo/hero.gif` |
+| Every frame says where its answers come from (recorded live run, or the live camera guide) and that the photos are AI-generated samples | docs/demo/README.md |
 | **Still open (me):** the live URL ([LIVE_URL]) and the YouTube link ([YOUTUBE_URL]) are not filled in. Final judges watch the video live, so the first 10 seconds have to hook them. | docs/launch/YOUTUBE.md |
 | **Still open (me):** a clip of a real phone on a real object (even 20 seconds of a real faucet or pump) inside the video. The answers in the video are live, but the photos are AI-generated samples. | docs/DEMO_SCRIPT.md |
 

@@ -1,4 +1,4 @@
-# Project report: Tukang Copilot 1.30.0
+# Project report: Tukang Copilot 1.31.1
 
 Written 6 November 2026. This is the one document that says what I built, how well it works, what I measured, and what is still open. Every number here comes from a real run that is linked; nothing is projected.
 
@@ -51,13 +51,17 @@ From [LIVE_RUN.md](LIVE_RUN.md) and [EVAL.md](EVAL.md), 5 November 2026:
 - Recorded demo: re-recorded live on 6 November 2026, 01:23 WIB; one yes/no question in each language; the sample photo passes on the step it shows.
 - Static judge build: builds and passes its own check.
 
+## What changed in 1.31.0 and 1.31.1
+
+1.31.0 is a UI pass: smoother screen changes, instant feedback on every tap, placeholders that stop the progress screen from jumping, and the layout bugs I found at 360 px (CHANGELOG). 1.31.1 re-made the screenshots, the demo video, the X clip, the GIF and the thumbnail on those screens from recorded live answers, fixed the recorded demo's hand-off links (they pointed at the machine it was recorded on), and gave the test suite's waits for a repair a 60 s budget, because CI runners are slower than my machine and three waits of 10 to 15 s timed out there.
+
 ## What changed in 1.30.0 (from the live runs)
 
 Fourteen fixes found by running the real API and reviewing every screen, each with a test. The main ones: structured calls always stream (the API returned 504 on long answers), every schema field is required (the API dropped optional ones), SAM masks are clipped to the part's box (one mask tinted a whole wall), the follow-up is one yes/no question, the sample photo is checked on the step it shows, the red-stop PDF no longer lists parts to buy, and Basa Jawa wording fixes. Full list: [CHANGELOG.md](../CHANGELOG.md).
 
 ## What is real, what is sample, what is not measured
 
-- Real: all live answers, the recorded demo, the eval's live column, the screenshots and video (shot against the live API).
+- Real: all live answers, the recorded demo, the eval's live column, the screenshots and video (real Meta API answers recorded on live runs and played back in the app; the live camera guide ran live while filming).
 - Sample: the photos are AI-generated and labelled on the image itself. Offline sample mode uses pre-written answers and says so on screen. Prices are labelled estimates.
 - Not measured: real owner trials and real-world photos. I make no claim about money saved by real people.
 
