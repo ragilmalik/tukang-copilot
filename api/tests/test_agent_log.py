@@ -147,3 +147,33 @@ def test_check_event_records_which_plan_it_belonged_to():
     log = c.get(f"/api/sessions/{sid}").json()["agent_log"]
     checks = [e for e in log if e["kind"] == "check"]
     assert checks and checks[0]["cause"] == 0
+
+
+def test_an_answer_waits_for_the_worker_that_asked(monkeypatch):
+    # The worker that asked the question writes the session once more on its way out. An answer that
+    # arrived in between used to be overwritten, so the repair asked the same question again (CI 6 Nov).
+    import threading
+
+    from api.pipeline import engine
+
+    sid = client.post("/api/sessions", data={"sample": "motor", "language": "en"}).json()["id"]
+    assert _wait(sid)["status"] == "needs_answer"
+    lock = engine._locks[sid]
+    lock.acquire()  # stand in for a worker still finishing
+    done = threading.Event()
+
+    def send() -> None:
+        engine.answer(sid, "no")
+        done.set()
+
+    threading.Thread(target=send, daemon=True).start()
+    try:
+        assert not done.wait(0.3), "the answer must wait for the run lock"
+        assert engine.load(sid)["status"] == "needs_answer"
+    finally:
+        lock.release()
+    assert done.wait(5)
+    s = engine.load(sid)
+    assert s["status"] == "running" and s["answer"] == "no"
+    engine.start(sid)
+    assert _wait(sid, ("ready",))["status"] == "ready"

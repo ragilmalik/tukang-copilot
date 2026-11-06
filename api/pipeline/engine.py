@@ -566,8 +566,7 @@ def run(sid: str) -> dict[str, Any]:
             if dx.causes[0].confidence < 60 and dx.follow_up_question and not s.get("answer"):
                 s["status"], s["question"] = "needs_answer", dx.follow_up_question
                 _event(s, "ask", conf=dx.causes[0].confidence, threshold=60)
-                save(s)
-                return s
+                return s  # the finally block saves it, cost included, while the run lock is still held
             plan = stage_plan(s, rep, dx)
             if not stage_safety(s, dx, plan):
                 return s
@@ -608,13 +607,17 @@ def start(sid: str) -> None:
 
 
 def answer(sid: str, text: str) -> dict[str, Any]:
-    s = load(sid)
-    if s["status"] != "needs_answer":
-        raise ValueError("this session is not waiting for an answer")
-    s["answer"], s["question"], s["status"] = text.strip()[:500], None, "running"
-    _event(s, "answer")
-    save(s)
-    return s
+    # Take the run lock: the worker that asked the question still writes the session once more on its way
+    # out (the cost line). Without the lock a quick answer could land in between and that last write would
+    # put the question back and drop the answer, so the repair asked the same question again.
+    with _locks.setdefault(sid, threading.Lock()):
+        s = load(sid)
+        if s["status"] != "needs_answer":
+            raise ValueError("this session is not waiting for an answer")
+        s["answer"], s["question"], s["status"] = text.strip()[:500], None, "running"
+        _event(s, "answer")
+        save(s)
+        return s
 
 
 class LimitReached(ValueError):
