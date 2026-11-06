@@ -49,8 +49,14 @@ This is the "how did you build it and why that way" document. It sits between [H
 
 ## 9. Ownership without accounts
 
-- **What:** creating a repair returns an `owner_token` once. The owner's browser keeps it and sends it to set the outcome or erase the repair. A shared guide link never carries it.
-- **Why:** sharing a guide with a mechanic must not let them delete or change it.
+- **What:** creating a repair returns an `owner_token` once. The owner's browser keeps it and sends it on every call that changes the repair or spends on it: answer, Try again, Still broken, the step check, the live guide, the voice command, the outcome and erase (the first five since 1.32.0). A shared guide link never carries it.
+- **Why:** sharing a guide with a mechanic must not let them delete or change it, or spend on it.
+
+## 9b. One change to a repair at a time
+
+- **What:** `engine.locked(sid)` is a per-repair lock. The first analysis and a re-plan hold it for their whole run; answer, retry, outcome and the bookkeeping of a step check, a live-guide frame and a voice command hold it for a few lines. A step check reserves its count and photo name under the lock, runs the model with no lock held, and records the result under the lock only if the repair is still on the same plan.
+- **Why:** every writer loads the whole session, changes a part and saves the whole session. Without a lock the later save silently drops the other's change (CI found it with a quick answer to the follow-up question; the 1.32.0 audit found the same bug in a double re-plan, a check landing on the next plan, parallel checks past their cap and more).
+- **How it is tested:** `api/tests/test_races.py` holds the lock, blocks the mock model call on an Event or meets two threads at a Barrier, so every race happens on every run, without sleeps.
 
 ## 10. Cost guard and abuse guard
 

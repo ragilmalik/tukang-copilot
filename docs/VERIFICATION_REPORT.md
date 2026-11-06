@@ -1,6 +1,6 @@
 # Verification report
 
-I checked the app against SPEC.md and the hackathon rules. The first version of this report is from 2026-10-30; the latest check is 2026-11-06 WIB (v1.31.1). Section 5d covers 1.24 and 1.25, section 5e covers 1.27.0, section 5f covers 1.28 to 1.29.4, section 5g covers 1.29.6 to 1.29.13, section 5h covers 1.30.0, section 5i covers 1.31.0 and 1.31.1, and the earlier sections date from v1.22.0.
+I checked the app against SPEC.md and the hackathon rules. The first version of this report is from 2026-10-30; the latest check is 2026-11-06 WIB (v1.32.0). Section 5d covers 1.24 and 1.25, section 5e covers 1.27.0, section 5f covers 1.28 to 1.29.4, section 5g covers 1.29.6 to 1.29.13, section 5h covers 1.30.0, section 5i covers 1.31.0 and 1.31.1, section 5j covers 1.32.0, and the earlier sections date from v1.22.0.
 
 Legend: ✅ verified by a test or run · 🟡 built, verified only offline (needs a real-key or real-phone check) · ⬜ not done yet (in TODO.md) · ↔️ done differently (see DECISIONS.md).
 
@@ -207,6 +207,29 @@ These came from playing every flow again on a 390x844 phone and a laptop in all 
 | Demo video and X clip re-made from the same recordings; every frame looked at (one every 2 s); loudness and silence measured | ✅ | Main video 2:54 (174.1 s by ffprobe), 1920x1080 at 60 fps, 34.2 MB; loudness -16.0 LUFS integrated, true peak -3.9 dBFS (ffmpeg ebur128); the only silence of 1 s or more below -40 dB is the last 1.6 s on the close card (ffmpeg silencedetect). A speech-to-text pass (faster-whisper tiny.en) on the voice-over found 402 of the 424 script words (94.8%); the misses are proper nouns (Tukang, bengkel, Muse Spark). X clip 43.5 s, 1080x1920, 12.1 MB, every frame of its contact sheets looked at. Live spend for making the media: about $0.34 by the app's own meter |
 
 **Run numbers (2026-11-06, v1.31.1):** pytest without a browser **858 passed, 0 failed, 0 skipped** (99 files, one by one), Playwright **147 passed, 0 failed, 0 skipped** (24 files, real Chromium, one by one), 1005 in total, the same count `make_test_report.py` got on the whole suite in one run (docs/TEST_REPORT.md); the jsdom flow and the axe-core check ran (not skipped); ruff clean; `mypy api --strict` no issues in 166 files; `smoke_e2e.py` ALL PASSED (69 checks) on an `OFFLINE=1` server; `build_static.py` and `--check` OK; `record_replay.py --check` up to date. No live API calls in this pass. GitHub Actions CI is green again from 09fa5f1 on (the failures before it were the demo video test running on commits without the MP4s).
+
+## 5j. v1.32.0 weakness hunt
+
+| Finding (ranked by user impact) | Status | Evidence |
+|---|---|---|
+| Two writers on one repair overwrote each other: a second "Still broken" while one was planning was accepted and then lost (confirmed on 5d9dd75) | ✅ | `test_races.py::test_a_second_replan_while_one_is_planning_is_busy` |
+| A step check finishing after "Still broken" ticked the same step of the new plan | ✅ | `test_races.py::test_a_check_that_finishes_after_a_replan_is_not_put_on_the_new_plan` |
+| Parallel photo checks got past `MAX_STEP_CHECKS`; two checks on one step overwrote each other's photo; a failed check now gives its count back | ✅ | `test_parallel_checks_cannot_get_past_the_photo_check_cap`, `test_two_checks_on_one_step_keep_both_photos`, `test_a_failed_check_gives_its_count_back` |
+| Step checks and the live guide accepted on a red stop (confirmed on 5d9dd75); re-plan from any status | ✅ | `test_steps_and_live_guide_are_refused_off_the_steps`, `test_replan_only_from_a_plan_on_screen` |
+| A second start or two quick Try again taps ran the repair twice | ✅ | `test_a_second_start_does_not_run_a_finished_repair_again`, `test_two_quick_retries_make_one` |
+| Live-guide frame and "It works now" during a re-plan | ✅ | `test_live_guide_frame_during_a_replan_waits_its_turn`, `test_it_works_now_during_a_replan_is_busy` |
+| A server restart left a repair at "running" forever | ✅ (offline) / 🟡 (Render restart) | `test_a_repair_left_running_by_a_restart_becomes_retryable`, `test_server_start_runs_the_recovery`, Chromium `test_a_repair_a_restart_interrupted_comes_back_with_try_again` |
+| The live photo check ran on the event loop and stalled the server | ✅ | `test_step_check_runs_off_the_event_loop` |
+| Lock, erase-mark, throttle and folder leaks on a long-running server; erase during an open progress stream | ✅ | `test_erase_and_janitor_drop_the_lock_and_erase_marks`, `test_janitor_drops_locks_of_expired_sessions`, `test_janitor_removes_half_made_folders_and_stale_tmp_files`, `test_progress_stream_ends_cleanly_when_the_repair_is_erased` |
+| Shared guide link could re-plan, check, track, answer and spend through the API (confirmed on 5d9dd75: re-plan without a token was 200) | ✅ | `test_owner_routes.py::test_every_route_that_changes_a_repair_needs_the_owner_token` (6 routes), `test_the_app_sends_the_owner_token_on_each_of_those_routes`, smoke checks "refused without the owner token" |
+| Rate limit skipped with a made-up X-Forwarded-For (confirmed on 5d9dd75) | ✅ (code) / ⬜ (Render header not checked live) | `test_rate_limit_key_is_the_address_our_proxy_wrote`, `test_a_spoofed_header_no_longer_skips_the_limit`, `test_a_header_the_edge_proxy_overwrites_wins` |
+| Erasing a repair took its spend out of the daily cap (confirmed on 5d9dd75) | ✅ | `test_erasing_a_repair_keeps_its_spend_in_the_daily_cap` |
+| No cache rule on the owner's photos and JSON; Unicode session ids; a bomb on the step check answered "AI busy" | ✅ | `test_private_repair_data_is_never_cached`, `test_session_ids_are_ascii_letters_and_digits`, `test_a_bomb_on_the_step_check_is_400_not_503` |
+| Console errors on any main screen; progress on a throttled connection; English in the id/jv tables | ✅ (Chromium) | `test_playwright_screens_clean.py`, `test_i18n.py::test_no_english_string_shows_in_bahasa_or_basa_jawa` |
+| test_doc_counts.py had stopped checking (3-digit pattern, 4-digit count) | ✅ | `test_doc_counts.py::test_the_pattern_reads_four_digit_counts` |
+| Disk full during a run leaves the repair at "running" until the next restart | ⬜ (not fixed) | Nothing can be written while the disk is full; `recover_interrupted` marks it retryable at the next start |
+
+RUN_NUMBERS_1320
 
 ## 6. What is not verified yet
 
