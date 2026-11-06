@@ -14,6 +14,7 @@ Findings ranked by user impact, each with its test; the full audit is in CHANGEL
 - [x] Cache-Control no-store on /api and /files, ASCII session ids, decompression bomb is a 400 on check and track
 - [x] Janitor clears locks, erase marks, half-made folders and stale tmp files; erase ends an open progress stream cleanly
 - [x] Every main screen with no console error, restart recovery and slow network in Chromium (test_playwright_screens_clean.py); no English in the id/jv string tables
+- [x] Writing check: `scripts/check_voice.py` + test_check_voice.py, every hit rewritten (0 hits), HANDOFF rewritten as maintainer notes
 - [ ] Full run: ruff, mypy strict, all tests through make_test_report.py, offline smoke, static build, replay check
 - [ ] Docs with the measured numbers, one-pager and guide bundle rebuilt, pushed
 - [ ] After the first Render deploy: check that `cf-connecting-ip` reaches the app (the rate limit keys on it)

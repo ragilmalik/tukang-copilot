@@ -7,6 +7,7 @@ on 5d9dd75 (the 1.31.1 head)."""
 import asyncio
 import io
 import json
+import math
 import threading
 import time
 from typing import Any
@@ -408,6 +409,15 @@ def test_erasing_a_repair_keeps_its_spend_in_the_daily_cap() -> None:
     assert guard.spent_last_24h(now + 86400 + 60) == pytest.approx(0.0)
     guard.prune_spend_ledger(now + 86400 + 60)
     assert (settings.data_dir / guard.LEDGER).read_text() == ""
+
+
+def test_an_erase_counts_in_the_cap_at_once() -> None:
+    """The ledger time is rounded down: with round() a spend recorded at x.06 s was stored as x.1 s, after a
+    "now" of x.07 s, and the daily sum asked right after the erase left it out (seen on a CI runner)."""
+    at = math.floor(time.time()) - 10 + 0.06
+    before = guard.spent_last_24h(at + 0.01)
+    guard.record_erased_spend(1.0, at)
+    assert guard.spent_last_24h(at + 0.01) - before == pytest.approx(1.0)
 
 
 def test_ledger_lines_hold_numbers_only() -> None:

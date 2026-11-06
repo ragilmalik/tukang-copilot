@@ -35,12 +35,17 @@ Step by step: [docs/TUTORIAL.md](docs/TUTORIAL.md). Every setting: [docs/SETUP.m
 - Demo media: [docs/demo/](docs/demo/README.md). Launch kit: [docs/launch/](docs/launch/).
 - Copy of the deliverables (video, one-pager, guide PDF, repo zip): Google Drive folder "Meta Hackathon - Tukang Copilot" (private to my account): https://drive.google.com/drive/folders/1mxVXV1tgjCuxfKoSAHWJpc6V7Yz9vslt
 
-## Rules if you change anything
+## Before you change anything
 
-1. Never commit a key or `.env`. `scripts/set_keys.py` writes `.env`, and git ignores it.
-2. Only `api/meta_client.py` talks to Meta.
-3. After a change: ruff, mypy strict, the tests, then `python scripts/make_test_report.py`, and update CHANGELOG, TODO and the docs the change touches.
-4. If you change prompts or the session shape, re-record the demo with `python scripts/record_replay.py` (needs the key, about $0.60) and check it with `--check`.
+Keys stay out of git: `scripts/set_keys.py` writes `.env`, and `.gitignore` covers it. Only `api/meta_client.py` talks
+to Meta, and I'd keep it that way, because the per-repair cost cap and the log scrubber only see calls that go through
+it.
+
+After a change I run ruff, `mypy api --strict`, the tests, `python scripts/check_voice.py` (it keeps filler words and
+dashes out of the docs and comments) and then `python scripts/make_test_report.py`, which rewrites docs/TEST_REPORT.md
+from the real run. Then I update CHANGELOG, TODO and whichever docs the change touches. A change to the prompts or to
+the session shape means re-recording the demo with `python scripts/record_replay.py` (needs the key, about $0.60) and
+checking it with `--check`.
 
 ## Open items
 

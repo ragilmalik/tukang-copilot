@@ -5,6 +5,10 @@ Deadline as published: Wed Nov 4, 2026, 9:00 PM ET = Thu Nov 5, 2026, 09:00 WIB.
 The fields below follow the form's order and use its exact labels. I read the form on 2026-11-01 without typing or
 submitting anything, and no field shows a character limit. Nothing goes in until I click Submit.
 
+Status: not submitted. When I opened the form on 6 Nov 2026 at 09:29 WIB, signed in as ragilmalika, the page showed a
+disabled "Event Finished" button and "That's time! All submissions are due now." No form opened. The fields stay here
+in case the organisers accept a late entry.
+
 Links to fill before pasting: `[LIVE_URL]` `[YOUTUBE_URL]` `[X_POST_URL]`, and `[STATIC_URL]` only if
 the static build is hosted.
 

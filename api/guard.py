@@ -7,6 +7,7 @@ DAILY_BUDGET_USD (default 10, 0 = off). Messages come in id/jv/en so the phone s
 from __future__ import annotations
 
 import json
+import math
 import threading
 import time
 from collections import defaultdict, deque
@@ -147,7 +148,9 @@ def record_erased_spend(usd: float, at: float) -> None:
     with _ledger_lock:
         p.parent.mkdir(parents=True, exist_ok=True)
         with p.open("a", encoding="utf-8") as f:
-            f.write(json.dumps({"t": round(at, 1), "usd": round(usd, 4)}) + "\n")
+            # rounded down, never up: round() could put the line up to 0.05 s after the erase, and the 24 h sum
+            # (which stops at "now") missed it when it was asked right away (CI caught this on a fast runner)
+            f.write(json.dumps({"t": math.floor(at * 10) / 10, "usd": round(usd, 4)}) + "\n")
         _spend_cache = (0.0, 0.0)
 
 
