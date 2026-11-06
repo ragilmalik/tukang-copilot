@@ -667,6 +667,7 @@ async function fetchSession(id) { const r = await fetch("/api/sessions/" + id); 
 
 function follow(id) {
   if (es) es.close();
+  progId = String(id); tickElapsed();
   const settle = async () => {
     S = await fetchSession(id); renderProgress(S);
     if (S.status === "ready") await openResult(id);
@@ -1595,16 +1596,19 @@ function stageTool(s, k) {
   if (STAGE_TOOL[k]) return m[STAGE_TOOL[k]] || "";
   return k === "narrate" ? "edge-tts" : t("agCode");
 }
-let progT0 = 0, progTimer = null;
+let progT0 = 0, progTimer = null, progId = "";
 // "⏱ 34 s · Diagnosing (muse-spark-1.3)": the whole wait, the stage that is working and the model doing it, plus how
 // long a live repair usually takes (only on the live server). The running row in the list counts its own seconds.
 function tickElapsed() {
   const el = $("elapsed"); if (!el) return;
-  const running = S && ["created", "running"].includes(S.status) && view === "progress";
+  // The clock runs from the tap, not from the first answer: on a slow connection the first state can take seconds,
+  // and S may still hold the previous repair. Until this repair's state arrives, it counts as running.
+  const mine = !!S && S.id === progId;
+  const running = view === "progress" && (!mine || ["created", "running"].includes(S.status));
   let line = "";
   if (running) {
     line = "⏱ " + t("elapsed").replace("{n}", String(Math.round((Date.now() - progT0) / 1000)));
-    const cur = Object.entries(S.stages || {}).find(([, v]) => v && v.status === "running");
+    const cur = mine ? Object.entries(S.stages || {}).find(([, v]) => v && v.status === "running") : null;
     if (cur) { const tool = stageTool(S, cur[0]); line += " · " + (t("stages")[cur[0]] || cur[0]) + (tool ? ` (${tool})` : ""); }
     if (HEALTH && HEALTH.mode === "live") line += " · " + t("liveUsual");
   }

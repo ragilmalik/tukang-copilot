@@ -14,6 +14,7 @@ Findings ranked by user impact, each with its test; the full audit is in CHANGEL
 - [x] Cache-Control no-store on /api and /files, ASCII session ids, decompression bomb is a 400 on check and track
 - [x] Janitor clears locks, erase marks, half-made folders and stale tmp files; erase ends an open progress stream cleanly
 - [x] Every main screen with no console error, restart recovery and slow network in Chromium (test_playwright_screens_clean.py); no English in the id/jv string tables
+- [x] CI on 17cf49a and daaf282 went red: the shared-guide re-plan test had no owner token (fixed in a454620) and the erased-spend ledger rounded the erase time up by up to 0.05 s, so a daily sum asked right after an erase missed it (fixed in 7d7969c, test_an_erase_counts_in_the_cap_at_once). CI on 7d7969c then failed the slow-connection test: the progress clock waited for the first server state; it now counts from the tap (test_the_clock_starts_before_the_first_answer_arrives)
 - [x] Writing check: `scripts/check_voice.py` + test_check_voice.py, every hit rewritten (0 hits), HANDOFF rewritten as maintainer notes
 - [ ] Full run: ruff, mypy strict, all tests through make_test_report.py, offline smoke, static build, replay check
 - [ ] Docs with the measured numbers, one-pager and guide bundle rebuilt, pushed

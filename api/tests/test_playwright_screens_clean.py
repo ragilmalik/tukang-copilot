@@ -118,6 +118,21 @@ def test_a_repair_a_restart_interrupted_comes_back_with_try_again(server: str, b
     assert not problems, problems
 
 
+def test_the_clock_starts_before_the_first_answer_arrives(server: str, browser: Any) -> None:
+    """The phone's clock used to wait for the first session state: on a slow line (or with an earlier repair's state
+    still in memory) the progress screen showed no clock at all until then. Here the state never arrives."""
+    problems: list[str] = []
+    pg = _phone(browser, problems)
+    pg.route("**/api/sessions/*/events", lambda route: None)  # held: never answered
+    pg.route("**/api/sessions/*", lambda route: None if route.request.method == "GET" else route.continue_())
+    pg.goto(server + "/")
+    pg.click('button.sample[data-sample="faucet"]')
+    pg.wait_for_selector("#progress:not(.hidden)", timeout=10000)
+    pg.wait_for_function("() => /\\d/.test(document.querySelector('#elapsed').textContent)", timeout=3000)
+    first = pg.inner_text("#elapsed")
+    pg.wait_for_function("(t) => document.querySelector('#elapsed').textContent !== t", arg=first, timeout=3000)  # it counts
+
+
 def test_progress_stays_honest_on_a_slow_connection(server: str, browser: Any) -> None:
     problems: list[str] = []
     pg = _phone(browser, problems)
