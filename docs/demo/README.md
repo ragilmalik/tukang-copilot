@@ -9,8 +9,9 @@ corner, and every frame of the video says where its answers come from.
 The answers on screen are real answers from the Meta Model API, recorded on live runs and played back in the app
 (the script's recorded mode, `DEMO_RECORDED_DATA`), so nothing on screen is a canned offline answer:
 
-- The motorbike repair is the app's own recorded 1-tap demo (`web/replay/demo.json`), recorded from the live API on
-  6 Nov 2026 at 01:23 WIB. The "Recorded demo" badge is on screen.
+- The motorbike repair is the app's own recorded 1-tap demo (`web/replay/demo.json`). The screenshots use the recording
+  made from the live API on the new photos on 6 Nov 2026 at 14:01 WIB; the current video and GIF still show the earlier
+  recording of 01:23 WIB on the previous photos. The "Recorded demo" badge is on screen.
 - The pump, rice cooker, faucet (with its Muse Image diagram) and Basa Jawa tyre screens are live sessions I recorded
   on 6 Nov 2026, reopened in the app the way it reopens a saved repair.
 - The live camera guide (`16_live_guide.png` and the live camera scene) calls SAM 3.1 live while filming, on Chromium's

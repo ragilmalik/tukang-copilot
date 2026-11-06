@@ -219,7 +219,7 @@ strict clean on 171 files, ruff clean, and the HTTP smoke test passed with 77 ch
 | [docs/SUBMISSION.md](docs/SUBMISSION.md) and [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md) | Form text field by field, and the steps to submit |
 | [docs/WRITEUP.md](docs/WRITEUP.md) | Write-up: problem, user, demo, how it works, safety, eval, status |
 | [docs/JUDGING_MAP.md](docs/JUDGING_MAP.md) | Each judging criterion and where the evidence is |
-| [docs/launch/](docs/launch/) | YouTube text and chapters, X thread, community vote kit, judge FAQ, one-pager |
+| [docs/launch/](docs/launch/) | YouTube text and chapters, X thread, community vote kit, judge FAQ, one-pager, marketing images with their claims table ([ASSETS.md](docs/launch/ASSETS.md)) |
 | [docs/demo/README.md](docs/demo/README.md) | Demo video, vertical clip, screenshots, and how to make them again |
 | [docs/DECISIONS.md](docs/DECISIONS.md), [docs/ROADMAP.md](docs/ROADMAP.md), [docs/ATTRIBUTIONS.md](docs/ATTRIBUTIONS.md) | Why things are built this way, what comes next, third-party notices |
 | [CHANGELOG.md](CHANGELOG.md) and [TODO.md](TODO.md) | Dated build log, and what is left |

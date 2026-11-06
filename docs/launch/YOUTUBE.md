@@ -3,7 +3,8 @@
 Upload the real-phone recording if I have one by then, otherwise `docs/demo/tukang-copilot-demo.mp4` (2:54, real Meta API answers recorded on a live run).
 Unlisted is fine for judging, but Public helps with Most Viral and Community Vote. Open the link in a private window
 before pasting it into the form. For captions, upload `docs/demo/tukang-copilot-demo.en.srt` as English subtitles.
-The thumbnail is `docs/launch/thumbnail.png` (1280x720); custom thumbnails need a phone-verified YouTube account.
+The thumbnail is `docs/launch/thumbnail.png` (1280x720, 1.3 MB): the real pump result screen on an AI-generated scene,
+labelled "AI-generated scene" (docs/launch/ASSETS.md); custom thumbnails need a phone-verified YouTube account.
 
 ## Title options
 1. Tukang Copilot: AI finds the broken part and checks every repair step (Muse Spark + SAM 3.1)

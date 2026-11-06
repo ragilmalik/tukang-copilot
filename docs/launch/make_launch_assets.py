@@ -1,4 +1,4 @@
-"""Make the launch assets: YouTube thumbnail (1280x720), architecture diagram (1920x1080) and the one-pager PDF.
+"""Make the launch assets: YouTube thumbnail (1280x720, built by make_marketing_images.py), architecture diagram (1920x1080) and the one-pager PDF.
 
 Run from the repo root:
     python docs/launch/make_launch_assets.py              # thumbnail + architecture diagram
@@ -69,6 +69,8 @@ def paste_shadow(base: Image.Image, im: Image.Image, xy: tuple[int, int], angle:
 
 
 def thumbnail() -> Path:
+    """The drawn thumbnail of 1.31.1 (navy panel, two phones). Run it as `thumbnail-drawn`; it writes
+    thumbnail-drawn.png so it can not replace the current thumbnail."""
     W, H = 1280, 720
     img = Image.new("RGBA", (W, H), NAVY + (255,))
     d = ImageDraw.Draw(img)
@@ -105,7 +107,7 @@ def thumbnail() -> Path:
     d.rounded_rectangle([x, 590, x + tw + 40, 646], 14, fill=(52, 64, 78, 255))
     d.text((x + 20, 602), tag, font=f_tag, fill=(225, 230, 236))
 
-    out = OUT / "thumbnail.png"
+    out = OUT / "thumbnail-drawn.png"
     img.convert("RGB").save(out, optimize=True)
     return out
 
@@ -233,7 +235,17 @@ def one_pager() -> Path:
     return out
 
 
-BUILDERS = {"thumbnail": thumbnail, "architecture": architecture, "onepager": one_pager}
+def marketing_thumbnail() -> Path:
+    """The YouTube thumbnail is now a real app screen on a labelled AI-generated scene (make_marketing_images.py);
+    the older drawn thumbnail() above is kept for reference and no longer writes thumbnail.png by default."""
+    sys.path.insert(0, str(OUT))
+    import make_marketing_images  # noqa: PLC0415  (only this builder needs NumPy and ImageMagick)
+
+    return make_marketing_images.build("thumbnail")
+
+
+BUILDERS = {"thumbnail": marketing_thumbnail, "thumbnail-drawn": thumbnail, "architecture": architecture,
+            "onepager": one_pager}
 
 
 def main(argv: list[str]) -> int:

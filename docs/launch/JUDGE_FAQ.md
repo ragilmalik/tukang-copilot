@@ -6,7 +6,7 @@ Short answers first, then the file or screenshot in this repo that backs them up
 **1. Did you actually call the Meta Model API, or is this all mocked?**
 Yes, live. On 5 November 2026 I ran every sample scenario on the real Meta Model API with my own key: seven runs, about
 $0.37 in total, with timings per stage and cost per repair in docs/LIVE_RUN.md, and the eval has a live column
-(docs/EVAL.md). The recorded 1-tap demo is a live run from 6 Nov 2026 (01:23 WIB). The demo video plays real answers
+(docs/EVAL.md). The recorded 1-tap demo is a live run from 6 Nov 2026 (14:01 WIB, on the new sample photos; the demo video still shows the 01:23 WIB run). The demo video plays real answers
 recorded from the live API on 6 Nov 2026 and says so on every frame; only the live camera guide in it called SAM 3.1
 live while I filmed. Every Meta call goes through `api/meta_client.py` against `api.meta.ai`, and `test_live_path.py`
 also runs that path offline against a test double built from the official request and response shapes, so every
