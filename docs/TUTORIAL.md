@@ -2,7 +2,7 @@
 
 This walks you through Tukang Copilot from zero, the way I would show a friend. You don't need to write code. Plan on 15 minutes for the offline run and 15 more if you want the real Meta models.
 
-**Who this is for:** anyone who wants to see the app work on their own laptop or phone, including judges and people who have never opened a terminal.
+**Who this is for:** anyone who wants to see the app work on their own laptop or phone, including people who have never opened a terminal.
 **What you get at the end:** the app running on your machine, one full motorbike repair finished (diagnosis, steps, camera check, re-plan), and, if you have a Meta key, the same repair answered by the real models.
 **Why it is set up this way:** the app runs with no key at all (offline sample mode), so nobody has to pay or sign up just to look. The real models switch on with one setting.
 
@@ -26,9 +26,9 @@ This walks you through Tukang Copilot from zero, the way I would show a friend. 
 
 ## Part 2. Switch on the real Meta models
 
-You need a Meta Model API key from https://dev.meta.ai. A repair costs about 4 US cents (median from my live run on 5 Nov 2026).
+You need a Meta Model API key from https://dev.meta.ai. A repair costs about 4 US cents (median from my live run on 5 Nov 2026, on the earlier sample photos).
 
-1. On dev.meta.ai, claim the hackathon credits, add a card under **Billing** and set a spend limit. I use $20.
+1. On dev.meta.ai, add a card under **Billing** (or use any credits Meta gave you) and set a spend limit. I use $20.
 2. **API keys**, then **Create key**, then copy it. Never paste a key into a chat or an issue.
 3. In the project folder run `python scripts/set_keys.py` (Windows: `.venv\Scripts\python scripts\set_keys.py`). Paste the key when it asks. Nothing shows while you paste. Press Enter.
 4. It writes the key into `.env` (git ignores that file) and checks every model the app uses. It should end with **ALL GOOD** for well under 5 cents.

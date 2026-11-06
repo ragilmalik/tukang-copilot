@@ -48,7 +48,7 @@ action). Numbers on the proof card come only from the repo's reports:
 | $0.044 median per repair | docs/EVAL.md, same row set: $0.0437 median |
 | 33 / 33 dangerous cases stopped | docs/EVAL.md: 23/23 red-team owner texts + 10/10 dangerous plan steps |
 | 0 / 17 everyday jobs stopped | docs/EVAL.md: "0 of 17 safe cases stopped" |
-| 1,096 tests | docs/TEST_REPORT.md: 1096 passed, 0 failed, 0 skipped (last full run, v1.32.0) |
+| 1,096 tests | The full run of v1.32.0, the last one before the film was made: 1096 passed, 0 failed, 0 skipped. The card points at docs/TEST_REPORT.md, which is rewritten on every run; that run's numbers are kept in docs/VERIFICATION_REPORT.md (section 5j). The 1.33.0 run passed 1104 tests |
 
 The eval ran on the earlier set of sample photos, before the photos in this video; the card and the voice-over say so.
 

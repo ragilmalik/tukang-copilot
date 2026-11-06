@@ -38,7 +38,7 @@ WhatsApp sends each photo of an album as its own message, so the channel waits `
 The simulator at `/wa` is a WhatsApp-style page, clearly labelled "Simulator, runs the same engine in demo
 mode". It calls `/api/wa-sim/*`, which builds the same webhook message objects and runs them through the same
 handler; the replies it shows are the exact Cloud API message objects the real channel would send. It works
-in id/jv/en and needs no WhatsApp number, which lets judges and the demo video show the channel. It is on in demo
+in id/jv/en and needs no WhatsApp number, which lets visitors and the demo video show the channel. It is on in demo
 mode only (`WA_SIM=1` also allows it with a live key, which then spends real model calls).
 
 ## Setup (10 steps, about 20 minutes)
@@ -48,7 +48,7 @@ mode only (`WA_SIM=1` also allows it with a live key, which then spends real mod
 3. In the app, open **Use cases > Customize > API Setup** (older dashboards: **WhatsApp > API Setup**). Meta gives you a free **test phone number**.
 4. Under **To**, add your own WhatsApp number and type the code WhatsApp sends you. The test number can only message numbers you add here (up to 5).
 5. On the same page, copy the **Phone number ID** (a long number, not the phone number itself). This is `WA_PHONE_NUMBER_ID`.
-6. Click **Generate access token** and copy it. This is `WA_TOKEN`. It expires after about a day; for the judging week make a permanent one: Business Settings > System users > Add > Generate token with `whatsapp_business_messaging` and `whatsapp_business_management`.
+6. Click **Generate access token** and copy it. This is `WA_TOKEN`. It expires after about a day; for anything longer make a permanent one: Business Settings > System users > Add > Generate token with `whatsapp_business_messaging` and `whatsapp_business_management`.
 7. Open **App settings > Basic**, click **Show** next to **App secret**, and copy it. This is `WA_APP_SECRET`.
 8. Make up a verify word (for example `tukang-semarang-2026`). This is `WA_VERIFY_TOKEN`.
 9. In Render, open the tukang-copilot service > **Environment**, fill in the four values `WA_TOKEN`, `WA_PHONE_NUMBER_ID`, `WA_VERIFY_TOKEN`, `WA_APP_SECRET` (render.yaml already lists them as empty secrets) and save. Render restarts the app.
@@ -79,7 +79,7 @@ The channel stays off (`/webhooks/whatsapp` answers 404) until the first four va
 - Live mode: the web app's abuse guard applies per phone number (hashed): `RATE_LIMIT_PER_HOUR` new repairs, `FOLLOWUP_RATE_PER_HOUR` checks / re-plans / voice notes, and `DAILY_BUDGET_USD` for the whole server. A blocked owner gets the same friendly message in their language.
 - Cloud API rules (from the docs below): the business number can answer freely for 24 hours after the owner's last message (customer service window); reply buttons are at most 3, titles at most 20 characters, body at most 1024; captions at most 1024. The channel cuts text to fit.
 - The chat state is kept in memory: a server restart forgets where a chat was (the repair files on disk stay until `RETENTION_HOURS`). The owner just sends a new photo. One server process only (Render free plan); several processes would need a shared store.
-- The test number reaches only the 5 numbers added in API Setup. A real public number needs Meta business verification, which is not needed for the hackathon.
+- The test number reaches only the 5 numbers added in API Setup. A real public number needs Meta business verification, which I have not done.
 - Not built: video messages (the web app takes a 5 to 10 s clip; on WhatsApp send photos instead), group chats, template messages outside the 24-hour window.
 
 ## Privacy

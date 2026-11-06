@@ -1,8 +1,17 @@
 # TODO
 
-The entry deadline was Thu Nov 5, 2026, 09:00 WIB (Nov 4, 9 PM ET). Code is done; what is left is media, final numbers and the steps only I can do with my accounts.
+Tukang Copilot is my own project. I built it first for the Meta AI developer hackathon (Oct to Nov 2026); the submission page had closed when I tried on 6 Nov 2026, so nothing was submitted, and the items that only made sense for the event are marked "dropped" below. What is left: listening to the new film, the steps only I can do with my accounts, and real-world trials.
 
-## 1.33.0 media remake (6 Nov, in progress)
+## 1.33.0 release (6 Nov)
+- [x] CI fix: the app said 1.32.0 while CHANGELOG headed 1.33.0 (test_version_sync); the version lives only in api/__init__.py and is now 1.33.0. The offline cache name is not tied to the version (v27 since this release's new recording)
+- [x] `mypy api --strict` failed on two test files (test_demo_video.py, test_replay.py) and the demo scripts had 8 more errors; all fixed, clean on 172 files
+- [x] Docs rewritten for a personal project (README, HANDOFF, REPORT, WRITEUP, VERIFICATION_REPORT, ONE_PAGER, YOUTUBE, demo README, ROADMAP, SETUP, TUTORIAL, DEPLOY, DECISIONS, METHODS, WHATSAPP, TROUBLESHOOTING, ARCHITECTURE, AI_PIPELINE, CHANGELOG header); user-facing wording in check_keys.py, deploy_check.py, record_replay.py, first_live_run.py and render.yaml
+- [x] Hackathon papers moved to docs/archive/hackathon/ with a README (SUBMISSION, SUBMISSION_CHECKLIST, JUDGING_MAP, JUDGE_FAQ, COMMUNITY_VOTE_KIT, X_THREAD, DEMO_SCRIPT, SPEC); test_doc_links.py checks every relative link; test_doc_counts, test_no_em_dash_docs and test_no_emdash follow the move
+- [x] Full run: 1104 passed, 0 failed, 0 skipped (6 Nov 2026, 15:53 WIB, commit 1f84cae; 953 without a browser in 104 files, 151 in real Chromium in 25 files). The first run on ee04108 had 2 failures: two browser tests still waited for the recorded demo's follow-up question, fixed in 1f84cae; offline smoke ALL PASSED (77 checks, port 8765)
+- [x] One-pager rebuilt (1 A4 page, 1104 tests and 77-check smoke on it, looked at) and guide bundle rebuilt (54 pages, 14 docs, v1.33.0, page 1 looked at)
+- [ ] Commit, push, CI green, package, Drive upload (in progress)
+
+## 1.33.0 media remake (6 Nov)
 What I want from it: more realistic images and video, a more natural voice, better music, new realistic sample photos with a live re-recording, every screen shot again, all docs updated.
 - [x] a. Voice A/B of free engines (Kokoro-82M, edge-tts, Piper): narrator edge-tts AndrewMultilingual at -8%; music "Lucky Acoustic" (Jesse Keller, CC BY 3.0); five labelled b-roll stills in docs/launch/broll/
 - [x] a. Marketing images (thumbnail, cover, square, vertical) with real app screens composited on the phones: docs/launch/make_marketing_images.py, claims table in docs/launch/ASSETS.md
@@ -72,24 +81,24 @@ Findings ranked by user impact, each with its test; the full audit is in CHANGEL
 - [x] Re-record the 1-tap demo from the live API (one yes/no question in every language, the sample photo passes on its step): 6 Nov 01:23 WIB, pipeline $0.18
 - [x] Commit and push (main at 9179f81 on 6 Nov)
 
-## Must (to submit)
+## Must (from the hackathon days)
 Done by me (code, docs, media):
 - [x] Meta key set, `check_keys.py` passes all 5 required models (5 Nov 2026)
 - [x] Live runs on 7 scenarios and the live eval (docs/LIVE_RUN.md, docs/EVAL.md); fixes from them shipped in 1.30.0
 - [x] Public repo https://github.com/ragilmalik/tukang-copilot, history cleaned of private data
 - [x] Full doc set: TUTORIAL, HOW_TO_USE, HOW_IT_WORKS, ARCHITECTURE, METHODS, SUGGESTIONS, TEST_CHECKLIST, VERIFICATION_REPORT, REPORT, HANDOFF
-- [ ] Final media from the live API: screenshots, hero.gif, thumbnail, og image, demo video under 3:00, vertical clip (in progress)
-- [ ] Fill the measured numbers in README, SUBMISSION, WRITEUP, JUDGING_MAP, SUBMISSION_CHECKLIST
-- [ ] Rebuild the one-pager PDF and the guide bundle, fresh-clone check, Drive upload
+- [x] Final media from the live API: screenshots, hero.gif, thumbnail, og image, demo video under 3:00, vertical clip (1.33.0)
+- [x] Fill the measured numbers in README, WRITEUP and REPORT (1.33.0; the submission papers are archived with the numbers of their day)
+- [ ] Rebuild the one-pager PDF and the guide bundle, Drive upload (1.33.0 release, above)
 
 Only I can do these (my accounts):
-- [ ] Check with the organisers whether a late entry is accepted (the form closed Thu Nov 5, 09:00 WIB)
-- [ ] Upload the video to YouTube with docs/launch/YOUTUBE.md, then put the link in README and SUBMISSION
-- [ ] Post the X thread (docs/launch/X_THREAD.md) with the vertical clip
-- [ ] Paste the docs/SUBMISSION.md fields into Cerebral Valley and submit; answer the AI-tools question honestly (the sample photos are AI-generated and labelled). Tried on 6 Nov 2026, 09:29 WIB, signed in as ragilmalika (Google): the submit page shows a disabled "Event Finished" button and "That's time! All submissions are due now." No form opened, nothing was submitted. Open only if the organisers accept a late entry
+- [x] Dropped: asking the organisers about a late entry (personal project now)
+- [ ] If I want it public: upload the video to YouTube with docs/launch/YOUTUBE.md, then put the link in the README
+- [ ] If I want it: post about it on X with the vertical clip (the old thread draft is in docs/archive/hackathon/X_THREAD.md)
+- [x] Dropped: the Cerebral Valley submission. Tried on 6 Nov 2026, 09:29 WIB, signed in as ragilmalika (Google): the submit page showed a disabled "Event Finished" button and "That's time! All submissions are due now." No form opened, nothing was submitted (the field text is archived in docs/archive/hackathon/SUBMISSION.md)
 - [ ] Deploy on Render (docs/DEPLOY.md) if I want a live link, then `deploy_check.py <url> --live`
-- [ ] Rotate the Meta key after judging
-- [ ] Share docs/launch/COMMUNITY_VOTE_KIT.md when voting opens Tue Nov 10, 00:00 WIB
+- [ ] Rotate the Meta key now that the live runs are done
+- [x] Dropped: the community vote kit (archived in docs/archive/hackathon/COMMUNITY_VOTE_KIT.md)
 - [ ] Real photos and 5 owner trials (docs/USER_TRIAL_KIT.md), then `scripts/impact_report.py`
 
 ## Should (scores better)
@@ -97,7 +106,7 @@ Only I can do these (my accounts):
 - [x] Video capture (5 to 10 s, 3 sharpest frames)
 - [x] PDF export of the report, plus local "My garage" history (localStorage)
 - [ ] (keys) Open-weights run on Baseten (needs BASETEN_API_KEY); the badge is built and shows when active
-- [ ] (keys) Post the X thread (docs/launch/X_THREAD.md, 43.5 s clip ready) before submitting; engagement counts until Nov 8 11:59 PM ET (Nov 9 11:59 WIB)
+- [x] Dropped: the X thread for the event's engagement prize
 - [x] Screenshots, demo video and vertical clip (docs/demo/), regenerated for v1.23 (26 shots, 2:57 video, GIF)
 - [x] Re-shot screenshots and video for the compact tip bar and the PDF agent-log page (v1.23)
 - [x] Streamed partial results on the progress screen (object, SAM overlay, top cause as each stage finishes) (v1.23)
@@ -116,7 +125,7 @@ Only I can do these (my accounts):
 - [x] AI-generated sample photos, labelled, in place of the flat drawings; demo video re-shot at 1080p60, 2:53, X clip 43.5 s (v1.29.0)
 - [x] PDF report, workshop sheet and share cards in the new look; friendly page for expired guide links; strict CSP and HSTS; STOP card on shared red-stop links; axe-core clean on every main screen (v1.29.1 to v1.29.4)
 - [x] After the live run: eval re-run live, numbers in docs/EVAL.md (5 Nov 2026)
-- [ ] Open the live link a few minutes before judging or recording so the free server is awake (a brand-new visitor can't get the recording until the page itself loads)
+- [ ] Once deployed: open the live link a few minutes before a demo so the free server is awake (a brand-new visitor can't get the recording until the page itself loads)
 
 ## Could
 - [x] Abuse guard (rate limit and daily spend cap) and security headers for the public deploy

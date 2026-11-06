@@ -28,7 +28,7 @@ SAM 3.1 gives pixel-accurate masks of the exact parts on the user's own photo. L
 
 Muse Image edits the user's own photo (as a reference image), so a diagram shows the same object instead of a generic one. A Spark review catches garbled text or the wrong object.
 
-Muse Spark Open (open weights) can take over the two reasoning stages through Baseten, for the open-weight track. The schemas are the same. `max_tokens` is 16384 because reasoning and answer share that budget.
+Muse Spark Open (open weights) can take over the two reasoning stages through Baseten, so the app can also run on open weights. The schemas are the same. `max_tokens` is 16384 because reasoning and answer share that budget.
 
 ## Agentic behaviour (plan, act, verify, re-plan)
 

@@ -1,6 +1,6 @@
-# Roadmap (after the hackathon)
+# Roadmap
 
-Some things I first put on this list got built during the hackathon after all: the WhatsApp channel (webhook and
+Some things I first put on this list got built in the first weeks after all: the WhatsApp channel (webhook and
 simulator done, a real number still needs my Meta app setup), installing the app as a PWA, SAM 3.1 on live camera
 frames with hands-free voice commands, the bengkel hand-off (WhatsApp summary, Maps search, mechanic brief PDF), the
 water pump scenario, and an axe-core accessibility pass on every main screen. What is left:

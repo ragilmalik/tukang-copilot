@@ -8,7 +8,7 @@ Every phone becomes a mechanic's apprentice. Point your phone at something broke
 Indonesia, Javanese or English. It outlines the exact part on your own photo, walks you through the fix, checks each
 step with your camera, and says STOP when the job is dangerous.
 
-<div class="tag">Meta Global AI Developer Hackathon 2026 · Indie track · Push the Frontier · solo, Semarang</div>
+<div class="tag">My own open-source project · built solo in Semarang since Oct 2026 · v1.33.0</div>
 
 ## The problem
 - Indonesia has **139 million** motorbikes (BPS 2024), and **17%** of households drink water drawn by an electric pump (BPS 2023).
@@ -37,17 +37,17 @@ step with your camera, and says STOP when the job is dangerous.
 
 ![](architecture.png){width=55%}
 
-## Why it's frontier, and why it's safe
+## What is new, and why it's safe
 - The model checks whether a person's physical action worked, then changes the plan if it didn't.
 - Five Meta models go through one client file: Muse Spark 1.3 and 1.2 audio, SAM 3.1 (photos and live camera), Voice Transcribe, Muse Image, and Muse Spark Open on Baseten (open weights, one switch).
 - The same agent and safety gate run on Meta's WhatsApp Cloud API: photo and voice note in, marked photo, step buttons and red STOP out.
 - Gas, mains, 220 V internals, brakes and fuel get a red STOP from plain code before any model call; untrusted text is fenced against prompt injection.
 
 ## Evidence
-**1096** automated tests pass (0 failed, 0 skipped; real Chromium + jsdom) · **77-check** HTTP smoke passes · mypy strict, ruff clean ·
-live Meta API (5 Nov 2026): **7** scenarios run, **9/9** sample photos right on top cause and safety level, **$0.03 to $0.07** per repair ·
+**1104** automated tests pass (0 failed, 0 skipped; real Chromium + jsdom) · **77-check** HTTP smoke passes · mypy strict, ruff clean ·
+live Meta API (5 Nov 2026, earlier sample photos): **7** scenarios run, **9/9** sample photos right on top cause and safety level, **$0.03 to $0.07** per repair ·
 red-team eval: **100%** safety-stop recall on 33 cases, **0** false stops on 17 safe, injections resisted (live 4/4, offline 7/7) ·
 3 languages · 2:25 captioned video of recorded live answers.
 Honest status: the photos are labelled AI-generated samples; WhatsApp is tested with a Graph API test double (real number pending); Semarang user trials are pending.
 
-<div class="links">Try it: [LIVE_URL] · Code (MIT): https://github.com/ragilmalik/tukang-copilot · Video: [YOUTUBE_URL]</div>
+<div class="links">Code (MIT): https://github.com/ragilmalik/tukang-copilot · Video: docs/demo/ in the repo · Built first for the Meta AI developer hackathon (Oct to Nov 2026); not submitted</div>

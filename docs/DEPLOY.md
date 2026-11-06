@@ -17,7 +17,7 @@ Render needs two files, and both are in the repo: `render.yaml` (the "Blueprint"
 | Cost | $0 | about $7/month, or use a `HTHON-` credit code (Account → Billing → Redeem code) |
 | Sleeps? | Yes, after 15 min with no visitors. The next visit waits about 1 minute while it wakes up. | Never sleeps |
 | Photos and shared guide links kept | Until it falls asleep or redeploys (temporary disk; deleted after 24 h anyway) | Until the next redeploy or restart (max 24 h) |
-| Good for | Testing, sharing the link, the video | Judging days, so the first judge never waits |
+| Good for | Testing, sharing the link, the video | Demo days, so the first visitor never waits |
 
 Start on Free. Switching later is one click (step 14) and doesn't need a code redeploy.
 
@@ -55,7 +55,7 @@ Start on Free. Switching later is one click (step 14) and doesn't need a code re
     - **PUBLIC_BASE_URL**: set it to your https Render address from step 9 (e.g. `https://tukang-copilot.onrender.com`, no slash at the end). The mechanic hand-off and WhatsApp links use it.
     - Other settings already in render.yaml: `MAX_TRACK_FRAMES` 120 (live camera frames per repair, about $0.30 of SAM at most), `TRACK_MIN_INTERVAL_S` 0.6 (at most ~1.6 frames a second), `DEMO_FALLBACK` 1 (a failing live call uses the labelled demo answer for that step so a judge never sees a dead end), `IMPACT_TOKEN` (optional, to download `/api/impact/outcomes.jsonl` with header `X-Impact-Token`).
     - Turn on open weights: set `USE_OPEN_WEIGHTS` to `1` and make sure `BASETEN_API_KEY` is filled.
-    - Emergency switch if the live Meta API misbehaves during judging: set `OFFLINE` to `1`. The app keeps working on the pre-written offline sample answers at no cost, and says so in the header. Set it back to `0` afterwards.
+    - Emergency switch if the live Meta API misbehaves during a demo: set `OFFLINE` to `1`. The app keeps working on the pre-written offline sample answers at no cost, and says so in the header. Set it back to `0` afterwards.
     - Spend caps are already set: `MAX_COST_PER_SESSION_USD` 0.50 per repair, `DAILY_BUDGET_USD` 10 per 24 h for the whole site, `RATE_LIMIT_PER_HOUR` 30 new repairs per visitor, `FOLLOWUP_RATE_PER_HOUR` 240 model calls inside repairs per visitor, `MAX_STEP_CHECKS` 40 photo checks per repair. Also set a spend limit on dev.meta.ai → Billing.
 
 ## Updates
@@ -71,7 +71,7 @@ Start on Free. Switching later is one click (step 14) and doesn't need a code re
 13. Service page → **Events** (left menu) → find the last deploy that says **Deploy live** and worked → click **Rollback** next to it → confirm. The old version is back in about a minute. (A rollback turns auto-deploy off for safety; turn it back on in **Settings → Build & Deploy → Auto-Deploy: Yes** after the fix is pushed.)
     - Quicker in an emergency: set `OFFLINE` to `1` (step 11).
 
-## Switch to the always-on plan (optional, before judging)
+## Switch to the always-on plan (optional, before a demo)
 
 14. Service page → **Settings** → **Instance Type** → **Starter** → **Save**. Redeem a credit first if you have one: **Account (top right) → Billing → Redeem code** (`HTHON-…`). To go back to $0, choose **Free** the same way.
 

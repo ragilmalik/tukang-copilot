@@ -160,4 +160,4 @@ as soon as it exists, so the owner reads what Muse Spark saw and sees the SAM ou
   `CORS_ORIGINS` names a site.
 
 ## Next.js and a separate backend
-The first spec asked for them. I went with one process instead: no build step, less for someone who doesn't code to break, and judges get one URL. Details in [DECISIONS.md](DECISIONS.md#d1).
+The first spec asked for them. I went with one process instead: no build step, less for someone who doesn't code to break, and visitors get one URL. Details in [DECISIONS.md](DECISIONS.md#d1).

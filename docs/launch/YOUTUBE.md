@@ -43,7 +43,7 @@ How it works
 - Muse Spark Open (open weights) on Baseten can take over diagnosis and planning with one switch
 - The safety stops (gas, house wiring, 220 V internals, brakes, fuel) are plain code that runs before any model call
 
-Numbers (docs/EVAL.md, live eval of 5 Nov 2026 on the earlier sample photos): median 83 s and $0.044 per repair, 33 of 33 dangerous cases stopped, 0 of 17 everyday jobs stopped. 1,096 automated tests passed in the last full run (docs/TEST_REPORT.md).
+Numbers (docs/EVAL.md, live eval of 5 Nov 2026 on the earlier sample photos): median 83 s and $0.044 per repair, 33 of 33 dangerous cases stopped, 0 of 17 everyday jobs stopped. 1104 automated tests passed in the last full run (docs/TEST_REPORT.md, v1.33.0).
 
 Music: "Lucky Acoustic" by Jesse Keller (https://www.jamendo.com/track/1540859), licensed under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/)
 

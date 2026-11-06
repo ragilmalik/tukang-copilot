@@ -1,6 +1,6 @@
-# Project report: Tukang Copilot 1.32.0
+# Project report: Tukang Copilot 1.33.0
 
-Written 6 November 2026. This is the one document that says what I built, how well it works, what I measured, and what is still open. Every number here comes from a real run that is linked; nothing is projected.
+Written 6 November 2026 by me, Malik. Tukang Copilot is my own open-source project. This is the one document that says what I built, how well it works, what I measured, and what is still open. Every number here comes from a real run that is linked; nothing is projected.
 
 ## What (the product)
 
@@ -21,7 +21,7 @@ Owners who would otherwise pay a bengkel for a 10-minute job, or try a dangerous
 
 ## When and where
 
-Built for the Meta Global AI Developer Hackathon (Indie track, theme Push the Frontier), in Semarang, from late October to 6 November 2026. The live runs were on 5 and 6 November 2026 against `api.meta.ai`.
+Built by me alone in Semarang, from 30 October 2026 (first commit) to now. I first built it for the Meta AI developer hackathon (Oct to Nov 2026); the submission page had closed when I tried on 6 November, so nothing was submitted, and I carry it on as a personal project. The live runs were on 5 and 6 November 2026 against `api.meta.ai`.
 
 ## How (the build)
 
@@ -29,7 +29,7 @@ Python 3.11 and FastAPI on the server, plain JavaScript in the browser, no datab
 
 ## Results on the real Meta API
 
-From [LIVE_RUN.md](LIVE_RUN.md) and [EVAL.md](EVAL.md), 5 November 2026:
+From [LIVE_RUN.md](LIVE_RUN.md) and [EVAL.md](EVAL.md), 5 November 2026. These ran on the earlier set of AI-generated sample photos; the photos changed in 1.33.0 and the eval has not been run again on the new ones:
 
 | Measure | Result |
 |---|---|
@@ -45,11 +45,15 @@ From [LIVE_RUN.md](LIVE_RUN.md) and [EVAL.md](EVAL.md), 5 November 2026:
 
 ## Engineering checks (this release)
 
-- 1096 automated tests passed, 0 failed, 0 skipped ([TEST_REPORT.md](TEST_REPORT.md)): 945 without a browser, 151 in real Chromium.
-- mypy strict: no issues in 171 files. ruff: clean. `scripts/check_voice.py`: 0 hits.
+- 1104 automated tests passed, 0 failed, 0 skipped ([TEST_REPORT.md](TEST_REPORT.md), run of 6 Nov 2026, 15:53 WIB on commit 1f84cae): 953 without a browser, 151 in real Chromium.
+- mypy strict (`mypy api --strict`): no issues in 172 files. ruff: clean. `scripts/check_voice.py`: 0 hits.
 - HTTP smoke on a running offline server: ALL PASSED, 77 checks.
 - Recorded demo: re-recorded live on 6 November 2026, 14:01 WIB, on the new photorealistic sample photos. The plug cap is visibly off in the new motorbike photo, so the model was 85 to 88% sure of the cause in each language and asked no follow-up question (it asks only under 60%); the sample photo passes on the step it shows.
-- Static judge build: builds and passes its own check.
+- Static build: builds and passes its own check.
+
+## What changed in 1.33.0 (new photos and media)
+
+I wanted more realistic sample photos, images and video, a more natural voice and better music. 1.33.0 has new photorealistic sample photos (still AI-generated and labelled on the image), and I recorded the 1-tap demo again on them from the live API on 6 November 2026 at 14:01 WIB. On the new motorbike photo the model was 85 to 88% sure the plug cap was off, so it asked no question, and the recorder had to learn to record what the model did instead of insisting on a question. Four more live sessions (pump, rice cooker red stop, tyre in Basa Jawa, tap with a diagram) feed the screenshots. All 118 screenshots are listed in docs/demo/screenshots/INDEX.md, 7 of them still from the previous photo set and marked. The marketing images, the 2:25 film, the 31.4 s vertical clip and the 2.92 MB GIF are new, with a per-sentence voice-over and licensed music (CC BY 3.0). A fix in the screenshot script came out of it: recorded sessions were opened without the owner's token, so some screens showed 403 errors. Full list: [CHANGELOG.md](../CHANGELOG.md) 1.33.0.
 
 ## What changed in 1.32.0 (a weakness hunt)
 
@@ -67,7 +71,7 @@ Fourteen fixes found by running the real API and reviewing every screen, each wi
 
 ## What is real, what is sample, what is not measured
 
-- Real: all live answers, the recorded demo, the eval's live column, the screenshots and video (real Meta API answers recorded on live runs and played back in the app; the live camera guide ran live while filming).
+- Real: all live answers, the recorded demo, the eval's live column, the screenshots, the film and the GIF (real Meta API answers recorded on the live run of 6 November 2026 and played back in the app). The film opens on AI-generated scenes of people and homes, labelled on screen. The older `16_live_guide` screenshot called SAM 3.1 live.
 - Sample: the photos are AI-generated and labelled on the image itself. Offline sample mode uses pre-written answers and says so on screen. Prices are labelled estimates.
 - Not measured: real owner trials and real-world photos. I make no claim about money saved by real people.
 

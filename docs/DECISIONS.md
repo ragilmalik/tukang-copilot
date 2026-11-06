@@ -2,7 +2,7 @@
 
 <a id="d1"></a>
 **D1. One FastAPI process serving a plain HTML/JS app, instead of Next.js plus a separate backend** (spec §7 asked for Next.js on Vercel).
-Judges get one URL. There is no build step, no CORS, no second deploy, and less for someone who doesn't code to break. The UI has 5 screens and doesn't need a framework. If it grows I'll revisit this; the API already lives under `/api/*`, so a Next.js front end could sit on top without backend changes.
+Visitors get one URL. There is no build step, no CORS, no second deploy, and less for someone who doesn't code to break. The UI has 5 screens and doesn't need a framework. If it grows I'll revisit this; the API already lives under `/api/*`, so a Next.js front end could sit on top without backend changes.
 
 **D2. Session state in one JSON file per session, not SQLite.** Sessions only live 24 h, each one has a single writer (behind a lock), and the file doubles as the debug record. SQLite/R2 is on the roadmap.
 
@@ -22,6 +22,6 @@ Judges get one URL. There is no build step, no CORS, no second deploy, and less 
 
 **D10. Standard-mode model ids only.** Contributor mode is cheaper, but it lets Meta train on users' photos. I won't accept that for a household app.
 
-**D11. Per-session cost cap ($0.50 default).** The hackathon credits are $150, and a runaway loop shouldn't be able to drain them.
+**D11. Per-session cost cap ($0.50 default).** I started with $150 of Meta API credits from the hackathon I first built this for, and a runaway loop shouldn't be able to drain them.
 
 **D12. Cache-Control on /static, by file type (1.29.10).** Fonts and any URL with `?v=` are cached for a year as immutable, pictures, PDFs and the vendored QR library for a day, and app.js, style.css, the replay script and the recording get `no-cache`, so the phone asks again on every load and usually gets a cheap 304. I chose revalidation over hashed file names because there is no build step, and I want a push to show up on the next load instead of after a day. The service worker still serves the shell offline (cache `tukang-shell-v21`).

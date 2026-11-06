@@ -9,7 +9,7 @@
 | check_keys: FAIL 402 / billing | No card, or the credits are used up | dev.meta.ai, Billing: add a card, check the credits, raise the spend limit |
 | check_keys: FAIL 403 / model not enabled | That model is not enabled for your team | dev.meta.ai, Models: note which model failed and get it enabled for the team |
 | 429 errors | Rate limit | The app retries with backoff. Wait a minute |
-| "Terlalu banyak permintaan" / "Too many requests" (429) or "daily usage limit" (503) | A live site hit `RATE_LIMIT_PER_HOUR` or `DAILY_BUDGET_USD` | Wait, or raise the value in the Render env vars (judges: set `DAILY_BUDGET_USD` to what you can afford) |
+| "Terlalu banyak permintaan" / "Too many requests" (429) or "daily usage limit" (503) | A live site hit `RATE_LIMIT_PER_HOUR` or `DAILY_BUDGET_USD` | Wait, or raise the value in the Render env vars (set `DAILY_BUDGET_USD` to what you can afford) |
 | "Job budget … reached" | `MAX_COST_PER_SESSION_USD` hit | Raise it in `.env` (e.g. 1.00) or lower `MAX_DIAGRAMS` |
 | Mic button does nothing on the phone | Phones only allow mic and camera on https | Use the Render link or a Cloudflare tunnel |
 | "Microphone unavailable" | Permission denied | Chrome ⋮ > Settings > Site settings > Microphone > allow |

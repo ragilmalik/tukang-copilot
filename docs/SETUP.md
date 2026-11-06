@@ -17,7 +17,7 @@ To try it on a phone on the same Wi-Fi, open `http://<laptop-ip>:8000` (Windows:
 
 ## Real Meta models (15 minutes)
 
-1. On https://dev.meta.ai, claim the hackathon credits, add a card under **Billing** and set a spend limit (I use $20).
+1. On https://dev.meta.ai, add a card under **Billing** (or use any credits Meta gave you) and set a spend limit (I use $20).
 2. **API keys** → **Create key** → copy it. Don't paste it into any chat.
 3. Run `python scripts/set_keys.py` (Windows: `.venv\Scripts\python scripts\set_keys.py`), paste the key (nothing shows while you paste) and press Enter. Press Enter again to skip Baseten.
 
@@ -35,7 +35,7 @@ With this on, diagnosis and planning run on Muse Spark Open (`meta-models/muse-s
 
 [DEPLOY.md](DEPLOY.md) has the Render steps (free plan). Short version: Render → New → Blueprint → repo `ragilmalik/tukang-copilot` → paste `MODEL_API_KEY` (and `BASETEN_API_KEY`) → Apply → wait for Live. Then run `python scripts/deploy_check.py https://<your-app>.onrender.com`; it should say READY, and `--live` also runs real repairs (a few cents). `https://<your-app>/health` says `"mode": "live"` with a key and `"mock"` without one.
 
-If the live API misbehaves during judging, set `OFFLINE` to `1` in Render's Environment. About a minute later the app runs on the pre-written offline sample answers with no spend (the header says so). Set it back to `0` afterwards.
+If the live API misbehaves during a demo, set `OFFLINE` to `1` in Render's Environment. About a minute later the app runs on the pre-written offline sample answers with no spend (the header says so). Set it back to `0` afterwards.
 
 `python scripts/build_static.py` builds `dist-static/`, a server-free copy that plays the recorded demo; `--help` lists hosting steps. WhatsApp setup is in [WHATSAPP.md](WHATSAPP.md) and is optional.
 

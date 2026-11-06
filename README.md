@@ -9,8 +9,10 @@ It also works in WhatsApp. Send a photo and a voice note and you get back the ma
 step and the same red stop, from the same engine and safety gate ([docs/WHATSAPP.md](docs/WHATSAPP.md); there is a
 simulator at `/wa`).
 
-Meta Global AI Developer Hackathon 2026 (Meta x Cerebral Valley) · Indie Developer track · Push the Frontier ·
-built solo in Semarang during the hackathon (first commit 30 Oct 2026).
+This is my own open-source project (MIT), built alone in Semarang, Indonesia, version 1.33.0. Who it is for: owners in
+Indonesia who would otherwise pay a bengkel (repair shop) for a 10-minute job, or try a dangerous one alone. A short history: I built it first for the Meta AI developer hackathon (Oct to Nov 2026,
+first commit 30 Oct). When I tried to submit on 6 Nov 2026 the submission page had already closed, so nothing was
+submitted, and I carry it on as a personal project.
 
 <table><tr>
 <td width="330"><img src="docs/demo/hero.gif" width="320" alt="Recorded phone screens with real Meta API answers: results streaming in, diagnosis, SAM 3.1 parts, a passed step check, the red stop, a tyre repair in Basa Jawa"></td>
@@ -18,12 +20,12 @@ built solo in Semarang during the hackathon (first commit 30 Oct 2026).
 
 | | |
 |---|---|
-| Live app | [LIVE_URL] |
-| Demo video | [YOUTUBE_URL] · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:25, app screens recorded from the live Meta API on 6 Nov 2026, captions, voice-over and music; chapters in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt)) · 9:16 cut: [tukang-copilot-x-vertical.mp4](docs/demo/tukang-copilot-x-vertical.mp4) (31 s) |
+| Live app | none yet: run it on your own machine (below), or serve the static build in `dist-static/` (recorded demo only) |
+| Demo video | [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:25, app screens recorded from the live Meta API on 6 Nov 2026, captions, voice-over and music; chapters in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt)) · 9:16 cut: [tukang-copilot-x-vertical.mp4](docs/demo/tukang-copilot-x-vertical.mp4) (31.4 s) |
 | Code | https://github.com/ragilmalik/tukang-copilot (MIT) |
 | Live results | [docs/LIVE_RUN.md](docs/LIVE_RUN.md) (seven scenarios on the real API) · [docs/EVAL.md](docs/EVAL.md) (eval with a live column) |
-| For judges | [Judging map](docs/archive/hackathon/JUDGING_MAP.md) · [Judge FAQ](docs/archive/hackathon/JUDGE_FAQ.md) · [One-pager PDF](docs/launch/one-pager.pdf) |
-| Write-up | [docs/WRITEUP.md](docs/WRITEUP.md) · form copy: [docs/SUBMISSION.md](docs/archive/hackathon/SUBMISSION.md) |
+| Overview | [One-pager PDF](docs/launch/one-pager.pdf) · [Project report](docs/REPORT.md) |
+| Write-up | [docs/WRITEUP.md](docs/WRITEUP.md) |
 
 </td></tr></table>
 
@@ -32,7 +34,7 @@ built solo in Semarang during the hackathon (first commit 30 Oct 2026).
 Every answer in the video, the screenshots, the GIF and the recorded 1-tap demo came from the real Meta Model API
 (Muse Spark 1.3, SAM 3.1, Muse Image) with my own key: the video and the GIF play back a live run of 6 November 2026
 (from 14:01 WIB) on the new sample photos, and the eval and live-run numbers are from 5 November on the earlier
-photos. The playback skips the model waits; the real time is in the table below. The photos are AI-generated sample
+set of sample photos (I have not run the eval again on the new ones). The playback skips the model waits; the real time is in the table below. The photos are AI-generated sample
 photos, and every one of them says "Sample photo (AI-generated)" in the corner, because I didn't want to pass off a
 generated picture as my motorbike. The people and homes at the start of the video are AI-generated scenes and are
 labelled that way on screen.
@@ -41,11 +43,7 @@ What I have not done yet: run it on photos of my own broken things, run user tri
 WhatsApp number (the channel is tested against a Graph API test double and the `/wa` simulator), and run Muse Spark Open
 on Baseten (the switch exists and is tested against a test double, but no real Baseten call has been made).
 
-Submission status: not submitted. I opened the Cerebral Valley submit page on 6 November 2026 at 09:29 WIB, signed
-in with my account, and it showed a disabled "Event Finished" button with "That's time! All submissions are due now."
-No form opened, so nothing was sent.
-
-### Live results, 5 November 2026
+### Live results, 5 November 2026 (earlier sample photos)
 
 | Scenario | Language | What happened | Photo in to plan ready | SAM 3.1 masks | Cost |
 |---|---|---|---|---|---|
@@ -65,7 +63,7 @@ live runs, including the four problems they found and what I changed, is [docs/L
 
 ## Try it
 
-1. Open [LIVE_URL] on a phone, or run it locally (below). You don't need an account.
+1. Run it locally (below) and open it on your laptop or phone. You don't need an account.
 2. Tap **▶ Try the 1-tap demo**. Results stream in as each stage finishes: what Muse Spark saw, the parts SAM 3.1 outlined, the likely cause.
 3. Answer the one question it asks (it only asks when it is under 60% sure), tick the safety list, and the steps unlock.
 4. Tap **Check this step** and pick the dark sample photo. It gets refused with a specific reason. Pick the right one and it passes.
@@ -74,9 +72,10 @@ live runs, including the four problems they found and what I changed, is [docs/L
 7. Try "rice cooker mati": a red STOP with a technician PDF and a bengkel hand-off. Then switch to Basa Jawa at the top.
 8. Open `/wa` (the "Also works in WhatsApp" link). The same engine answers as a WhatsApp chat with the marked photo, the diagnosis and step buttons. It is a simulator page, not a real WhatsApp number.
 
-> A live repair takes 1 to 2 minutes because Muse Spark thinks for a while at each stage. The free Render server also
-> sleeps and needs about 50 s to wake. If the server hasn't answered within 4 s, the 1-tap demo plays the recorded run
-> from `web/replay/` instead, labelled "▶ Recorded demo: real Meta API answers from 5 Nov 2026" on screen (`?replay=1`
+> A live repair takes 1 to 2 minutes because Muse Spark thinks for a while at each stage. On a free Render server
+> (if you deploy one) the server sleeps and needs about 50 s to wake. If the server hasn't answered within 4 s, the
+> 1-tap demo plays the recorded run from `web/replay/` instead, labelled "▶ Recorded demo: real Meta API answers from
+> 6 Nov 2026" on screen (`?replay=1`
 > forces it). Your own photos, the live camera and voice commands need the awake server.
 >
 > The first screen follows the phone's language. `?lang=en`, `?lang=id` or `?lang=jv` overrides it.
@@ -192,14 +191,15 @@ pip install -r requirements-dev.txt
 scripts/check_all.sh
 ```
 
-The last full run (1.32.0): 1096 tests passed, 0 failed, 0 skipped ([docs/TEST_REPORT.md](docs/TEST_REPORT.md)), mypy
-strict clean on 171 files, ruff clean, and the HTTP smoke test passed with 77 checks on an offline server (its 69-check version in 1.31.1 also passed on a live server).
+The last full run (1.33.0, 6 Nov 2026, 15:53 WIB): 1104 tests passed, 0 failed, 0 skipped ([docs/TEST_REPORT.md](docs/TEST_REPORT.md)),
+mypy strict clean on 172 files, ruff clean, and the HTTP smoke test passed with 77 checks on an offline server
+(its 69-check version in 1.31.1 also passed on a live server).
 
 ## Documentation map
 
 | Doc | For |
 |---|---|
-| [HANDOFF.md](HANDOFF.md) | Short handoff: how to run with or without a key, what is real vs sample, test results, submission text |
+| [HANDOFF.md](HANDOFF.md) | Short handoff: how to run with or without a key, what is real vs sample, test results, where the copies are |
 | [docs/LIVE_RUN.md](docs/LIVE_RUN.md) | The live runs on the real Meta API: results, timings, costs, what broke and what I changed |
 | [docs/EVAL.md](docs/EVAL.md) | Eval: fixtures, red-team safety, prompt injection, latency, cost (live, offline and test-double columns) |
 | [docs/META_API_NOTES.md](docs/META_API_NOTES.md) | Endpoints, model ids, prices, and how the live API actually behaved |
@@ -219,25 +219,26 @@ strict clean on 171 files, ruff clean, and the HTTP smoke test passed with 77 ch
 | [docs/REPORT.md](docs/REPORT.md) | Project report: what I built, live results, checks, what is real vs sample, known limits |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Render deploy click by click |
 | [docs/WHATSAPP.md](docs/WHATSAPP.md) | Optional WhatsApp channel: Meta app setup, settings, simulator, tests |
-| [docs/SUBMISSION.md](docs/archive/hackathon/SUBMISSION.md) and [docs/SUBMISSION_CHECKLIST.md](docs/archive/hackathon/SUBMISSION_CHECKLIST.md) | Form text field by field, and the steps to submit |
 | [docs/WRITEUP.md](docs/WRITEUP.md) | Write-up: problem, user, demo, how it works, safety, eval, status |
-| [docs/JUDGING_MAP.md](docs/archive/hackathon/JUDGING_MAP.md) | Each judging criterion and where the evidence is |
-| [docs/launch/](docs/launch/) | YouTube text and chapters, X thread, community vote kit, judge FAQ, one-pager, marketing images with their claims table ([ASSETS.md](docs/launch/ASSETS.md)) |
+| [docs/launch/](docs/launch/) | YouTube text and chapters, one-pager, marketing images with their claims table ([ASSETS.md](docs/launch/ASSETS.md)) |
+| [docs/archive/hackathon/](docs/archive/hackathon/README.md) | The papers from the hackathon I first built this for (submission text, judging map, judge FAQ, vote and X kits, first demo script, original spec), kept as they were |
 | [docs/demo/README.md](docs/demo/README.md) | Demo video, vertical clip, screenshots, and how to make them again |
 | [docs/DECISIONS.md](docs/DECISIONS.md), [docs/ROADMAP.md](docs/ROADMAP.md), [docs/ATTRIBUTIONS.md](docs/ATTRIBUTIONS.md) | Why things are built this way, what comes next, third-party notices |
 | [CHANGELOG.md](CHANGELOG.md) and [TODO.md](TODO.md) | Dated build log, and what is left |
 
-## Built during the hackathon
+## History
 
-I wrote everything in this repository during the event; the first commit is 30 October 2026, and
+I wrote everything in this repository myself, starting 30 October 2026 (first commit), and
 [CHANGELOG.md](CHANGELOG.md) has the dated list. The short version:
+
+- 6 Nov (v1.33): new photorealistic sample photos (still labelled AI-generated), the 1-tap demo recorded again on them from the live API, 118 screenshots with an index, marketing images, a new 2:25 film, a 31.4 s vertical clip and a GIF with a new voice and licensed music, and the docs rewritten for a personal project.
 
 - 6 Nov (v1.32): a weakness hunt. One lock per repair so two requests can no longer overwrite each other (double re-plan, a step check landing on the next plan, photo checks past their cap), a repair interrupted by a restart comes back with Try again, the shared guide link is read-only at the API too, a rate limit that can't be skipped with a made-up header, the photo check off the event loop, and a progress clock that counts from the tap even on a slow connection.
 - 6 Nov (v1.31): a UI pass (smoother screen changes, instant tap feedback, layout fixes at 360 px), screenshots and video re-made on it from recorded live answers, and the recorded demo's hand-off links fixed.
 - 5 Nov (v1.30): first runs on the real Meta API. Streaming structured output, all schema fields required, Muse Image retry, Retry-After, secret-scrubbed logs with request ids. Live eval column, the recorded demo, screenshots and video re-made from real answers. CORS closed by default.
 - 2 to 4 Nov (v1.27 to v1.29): WhatsApp channel, owner token for shared links, the bengkel-sign look (light and dark), AI-generated sample photos, strict Content-Security-Policy and HSTS, axe-core clean screens, kind-specific red-stop lists.
 - 31 Oct to 1 Nov (v1.8 to v1.26): live camera guide, hands-free voice commands, bengkel hand-off, agent log, 1-tap demo, prompt-injection fencing, red-team eval, laptop view, static build.
-- 30 Oct: spec, Meta API reading, the pipeline (listen → look → SAM → diagnose → plan → safety → illustrate → verify → re-plan), the phone web app, tests, deploy files.
+- 30 Oct: spec ([docs/archive/hackathon/SPEC.md](docs/archive/hackathon/SPEC.md)), Meta API reading, the pipeline (listen → look → SAM → diagnose → plan → safety → illustrate → verify → re-plan), the phone web app, tests, deploy files.
 
 ## Team
 

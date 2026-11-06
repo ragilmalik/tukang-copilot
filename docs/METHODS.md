@@ -61,12 +61,12 @@ This is the "how did you build it and why that way" document. It sits between [H
 ## 10. Cost guard and abuse guard
 
 - **What:** `api/cost.py` meters every call and stops before a call that would pass `MAX_COST_PER_SESSION_USD` (0.50). A live site also has `RATE_LIMIT_PER_HOUR` per visitor and `DAILY_BUDGET_USD` for the whole site.
-- **Measured:** median 83 s and $0.044 per repair on the live API (5 Nov 2026).
+- **Measured:** median 83 s and $0.044 per repair on the live API (5 Nov 2026, on the earlier sample photos).
 
 ## 11. Recorded demo for sleeping servers
 
 - **What:** `scripts/record_replay.py` records one full live repair in all three languages into `web/replay/`. When the free server is asleep or unreachable, `web/replay.js` plays that recording, labelled on screen, and never fakes an answer for the visitor's own photo.
-- **Why:** a judge opening a cold free-tier link should still see the real product within seconds.
+- **Why:** a visitor opening a cold free-tier link should still see the real product within seconds.
 
 ## 12. Logging and security
 
