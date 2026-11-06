@@ -6,7 +6,7 @@ My notes for whoever picks this up next: a contributor, a friend helping me test
 
 Tukang Copilot 1.33.1 is my own open-source project (MIT). It is a phone web app that looks at a photo of a broken motorbike, pump, tap, tyre or rice cooker, marks the parts with SAM 3.1, diagnoses and plans with Muse Spark 1.3, checks each step from a photo, re-plans, and stops dangerous jobs. It speaks Bahasa Indonesia, Basa Jawa and English. I build it alone in Semarang. Repo: https://github.com/ragilmalik/tukang-copilot
 
-Release 1.33.0 (tag v1.33.0 on 1156e90): https://github.com/ragilmalik/tukang-copilot/releases/tag/v1.33.0, with the repo zip (154.2 MB), the film and the vertical clip as downloads.
+Release 1.33.1 (tag v1.33.1 on d83343c): https://github.com/ragilmalik/tukang-copilot/releases/tag/v1.33.1, with the repo zip (154.2 MB), the film and the vertical clip as downloads. The 1.33.0 release stays up at https://github.com/ragilmalik/tukang-copilot/releases/tag/v1.33.0.
 
 History in one line: I built it first for the Meta AI developer hackathon (Oct to Nov 2026); the submission page had closed when I tried on 6 Nov 2026, so nothing was submitted. The papers from that event are in [docs/archive/hackathon/](docs/archive/hackathon/README.md) and no longer drive any decision.
 
@@ -37,7 +37,7 @@ Step by step: [docs/TUTORIAL.md](docs/TUTORIAL.md). Every setting: [docs/SETUP.m
 - Understanding it: [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) (plain words), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/METHODS.md](docs/METHODS.md), [docs/AI_PIPELINE.md](docs/AI_PIPELINE.md).
 - Results: [docs/REPORT.md](docs/REPORT.md). Write-up: [docs/WRITEUP.md](docs/WRITEUP.md).
 - Demo media: [docs/demo/](docs/demo/README.md) (118 screenshots listed in [INDEX.md](docs/demo/screenshots/INDEX.md)). Launch kit: [docs/launch/](docs/launch/) (YouTube text, one-pager, marketing images and their claims table).
-- Copy of the deliverables (repo zip with a LINKS.txt, film, vertical clip, captions, one-pager, guide PDF, screenshots): my Google Drive folder "Meta Hackathon - Tukang Copilot" (private to my account; the name is from before the project went personal): https://drive.google.com/drive/folders/1mxVXV1tgjCuxfKoSAHWJpc6V7Yz9vslt. The 1.33.0 files (136, from commit 1156e90) sit at the top with screenshots in a subfolder; the 1.32.0 copies sit in its "old-1.32.0" subfolder.
+- Copy of the deliverables (repo zip with a LINKS.txt, film, vertical clip, captions, one-pager, guide PDF, screenshots): my Google Drive folder "Meta Hackathon - Tukang Copilot" (private to my account; the name is from before the project went personal): https://drive.google.com/drive/folders/1mxVXV1tgjCuxfKoSAHWJpc6V7Yz9vslt. The 1.33.1 files (136, from commit d83343c) sit at the top with screenshots in a subfolder; the 1.33.0 copies sit in its "old-1.33.0" subfolder and the 1.32.0 copies in "old-1.32.0".
 
 ## Before you change anything
 

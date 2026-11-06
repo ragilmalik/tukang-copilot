@@ -16,8 +16,10 @@ Tukang Copilot is my own project. I built it first for the Meta AI developer hac
 - [x] Full run on 7 Nov, 01:21 WIB: 1126 passed, 0 failed, 0 skipped (973 without a browser in 107 files, 153 in real Chromium in 25 files); the 01:01 run had 4 layout failures from an earlier draft of the progress-row fix, fixed before the second run
 - [x] `mypy api --strict` 175 files, `mypy --strict .` 197 files, ruff clean, check_voice 0 hits, `record_replay.py --check` up to date, `build_static.py --check` OK, offline smoke ALL PASSED (77 checks, port 8765)
 - [x] Version 1.33.1, CHANGELOG, README, HANDOFF, REPORT, WRITEUP, TESTING, ONE_PAGER, VERIFICATION_REPORT, TEST_REPORT
-- [ ] One-pager and guide bundle rebuilt, commit, push, CI
-- [ ] Tag v1.33.1, package, GitHub Release, Drive copy (1.33.0 files moved to old-1.33.0)
+- [x] One-pager rebuilt (1 A4 page, looked at) and guide bundle rebuilt (56 pages, v1.33.1, page 1 looked at); leak scan clean; commit d83343c pushed, CI green (https://github.com/ragilmalik/tukang-copilot/actions/runs/42273187308)
+- [x] Tag v1.33.1 on d83343c; package from the clean tree (repo zip 154.2 MB = the tag's 530 files plus LINKS.txt; 136 files in all)
+- [x] GitHub Release v1.33.1 (Latest): https://github.com/ragilmalik/tukang-copilot/releases/tag/v1.33.1 with the zip, the film and the vertical clip; sizes and SHA-256 match the local files
+- [x] Drive: the 1.33.0 files and their screenshots folder moved into "old-1.33.0" (nothing deleted, old-1.32.0 untouched); all 136 files of 1.33.1 uploaded, every one matches by size and MD5; the folder, both subfolders, old-1.33.0 and every new file are owner-only
 
 ## 1.33.0 release (6 Nov)
 - [x] CI fix: the app said 1.32.0 while CHANGELOG headed 1.33.0 (test_version_sync); the version lives only in api/__init__.py and is now 1.33.0. The offline cache name is not tied to the version (v27 since this release's new recording)
