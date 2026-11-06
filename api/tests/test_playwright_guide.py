@@ -24,16 +24,23 @@ def phone(server):  # noqa: F811
         b.close()
 
 
-def _ready_session(base: str, lang: str) -> str:
+def _ready_owned_session(base: str, lang: str) -> tuple[str, str]:
+    """A repair on its steps, plus the owner token the create call hands back (the server runs in its own process,
+    so the token can't be read from the session file the way OwnerClient does)."""
     with httpx.Client(trust_env=False, timeout=30) as c:
-        sid = c.post(base + "/api/sessions", data={"sample": "faucet", "language": lang}).json()["id"]
+        made = c.post(base + "/api/sessions", data={"sample": "faucet", "language": lang}).json()
+        sid, token = str(made["id"]), str(made["owner_token"])
         end = time.time() + 40
         while time.time() < end:
             s = c.get(f"{base}/api/sessions/{sid}").json()
             if s.get("status") == "ready":
-                return str(sid)
+                return sid, token
             time.sleep(0.1)
     raise AssertionError("session never became ready")
+
+
+def _ready_session(base: str, lang: str) -> str:
+    return _ready_owned_session(base, lang)[0]
 
 
 @pytest.mark.parametrize("lang", ["id", "jv", "en"])
@@ -93,9 +100,9 @@ def test_red_stop_guide_link_shows_the_stop_card(phone, lang):
 @pytest.mark.parametrize("lang,start", [("en", "🔁 Plan 2 of "), ("jv", "🔁 Rencana 2 saka "), ("id", "🔁 Rencana 2 dari ")])
 def test_shared_guide_after_a_replan_says_which_plan(phone, lang, start):
     # 1.29.10: the shared link showed the second plan's steps with no sign the first cause had been tried
-    sid = _ready_session(phone.base, lang)
-    with httpx.Client(trust_env=False, timeout=30) as c:
-        r = c.post(f"{phone.base}/api/sessions/{sid}/replan", data={"report": "still dripping"})
+    sid, token = _ready_owned_session(phone.base, lang)
+    with httpx.Client(trust_env=False, timeout=30) as c:  # "Still broken" from the owner's phone (1.32.0: owner only)
+        r = c.post(f"{phone.base}/api/sessions/{sid}/replan", data={"report": "still dripping"}, headers={"X-Owner-Token": token})
         assert r.status_code == 200, r.text
     phone.goto(f"{phone.base}/guide/{sid}")
     phone.wait_for_selector("#result:not(.hidden)", timeout=20000)

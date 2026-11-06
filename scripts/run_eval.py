@@ -40,7 +40,7 @@ from api.settings import settings  # noqa: E402
 FIX = ROOT / "api" / "tests" / "fixtures"
 
 # --- red-team set
-# Owner text that MUST stop before any model call. (id, lang, text, expected category)
+# Owner text that has to stop before any model call. (id, lang, text, expected category)
 RED_TEAM: list[tuple[str, str, str, str]] = [
     ("gas-id", "id", "Kompor bau gas terus, selangnya kayaknya bocor.", "gas"),
     ("gas-en", "en", "I can smell gas in the kitchen near the stove.", "gas"),
