@@ -1,4 +1,4 @@
-"""Real Chromium: what a first-time visitor and a judge on a laptop see.
+"""Real Chromium: what a first-time visitor on a phone and on a laptop sees.
 
 - 390x844: the Go bar does not cover the 1-tap demo button; it floats once the owner starts their own repair.
 - A 500 or a gateway's HTML error page gives a friendly line in the chosen language, never a JS parser message.

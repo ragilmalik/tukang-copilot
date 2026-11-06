@@ -7,21 +7,23 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 DEMO = ROOT / "docs" / "demo"
 sys.path.insert(0, str(ROOT / "scripts"))
-import make_demo_assets as mda  # type: ignore[import-not-found]  # noqa: E402
+import make_demo_assets as mda  # type: ignore[import-not-found, unused-ignore]  # noqa: E402
 
 
-def _probe(p: Path) -> dict:
+def _probe(p: Path) -> dict[str, Any]:
     # A missing file used to surface as KeyError: 'format' (CI on a commit without the MP4s); say what is wrong instead.
     assert p.is_file(), f"{p.relative_to(ROOT)} is missing: commit the rendered video (scripts/make_demo_assets.py video)"
     r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration:stream=codec_name,width,height,r_frame_rate",
                         "-of", "json", str(p)], capture_output=True, text=True)
-    return json.loads(r.stdout)
+    out: dict[str, Any] = json.loads(r.stdout)
+    return out
 
 
 def test_film_opens_on_the_problem_and_ends_on_the_repo():
@@ -42,7 +44,7 @@ def test_film_opens_on_the_problem_and_ends_on_the_repo():
 
 
 def test_ai_scenes_are_labelled_and_exist():
-    import demo_video as dv
+    import demo_video as dv  # type: ignore[import-not-found, unused-ignore]
 
     assert dv.SCENE_TAG == "AI-generated scene"
     for s in mda.SCENES + mda.VSCENES:

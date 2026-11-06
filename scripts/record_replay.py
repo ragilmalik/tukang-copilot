@@ -290,7 +290,7 @@ def build(out_dir: Path, pace: float = PACE_S, live: bool = False) -> dict[str, 
     cost = round(sum(float(((L["ready"]["session"].get("cost") or {}).get("spent_usd")) or 0) for L in langs.values()), 4)
     note = (f"RECORDED live run: every answer came from the real Meta Model API on {when}. Replaying it makes no model calls. "
             "The photos are labelled AI-generated sample photos." if live else
-            "OFFLINE shape check (canned answers, no Meta key). Never shipped to judges.")
+            "OFFLINE shape check (canned answers, no Meta key). Never shipped in the app.")
     data = {"format": FORMAT, "kind": "recorded-demo", "recorded_with": __version__, "sample": "motor",
             "source": "meta-api-live" if live else "offline", "recorded_at": when if live else "",
             "pipeline_cost_usd": cost if live else 0,

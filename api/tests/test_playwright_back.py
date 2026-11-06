@@ -1,8 +1,13 @@
 """The phone Back button returns to the first screen instead of leaving the site (real Chromium, 390x844)."""
+import json
+from pathlib import Path
+
 import pytest
 
 pytest.importorskip("playwright.sync_api")
 from api.tests.test_playwright_smoke import page, server  # noqa: E402,F401  (pytest fixtures)
+
+DEMO = Path(__file__).resolve().parents[2] / "web" / "replay" / "demo.json"
 
 
 def _visible(page, sel):
@@ -50,12 +55,17 @@ def test_start_again_lands_on_a_clean_first_screen_without_a_hash(page):
 
 
 def test_back_and_forward_also_work_in_the_recorded_demo(page):
+    """The recording asks the follow-up question only if the live run asked one (demo.json "asked"; since 1.33.0 the
+    model was sure enough on the new photos and asked none), so wait for whichever screen the recording shows."""
+    asked = json.loads(DEMO.read_text(encoding="utf-8"))["langs"]["en"]["asked"]
+    first = "#question:not(.hidden)" if asked else "#result:not(.hidden)"
     page.goto(page.base + "/?replay=1")
     page.select_option("#lang", "en")
     page.click("#demoBtn")
-    page.wait_for_selector("#question:not(.hidden)", timeout=20000)
+    page.wait_for_selector(first, timeout=20000)
     page.go_back()
     page.wait_for_selector("#capture:not(.hidden)", timeout=5000)
+    assert not _visible(page, "#question") and not _visible(page, "#result")
     page.go_forward()
     page.wait_for_selector("#progress:not(.hidden)", timeout=5000)
-    page.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=20000)
+    page.wait_for_selector(first, timeout=20000)

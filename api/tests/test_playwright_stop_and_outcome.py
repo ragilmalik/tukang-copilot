@@ -87,13 +87,17 @@ def test_demo_plays_the_recording_when_the_server_stops_answering(page):
     page.wait_for_selector("#modeBadge:not(.hidden)")      # the page and /api/health loaded fine
     page.route("**/api/**", lambda r: r.abort())           # then the server went away
     page.click("#demoBtn")
-    page.wait_for_selector("#question:not(.hidden)", timeout=30000)
+    rec = json.loads(DEMO.read_text(encoding="utf-8"))["langs"]["en"]
+    # the follow-up question shows only when the live run asked one ("asked"; the 1.33.0 recording asked none)
+    page.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=30000)
     assert "Recorded demo" in page.inner_text("#modeBadge")
     assert page.inner_text("#formErr").strip() == ""
-    page.click('#quickAns button[data-q="qYes"]')
+    if rec["asked"]:
+        page.wait_for_selector("#question:not(.hidden)")
+        page.click('#quickAns button[data-q="qYes"]')
     page.wait_for_selector("#result:not(.hidden)", timeout=30000)
-    top = json.loads(DEMO.read_text(encoding="utf-8"))["langs"]["en"]["ready"]["session"]["diagnosis"]["causes"][0]
-    assert f"{top['confidence']}%" in page.inner_text("#dxCauses")   # the recorded diagnosis after the answer
+    top = rec["ready"]["session"]["diagnosis"]["causes"][0]
+    assert f"{top['confidence']}%" in page.inner_text("#dxCauses")   # the recorded diagnosis, from the recording
     assert top["title"] in page.inner_text("#dxCauses")
 
 

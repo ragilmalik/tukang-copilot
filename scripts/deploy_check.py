@@ -55,7 +55,7 @@ def get_health(c: httpx.Client, base: str, wait_s: float) -> dict[str, Any] | No
                 waited = time.time() - t0
                 if waited > 15:
                     line("WARN", f"server took {waited:.0f}s to answer (it was asleep)",
-                         "Normal on Render's free plan. For judging day switch the service to the Starter plan "
+                         "Normal on Render's free plan. For a demo day switch the service to the Starter plan "
                          "(Settings > Instance type) so it never sleeps, or open the URL a minute before the demo.")
                 data: dict[str, Any] = r.json()
                 return data

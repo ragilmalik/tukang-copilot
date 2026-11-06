@@ -153,7 +153,7 @@ def render(r: dict[str, Any], sample: str, lang: str, fake: bool, missing: list[
         L.append(f"| {k} | {v.get('status')} | {v.get('ms', '-')} |")
     L += ["", "## Next", "",
           "- If everything above is fine: `python scripts/run_eval.py` and `python scripts/smoke_e2e.py http://127.0.0.1:8000` in live mode.",
-          "- Once checked, copy the total time and cost into WRITEUP and SUBMISSION.", ""]
+          "- Once checked, copy the total time and cost into WRITEUP and REPORT.", ""]
     return "\n".join(L)
 
 

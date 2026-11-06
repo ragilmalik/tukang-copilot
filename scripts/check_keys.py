@@ -168,7 +168,7 @@ def main() -> int:
 
     key_ok = check("API key + model list (GET /v1/models)", list_models,
                    "Wrong key: copy it again from dev.meta.ai > API keys and run python scripts/set_keys.py. "
-                   "402/403: add a card or claim the hackathon credits on the dev.meta.ai Billing page. "
+                   "402/403: add a card or credits on the dev.meta.ai Billing page. "
                    "Model not enabled: turn it on in dev.meta.ai or ask the organisers.")
     if not key_ok and "not enabled" not in results[-1][2]:
         print(f"\n{RED}Stopped: the key itself did not work, so the model checks were skipped.{END}")

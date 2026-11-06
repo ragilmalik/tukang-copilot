@@ -10,7 +10,7 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     # free = $0 but sleeps after 15 min idle (first visit then takes about a minute).
-    # starter = about $7/month, always awake: switch to it in Settings before judging/demo day if you want.
+    # starter = about $7/month, always awake: switch to it in Settings before a demo day if you want.
     plan: free
     region: singapore
     branch: main

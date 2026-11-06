@@ -3,6 +3,7 @@ import json
 import re
 import sys
 from pathlib import Path
+from typing import Any
 
 from fastapi.testclient import TestClient
 
@@ -77,7 +78,7 @@ def test_every_recorded_picture_exists_and_is_served():
 
 def test_fixture_matches_what_the_app_produces_today():
     sys.path.insert(0, str(ROOT / "scripts"))
-    import record_replay  # type: ignore[import-not-found]
+    import record_replay  # type: ignore[import-not-found, unused-ignore]
 
     assert record_replay.is_current(), "run: python scripts/record_replay.py"
 
@@ -144,9 +145,9 @@ def test_shape_check_allows_a_recording_without_the_follow_up_question():
     """The live model asks only when unsure; the offline run asks. The ask part and the log's ask/answer lines are then
     left out of the comparison, and any other difference still counts."""
     sys.path.insert(0, str(ROOT / "scripts"))
-    import record_replay  # type: ignore[import-not-found]
+    import record_replay  # type: ignore[import-not-found, unused-ignore]
 
-    def lang(asked: bool, extra: bool = False) -> dict:
+    def lang(asked: bool, extra: bool = False) -> dict[str, Any]:
         log = [{"t": 0, "kind": "gate", "ok": True}] + ([{"t": 1, "kind": "ask", "conf": 55, "threshold": 60}] if asked else [])
         sess = {"status": "ready", "agent_log": log, **({"new_field": 1} if extra else {})}
         ask = {"snaps": [{"status": "needs_answer" if asked else "ready", "question": "q" if asked else None}],
