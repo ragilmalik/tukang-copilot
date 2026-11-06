@@ -9,7 +9,9 @@ Tukang Copilot is my own project. I built it first for the Meta AI developer hac
 - [x] Hackathon papers moved to docs/archive/hackathon/ with a README (SUBMISSION, SUBMISSION_CHECKLIST, JUDGING_MAP, JUDGE_FAQ, COMMUNITY_VOTE_KIT, X_THREAD, DEMO_SCRIPT, SPEC); test_doc_links.py checks every relative link; test_doc_counts, test_no_em_dash_docs and test_no_emdash follow the move
 - [x] Full run: 1104 passed, 0 failed, 0 skipped (6 Nov 2026, 15:53 WIB, commit 1f84cae; 953 without a browser in 104 files, 151 in real Chromium in 25 files). The first run on ee04108 had 2 failures: two browser tests still waited for the recorded demo's follow-up question, fixed in 1f84cae; offline smoke ALL PASSED (77 checks, port 8765)
 - [x] One-pager rebuilt (1 A4 page, 1104 tests and 77-check smoke on it, looked at) and guide bundle rebuilt (54 pages, 14 docs, v1.33.0, page 1 looked at)
-- [ ] Commit, push, CI green, package, Drive upload (in progress)
+- [x] Commit 1156e90 pushed, CI green on it (https://github.com/ragilmalik/tukang-copilot/actions/runs/42193387965); package built from 1156e90 (repo zip 154.2 MB, 527 repo files plus LINKS.txt, film, vertical clip, captions, one-pager, guide PDF, marketing images, GIF, 4 docs, 118 screenshots: 136 files)
+- [x] Drive: all 136 files in the folder (screenshots and screenshots/gallery as subfolders, the 1.32.0 copies in old-1.32.0); every file matches by size and MD5, the folder, both subfolders and the files checked are owner-only
+- [x] GitHub Release v1.33.0 on 1156e90: https://github.com/ragilmalik/tukang-copilot/releases/tag/v1.33.0 with the zip, the film and the vertical clip as assets (zip over GitHub's 100 MB file limit, so it is a release asset and not a repo file); asset sizes and SHA-256 match the local files
 
 ## 1.33.0 media remake (6 Nov)
 What I want from it: more realistic images and video, a more natural voice, better music, new realistic sample photos with a live re-recording, every screen shot again, all docs updated.

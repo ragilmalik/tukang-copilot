@@ -23,6 +23,7 @@ submitted, and I carry it on as a personal project.
 | Live app | none yet: run it on your own machine (below), or serve the static build in `dist-static/` (recorded demo only) |
 | Demo video | [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:25, app screens recorded from the live Meta API on 6 Nov 2026, captions, voice-over and music; chapters in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt)) · 9:16 cut: [tukang-copilot-x-vertical.mp4](docs/demo/tukang-copilot-x-vertical.mp4) (31.4 s) |
 | Code | https://github.com/ragilmalik/tukang-copilot (MIT) |
+| Download | [Release 1.33.0](https://github.com/ragilmalik/tukang-copilot/releases/tag/v1.33.0): the full repository as a zip (154.2 MB, with the screenshots and media), the film and the 9:16 clip |
 | Live results | [docs/LIVE_RUN.md](docs/LIVE_RUN.md) (seven scenarios on the real API) · [docs/EVAL.md](docs/EVAL.md) (eval with a live column) |
 | Overview | [One-pager PDF](docs/launch/one-pager.pdf) · [Project report](docs/REPORT.md) |
 | Write-up | [docs/WRITEUP.md](docs/WRITEUP.md) |
