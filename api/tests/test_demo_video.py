@@ -15,6 +15,8 @@ import make_demo_assets as mda  # type: ignore[import-not-found]  # noqa: E402
 
 
 def _dur(p: Path) -> float:
+    # A missing file used to surface as KeyError: 'format' (CI on a commit without the MP4s); say what is wrong instead.
+    assert p.is_file(), f"{p.relative_to(ROOT)} is missing: commit the rendered video (scripts/make_demo_assets.py video)"
     r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "json", str(p)], capture_output=True, text=True)
     return float(json.loads(r.stdout)["format"]["duration"])
 

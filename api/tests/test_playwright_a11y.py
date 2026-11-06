@@ -1,5 +1,6 @@
 """axe-core on every screen in real Chromium (no serious or critical findings), one h1 on each screen, file pickers
 are native inputs in the tab order, and the skipped listening stage says why in the owner's language."""
+import os
 from pathlib import Path
 
 import pytest
@@ -10,7 +11,18 @@ import playwright.sync_api as pw  # noqa: E402
 from api.tests.test_playwright_smoke import _chromium_path, server  # noqa: E402,F401  (pytest fixtures)
 
 pytestmark = pytest.mark.slow
-AXE = Path("/tmp/jd/node_modules/axe-core/axe.min.js")
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def _axe_path() -> Path:
+    """axe-core is found where jsdom is found (test_dom_jsdom.py): JSDOM_DIR, the repo's node_modules (CI), /tmp/jd."""
+    for d in (os.environ.get("JSDOM_DIR"), str(ROOT), "/tmp/jd"):
+        if d and (Path(d) / "node_modules" / "axe-core" / "axe.min.js").is_file():
+            return Path(d) / "node_modules" / "axe-core" / "axe.min.js"
+    return Path("/tmp/jd/node_modules/axe-core/axe.min.js")  # missing: the test below skips and says how to install
+
+
+AXE = _axe_path()
 RUN = """async () => { const r = await axe.run(document, {runOnly: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice']});
   return r.violations.map(v => ({id: v.id, impact: v.impact, at: v.nodes.slice(0, 3).map(n => n.target.join(' '))})); }"""
 
@@ -41,7 +53,7 @@ def _axe(pg, name: str) -> list[str]:
 
 def test_every_screen_has_one_h1_and_no_serious_axe_findings(phone):
     if not AXE.exists():
-        pytest.skip("axe-core not installed (npm install --prefix /tmp/jd axe-core)")
+        pytest.skip("axe-core not installed (npm install --prefix . --no-save axe-core, or into /tmp/jd)")
     pg, base, bad = phone, phone.base, []
     pg.goto(base + "/?lang=en", wait_until="load")
     pg.wait_for_timeout(500)
@@ -97,3 +109,12 @@ def test_typed_repair_says_why_listening_was_skipped(phone, lang, stage, note):
     phone.wait_for_selector("#st-listen .note:not(:empty)", timeout=20000)
     assert phone.inner_text("#st-listen .note") == note
     assert phone.inner_text("#st-listen").startswith(stage)
+
+
+def test_axe_is_found_where_jsdom_is_found(tmp_path, monkeypatch):
+    # CI installs axe-core into the repo's node_modules; a hard-coded /tmp/jd path made the axe test skip there.
+    js = tmp_path / "node_modules" / "axe-core" / "axe.min.js"
+    js.parent.mkdir(parents=True)
+    js.write_text("/* axe */")
+    monkeypatch.setenv("JSDOM_DIR", str(tmp_path))
+    assert _axe_path() == js
