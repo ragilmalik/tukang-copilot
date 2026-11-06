@@ -25,7 +25,7 @@ CI (`.github/workflows/ci.yml`) runs the same thing on every push. The browser t
 | `test_report_pdf.py` | PDF repair report |
 | `test_web.py` | `app.js` parses; every element id the JS uses exists; every UI string has id + en text; shared page is read-only; no secrets in web files; every emoji the screen can show has a Lucide icon; the Barlow fonts and both licences ship; nothing loads from a font CDN |
 | `test_csp.py` | Every HTML page sends a strict Content-Security-Policy (no inline script, no eval), JSON answers don't; HSTS only when the proxy says https; no inline script or event handler in the pages; `web/wa.js` served as a file; status notes and disclaimer inside landmarks |
-| `test_playwright_a11y.py` | Real Chromium: axe-core finds nothing serious or critical on the home, progress, question, result, stop, shared guide, WhatsApp simulator and laptop screens; one h1 per screen; file pickers are native inputs in the tab order. Needs axe-core from npm (`npm install --prefix /tmp/jd axe-core`) and skips without it |
+| `test_playwright_a11y.py` | Real Chromium (axe-core found in JSDOM_DIR, the repo's node_modules or /tmp/jd; CI installs it): axe-core finds nothing serious or critical on the home, progress, question, result, stop, shared guide, WhatsApp simulator and laptop screens; one h1 per screen; file pickers are native inputs in the tab order. Needs axe-core from npm (`npm install --prefix /tmp/jd axe-core`) and skips without it |
 | `test_gone_page.py` | An expired or erased guide link gets a short page in the owner's language (still 404), with the link id escaped |
 | `test_gzip.py` | Text is gzipped; fonts, photos, PNGs, audio and PDFs are sent as they are |
 | `test_replan_report.py`, `test_brief_now.py` | After "Still broken" the PDF report and the mechanic brief list the attempt in the owner's language; the cause being tried now is "being tried now", not "already tried"; the link preview follows the current plan |
@@ -35,6 +35,7 @@ CI (`.github/workflows/ci.yml`) runs the same thing on every push. The browser t
 | `test_playwright_share_shop_tour.py` | Price links are named by shop (Tokopedia, Shopee) and sit on one row; Share on a laptop writes "Link copied:" in a line, never an alert(); the 1-tap demo keeps the newest finding above the tip bar |
 | `test_static_cache.py` | /static sends Cache-Control: fonts and ?v= URLs a year (immutable), pictures a day, app code revalidated |
 | `test_jv_register.py` | Basa Jawa stays in ngoko: no "sampeyan", "antosna" or other krama words in the app, PDF or workshop sheets |
+| `test_launch_assets.py` | The one-pager build refuses anything but exactly one page and an unknown asset name; ONE_PAGER.md has no placeholder left and its PDF is committed |
 
 ## Recorded demo (v1.24)
 - `python scripts/record_replay.py` re-records `web/replay/` from the live API (about $0.60) after a change to the prompts, the session shape or the demo flow; `--check` exits 1 when the recording no longer matches (also a test in `test_replay.py`).

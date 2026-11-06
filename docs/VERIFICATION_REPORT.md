@@ -63,7 +63,7 @@ Evidence names point to tests in `api/tests/` (TEST_REPORT.md has the run) or to
 | `/health` | ✅ | `test_api::test_health` |
 | Lint (ruff) | ✅ | TEST_REPORT |
 | mypy strict / Playwright / jsdom | ✅ | `mypy api` strict: no issues in 67 files; real-Chromium tests (smoke + live camera with test camera feed); jsdom UI flow (214 checks) |
-| CI on push | 🟡 | `.github/workflows/ci.yml` written; runs once the repo exists |
+| CI on push | ✅ | `.github/workflows/ci.yml` on GitHub Actions: ruff, mypy, the full pytest suite with real Chromium, jsdom and (from 1.31.1) axe-core; green on 09fa5f1 (https://github.com/ragilmalik/tukang-copilot/actions/runs/42134244102) and on later pushes |
 | Path traversal / upload validation | ✅ | `test_api::test_not_found_and_path_traversal`, `test_bad_requests` |
 | Performance (< 25 s diagnosis on 4G, < 8 s check) | ⬜ | Measure on a real phone with real models |
 
@@ -206,14 +206,14 @@ These came from playing every flow again on a 390x844 phone and a laptop in all 
 | 28 phone screenshots re-shot on the 1.31.0 screens from recorded live answers (1-tap demo recording and live sessions recorded on 6 Nov 2026), the live camera guide shot live; every shot looked at | ✅ | `docs/demo/screenshots/`, `scripts/make_demo_assets.py` (recorded mode) |
 | Demo video and X clip re-made from the same recordings; every frame looked at (one every 2 s); loudness and silence measured | ✅ | Main video 2:54 (174.1 s by ffprobe), 1920x1080 at 60 fps, 34.2 MB; loudness -16.0 LUFS integrated, true peak -3.9 dBFS (ffmpeg ebur128); the only silence of 1 s or more below -40 dB is the last 1.6 s on the close card (ffmpeg silencedetect). A speech-to-text pass (faster-whisper tiny.en) on the voice-over found 402 of the 424 script words (94.8%); the misses are proper nouns (Tukang, bengkel, Muse Spark). X clip 43.5 s, 1080x1920, 12.1 MB, every frame of its contact sheets looked at. Live spend for making the media: about $0.34 by the app's own meter |
 
-**Run numbers ({{RUN_DATE}}, v1.31.1):** {{RUN_LINE}}
+**Run numbers (2026-11-06, v1.31.1):** pytest without a browser **857 passed, 0 failed, 0 skipped** (99 files, one by one), Playwright **147 passed, 0 failed, 0 skipped** (24 files, real Chromium, one by one), 1004 in total, the same count `make_test_report.py` got on the whole suite in one run (docs/TEST_REPORT.md); the jsdom flow and the axe-core check ran (not skipped); ruff clean; `mypy api --strict` no issues in 166 files; `smoke_e2e.py` ALL PASSED (69 checks) on an `OFFLINE=1` server; `build_static.py` and `--check` OK; `record_replay.py --check` up to date. No live API calls in this pass. GitHub Actions CI is green again from 09fa5f1 on (the failures before it were the demo video test running on commits without the MP4s).
 
 ## 6. What is not verified yet
 
 1. Live Meta answers: the sample scenarios ran on the real API on 5 November 2026 (docs/LIVE_RUN.md) and the recorded 1-tap demo was recorded live on 6 November 2026. Real-photo quality is still item 2.
 2. Real-photo quality: SAM hit rate on real bikes/pumps, diagnosis accuracy, step-check judgement, live-tracking quality. → real photos + 5 user trials (docs/USER_TRIAL_KIT.md).
 3. Real phones: rear camera over https (iOS needs playsinline + https), SpeechRecognition with jv-ID, WhatsApp deep link, HEIC upload, TalkBack, airplane mode. So far I've only used headless Chromium and jsdom.
-4. The Render deployment and GitHub CI have not run. The container was only emulated (no Docker on the test machine).
+4. The Render deployment has not run. The container was only emulated (no Docker on the test machine). GitHub Actions CI does run on every push (section 5i).
 5. The impact numbers are mock until the real trials run.
 6. The demo video plays real Meta API answers recorded on a live run (6 Nov 2026), not answers made while filming, on AI-generated sample photos and Chromium's test camera feed. All of it is labelled on screen.
 7. The WhatsApp channel has only run against a Graph API test double and in the `/wa` simulator; no real WhatsApp number has sent or received a message (needs the Meta app setup in docs/WHATSAPP.md).

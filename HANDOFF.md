@@ -24,7 +24,7 @@ Step by step: [docs/TUTORIAL.md](docs/TUTORIAL.md). Every setting: [docs/SETUP.m
 
 ## Test results (1.31.1)
 
-{{TESTS}} automated tests passed, 0 failed, 0 skipped; mypy strict clean on {{MYPY_FILES}} files; ruff clean; offline HTTP smoke ALL PASSED ({{SMOKE}} checks); static build and recorded-demo checks pass. Details: [docs/TEST_REPORT.md](docs/TEST_REPORT.md), [docs/VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md). Re-run: [docs/TEST_CHECKLIST.md](docs/TEST_CHECKLIST.md).
+1004 automated tests passed, 0 failed, 0 skipped; mypy strict clean on 166 files; ruff clean; offline HTTP smoke ALL PASSED (69 checks); static build and recorded-demo checks pass. Details: [docs/TEST_REPORT.md](docs/TEST_REPORT.md), [docs/VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md). Re-run: [docs/TEST_CHECKLIST.md](docs/TEST_CHECKLIST.md).
 
 ## Where things are
 

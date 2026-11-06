@@ -8,8 +8,8 @@ The entry deadline was Thu Nov 5, 2026, 09:00 WIB (Nov 4, 9 PM ET). Code is done
 - [x] C1. Intro voice-over says where the answers come from: "recorded on a live run" when the video plays recorded answers, "live" when it films live calls; the video refuses a voice clip made for the other mode (pushed dee1364)
 - [x] C. Main video re-captured and rendered: 2:54 (174.1 s), 1080p60, captions burned in, -16.0 LUFS, true peak -3.9 dBFS, no silence of 1 s or more except the last 1.6 s on the close card; voice-over speech-to-text 402/424 script words (pushed 9901da7)
 - [x] D. Vertical X clip (43.5 s, 1080x1920, 12.1 MB), hero GIF (640x1200, 2.2 MB), YouTube thumbnail re-made (pushed 9901da7); the og image is a composed share card that does not show the 1.31.0 screens, looked at and kept
-- [ ] E. Docs: every placeholder filled with measured numbers, stale counts and wording fixed, one-pager and guide bundle rebuilt
-- [ ] F. Final full run (ruff, mypy, all tests, jsdom/axe, smoke, static build, replay check), numbers in the docs, push
+- [x] E. Docs: every placeholder filled with measured numbers (only `DRIVE_URL`, `[LIVE_URL]`, `[YOUTUBE_URL]` and `[VOTE_URL]` stay for me to fill), stale wording fixed (CI status, TEST_REPORT live-run line), one-pager rebuilt by `make_launch_assets.py onepager` (1 A4 page, looked at), guide bundle rebuilt
+- [x] F. Final full run on 6 Nov: ruff clean, mypy strict 166 files, 857 non-browser + 147 Chromium tests passed one file at a time (0 failed, 0 skipped), `make_test_report.py` 1004/1004 ALL PASSED, jsdom and axe ran, offline smoke ALL PASSED (69 checks), static build and --check OK, replay fixture up to date; CI green again (axe-core now runs there too); pushed
 
 ## 1.31.0 UI pass (6 Nov)
 - [x] Screen changes through a View Transition (fallback: instant), skipped by the first tap or key, the tap still lands, off under reduced motion

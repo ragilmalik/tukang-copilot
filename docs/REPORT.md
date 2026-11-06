@@ -45,9 +45,9 @@ From [LIVE_RUN.md](LIVE_RUN.md) and [EVAL.md](EVAL.md), 5 November 2026:
 
 ## Engineering checks (this release)
 
-- {{TESTS}} automated tests passed, 0 failed, 0 skipped ([TEST_REPORT.md](TEST_REPORT.md)).
-- mypy strict: no issues in {{MYPY_FILES}} files. ruff: clean.
-- HTTP smoke on a running offline server: ALL PASSED, {{SMOKE}} checks.
+- 1004 automated tests passed, 0 failed, 0 skipped ([TEST_REPORT.md](TEST_REPORT.md)).
+- mypy strict: no issues in 166 files. ruff: clean.
+- HTTP smoke on a running offline server: ALL PASSED, 69 checks.
 - Recorded demo: re-recorded live on 6 November 2026, 01:23 WIB; one yes/no question in each language; the sample photo passes on the step it shows.
 - Static judge build: builds and passes its own check.
 
