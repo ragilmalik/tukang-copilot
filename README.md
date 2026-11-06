@@ -13,13 +13,13 @@ Meta Global AI Developer Hackathon 2026 (Meta x Cerebral Valley) · Indie Develo
 built solo in Semarang during the hackathon (first commit 30 Oct 2026).
 
 <table><tr>
-<td width="330"><img src="docs/demo/hero.gif" width="320" alt="Phone flow on live Meta API answers: photo, SAM 3.1 parts, diagnosis, safety tick list, camera step check, re-plan, red stop, Basa Jawa"></td>
+<td width="330"><img src="docs/demo/hero.gif" width="320" alt="Recorded phone screens with real Meta API answers: results streaming in, diagnosis, SAM 3.1 parts, a passed step check, the red stop, a tyre repair in Basa Jawa"></td>
 <td>
 
 | | |
 |---|---|
 | Live app | [LIVE_URL] |
-| 3-min video | [YOUTUBE_URL] · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:54, real Meta API answers, captions + voice-over; chapters in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt)) |
+| Demo video | [YOUTUBE_URL] · repo copy: [docs/demo/tukang-copilot-demo.mp4](docs/demo/tukang-copilot-demo.mp4) (2:25, app screens recorded from the live Meta API on 6 Nov 2026, captions, voice-over and music; chapters in [docs/demo/TIMESTAMPS.txt](docs/demo/TIMESTAMPS.txt)) · 9:16 cut: [tukang-copilot-x-vertical.mp4](docs/demo/tukang-copilot-x-vertical.mp4) (31 s) |
 | Code | https://github.com/ragilmalik/tukang-copilot (MIT) |
 | Live results | [docs/LIVE_RUN.md](docs/LIVE_RUN.md) (seven scenarios on the real API) · [docs/EVAL.md](docs/EVAL.md) (eval with a live column) |
 | For judges | [Judging map](docs/JUDGING_MAP.md) · [Judge FAQ](docs/launch/JUDGE_FAQ.md) · [One-pager PDF](docs/launch/one-pager.pdf) |
@@ -30,9 +30,12 @@ built solo in Semarang during the hackathon (first commit 30 Oct 2026).
 ## What is real here
 
 Every answer in the video, the screenshots, the GIF and the recorded 1-tap demo came from the real Meta Model API
-(Muse Spark 1.3, SAM 3.1, Muse Image) on 5 November 2026, with my own key. The waits for the models are cut in the
-video; the real time is in the table below. The photos are AI-generated sample photos, and every one of them says
-"Sample photo (AI-generated)" in the corner, because I didn't want to pass off a generated picture as my motorbike.
+(Muse Spark 1.3, SAM 3.1, Muse Image) with my own key: the video and the GIF play back a live run of 6 November 2026
+(from 14:01 WIB) on the new sample photos, and the eval and live-run numbers are from 5 November on the earlier
+photos. The playback skips the model waits; the real time is in the table below. The photos are AI-generated sample
+photos, and every one of them says "Sample photo (AI-generated)" in the corner, because I didn't want to pass off a
+generated picture as my motorbike. The people and homes at the start of the video are AI-generated scenes and are
+labelled that way on screen.
 
 What I have not done yet: run it on photos of my own broken things, run user trials with other people, connect a real
 WhatsApp number (the channel is tested against a Graph API test double and the `/wa` simulator), and run Muse Spark Open
@@ -104,7 +107,7 @@ line goes through a scrubber in [`api/logs.py`](api/logs.py) and carries an `X-R
 | Muse Image diagram | Bengkel hand-off | Safety stop | Basa Jawa |
 | ![diagram](docs/demo/screenshots/28_diagram_step.png) | ![hand-off](docs/demo/screenshots/18_handoff.png) | ![stop](docs/demo/screenshots/11_rice_stop.png) | ![jawa](docs/demo/screenshots/20_javanese_result.png) |
 
-<sub>Every screenshot is listed in [docs/demo/screenshots/INDEX.md](docs/demo/screenshots/INDEX.md): the numbered set used by the video, plus a gallery of every screen in Bahasa Indonesia, Basa Jawa and English, light and dark. They were re-shot on 6 November 2026 on the new photorealistic sample photos (labelled AI-generated), from Meta API answers recorded on live runs that day. Seven older shots from the previous photo set are kept and marked in the index until the video is re-made.</sub>
+<sub>Every screenshot is listed in [docs/demo/screenshots/INDEX.md](docs/demo/screenshots/INDEX.md): the numbered set used by the video, plus a gallery of every screen in Bahasa Indonesia, Basa Jawa and English, light and dark. They were re-shot on 6 November 2026 on the new photorealistic sample photos (labelled AI-generated), from Meta API answers recorded on live runs that day. Seven older shots from the previous photo set are kept and marked in the index; the video and the GIF use none of them.</sub>
 
 ## Why I built it
 

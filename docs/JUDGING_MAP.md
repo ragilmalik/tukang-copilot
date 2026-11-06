@@ -1,7 +1,7 @@
 # Judging map: each criterion and where the evidence is
 
 I checked the rules on 2026-11-01 (WIB) against the official sources below. The video is
-`docs/demo/tukang-copilot-demo.mp4` (2:54); scene start times are in `docs/demo/TIMESTAMPS.txt` and in the
+`docs/demo/tukang-copilot-demo.mp4` (2:25, re-made on 6 Nov 2026 after the event as a product video); scene start times are in `docs/demo/TIMESTAMPS.txt` and in the
 YouTube chapters (docs/launch/YOUTUBE.md). Everything the video and screenshots show is real Meta API output
 recorded on live runs (the 1-tap demo and live sessions of 6 Nov 2026, played back in the app; the live camera guide ran
 live) on labelled AI-generated sample photos.
@@ -75,7 +75,7 @@ live) on labelled AI-generated sample photos.
 
 | Evidence | Where |
 |---|---|
-| 2:54 video with captions and voice-over, under the 3-minute limit, every answer a real Meta API answer recorded on a live run and played back (said on every frame) | `docs/demo/tukang-copilot-demo.mp4`, `.en.srt` |
+| 2:25 video with captions, voice-over and music, every app screen real Meta API output recorded on a live run on 6 Nov 2026 and played back (said on every phone frame); AI-generated scenes labelled | `docs/demo/tukang-copilot-demo.mp4`, `.en.srt` |
 | 1-tap demo with no photo needed; a recorded demo plays if the free server is asleep | README "Try it in 60 seconds", `27_recorded_demo.png` |
 | Laptop view: on a screen 1024 px or wider the app sits in a phone frame with a side panel (QR code of the current URL, 1-tap demo, id/jv/en switch) | `29_laptop.png`, `test_playwright_desk.py` |
 | Static judge build with no server and no cold start: `scripts/build_static.py` writes `dist-static/` (recorded demo, relative paths; not hosted yet) | `scripts/build_static.py --help`, `test_playwright_static.py` |
@@ -88,7 +88,7 @@ live) on labelled AI-generated sample photos.
 
 | Prize | How it is judged (quoted) | My evidence | Status / gap |
 |---|---|---|---|
-| Most Viral Project, $20K | "Post your project demo on X and submit the post link through the hackathon platform. ... total engagement (likes, reposts, and comments) up until November 8 EOD" (slide: Nov 8, 11:59 PM ET). | 43.5 s vertical clip `docs/demo/tukang-copilot-x-vertical.mp4`; thread in docs/launch/X_THREAD.md; share cards (`26_share_card.png`) | I post before submitting so the link can go in form field 5. The engagement window closes Nov 8 11:59 PM ET = **Nov 9, 11:59 WIB**. |
+| Most Viral Project, $20K | "Post your project demo on X and submit the post link through the hackathon platform. ... total engagement (likes, reposts, and comments) up until November 8 EOD" (slide: Nov 8, 11:59 PM ET). | 31 s vertical clip with voice and music `docs/demo/tukang-copilot-x-vertical.mp4`; thread in docs/launch/X_THREAD.md; share cards (`26_share_card.png`) | I post before submitting so the link can go in form field 5. The engagement window closes Nov 8 11:59 PM ET = **Nov 9, 11:59 WIB**. |
 | Best Build on Meta Open Weights, $10K | "best project built using Muse Glimmer or Muse Spark Open, served on participants' own hardware or through partner-provided inference. Projects are flagged during the first judging round. The infrastructure partner verifies that the project runs on an eligible Meta open-weight model." | `USE_OPEN_WEIGHTS=1` moves diagnosis + planning to Muse Spark Open via Baseten; badge in the UI; tested against a Baseten test double | **Still open (me):** needs a real Baseten deployment and one logged run, otherwise the partner can't verify it. Without Baseten credits I won't claim this prize. |
 | Community Vote, $10K | "most votes in the public gallery ... total number of votes received through the hackathon platform, limited to one vote per verified account." The vote opens at the Nov 9 closing ceremony (12:00 PM ET = Nov 10, 00:00 WIB); the winner is announced Nov 16 on Discord. | Kit in docs/launch/COMMUNITY_VOTE_KIT.md (id, jv, en) | The gallery URL isn't public yet (checked 2026-11-01). Voters need a verified Cerebral Valley account. I send the kit only once the vote opens. |
 | Best Agentic Use-Case, $5K | "strongest use of AI agents to complete meaningful tasks, make decisions, or coordinate multi-step workflows. Judges evaluate the project's level of autonomy, effectiveness in completing its intended task, and practical usefulness." | The loop: ask when unsure, plan, gate on safety, verify each step from a photo, re-plan, escalate or hand off. The agent log "What the AI did" shows the model behind each decision (`23_agent_log.png`, `24_agent_jump.png`, `25_pdf_agent.png`); the same loop runs over WhatsApp (`30_whatsapp_*.png`) | My strongest bonus claim. The live run shows the loop working (question, plan, camera checks, re-plan, red stop); how often owners really fix things waits on the trials. |

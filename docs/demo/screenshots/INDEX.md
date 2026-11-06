@@ -8,7 +8,7 @@ Re-make: `python scripts/make_demo_assets.py shots` (numbered set, needs `DEMO_R
 guide is the only live call) and `python scripts/make_screenshots.py` (gallery, no model calls); then
 `python scripts/make_screenshot_index.py` rewrites this file.
 
-## Numbered set (README, video, GIF)
+## Numbered set (README, video end card, marketing images)
 
 | File | Shows | Size |
 |---|---|---|
@@ -42,7 +42,7 @@ guide is the only live call) and `python scripts/make_screenshots.py` (gallery, 
 ## Kept from the previous sample photo set (1.31.1, not re-taken)
 
 These show the old sample photos with the live answers recorded on them on 6 Nov 2026 (before the new photos).
-They stay because the current video and GIF use them, until those are re-made. Why they were not re-taken:
+They stay as a record of those screens; the video and the GIF re-made on 6 Nov 2026 use none of them. Why they were not re-taken:
 the new 1-tap demo recording has no follow-up question (the model was sure), no recorded sample session asked
 one, and the live camera guide and the WhatsApp simulator need new live calls that the $1.00 cap of the remake
 no longer covered (the live guide run spent $0.05 on 20 SAM 3.1 frames and did not lock on the new pump photo).

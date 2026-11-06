@@ -1,6 +1,6 @@
 # B-roll stills for the video
 
-Five 1920×1080 stills for the people-and-home parts of the next video. An image model made them from my prompts in November 2026, so none of them is a real photo of a real person or a real repair, and each one says "AI-generated scene" in the bottom-right corner. Everything the app does on screen in the video comes from real screen recordings, never from these stills.
+Five 1920×1080 stills for the people-and-home parts of the demo video (three are in it: pump, motorbike, rice cooker; the tap and phone-in-hand stills are not used). An image model made them from my prompts in November 2026, so none of them is a real photo of a real person or a real repair, and each one says "AI-generated scene" in the bottom-right corner. Everything the app does on screen in the video comes from real screen recordings, never from these stills.
 
 | File | What it shows |
 |---|---|
@@ -12,4 +12,4 @@ Five 1920×1080 stills for the people-and-home parts of the next video. An image
 
 The generator painted brand badges on two of the marketing scenes (a scooter model name and a rice cooker brand). I blurred both before using them, so no brand appears to endorse the app.
 
-Voice and music for the next video: the narrator is the free edge-tts voice `en-US-AndrewMultilingualNeural` at -8% speed, the owners' lines use `id-ID-ArdiNeural` / `id-ID-GadisNeural` (Bahasa) and `jv-ID-DimasNeural` / `jv-ID-SitiNeural` (Basa Jawa). The music is "Lucky Acoustic" by Jesse Keller (jamendo.com/track/1540859, CC BY 3.0); the credit goes on the end card, in the YouTube description and in docs/ATTRIBUTIONS.md when the video ships.
+Voice and music of the video (docs/demo/README.md has the details): the narrator is the free edge-tts voice `en-US-AndrewMultilingualNeural` at -8% speed, the owners' lines use `id-ID-ArdiNeural` / `id-ID-GadisNeural` (Bahasa) and `jv-ID-DimasNeural` / `jv-ID-SitiNeural` (Basa Jawa). The music is "Lucky Acoustic" by Jesse Keller (jamendo.com/track/1540859, CC BY 3.0); the credit is on the end card, in the YouTube description and in docs/ATTRIBUTIONS.md.

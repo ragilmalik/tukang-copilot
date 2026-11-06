@@ -11,7 +11,9 @@ What I want from it: more realistic images and video, a more natural voice, bett
 - [ ] WhatsApp simulator shots not re-taken: they need about $0.15 of live answers and the $1.00 cap had $0.06 left
 - [x] d. Every screen shot again (id, jv, en; light and dark; laptop view) with docs/demo/screenshots/INDEX.md: 118 files (26 numbered re-shot + 85 gallery on the new photos, 7 older shots kept and marked: 03_question, 16_live_guide, 30_whatsapp_*)
 - [ ] 16_live_guide on the new photos: the take on the pump photo (20 SAM 3.1 frames, $0.05) did not lock within 30 s; needs budget and maybe a tighter part outline
-- [ ] e. New video and vertical clip (next pass), docs updated
+- [x] e. New video (2:25, 1080p30, -16.0 LUFS, voice + music, burned-in captions + .srt), vertical clip (31.4 s, 1080x1920, voice + music) and hero GIF (640x1200, 2.9 MB), all from screens recorded on the 6 Nov live run (no model calls, $0.00); hook on labelled AI-generated scenes, proof card from docs/EVAL.md and docs/TEST_REPORT.md, music credit on the end card and in ATTRIBUTIONS, YOUTUBE (new description and chapters), README, CHANGELOG, one-pager rebuilt (1 page, looked at); test_demo_video.py rewritten; speech-to-text 91.5% of narration words (faster-whisper base.en)
+- [ ] Listen to the film and the vertical clip by ear before upload (voice, music level, the Bahasa and Basa Jawa owner lines, "Javanese" in the tyre scene, which the speech-to-text heard as "Japanese")
+- [ ] Re-check the music licence on https://www.jamendo.com/track/1540859 (read from Openverse as CC BY 3.0)
 
 ## 1.32.0 weakness hunt (6 Nov)
 Findings ranked by user impact, each with its test; the full audit is in CHANGELOG 1.32.0.

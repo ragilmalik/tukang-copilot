@@ -1,19 +1,21 @@
-"""The demo video, shot from the real app answering live from the Meta Model API: screen recordings of the phone UI, put in a phone frame on the
-app's own concrete background, with Barlow captions, crossfades and a few slow zooms on the moments that matter.
+"""The demo video, shot from the real app playing back answers recorded on the live Meta Model API: screen recordings
+of the phone UI in a phone frame on the app's own concrete background, labelled AI-generated scene stills with slow
+Ken Burns moves for the people-and-home parts, Barlow captions and crossfades.
 
 Two halves, both driven by scripts/make_demo_assets.py:
 
   capture GROUP   Chromium (390x844 @2x, id-ID) runs one part of the story while the DevTools screencast records the
-                  screen, about 50-60 frames a second while something moves. Frames go to $TMPDIR/tukang-video/clips/<scene>.
-                  Groups: motor (home to SAM parts), steps (safety list to bengkel hand-off), other (live camera, red stop,
-                  open weights). Each group starts its own demo server and browser, so one group fits in about a minute.
-  render          60 fps frames composed with Pillow and piped to ffmpeg, one cached segment per scene (with its
-                  voice-over), then joined. The vertical X clip reuses the same recordings.
+                  screen. Frames go to $TMPDIR/tukang-video/clips/<scene>. Groups: motor (home to SAM parts), steps
+                  (safety list to bengkel hand-off), other (Muse Image diagram, red stop, Basa Jawa tyre). Each group
+                  starts its own demo server and browser.
+  render          30 fps frames composed with Pillow and piped to ffmpeg, one cached segment per scene (with its
+                  voice-over), then joined; the music goes under the voice in one last mix. The vertical clip reuses
+                  the same recordings.
 
-Every answer on screen is a real Meta API answer, said on every frame: live by default (waits for the models are
-cut and the real wait is noted), or with DEMO_RECORDED_DATA set, played back from answers recorded on the live API
-(the recorded 1-tap demo and recorded live sessions; only the live camera guide calls SAM 3.1 live). The photos are
-AI-generated sample photos, said in the corner of every frame.
+Every answer on screen is a real Meta API answer: with DEMO_RECORDED_DATA set it is played back from answers recorded
+on the live API on 6 Nov 2026 (the recorded 1-tap demo and recorded live sessions), and every phone frame says so.
+The photos are AI-generated sample photos, said in their corner. Stills of people and homes are AI-generated scenes
+and carry that label while they are on screen.
 """
 from __future__ import annotations
 
@@ -23,6 +25,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 from collections.abc import Callable
@@ -38,8 +41,9 @@ FONTS = ROOT / "web" / "fonts"
 FIX = ROOT / "api" / "tests" / "fixtures"
 WORK = Path(os.environ.get("DEMO_BUILD_DIR", Path(tempfile.gettempdir()) / "tukang-video"))
 CLIPS = WORK / "clips"
-FPS = 60
+FPS = 30
 XFADE = 0.45  # crossfade at the start of every scene, from the last frame of the one before
+LEAD = 0.2   # the voice starts this long after the cut, so the picture is there before its first word
 
 # design tokens (docs: work/frontend-skills/DESIGN_DIRECTION.md, web/style.css)
 CONCRETE, PLATE, INK, MUTED = (232, 233, 229), (255, 255, 255), (26, 29, 33), (79, 86, 94)
@@ -63,11 +67,21 @@ def played_back() -> bool:
 
 
 def _replay_day() -> str:
-    """The day the recorded 1-tap demo was recorded on the live API, from web/replay/demo.json ("2026-11-06 01:23 WIB")."""
+    """The day the recorded 1-tap demo was recorded on the live API, from web/replay/demo.json ("2026-11-06 14:01 WIB")."""
     from datetime import date
 
-    d = date.fromisoformat(str(json.loads((ROOT / "web" / "replay" / "demo.json").read_text(encoding="utf-8"))["recorded_at"])[:10])
+    d = date.fromisoformat(_replay_stamp()[:10])
     return f"{d.day} {d:%b %Y}"
+
+
+def _replay_stamp() -> str:
+    return str(json.loads((ROOT / "web" / "replay" / "demo.json").read_text(encoding="utf-8"))["recorded_at"])
+
+
+def recorded_time() -> str:
+    """The clock time of the recorded live run ("14:01 WIB"); empty for live filming."""
+    stamp = _replay_stamp()
+    return stamp[11:] if played_back() and len(stamp) > 11 else ""
 
 
 def _today_wib() -> str:
@@ -79,16 +93,17 @@ def _today_wib() -> str:
 
 
 def demo_note() -> str:
+    """The pill on every phone frame: where the answers come from and that the photos are samples."""
     if played_back():
-        return f"Real Meta API answers, recorded {recorded_on()} · AI-generated sample photos"
+        return f"Real Meta API output, recorded live {recorded_on()} {recorded_time()} · AI-generated sample photos"
     return f"Live Meta API answers · {recorded_on()} · AI-generated sample photos"
 
 
 def answers_note() -> str:
-    """The line on the close card that says where the answers come from."""
+    """The line on the end card that says where the answers come from."""
     if played_back():
-        return (f"Answers recorded live on the Meta Model API, {recorded_on()}, and played back; "
-                "the live camera guide ran live. Photos are AI-generated samples.")
+        return (f"App screens: real Meta API output recorded on a live run, {recorded_on()} from {recorded_time()}, "
+                "played back in the app. Photos are AI-generated samples; people and homes are AI-generated scenes.")
     return f"Recorded live on the Meta Model API, {recorded_on()}. Model waits are cut; photos are AI-generated samples."
 
 
@@ -412,12 +427,14 @@ class Renderer:
     """Frame source for one scene. frame(t) returns an RGB image of `size`."""
 
     def __init__(self, shot: Shot, size: tuple[int, int], vertical: bool = False, clip_offset: float = 0.0,
-                 zooms: dict[str, list[tuple[float, float, float]]] | None = None):
+                 zooms: dict[str, list[tuple[float, float, float]]] | None = None, clip_key: str = ""):
         self.shot, self.size, self.vertical = shot, size, vertical
         self.sc = shot.sc
         self.offset = clip_offset
         self.zooms = zooms
-        self.clip = Clip(self.sc.key) if has_clip(self.sc.key) and not self.sc.image.startswith(("title:", "wa:", "arch")) else None
+        self.clip_key = clip_key or self.sc.key  # the vertical clip names its scenes differently from the recordings
+        card_like = self.sc.image.startswith(("title:", "broll:", "still:")) or self.sc.image == "proof"
+        self.clip = Clip(self.clip_key) if has_clip(self.clip_key) and not card_like else None
         self._bg_cache: dict[str, Image.Image] = {}
         self._still: Image.Image | None = None
         self._last: tuple[Any, Image.Image] | None = None
@@ -439,30 +456,31 @@ class Renderer:
 
     def frame(self, t: float) -> Image.Image:
         img = self.sc.image
+        sub = _sub_at(self.shot, t)
+        if img.startswith(("broll:", "still:")):
+            return broll_frame(self.shot, t, self.size, self.vertical, sub)
+        if img == "proof":
+            key = ("proof", sub, min(int(t * FPS), int(3.2 * FPS)))  # the rows fade in over the first 3.2 s
+            if self._last is None or self._last[0] != key:
+                self._last = (key, proof_card(self.shot, t, self.size, self.vertical, sub))
+            return self._last[1]
         if img.startswith("title:"):
-            if self.sc.key != "hook" and t > 2.2:  # every fade is done: the card only changes with the caption
-                key = ("card", "" if self.vertical else _sub_at(self.shot, t))
-                if self._last is None or self._last[0] != key:
-                    self._last = (key, card(self.sc, t, self.shot, self.size, self.vertical))
-                return self._last[1]
-            return card(self.sc, t, self.shot, self.size, self.vertical)
-        if img == "arch":
-            return arch_card(self.shot, t, self.size, self.vertical)
-        if img.startswith("wa:"):
-            return wa_card(self.shot, t, self.size, self.vertical)
-        sub = self.shot.subs and (self.shot.subs[0][2] if self.vertical else _sub_at(self.shot, t)) or ""
+            key = ("card", sub, min(int(t * FPS), int(2.2 * FPS)))  # every fade is done by 2.2 s
+            if self._last is None or self._last[0] != key:
+                self._last = (key, close_card(self.sc, t, self.size, self.vertical, sub))
+            return self._last[1]
         if self.vertical:
             return self._vframe(t, sub)
         key, screen = self._screen(t)
-        z, fy = zoom_at(self.sc.key, t, self.zooms)
+        z, fy = zoom_at(self.clip_key, t, self.zooms)
         cache_key = (key, sub, round(z, 4), round(fy, 1))
         if self._last is not None and self._last[0] == cache_key:
             return self._last[1]
         im = self._bg(sub).copy()
-        ph = VERT_PHONE if self.vertical else LAND_PHONE
+        ph = LAND_PHONE
         fx, fyc = ph.css_to_canvas(195, fy)
         k = min(1.0, (z - 1) / 0.35) if z > 1 else 0.0
-        mid = (ph.top + ph.h / 2) if not self.vertical else (ph.top + ph.h / 2)
+        mid = ph.top + ph.h / 2
         draw_phone(im, ph, screen, z, (fx, fyc), (fx, fyc + (mid - fyc) * k))
         self._last = (cache_key, im)
         return im
@@ -471,7 +489,7 @@ class Renderer:
         """Vertical phone scene: background, the (maybe zoomed) phone, then the header band and the caption on top,
         so a zoom never covers the words."""
         key, screen = self._screen(t)
-        z, fy = zoom_at(self.sc.key, t, self.zooms)
+        z, fy = zoom_at(self.clip_key, t, self.zooms)
         cache_key = (key, sub, round(z, 4), round(fy, 1))
         if self._last is not None and self._last[0] == cache_key:
             return self._last[1]
@@ -490,201 +508,264 @@ class Renderer:
         return im
 
 
-# --- cards (title, hook, close), WhatsApp and the architecture
+# --- cards: AI-generated scene stills (Ken Burns), the proof card and the end card
 def _fade(t: float, start: float, dur: float = 0.7) -> float:
     return ease((t - start) / dur)
 
 
-def card(sc: Any, t: float, shot: Shot, size: tuple[int, int], vertical: bool) -> Image.Image:
+SCENE_TAG = "AI-generated scene"
+
+
+def tag(im: Image.Image, text: str, right: int, bottom: int, size: int = 24) -> None:
+    """Dark pill with white text in a corner, the look of the "Sample photo (AI-generated)" tag on the sample photos."""
+    f = font("semi", size)
+    d = ImageDraw.Draw(im, "RGBA")
+    w = d.textlength(text, font=f)
+    pad_x, pad_y = int(size * 0.6), int(size * 0.35)
+    h = size + 2 * pad_y
+    d.rounded_rectangle([right - w - 2 * pad_x, bottom - h, right, bottom], radius=h // 2, fill=(20, 22, 26, 190))
+    d.text((right - w - pad_x, bottom - h + pad_y - size * 0.08), text, font=f, fill=(255, 255, 255, 245))
+
+
+@lru_cache(maxsize=16)
+def _source(spec: str) -> tuple[Image.Image, bool]:
+    """The picture of a b-roll scene and whether it already carries its own "AI-generated scene" tag.
+
+    "broll:<path>" is a labelled 1920x1080 still (docs/launch/broll, tag burned into the bottom-right corner);
+    "still:<name>" is a scene of docs/launch/scenes with the real app screenshot warped onto its blank phone
+    (docs/launch/make_marketing_images.py), made once into the build folder."""
+    kind, _, ref = spec.partition(":")
+    if kind == "broll":
+        return Image.open(ROOT / ref).convert("RGB"), True
+    return scene_still(ref), False
+
+
+def scene_still(name: str) -> Image.Image:
+    """A scene photo (docs/launch/scenes) at its own size with the real screenshot on the phone, cached in WORK."""
+    out = WORK / "stills" / f"{name}.png"
+    if not out.exists():
+        import importlib.util
+
+        spec_ = importlib.util.spec_from_file_location("make_marketing_images", ROOT / "docs" / "launch" / "make_marketing_images.py")
+        assert spec_ is not None and spec_.loader is not None
+        mmi = importlib.util.module_from_spec(spec_)
+        sys.modules["make_marketing_images"] = mmi  # its dataclasses look their module up while the file loads
+        spec_.loader.exec_module(mmi)
+        spec = mmi.SPECS[name]
+        base = Image.open(mmi.SCENES / spec.scene).convert("RGB")
+        for box in spec.blur:  # brand names the generator painted
+            base = mmi.soften(base, box)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        mmi.warp_screen(base, spec, 1.0, (0, 0)).save(out)
+    return Image.open(out).convert("RGB")
+
+
+def _kb(src: Image.Image, t: float, dur: float, out: tuple[int, int], anchor: tuple[float, float], z1: float = 1.05) -> Image.Image:
+    """Ken Burns: a slow push-in (1.0 to z1 over the scene) on a picture that already has the output's aspect ratio,
+    anchored at `anchor` (0..1 of the picture), so that point stays put while the rest grows."""
+    z = 1.0 + (z1 - 1.0) * min(1.0, t / max(1.0, dur))  # linear: a steady drift, no ease-in that reads as a jolt
+    cw, ch = src.width / z, src.height / z
+    x0, y0 = (src.width - cw) * anchor[0], (src.height - ch) * anchor[1]
+    return src.resize(out, Image.Resampling.BILINEAR, box=(x0, y0, x0 + cw, y0 + ch))
+
+
+@lru_cache(maxsize=8)
+def _covered(spec: str, w: int, h: int, focus_x: float, focus_y: float) -> Image.Image:
+    """The picture cropped to the output's aspect ratio (no scaling yet), cropped around the focus point."""
+    src, _ = _source(spec)
+    r = w / h
+    if src.width / src.height > r:
+        cw, ch = src.height * r, float(src.height)
+    else:
+        cw, ch = float(src.width), src.width / r
+    x0, y0 = (src.width - cw) * focus_x, (src.height - ch) * focus_y
+    return src.crop((round(x0), round(y0), round(x0 + cw), round(y0 + ch)))
+
+
+@lru_cache(maxsize=4)
+def _blur_bg(spec: str, w: int, h: int) -> Image.Image:
+    """A blurred, darkened copy of a picture that does not have the frame's shape, to fill the frame behind it."""
+    from PIL import ImageEnhance
+
+    return ImageEnhance.Brightness(_covered(spec, w, h, 0.5, 0.5).resize((w, h), Image.Resampling.BILINEAR)
+                                   .filter(ImageFilter.GaussianBlur(40))).enhance(0.45)
+
+
+@lru_cache(maxsize=2)
+def _left_shade(w: int, h: int) -> Image.Image:
+    """Dark gradient on the left 60 % of a 16:9 still, under the headline."""
+    import numpy as np
+
+    g = np.clip(0.82 - np.linspace(0, 1, w) * 1.5, 0.0, 0.82)[None, :].repeat(h, 0)
+    sh = Image.new("RGBA", (w, h), ASPHALT + (255,))
+    sh.putalpha(Image.fromarray((g * 255).astype("uint8"), "L"))
+    return sh
+
+
+def broll_frame(shot: Shot, t: float, size: tuple[int, int], vertical: bool, sub: str) -> Image.Image:
+    """An AI-generated scene still with a slow push-in, the headline, the burned-in caption and the scene tag."""
+    sc = shot.sc
     w, h = size
-    if sc.key == "hook":
-        return hook_card(shot, t, size, vertical)
+    src, tagged = _source(sc.image)
+    anchor = {"br": (1.0, 1.0), "bl": (0.0, 1.0), "c": (0.5, 0.5), "tr": (1.0, 0.0), "r": (1.0, 0.5)}[getattr(sc, "move", "br") or "br"]
+    k1, k2 = _fade(t, 0.15), _fade(t, 0.5)
+    if not vertical:
+        if abs(src.width / src.height - w / h) < 0.03:  # 16:9 already: full frame
+            im = _kb(src, t, shot.dur, size, anchor)
+            box = (0, 0, w, h)
+        else:  # square or portrait scene: the whole picture on the right, a blurred copy behind it
+            im = _blur_bg(sc.image, w, h).copy()
+            ph = h - 80
+            pw = round(src.width * ph / src.height)
+            x0 = w - pw - 120
+            im.paste(_kb(src, t, shot.dur, (pw, ph), (0.5, 0.5)), (x0, 40))
+            box = (x0, 40, x0 + pw, 40 + ph)
+        im = Image.alpha_composite(im.convert("RGBA"), _left_shade(w, h))
+        layer = Image.new("RGBA", size, (0, 0, 0, 0))
+        d = ImageDraw.Draw(layer)
+        x, y = 120, 150
+        if sc.head:
+            y = text_block(d, (x, y + 18 * (1 - k1)), sc.head, font("black", 112), 900, ON_DARK + (int(255 * k1),), 108)
+        if sc.caption:
+            d.rectangle([x, y + 30, x + 10, y + 30 + 46], fill=TONE.get(sc.tone, TONE["act"]) + (int(255 * k2),))
+            text_block(d, (x + 30, y + 28), sc.caption, font("semi", 38), 820, ON_DARK + (int(240 * k2),), 50)
+        im.alpha_composite(layer)
+        im = im.convert("RGB")
+        if not tagged or box != (0, 0, w, h):  # the burned-in tag of a 16:9 still stays in its corner (anchored there)
+            tag(im, SCENE_TAG + ("" if tagged else " · real app screen on the phone"), box[2] - 22, box[3] - 22, 24)
+        if sub:  # beside a picture that does not fill the frame, the caption stays left of it (its tag stays readable)
+            _subtitle(im, sub, 120, h - 60, 1280 if box == (0, 0, w, h) else min(1280, box[0] - 160), size=36)
+        return im
+    # vertical: the picture as a band at the top (or full frame when it is portrait), headline under it
+    im = asphalt(w, h).copy()
+    portrait = src.height > src.width
+    if portrait:  # the tyre scene: full frame, at most a 1.41x scale
+        pic = _kb(_covered(sc.image, w, h, 0.5, 0.5), t, shot.dur, size, (0.5, 0.4))
+        im.paste(pic, (0, 0))
+        im = Image.alpha_composite(im.convert("RGBA"), _vshade(w, h)).convert("RGB")
+        box = (0, 0, w, h)
+        head_y = 250
+    else:
+        bh = 1100  # a near-square crop of the 16:9 still (about 1.02x scale): big enough to read on a phone
+        # cropped from the right edge and anchored bottom-right: a still's own burned-in tag stays whole in its corner
+        pic = _kb(_covered(sc.image, w, bh, 1.0, 0.5), t, shot.dur, (w, bh), (1.0, 1.0))
+        im.paste(pic, (0, 250))
+        box = (0, 250, w, 250 + bh)
+        head_y = 250 + bh + 50
+    brand_row(im, 60, 80, dark=True, size=64)
+    layer = Image.new("RGBA", size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    y = head_y
+    if sc.head:
+        y = text_block(d, (70, y + 18 * (1 - k1)), sc.head, font("black", 104), w - 140, ON_DARK + (int(255 * k1),), 100)
+    if sc.caption and not portrait:
+        text_block(d, (70, y + 16), sc.caption, font("semi", 42), w - 140, ON_DARK_MUTED + (int(255 * k2),), 54)
+    im = Image.alpha_composite(im.convert("RGBA"), layer).convert("RGB")
+    if not tagged or portrait:
+        tag(im, SCENE_TAG + ("" if tagged else " · real app screen"), box[2] - 24, box[3] - 24 if not portrait else 230, 28)
+    if sub:
+        vsubtitle(im, sub)
+    return im
+
+
+@lru_cache(maxsize=2)
+def _vshade(w: int, h: int) -> Image.Image:
+    """Dark top band on a full-frame vertical still, under the brand and the headline."""
+    import numpy as np
+
+    g = np.clip(0.9 - np.linspace(0, 1, h) * 1.8, 0.0, 0.9)[:, None].repeat(w, 1)
+    sh = Image.new("RGBA", (w, h), ASPHALT + (255,))
+    sh.putalpha(Image.fromarray((g * 255).astype("uint8"), "L"))
+    return sh
+
+
+def proof_card(shot: Shot, t: float, size: tuple[int, int], vertical: bool, sub: str) -> Image.Image:
+    """The measured numbers, one row each, with where they come from in small print. Only numbers from the repo's
+    own reports (make_demo_assets.PROOF)."""
+    from make_demo_assets import PROOF, PROOF_NOTE  # type: ignore[import-not-found]
+
+    w, h = size
+    im = asphalt(w, h).copy()
+    layer = Image.new("RGBA", size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    x = 150 if not vertical else 80
+    y = 80 if not vertical else 300  # 16:9: the rows and the source note end above a two-line caption
+    k0 = _fade(t, 0.05)
+    d.text((x, y), shot.sc.head, font=font("black", 92 if not vertical else 96), fill=ON_DARK + (int(255 * k0),))
+    y += 140 if not vertical else 150
+    big, small = font("black", 80 if not vertical else 88), font("body", 36 if not vertical else 38)
+    num_w = 460 if not vertical else 0
+    for i, (num, label) in enumerate(PROOF):
+        k = _fade(t, 0.4 + 0.45 * i)
+        a = int(255 * k)
+        d.text((x, y + 10 * (1 - k)), num, font=big, fill=TONE["act"] + (a,))
+        if vertical:
+            text_block(d, (x, y + 92), label, small, w - 2 * x, ON_DARK + (a,), 46)
+            y += 200
+        else:
+            text_block(d, (x + num_w, y + 24), label, small, w - x - num_w - 150, ON_DARK + (a,), 46)
+            y += 106
+    kn = _fade(t, 0.4 + 0.45 * len(PROOF))
+    text_block(d, (x, y + 20), PROOF_NOTE, font("body", 26 if not vertical else 30), w - 2 * x, ON_DARK_MUTED + (int(230 * kn),), 36 if not vertical else 40)
+    im.paste(layer, (0, 0), layer)
+    if sub:
+        if vertical:
+            vsubtitle(im, sub)
+        else:
+            _subtitle(im, sub, 260, h - 30, w - 520)
+    return im
+
+
+def close_card(sc: Any, t: float, size: tuple[int, int], vertical: bool, sub: str) -> Image.Image:
+    """End card: name, promise, the repo link (the one action), the source of the answers and the music credit."""
+    from make_demo_assets import MUSIC_CREDIT, REPO_URL  # type: ignore[import-not-found]
+
+    w, h = size
     im = asphalt(w, h).copy()
     big, small = sc.image[6:].split("|")
     layer = Image.new("RGBA", size, (0, 0, 0, 0))
     d = ImageDraw.Draw(layer)
-    x = 150 if not vertical else 90
-    y = 300 if not vertical else 560
-    if vertical and sc.key == "close":  # three lines of source note: start higher so the text ends above the phones
-        y = 400
+    x, y = (130, 120) if not vertical else (80, 260)
+    lw = 1020 if not vertical else w - 160
     k1, k2, k3 = _fade(t, 0.1), _fade(t, 0.45), _fade(t, 0.8)
-    lw = 1000 if not vertical else 900
-    if sc.key == "close" and not vertical:
-        lw = 1010
-    if sc.key == "close":
-        brand_row(layer, x, int(y - 10 + 18 * (1 - k1)), dark=True, size=96 if not vertical else 110)
-        yy = y + 170
-        yy = text_block(d, (x, yy + 18 * (1 - k2)), small.replace("'", "’"), font("black", 84 if not vertical else 92), lw, ON_DARK + (int(255 * k2),), 86)
-        yy = text_block(d, (x, yy + 36), sc.caption, font("body", 32 if not vertical else 38), lw - 20, ON_DARK_MUTED + (int(255 * k3),), 44)
-        text_block(d, (x, yy + 18), answers_note(), font("body", 26 if not vertical else 32),
-                   lw, ON_DARK_MUTED + (int(200 * k3),), 36)
-    else:  # opening title
-        brand_row(layer, x, int(y - 40 + 18 * (1 - k1)), dark=True, size=110 if not vertical else 120)
-        yy = y + 150
-        yy = text_block(d, (x, yy + 18 * (1 - k2)), big.replace(". ", ".\n"), font("black", 96 if not vertical else 100), 960, ON_DARK + (int(255 * k2),), 94)
-        yy = text_block(d, (x, yy + 30), small, font("body", 30 if not vertical else 36), 860, ON_DARK_MUTED + (int(255 * k3),), 42)
-        xx, chip = x, font("semi", 26 if not vertical else 30)
-        for name in ("Muse Spark", "SAM 3.1", "Muse Image", "Voice Transcribe"):
-            xx = pill(layer, (xx, int(yy + 34)), name, chip, ON_DARK + (int(255 * k3),), (255, 255, 255, int(26 * k3))) + 12
-    if not vertical and sc.key == "title":
-        _title_photo(layer, t)
-    if sc.key == "close":
-        _close_phones(im, t, vertical)
+    brand_row(layer, x, int(y + 18 * (1 - k1)), dark=True, size=96 if not vertical else 110)
+    yy = text_block(d, (x, y + 160 + 18 * (1 - k2)), big, font("black", 88 if not vertical else 96), lw, ON_DARK + (int(255 * k2),), 90)
+    yy = text_block(d, (x, yy + 22), small, font("body", 34 if not vertical else 40), lw, ON_DARK_MUTED + (int(255 * k2),), 46)
+    url_f = font("black", 58 if not vertical else 56)
+    end = pill(layer, (x, int(yy + 36)), REPO_URL, url_f, (16, 18, 20, int(255 * k3)), TONE["act"] + (int(255 * k3),), (26, 12))
+    del end
+    yy += 36 + 58 + 24 + 40
+    yy = text_block(d, (x, yy), answers_note(), font("body", 25 if not vertical else 30), lw, ON_DARK_MUTED + (int(220 * k3),), 34 if not vertical else 40)
+    text_block(d, (x, yy + 14), MUSIC_CREDIT, font("body", 25 if not vertical else 30), lw, ON_DARK_MUTED + (int(220 * k3),), 34 if not vertical else 40)
+    _close_phones(im, t, vertical)
     im.paste(layer, (0, 0), layer)
-    if vertical:
-        if shot.subs:
-            vsubtitle(im, shot.subs[0][2])
-    elif _sub_at(shot, t):  # the narrator speaks on the title and end cards too: burn in the caption like every other scene
-        _subtitle(im, _sub_at(shot, t), 260, h - 40, w - 520)
+    if sub:
+        if vertical:
+            vsubtitle(im, sub)
+        else:
+            _subtitle(im, sub, 130, h - 40, 1040)
     return im
 
 
-@lru_cache(maxsize=2)
-def _parts_photo() -> Image.Image | None:
-    p = CLIPS / "parts_photo.jpg"
-    return Image.open(p).convert("RGB") if p.exists() else None
-
-
-def _title_photo(layer: Image.Image, t: float) -> None:
-    """The masked sample photo on a plate, right side of the title card."""
-    ph = _parts_photo()
-    if ph is None:
-        return
-    k = _fade(t, 0.3, 1.0)
-    w = 640
-    im = ph.resize((w, int(ph.height * w / ph.width)), Image.Resampling.LANCZOS)
-    plate = Image.new("RGBA", (w + 24, im.height + 24 + 46), (39, 43, 48, int(255 * k)))
-    m = _round_mask(*plate.size, 26)
-    plate.paste(im, (12, 12))
-    d = ImageDraw.Draw(plate)
-    note = "Recorded live SAM 3.1 masks," if played_back() else "Live SAM 3.1 masks on an"
-    d.text((16, im.height + 22), f"{note} AI-generated sample photo", font=font("body", 21), fill=ON_DARK_MUTED + (int(255 * k),))
-    plate.putalpha(ImageChops.multiply(m, Image.new("L", plate.size, int(255 * k))))
-    layer.alpha_composite(plate, (1180, int(250 + 20 * (1 - k))))
-
-
 def _close_phones(im: Image.Image, t: float, vertical: bool) -> None:
-    """Three moments of the app on the right of the end card: parts on the photo, a passed check, the red stop."""
-    from make_demo_assets import SHOTS  # type: ignore[import-not-found]
-
+    """Three moments of the app on the end card: parts on the photo, a passed check, the red stop (new photos)."""
     names = ["05_parts", "08_check_pass", "11_rice_stop"]
-    sc = 0.6 if not vertical else 0.56
-    xs = [1300, 1540, 1780] if not vertical else [250, 540, 830]
-    top = 170 if not vertical else 1010
+    sc = 0.6 if not vertical else 0.5
+    xs = [1330, 1570, 1790] if not vertical else [250, 540, 830]
+    top = 150 if not vertical else 1040
     for i, name in enumerate(names):
         k = _fade(t, 0.4 + 0.25 * i, 0.7)
         if k <= 0:
             continue
-        screen = Image.open(SHOTS / f"{name}.png").convert("RGB").resize((780, 1688), Image.Resampling.LANCZOS)
+        screen = _shot_png(name)
         draw_phone(im, Phone(cx=xs[i], top=top + (60 if i == 1 else 0) + 30 * (1 - k), scale=sc), screen, alpha=k)
 
 
-@lru_cache(maxsize=1)
-def _hook_src() -> Image.Image:
-    src = Image.open(ROOT / "samples" / "motor.jpg").convert("RGB")
-    return src.crop((0, int(src.height * 0.07), src.width, src.height))  # its own corner tag; this card has its own label
+@lru_cache(maxsize=8)
+def _shot_png(name: str) -> Image.Image:
+    from make_demo_assets import SHOTS  # type: ignore[import-not-found]
 
-
-@lru_cache(maxsize=2)
-def _hook_shade(w: int, h: int, vertical: bool) -> Image.Image:
-    import numpy as np
-
-    if not vertical:
-        g = np.clip(1.0 - (np.linspace(0, 1, w) - 0.36) * 2.2, 0.08, 0.96)[None, :].repeat(h, 0)
-    else:
-        g = np.clip(np.linspace(0.95, 0.15, h) ** 1.3, 0.15, 0.92)[:, None].repeat(w, 1)
-    a = Image.fromarray((g * 255).astype("uint8"), "L")
-    sh = Image.new("RGBA", (w, h), ASPHALT + (255,))
-    sh.putalpha(a)
-    return sh
-
-
-def hook_card(shot: Shot, t: float, size: tuple[int, int], vertical: bool) -> Image.Image:
-    w, h = size
-    src = _hook_src()
-    z = 1.0 + 0.06 * (t / max(1.0, shot.dur))
-    im = Image.new("RGB", size, ASPHALT)
-    if not vertical:  # photo fills the height on the right; the text side fades into asphalt
-        pw = int(h * src.width / src.height)
-        cw, ch = src.width / z, src.height / z
-        ph = src.resize((pw, h), Image.Resampling.BILINEAR, box=((src.width - cw) * 0.5, (src.height - ch) * 0.45, (src.width - cw) * 0.5 + cw, (src.height - ch) * 0.45 + ch))
-        im.paste(ph, (w - pw, 0))
-    else:
-        scale = max(w / src.width, h / src.height) * z
-        cw, ch = w / scale, h / scale
-        x0 = min(max(0.0, src.width * 0.48 - cw / 2), src.width - cw)
-        im = src.resize((w, h), Image.Resampling.BILINEAR, box=(x0, 0, x0 + cw, ch))
-    im = Image.alpha_composite(im.convert("RGBA"), _hook_shade(w, h, vertical)).convert("RGB")
-    layer = Image.new("RGBA", size, (0, 0, 0, 0))
-    d = ImageDraw.Draw(layer)
-    big, small = shot.sc.image[6:].split("|")
-    x, y = (140, 210) if not vertical else (80, 220)
-    k1, k2, k3 = _fade(t, 0.1), _fade(t, 0.6), _fade(t, 1.2)
-    yy = text_block(d, (x, y + 20 * (1 - k1)), big.replace(". ", ".\n"), font("black", 128 if not vertical else 120), 1000, ON_DARK + (int(255 * k1),), 120)
-    yy = text_block(d, (x, yy + 34), small, font("body", 40), 900, ON_DARK + (int(235 * k2),), 52)
-    d.rectangle([x, yy + 34, x + 10, yy + 34 + 44], fill=TONE["act"] + (int(255 * k3),))
-    text_block(d, (x + 28, yy + 34), shot.sc.caption, font("semi", 32), 860, ON_DARK + (int(255 * k3),), 44)
-    pill(layer, (w - 470 if not vertical else 60, h - 70 if not vertical else 120), "Sample photo (AI-generated)", font("body", 22),
-         ON_DARK, (20, 22, 26, 170))
-    im.paste(layer, (0, 0), layer)
-    if vertical:
-        if shot.subs:
-            vsubtitle(im, shot.subs[0][2])
-    elif _sub_at(shot, t):
-        _subtitle(im, _sub_at(shot, t), x - 10, h - 110, 1000)
-    return im
-
-
-def wa_card(shot: Shot, t: float, size: tuple[int, int], vertical: bool) -> Image.Image:
-    from make_demo_assets import SHOTS, WA_LABELS  # type: ignore[import-not-found]
-
-    sc = shot.sc
-    sub = (_sub_at(shot, t) if not vertical else "")
-    im = (_panel(sc, sub, size) if not vertical else _vpanel(sc, shot.subs[0][2] if shot.subs else "", size)).copy()
-    names = sc.image[3:].split(",")
-    scale = 0.62 if not vertical else 0.80
-    gap = 34 if not vertical else 10
-    ph_w = (390 + 26) * scale
-    total = len(names) * ph_w + (len(names) - 1) * gap
-    x_start = (930 - total) / 2 + 20 if not vertical else (size[0] - total) / 2
-    top = 250 if not vertical else 620
-    d = ImageDraw.Draw(im)
-    for i, name in enumerate(names):
-        k = _fade(t, 0.15 + 0.35 * i, 0.6)
-        if k <= 0:
-            continue
-        cx = x_start + i * (ph_w + gap) + ph_w / 2
-        ph = Phone(cx=cx, top=top + 30 * (1 - k), scale=scale)
-        screen = Image.open(SHOTS / f"{name}.png").convert("RGB").resize((780, 1688), Image.Resampling.LANCZOS)
-        draw_phone(im, ph, screen, alpha=k)
-        lab = WA_LABELS[i] if i < len(WA_LABELS) else ""
-        lf = font("semi", 26 if not vertical else 24)
-        d.text((cx - d.textlength(lab, font=lf) / 2, top - 52), lab, font=lf, fill=INK + (int(255 * k),))
-    if not vertical:
-        d.text((x_start, top + (906 * scale) + 30), "WhatsApp simulator (/wa) · same handler as the Cloud API webhook · live Meta answers",
-               font=font("body", 22), fill=MUTED)
-    return im
-
-
-def arch_card(shot: Shot, t: float, size: tuple[int, int], vertical: bool) -> Image.Image:
-    from make_demo_assets import ARCH  # type: ignore[import-not-found]
-
-    w, h = size
-    a = Image.open(ARCH).convert("RGB")
-    if not vertical:
-        # the diagram's own footnotes sit near the bottom: shrink it a little so the caption box never covers them
-        z = 0.86 + 0.02 * ease(t / max(1.0, shot.dur))
-        dw, dh = int(w * z), int(h * z)
-        im = concrete(w, h).copy()
-        im.paste(a.resize((dw, dh), Image.Resampling.BILINEAR), ((w - dw) // 2, max(0, int(h * 0.88) - dh - 8)))
-        sub = _sub_at(shot, t)
-        if sub:
-            _subtitle(im, sub, 260, h - 36, w - 520)
-        return im
-    im = _vpanel(shot.sc, shot.subs[0][2] if shot.subs else "", size).copy()
-    aw = w - 40
-    im.paste(a.resize((aw, int(a.height * aw / a.width)), Image.Resampling.LANCZOS), (20, 700))
-    return im
+    return Image.open(SHOTS / f"{name}.png").convert("RGB").resize((780, 1688), Image.Resampling.LANCZOS)
 
 
 # --- vertical (9:16) layout
@@ -692,11 +773,12 @@ VERT_PHONE = Phone(cx=540, top=430, scale=1.18)
 # X / Reels / Shorts draw their own buttons and text over the edges of a 9:16 video: captions stay inside this box
 VERT_SAFE_BOTTOM = 1920 - 250
 VERT_SAFE_SIDE = 60
+VERT_CAPTION_PX = 46  # 46 px on a 1920 px tall frame: readable on a phone held upright
 
 
 def vsubtitle(im: Image.Image, text: str) -> None:
     """The English caption of the vertical clip, drawn last (over the phone) and inside the safe area."""
-    _subtitle(im, text, VERT_SAFE_SIDE, VERT_SAFE_BOTTOM, im.width - 2 * VERT_SAFE_SIDE, size=40)
+    _subtitle(im, text, VERT_SAFE_SIDE, VERT_SAFE_BOTTOM, im.width - 2 * VERT_SAFE_SIDE, size=VERT_CAPTION_PX)
 
 
 def _vpanel(sc: Any, sub: str, size: tuple[int, int]) -> Image.Image:
@@ -704,10 +786,10 @@ def _vpanel(sc: Any, sub: str, size: tuple[int, int]) -> Image.Image:
     im = concrete(w, h).copy()
     d = ImageDraw.Draw(im)
     brand_row(im, 80, 70, size=56)
-    pill(im, (80, 150), demo_note(), font("body", 24), MUTED, PLATE)
+    pill(im, (80, 150), demo_note(), font("body", 21), MUTED, PLATE)
     hf = font("black", 74)
     y = 225
-    lines = wrap(sc.caption, hf, w - 180)[:3]
+    lines = wrap(sc.head or sc.caption, hf, w - 180)[:2]
     d.rectangle([60, y + 8, 70, y + 8 + len(lines) * 72 - 12], fill=TONE.get(sc.tone, TONE["act"]))
     for ln in lines:
         draw_text(d, (90, y), ln, hf, INK)
@@ -720,15 +802,19 @@ def _vpanel(sc: Any, sub: str, size: tuple[int, int]) -> Image.Image:
 # --- encode
 def render_segment(shot: Shot, out: Path, size: tuple[int, int], audio: Path | None, prev_last: Path | None,
                    renderer: Renderer, last_png: Path) -> None:
-    """Pipe 60 fps frames into ffmpeg (H.264, CRF 18) with the scene's voice-over; save the last frame for the next crossfade."""
+    """Pipe 30 fps frames into ffmpeg (H.264 veryfast, CRF 20) with the scene's voice-over, which starts LEAD s after
+    the cut; save the last frame for the next crossfade."""
     n = int(round(shot.dur * FPS))
     a_in = ["-i", str(audio)] if audio else ["-f", "lavfi", "-t", f"{shot.dur:.3f}", "-i", "anullsrc=r=48000:cl=stereo"]
     fade_out = max(0.0, shot.dur - 0.12)
+    delay = int(LEAD * 1000) if audio else 0
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{size[0]}x{size[1]}", "-r", str(FPS), "-i", "-",
-           *a_in, "-filter_complex", f"[1:a]aresample=48000,apad=whole_dur={shot.dur:.3f},afade=t=in:d=0.04,afade=t=out:st={fade_out:.3f}:d=0.12[a]",
+           *a_in, "-filter_complex",
+           f"[1:a]aresample=48000,aformat=channel_layouts=stereo,adelay={delay}|{delay},apad=whole_dur={shot.dur:.3f},"
+           f"afade=t=in:d=0.04,afade=t=out:st={fade_out:.3f}:d=0.12[a]",
            "-map", "0:v", "-map", "[a]", "-t", f"{shot.dur:.3f}",
-           "-c:v", "libx264", "-preset", "veryfast", "-crf", "18", "-pix_fmt", "yuv420p", "-r", str(FPS), "-g", str(FPS * 2),
-           "-c:a", "aac", "-b:a", "160k", "-ar", "48000", "-ac", "2", str(out) + ".part.mp4"]
+           "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p", "-r", str(FPS), "-g", str(FPS * 2),
+           "-c:a", "pcm_s16le", "-ar", "48000", "-ac", "2", str(out) + ".part.mkv"]
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     assert p.stdin is not None
     prev = Image.open(prev_last).convert("RGB").resize(size) if prev_last and prev_last.exists() else None
@@ -743,7 +829,7 @@ def render_segment(shot: Shot, out: Path, size: tuple[int, int], audio: Path | N
     p.stdin.close()
     if p.wait() != 0:
         raise SystemExit(f"ffmpeg failed on {out.name}")
-    os.replace(str(out) + ".part.mp4", out)
+    os.replace(str(out) + ".part.mkv", out)
     if last is not None:
         last.save(last_png)
 
@@ -849,9 +935,9 @@ def run_scene(rec: Recorder, key: str, length: float, actions: Callable[[Callabl
 LIVE_MS = 240_000  # live Meta answers take up to a couple of minutes; the wait is cut from the clip (Recorder.cut)
 
 # --- what each recorded scene does (scene clock in seconds; lengths come from the voice-over)
-GROUPS = {"motor": ["intro", "progress", "question", "diagnosis", "parts"],
-          "steps": ["preflight", "check_fail", "check_pass", "handsfree", "replan", "agent", "handoff"],
-          "other": ["live", "rice", "diagram"]}
+GROUPS = {"motor": ["home", "capture", "progress", "diagnosis", "parts"],
+          "steps": ["preflight", "steps", "check_fail", "check_pass", "replan", "handoff"],
+          "other": ["diagram", "rice", "tyre"]}
 
 
 def capture(group: str, lengths: dict[str, float]) -> None:
@@ -870,8 +956,6 @@ def capture(group: str, lengths: dict[str, float]) -> None:
     dark = Path(tempfile.mkdtemp()) / "dark.jpg"
     dark.write_bytes(_dark_photo("motor"))
     args = ["--no-proxy-server", "--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"]
-    if group == "other":
-        args.append(f"--use-file-for-fake-video-capture={mda._fake_camera_y4m(FIX / 'sample_pump_overview.jpg')}")
     with sync_playwright() as p:
         b = p.chromium.launch(executable_path=mda._chromium(), args=args)
         ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, locale="id-ID",
@@ -888,6 +972,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
         pg = ctx.new_page()
         mda._console_watch(pg, page_errors)
         recorder = Recorder(ctx, pg)
+        rec_now = recorder.now
 
         def scroll_to(sel: str, off: int = -80, ms: int = 900) -> None:
             pg.evaluate("([s, o, ms]) => { const el = document.querySelector(s); const y = el.getBoundingClientRect().top + scrollY + o;"
@@ -939,24 +1024,28 @@ def capture(group: str, lengths: dict[str, float]) -> None:
             logo = pg.locator(".brand .plate").first
             logo.screenshot(path=str(CLIPS / "logo.png"))
 
-            def intro(at: Callable[[float], None]) -> None:
-                if rec:  # the form, then down to the samples: the recording starts from the motorbike sample
-                    at(0.6)
-                    scroll_to("#photoBox", -70, 1000)
-                    at(2.4)
-                    scroll_to('button.sample[data-sample="motor"]', -520, 1200)
-                    return
-                at(0.6)
-                scroll_to("#photoBox", -70, 1000)
-                at(1.8)
+            def home(at: Callable[[float], None]) -> None:
+                # the first screen, then a slow scroll to the photo box and the language chips
+                at(1.2)
+                scroll_to("#photoBox", -260, 1600)
+
+            def capture_(at: Callable[[float], None]) -> None:
+                # pick the photo and type the problem like an owner would; nothing is sent here (the next scene
+                # plays the recorded 1-tap demo of this same photo)
+                at(0.3)
+                scroll_to("#photoBox", -70, 800)
+                at(1.2)
                 pg.set_input_files("#photo", str(FIX / "sample_motor_plug_area.jpg"))
-                at(2.5)
+                at(2.0)
                 pg.click('#cats button[data-cat="motor"]')
-                at(2.9)
-                scroll_to("#text", -540, 800)
+                at(2.5)
+                scroll_to("#text", -520, 800)
                 pg.click("#text")
-                pg.keyboard.type("Motor saya Honda Beat susah hidup, distarter cuma bunyi.", delay=34)
+                pg.keyboard.type("Motor saya susah hidup, distarter cuma bunyi.", delay=40)
                 pg.evaluate("document.activeElement && document.activeElement.blur()")
+                if rec:
+                    at(max(rec_now() + 0.3, lengths["capture"] - 1.6))
+                    scroll_to('button.sample[data-sample="motor"]', -520, 1000)
 
             def progress(at: Callable[[float], None]) -> None:
                 at(0.3)
@@ -970,18 +1059,10 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 pg.wait_for_timeout(700)
                 scroll_by(330, 1100)
 
-            def question(at: Callable[[float], None]) -> None:
-                recorder.cut(lambda: pg.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=LIVE_MS))
-                if not pg.is_visible("#question"):
-                    raise SystemExit("this live run did not ask a follow-up question: run `capture motor` again")
-                scroll_to("#question", -120, 700)
-                at(1.6)
-                pg.click("#answerText")
-                pg.keyboard.type(mda.ANSWER, delay=110)
-
             def diagnosis(at: Callable[[float], None]) -> None:
-                at(0.3)
-                pg.click("#answerBtn")
+                if pg.is_visible("#question"):  # a recording that asked its follow-up: answer it like the owner did
+                    pg.fill("#answerText", mda.ANSWER)
+                    pg.click("#answerBtn")
                 recorder.cut(lambda: pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS))
                 pg.evaluate("window.scrollTo(0, 0)")
                 recorder.mark("result")
@@ -992,7 +1073,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 at(0.2)
                 scroll_to("#partsWrap", -96, 1100)
 
-            plan = {"intro": intro, "progress": progress, "question": question, "diagnosis": diagnosis, "parts": parts}
+            plan = {"home": home, "capture": capture_, "progress": progress, "diagnosis": diagnosis, "parts": parts}
             for key in GROUPS["motor"]:
                 run_scene(recorder, key, lengths[key], plan[key])
             src = pg.evaluate("document.querySelector('#partsImg') && document.querySelector('#partsImg').src")
@@ -1010,9 +1091,15 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 at(0.2)
                 scroll_to("#preflight", -90, 1000)
                 at(1.6)
-                tick_all(700)
-                at(3.6)
+                tick_all(600)
+
+            def steps(at: Callable[[float], None]) -> None:
+                at(0.2)
                 scroll_to("#stepCard", -70, 1000)
+                at(2.6)
+                pg.click("#nextBtn")
+                at(4.4)
+                pg.click("#prevBtn")
 
             def check_fail(at: Callable[[float], None]) -> None:
                 at(0.6)
@@ -1044,17 +1131,7 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 recorder.cut(upload_and_check)
                 recorder.mark("pass")
 
-            def handsfree(at: Callable[[float], None]) -> None:
-                at(0.8)
-                scroll_to("#handsFree", -420, 900)
-                at(2.0)
-                pg.click("#handsFree")
-                pg.wait_for_selector("#voiceBar:not(.hidden)", timeout=5000)
-                at(3.4)
-                scroll_to("#voiceBar", -380, 900)
-
             def replan(at: Callable[[float], None]) -> None:
-                pg.uncheck("#handsFree")
                 at(0.3)
                 scroll_to("#stuckText", -300, 1000)
                 at(1.5)
@@ -1068,12 +1145,6 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 at(4.6)
                 scroll_top(1200)
 
-            def agent(at: Callable[[float], None]) -> None:
-                at(0.2)
-                scroll_to("#agent", -70, 1200)
-                at(2.4)
-                scroll_by(520, 4200)
-
             def handoff(at: Callable[[float], None]) -> None:
                 at(0.2)
                 scroll_to("#mechBtn", -420, 1200)
@@ -1086,8 +1157,8 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 at(5.6)
                 scroll_by(320, 2200)
 
-            plan = {"preflight": preflight, "check_fail": check_fail, "check_pass": check_pass, "handsfree": handsfree,
-                    "replan": replan, "agent": agent, "handoff": handoff}
+            plan = {"preflight": preflight, "steps": steps, "check_fail": check_fail, "check_pass": check_pass,
+                    "replan": replan, "handoff": handoff}
             for key in GROUPS["steps"]:
                 if key == "check_pass":  # the after-photo shows the plug cap pushed back on: check it on that step
                     go_to_step(mda.sample_step_n(pg, "motor"))
@@ -1097,32 +1168,9 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                     pg.wait_for_timeout(400)
                 run_scene(recorder, key, lengths[key], plan[key])
 
-        else:  # live camera on the pump, red stop on the rice cooker, the Muse Image diagram on the faucet
+        else:  # the Muse Image diagram on the faucet (en), the red stop on the rice cooker (id), the tyre in Basa Jawa
             # DEMO_ONLY=diagram (comma list) re-records only those scenes of this group, so one bad take costs one scene
             only = {k.strip() for k in os.environ.get("DEMO_ONLY", "").split(",") if k.strip()} or set(GROUPS["other"])
-
-            def setup_live() -> None:
-                settings.mock_pace_s = 0.0
-                if rec:  # a pump repair recorded on the live API; the camera guide itself runs live
-                    mda.open_recorded(pg, origin, mda.recorded_session("pump", "id"), "id")
-                else:
-                    pg.goto(base + "/")
-                    pg.click('button.sample[data-sample="pump"]')
-                    pg.wait_for_selector("#result:not(.hidden)", timeout=LIVE_MS)
-                for box in pg.locator("#preList input").all():
-                    box.check()
-                go_to_step(mda.live_step_n(pg))  # aim the live guide at the pump's electric motor (or the pump body)
-                pg.evaluate("document.querySelector('#stepCard').scrollIntoView({block: 'start'}); window.scrollBy(0, -70)")
-                settings.mock_pace_s = 0.6
-
-            def live(at: Callable[[float], None]) -> None:
-                at(0.3)
-                scroll_to("#liveBtn", -120, 900)
-                at(1.6)
-                pg.click("#liveBtn")
-                pg.wait_for_selector("#live:not(.hidden)")
-                at(2.4)
-                scroll_to("#liveBtn", -90, 700)
 
             def rice(at: Callable[[float], None]) -> None:
                 settings.mock_pace_s = 0.35
@@ -1148,15 +1196,13 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 pg.wait_for_timeout(300)
                 scroll_to("#stepCard", -70, 700)
 
-            if "live" in only:
-                setup_live()
-                run_scene(recorder, "live", lengths["live"], live)
-                pg.click("#liveClose")
-            if "rice" in only:
-                pg.goto(origin + "/")
-                pg.evaluate("document.querySelector('button.sample[data-sample=\"rice\"]').scrollIntoView({block: 'center'})")
-                pg.wait_for_timeout(400)
-                run_scene(recorder, "rice", lengths["rice"], rice)
+            def tyre(at: Callable[[float], None]) -> None:
+                # the Basa Jawa tyre repair: the result, then down to the parts on the photo and the first step
+                at(1.6)
+                scroll_to("#partsWrap", -96, 1400)
+                at(max(rec_now() + 0.3, lengths["tyre"] * 0.55))
+                scroll_to("#preflight", -90, 1400)
+
             if "diagram" in only:  # the English faucet repair, where Muse Image draws the washer swap
                 settings.mock_pace_s = 0.0
                 if rec:
@@ -1168,6 +1214,19 @@ def capture(group: str, lengths: dict[str, float]) -> None:
                 settings.mock_pace_s = 0.6
                 pg.evaluate("window.scrollTo(0, 0)")
                 run_scene(recorder, "diagram", lengths["diagram"], diagram)
+            if "rice" in only:
+                pg.goto(origin + "/")
+                pg.select_option("#lang", "id")
+                pg.evaluate("document.querySelector('button.sample[data-sample=\"rice\"]').scrollIntoView({block: 'center'})")
+                pg.wait_for_timeout(400)
+                run_scene(recorder, "rice", lengths["rice"], rice)
+            if "tyre" in only:
+                if not rec:
+                    raise SystemExit("the tyre scene plays the recorded Basa Jawa session: set DEMO_RECORDED_DATA")
+                mda.open_recorded(pg, origin, mda.recorded_session("tire", "jv"), "jv")
+                pg.evaluate("window.scrollTo(0, 0)")
+                pg.wait_for_timeout(500)
+                run_scene(recorder, "tyre", lengths["tyre"], tyre)
         b.close()
     srv.should_exit = True
     if rec:

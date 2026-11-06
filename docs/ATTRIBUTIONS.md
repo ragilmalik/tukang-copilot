@@ -31,6 +31,20 @@ Barlow and Barlow Condensed by Jeremy Tribby, SIL Open Font License 1.1 (https:/
 The UI icons are Lucide 1.66.0 (https://lucide.dev), ISC licence, with a few icons from Feather (MIT). `web/app.js` carries the path data for the 52 icons it uses and draws them as inline SVG; the licence text is in `web/vendor/lucide-LICENSE.txt`. The UI strings still contain emoji because the PDF, the WhatsApp text and the share text reuse them, but on screen each one is swapped for its Lucide icon.
 
 ## Assets
-I don't bundle any third-party images or music. The sample photos (`samples/*.jpg` and `api/tests/fixtures/sample_*.jpg`) are AI-generated with an image model, prompted for a phone shot of each broken thing; they are not real repairs, and each copy carries a "Sample photo (AI-generated), offline sample mode" tag on the picture and in its EXIF (`scripts/make_fixtures.py`). The part outlines on them are drawn by hand in `api/pipeline/sample_masks.json`. `docs/img/*` is drawn by my own code. The demo video and screenshots are mine (Ragil Artza Rozaksyah).
+The app bundles no third-party images or music. The sample photos (`samples/*.jpg` and `api/tests/fixtures/sample_*.jpg`) are AI-generated with an image model, prompted for a phone shot of each broken thing; they are not real repairs, and each copy carries a "Sample photo (AI-generated), offline sample mode" tag on the picture and in its EXIF (`scripts/make_fixtures.py`). The part outlines on them are drawn by hand in `api/pipeline/sample_masks.json`. `docs/img/*` is drawn by my own code. The demo video and screenshots are mine (Ragil Artza Rozaksyah). The people-and-home stills in the video and the
+marketing images (`docs/launch/broll/`, `docs/launch/scenes/`) are AI-generated from my prompts and say "AI-generated
+scene" while on screen.
+
+## Music in the demo video and the vertical clip
+- Title: "Lucky Acoustic"
+- Artist: Jesse Keller
+- Source: https://www.jamendo.com/track/1540859
+- Licence: CC BY 3.0, https://creativecommons.org/licenses/by/3.0/
+- Credit line (end card, YouTube description): Music: "Lucky Acoustic" by Jesse Keller (jamendo.com/track/1540859), licensed under CC BY 3.0
+- The audio file is not in this repo; the video build reads it from `DEMO_MUSIC`. I changed it only by mixing it under
+  the voice-over (level, a 3 dB cut at 2.5 kHz, ducking, fades), as CC BY 3.0 allows with this credit.
+- I read the licence from the Openverse record of the Jamendo track (ea4ef155-35a9-46bb-b136-4e4f8f2223d9); the
+  Jamendo page I fetched showed the credits but not the licence text. Check the licence on the Jamendo page again
+  before publishing the video anywhere new.
 
 The accessibility test (`api/tests/test_playwright_a11y.py`) runs axe-core (MPL-2.0, https://github.com/dequelabs/axe-core) from a local npm install. It is only used by the test and is not shipped with the app.

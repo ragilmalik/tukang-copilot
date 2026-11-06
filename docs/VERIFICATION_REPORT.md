@@ -14,7 +14,7 @@ Evidence names point to tests in `api/tests/` (TEST_REPORT.md has the run) or to
 | Fits a problem statement (Push the Frontier) | ✅ | README / SUBMISSION framing: understanding + repairing physical systems |
 | New work only, Oct 26 to Nov 4 | ✅ | First commit 2026-10-30 (9c2401d), public commit history; CHANGELOG |
 | Public repo, open license | ✅ | https://github.com/ragilmalik/tukang-copilot (public), MIT LICENSE |
-| 3-minute demo video | ✅ (file) / ⬜ (YouTube) | docs/demo/tukang-copilot-demo.mp4, 2:54 (1080p60): real Meta API answers recorded on a live run on 6 Nov 2026 and played back in the app, said on every frame; the live camera guide called SAM 3.1 live while filming. A real-phone recording (DEMO_SCRIPT.md) and the YouTube upload are still mine to do |
+| 3-minute demo video | ✅ (file) / ⬜ (YouTube) | docs/demo/tukang-copilot-demo.mp4, 2:25 (1080p30, re-made 6 Nov 2026): real Meta API answers recorded on a live run on 6 Nov 2026 and played back in the app, said on every phone frame; labelled AI-generated scenes for the people and homes; voice-over and music. A real-phone recording (DEMO_SCRIPT.md) and the YouTube upload are still mine to do |
 | No unlicensed assets | ✅ | ATTRIBUTIONS.md: Barlow (OFL) and Lucide (ISC) with their licences; the sample photos are AI-generated and labelled as such; diagrams drawn by my own code |
 | Avoid anti-projects (medical, basic RAG, simple image analyser, edu chatbot, politics) | ✅ | Medical blocked (`test_hard_stops[…luka berdarah…]`); multi-step agent with verification and re-plan, not one-shot analysis |
 

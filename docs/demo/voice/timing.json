@@ -1,4 +1,256 @@
 {
- "hook": 3.177,
- "wa": 3.293
+ "capture": [
+  [
+   0.0,
+   5.345,
+   "Pick a photo and say the problem, in Bahasa, Javanese or English."
+  ]
+ ],
+ "check_fail": [
+  [
+   0.0,
+   3.877,
+   "After a step, I send a photo and Muse Spark checks it."
+  ],
+  [
+   4.197,
+   6.401,
+   "Too dark, so it asks for another."
+  ]
+ ],
+ "check_pass": [
+  [
+   0.0,
+   2.879,
+   "A clear photo of the plug cap back on passes."
+  ]
+ ],
+ "close": [
+  [
+   0.0,
+   2.748,
+   "Tukang Copilot is open source."
+  ],
+  [
+   3.068,
+   5.359,
+   "The code is on GitHub, at the link below."
+  ]
+ ],
+ "diagnosis": [
+  [
+   0.0,
+   6.127,
+   "Then the likely cause, how sure it is, and the parts cost next to the bengkel price."
+  ]
+ ],
+ "diagram": [
+  [
+   0.0,
+   3.963,
+   "When a photo can't show a step, Muse Image draws a diagram."
+  ]
+ ],
+ "handoff": [
+  [
+   0.0,
+   1.099,
+   "A job for a pro?"
+  ],
+  [
+   1.419,
+   6.052,
+   "One tap hands it to a bengkel, with a WhatsApp summary and a PDF."
+  ]
+ ],
+ "home": [
+  [
+   0.0,
+   7.74,
+   "From here on, every phone screen is real output from Meta's models, recorded on a live run on November sixth."
+  ]
+ ],
+ "hook": [
+  [
+   0.0,
+   5.396,
+   "“Oh no, the water pump died again. The tub is empty.”"
+  ],
+  [
+   5.846,
+   8.982,
+   "When the water pump stops, the whole house waits."
+  ]
+ ],
+ "parts": [
+  [
+   0.0,
+   5.524,
+   "SAM 3.1 outlines the real parts on your own photo and numbers them."
+  ]
+ ],
+ "preflight": [
+  [
+   0.0,
+   2.103,
+   "A short safety list comes first."
+  ],
+  [
+   2.423,
+   5.578,
+   "The steps stay locked until every box is ticked."
+  ]
+ ],
+ "problem": [
+  [
+   0.0,
+   4.39,
+   "Or the motorbike won't start, and the bengkel down the road is closed."
+  ]
+ ],
+ "progress": [
+  [
+   0.0,
+   3.468,
+   "The one-tap demo replays that run on this same photo."
+  ],
+  [
+   3.788,
+   7.011,
+   "Results show up as each model finishes."
+  ]
+ ],
+ "promise": [
+  [
+   0.0,
+   1.784,
+   "So I built Tukang Copilot."
+  ],
+  [
+   2.104,
+   7.232,
+   "Take a photo, say what's wrong, and it finds the part and walks you through the fix."
+  ]
+ ],
+ "proof": [
+  [
+   0.0,
+   9.165,
+   "On the live API, with my earlier sample photos, a repair took a median of 83 seconds and about 4 US cents."
+  ],
+  [
+   9.485,
+   16.863,
+   "It stopped all 33 dangerous test cases, with no false stops on 17 everyday jobs."
+  ]
+ ],
+ "replan": [
+  [
+   0.0,
+   0.832,
+   "Still broken?"
+  ],
+  [
+   1.152,
+   3.999,
+   "It plans again around the next likely cause."
+  ]
+ ],
+ "rice": [
+  [
+   0.0,
+   7.082,
+   "A rice cooker that won't heat means 220-volt parts inside, so it stops and sends you to a service centre."
+  ]
+ ],
+ "rice_broll": [
+  [
+   0.0,
+   1.917,
+   "It also knows when to say no."
+  ]
+ ],
+ "steps": [
+  [
+   0.0,
+   1.793,
+   "Then it goes one step at a time."
+  ]
+ ],
+ "tyre": [
+  [
+   0.0,
+   1.749,
+   "It answers in Javanese too."
+  ]
+ ],
+ "tyre_broll": [
+  [
+   0.0,
+   2.496,
+   "“My bike tyre is flat, there's a nail stuck in it.”"
+  ]
+ ],
+ "v_check": [
+  [
+   0.0,
+   2.763,
+   "Then it checks every step from a new photo."
+  ]
+ ],
+ "v_close": [
+  [
+   0.0,
+   2.451,
+   "Real recorded output from Meta's models."
+  ],
+  [
+   2.771,
+   4.188,
+   "The code is on GitHub."
+  ]
+ ],
+ "v_hook": [
+  [
+   0.0,
+   3.051,
+   "“Oh no, the water pump died again.”"
+  ],
+  [
+   3.501,
+   4.09,
+   "Pump dead?"
+  ],
+  [
+   4.41,
+   5.356,
+   "Bike won't start?"
+  ],
+  [
+   5.676,
+   7.815,
+   "Take a photo and say what's wrong."
+  ]
+ ],
+ "v_parts": [
+  [
+   0.0,
+   5.135,
+   "Tukang Copilot finds the likely cause and outlines the parts on your photo."
+  ]
+ ],
+ "v_stop": [
+  [
+   0.0,
+   2.635,
+   "If the job is dangerous, it stops."
+  ]
+ ],
+ "v_tyre": [
+  [
+   0.0,
+   2.953,
+   "In Bahasa, Javanese or English."
+  ]
+ ]
 }

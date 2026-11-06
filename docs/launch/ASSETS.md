@@ -37,12 +37,21 @@ answers, shown exactly as the screenshot captured them, never typed by hand.
 |---|---|
 | "Photo in. Steps out." | README.md lines 3-5: you point the phone at something broken, the app works out the fault and plans the fix, then checks each step |
 | "Snap the engine. See the parts marked." | README.md line 4: "outlines the exact part on *your* photo (SAM 3.1)"; the screen shows 5 parts numbered by SAM 3.1 on the 1-tap demo photo |
-| "It knows when to stop." | README.md lines 5-6: "tells you to STOP when the job is dangerous"; the screen is the rice cooker red stop from a live session (docs/demo/README.md lines 15-16, docs/demo/screenshots/INDEX.md line 24) |
+| "It knows when to stop." | README.md lines 5-6: "tells you to STOP when the job is dangerous"; the screen is the rice cooker red stop from a live session (docs/demo/README.md, "Where the answers come from", docs/demo/screenshots/INDEX.md line 24) |
 | "Answers in Basa Jawa." | README.md lines 3-4 (Bahasa Indonesia, Javanese or English) and line 79 (`?lang=jv`); the screen is a live tyre session answered in Basa Jawa (docs/demo/screenshots/INDEX.md line 32) |
-| "Real app screen" | The screenshots named in the table above, made by `scripts/make_demo_assets.py shots` and `scripts/make_screenshots.py` from Meta API answers recorded on live runs (docs/demo/README.md lines 9-16) |
+| "Real app screen" | The screenshots named in the table above, made by `scripts/make_demo_assets.py shots` and `scripts/make_screenshots.py` from Meta API answers recorded on live runs (docs/demo/README.md, "Where the answers come from") |
 | "AI-generated scene" | This file: every scene came from an image model |
-| 75% (pump), 85% (motorbike), 88% (tyre) on the screens | Recorded live answers on 6 Nov 2026 (CHANGELOG.md line 7 for the 1-tap demo's 85 to 88%; the pump and tyre sessions are the recorded live sessions in docs/demo/README.md lines 15-16) |
-| "Demo rekaman" badge (cover screen) | The app marks the recorded 1-tap demo (docs/demo/README.md lines 12-14) |
+| 75% (pump), 85% (motorbike), 88% (tyre) on the screens | Recorded live answers on 6 Nov 2026 (CHANGELOG.md line 7 for the 1-tap demo's 85 to 88%; the pump and tyre sessions are the recorded live sessions in docs/demo/README.md, "Where the answers come from") |
+| "Demo rekaman" badge (cover screen) | The app marks the recorded 1-tap demo (docs/demo/README.md, "Where the answers come from") |
 
 If the sample photos or recordings change, re-take the screenshots first and then re-run the script, so a screen never
 shows answers from a different photo than the one on it.
+
+## Video and vertical clip
+
+The film (`docs/demo/tukang-copilot-demo.mp4`) and the vertical clip use the five stills in `broll/` and two scenes
+from `scenes/` (the motorbike scene as the "promise" shot and the tyre scene before the Basa Jawa repair), with the real
+screenshot warped onto the phone the same way as the images above (`scene_still` in scripts/demo_video.py). Every one
+of them carries "AI-generated scene" while it is on screen; the two with a phone add "real app screen on the phone".
+The numbers on the proof card and their sources are in docs/demo/README.md ("How the film is made"); a test
+(`test_proof_numbers_match_the_reports`) checks each against docs/EVAL.md and docs/TEST_REPORT.md.

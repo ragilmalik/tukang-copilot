@@ -1,5 +1,6 @@
-"""Demo video: under the 3:00 limit, opens on the hook title card with the hackathon line, shows the Muse Image
-diagram step, and the scene timestamps are written for the docs."""
+"""Demo film: opens on a real problem (a labelled AI-generated scene), shows the app on recorded screens, ends on the
+measured numbers and the repo link; the vertical clip has voice and music; captions, timestamps and the music credit
+are written for the docs."""
 import json
 import shutil
 import subprocess
@@ -14,63 +15,101 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import make_demo_assets as mda  # type: ignore[import-not-found]  # noqa: E402
 
 
-def _dur(p: Path) -> float:
+def _probe(p: Path) -> dict:
     # A missing file used to surface as KeyError: 'format' (CI on a commit without the MP4s); say what is wrong instead.
     assert p.is_file(), f"{p.relative_to(ROOT)} is missing: commit the rendered video (scripts/make_demo_assets.py video)"
-    r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "json", str(p)], capture_output=True, text=True)
-    return float(json.loads(r.stdout)["format"]["duration"])
+    r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration:stream=codec_name,width,height,r_frame_rate",
+                        "-of", "json", str(p)], capture_output=True, text=True)
+    return json.loads(r.stdout)
 
 
-def test_title_card_first_with_hackathon_line_and_diagram_scene():
-    first = mda.SCENES[0]
-    assert first.key == "title" and first.min_s == 3 and "Fix it yourself, safely. In Javanese." in first.image
-    assert "Built during the Meta AI Developer Hackathon, Oct 26 to Nov 4, 2026" in first.image
+def test_film_opens_on_the_problem_and_ends_on_the_repo():
     keys = [s.key for s in mda.SCENES]
-    assert "diagram" in keys and next(s for s in mda.SCENES if s.key == "diagram").image == "28_diagram_step"
-    assert (DEMO / "screenshots" / "28_diagram_step.png").exists() and (DEMO / "screenshots" / "29_laptop.png").exists()
-    for rec in (False, True):
-        assert all("image analy" not in (s.caption + s.say).lower() for s in mda.scenes(rec))
+    first = mda.SCENES[0]
+    assert first.key == "hook" and first.image.startswith("broll:") and first.pre[1] and first.pre_en
+    assert keys[-2:] == ["proof", "close"] and mda.REPO_URL == "github.com/ragilmalik/tukang-copilot"
+    # one workflow end to end, in this order
+    flow = ["home", "capture", "progress", "diagnosis", "parts", "preflight", "steps", "check_fail", "check_pass",
+            "replan", "handoff", "diagram", "rice", "tyre"]
+    assert [k for k in keys if k in flow] == flow
+    # no hackathon framing, no screens from the previous photo set
+    text = " ".join(s.caption + s.say + s.image + s.head for s in mda.SCENES + mda.VSCENES).lower()
+    assert "hackathon" not in text
+    for old in ("03_question", "16_live_guide", "30_whatsapp"):
+        assert old not in text
+    assert "question" not in keys and "live" not in keys
+
+
+def test_ai_scenes_are_labelled_and_exist():
+    import demo_video as dv
+
+    assert dv.SCENE_TAG == "AI-generated scene"
+    for s in mda.SCENES + mda.VSCENES:
+        kind, _, ref = s.image.partition(":")
+        if kind == "broll":
+            assert (ROOT / ref).is_file(), ref
+        if kind == "still":
+            assert ref in ("cover", "poster-vertical", "thumbnail", "square"), ref
+    # the intro says plainly that the screens are recorded Meta API output
+    home = next(s for s in mda.SCENES if s.key == "home")
+    assert "real output from Meta's models, recorded on a live run" in home.say
+
+
+def test_proof_numbers_match_the_reports():
+    """Every number on the proof card is in the report it names."""
+    ev = (ROOT / "docs" / "EVAL.md").read_text(encoding="utf-8")
+    tr = (ROOT / "docs" / "TEST_REPORT.md").read_text(encoding="utf-8")
+    assert "83492.4" in ev and "$0.0437" in ev                     # median latency and cost, live column
+    assert "23/23 (100%)" in ev and "10/10 (100%)" in ev           # 23 + 10 = 33 dangerous cases stopped
+    assert "0 of 17 safe cases stopped" in ev
+    assert "1096 passed, 0 failed, 0 skipped" in tr
+    nums = [n for n, _ in mda.PROOF]
+    assert nums == ["83 s", "$0.044", "33 / 33", "0 / 17", "1,096"]
+    assert "earlier set" in mda.PROOF_NOTE and "earlier sample photos" in next(s for s in mda.SCENES if s.key == "proof").say
 
 
 def test_captions_split_into_short_sentences():
-    for rec in (False, True):
-        for s in mda.scenes(rec):
-            for sent in mda._sentences(s.say):
-                assert len(sent) <= 140, sent
+    for s in mda.SCENES + mda.VSCENES:
+        for sent in mda._sentences(s.say):
+            assert len(sent) <= 140, sent
 
 
-def test_intro_says_where_the_answers_come_from():
-    """Live filming says the answers are live; played-back answers are called recorded, never live."""
-    live = next(s for s in mda.scenes(False) if s.key == "intro").say
-    rec = next(s for s in mda.scenes(True) if s.key == "intro").say
-    assert "live from Meta's models" in live
-    assert "recorded on a live run" in rec and "live from" not in rec
-    assert next(s for s in mda.SCENES if s.key == "intro").say == ""  # only scenes() gives the line, so no mode is forgotten
+def test_spoken_forms_only_change_the_voice():
+    assert mda._spoken("about $0.044") == "about four point four cents"
+    assert "one thousand" in mda._spoken("1,096 automated tests")
+
+
+def test_music_credit_everywhere():
+    credit = mda.MUSIC_CREDIT
+    assert "Lucky Acoustic" in credit and "Jesse Keller" in credit and "CC BY 3.0" in credit
+    for doc in (DEMO / "README.md", ROOT / "docs" / "ATTRIBUTIONS.md", ROOT / "docs" / "launch" / "YOUTUBE.md"):
+        body = doc.read_text(encoding="utf-8")
+        assert "Lucky Acoustic" in body and "1540859" in body and "creativecommons.org/licenses/by/3.0" in body, doc.name
+    assert "Lucky Acoustic" in (DEMO / "TIMESTAMPS.txt").read_text(encoding="utf-8")
 
 
 @pytest.mark.skipif(not shutil.which("ffprobe"), reason="ffprobe not installed")
 def test_videos_fit_the_limits_and_timestamps_match():
-    main = _dur(DEMO / "tukang-copilot-demo.mp4")
-    assert 150 < main < 180                                                 # hackathon limit is 3:00
-    assert 35 < _dur(DEMO / "tukang-copilot-x-vertical.mp4") <= 46
+    main = _probe(DEMO / "tukang-copilot-demo.mp4")
+    dur = float(main["format"]["duration"])
+    assert 90 <= dur <= 150                                                  # 1:30 to 2:30
+    v = next(s for s in main["streams"] if s["codec_name"] == "h264")
+    assert (v["width"], v["height"]) == (1920, 1080)
+    assert any(s["codec_name"] == "aac" for s in main["streams"])
+    vert = _probe(DEMO / "tukang-copilot-x-vertical.mp4")
+    vd = float(vert["format"]["duration"])
+    assert 30 <= vd <= 45
+    vv = next(s for s in vert["streams"] if s["codec_name"] == "h264")
+    assert (vv["width"], vv["height"]) == (1080, 1920)
+    assert any(s["codec_name"] == "aac" for s in vert["streams"])           # voice and music this time
     ts = (DEMO / "TIMESTAMPS.txt").read_text(encoding="utf-8")
-    assert "0:00  title" in ts and "diagram" in ts and f"{main:.1f} s" in ts
+    assert "0:00  hook" in ts and "  proof " in ts and f"{dur:.1f} s" in ts
     srt = (DEMO / "tukang-copilot-demo.en.srt").read_text(encoding="utf-8")
-    assert "Muse Image draws a diagram" in srt
-
-
-def test_whatsapp_scene_in_javanese_with_its_screenshots():
-    """A ~12 s WhatsApp scene (simulator, Basa Jawa): marked photo + diagnosis, step buttons, red stop."""
-    sc = next(s for s in mda.SCENES if s.key == "wa")
-    names = sc.image[3:].split(",")
-    assert sc.image.startswith("wa:") and names == ["30_whatsapp_jv_diagnosis", "30_whatsapp_jv_steps", "30_whatsapp_jv_redstop"]
-    for n in mda.WA_SHOTS:
-        assert (DEMO / "screenshots" / f"{n}.png").exists(), n
-    assert "WhatsApp" in sc.caption and "Basa Jawa" in sc.caption and "red stop" in sc.say
-    keys = [s.key for s in mda.SCENES]
-    assert keys.index("rice") < keys.index("wa") < keys.index("arch")
-    assert "  wa " in (DEMO / "TIMESTAMPS.txt").read_text(encoding="utf-8")
-    assert "30_whatsapp_jv_diagnosis" in mda.GIF_SHOTS
+    assert "Muse Image draws a diagram" in srt and "recorded on a live run" in srt
+    for f in DEMO.glob("*.mp4"):
+        assert f.stat().st_size < 100 * 1024 * 1024, f.name                # GitHub refuses files over 100 MB
+    gif = DEMO / "hero.gif"
+    assert gif.stat().st_size < 3 * 1024 * 1024
 
 
 def test_open_recorded_uses_the_sessions_owner_token(tmp_path, monkeypatch):

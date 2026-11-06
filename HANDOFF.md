@@ -18,7 +18,7 @@ Step by step: [docs/TUTORIAL.md](docs/TUTORIAL.md). Every setting: [docs/SETUP.m
 
 ## Real vs sample
 
-- **Real:** live mode answers, the recorded 1-tap demo (a live run from 6 Nov 2026), the live column of [docs/EVAL.md](docs/EVAL.md), [docs/LIVE_RUN.md](docs/LIVE_RUN.md), and the screenshots and video (real answers recorded on live runs and played back; the live camera guide ran live while filming).
+- **Real:** live mode answers, the recorded 1-tap demo (a live run from 6 Nov 2026), the live column of [docs/EVAL.md](docs/EVAL.md), [docs/LIVE_RUN.md](docs/LIVE_RUN.md), and the screenshots, video and GIF (real answers recorded on the live run of 6 Nov 2026 and played back; only the `16_live_guide` screenshot called SAM 3.1 live). The video opens on AI-generated scenes, labelled on screen; how it is built and measured is in [docs/demo/README.md](docs/demo/README.md).
 - **Sample:** the photos in `samples/` are AI-generated and say so on the image. Offline mode answers are pre-written. Prices are estimates.
 - **Not measured:** real owner trials.
 

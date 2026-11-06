@@ -68,14 +68,14 @@ The public vote is open, and one vote from you would help a lot:
 Try it free, no sign-up: [LIVE_URL]
 ```
 
-### WhatsApp Status (short, with the 43.5 s clip)
+### WhatsApp Status (short, with the 31 s clip)
 - ID: `Motor mogok, bengkel tutup? Aplikasi AI buatan saya masuk lomba Meta. Bantu 1 vote ya 🙏 [VOTE_URL]`
 - JV: `Motor mogok, bengkel tutup? Aplikasi AI gaweanku melu lomba Meta. Tulung siji vote nggih 🙏 [VOTE_URL]`
 - EN: `My AI repair app is in Meta's hackathon public vote. One vote helps 🙏 [VOTE_URL]`
 
 ---
 
-## Instagram (feed post or Reel with the 43.5 s clip; link in bio, IG captions don't make links clickable)
+## Instagram (feed post or Reel with the 31 s clip; link in bio, IG captions don't make links clickable)
 
 ### Caption: Bahasa Indonesia + English
 ```
