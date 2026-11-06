@@ -6,7 +6,6 @@ import shutil
 import subprocess
 
 import pytest
-from fastapi.testclient import TestClient
 from PIL import Image
 
 from api.channels import wa_sim, wa_text
@@ -14,8 +13,9 @@ from api.channels import whatsapp as wa
 from api.main import app
 from api.pipeline import engine
 from api.tests.doubles import fake_graph as fg
+from api.tests.owner_auth import OwnerClient
 
-client = TestClient(app)
+client = OwnerClient(app)
 PHONE = "6281234567890"
 SECRET = "test-app-secret"
 VERIFY = "verify-me-123"

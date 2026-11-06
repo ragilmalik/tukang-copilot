@@ -135,7 +135,7 @@ async def send(request: Request, chat: str = Form(...), text: str = Form(default
     if sample and sample not in SAMPLES:
         raise HTTPException(400, "unknown sample")
     try:  # costs nothing in offline sample mode, but keeps one visitor from filling the disk
-        guard.check_rate("wasim:" + guard.client_key(request.headers.get("x-forwarded-for"), request.client.host if request.client else None),
+        guard.check_rate("wasim:" + guard.request_key(request.headers, request.client.host if request.client else None),
                          bucket="wasim", limit=settings.wa_sim_rate_per_hour)
     except guard.Blocked as b:
         raise HTTPException(429, "Too many messages", headers={"Retry-After": str(b.retry_after)})

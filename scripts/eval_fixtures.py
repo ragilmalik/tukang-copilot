@@ -43,6 +43,9 @@ def parts_rate(s: dict[str, Any]) -> tuple[int, int]:
     return sum(1 for p in parts.values() if p.get("found")), len(parts)
 
 
+OWNERS: dict[str, dict[str, str]] = {}  # session id -> owner header, as the phone keeps it
+
+
 def run_item(c: httpx.Client, d: Path, item: dict[str, Any]) -> dict[str, Any]:
     lang = "en" if item["file"].endswith("_en.jpg") or item["text"].startswith(("My ", "The ", "Rice cooker not")) else "id"
     t0 = time.time()
@@ -51,11 +54,13 @@ def run_item(c: httpx.Client, d: Path, item: dict[str, Any]) -> dict[str, Any]:
                    files=[("photos", (item["file"], f, "image/jpeg"))])
     r.raise_for_status()
     sid = r.json()["id"]
+    OWNERS[sid] = {"X-Owner-Token": str(r.json().get("owner_token") or "")}  # the answer and the step checks need it
     s = wait(c, sid)
     asked = False
     if s["status"] == "needs_answer":
         asked = True
-        c.post(f"/api/sessions/{sid}/answer", data={"text": "Tidak tahu, tolong lanjut." if lang == "id" else "Not sure, please continue."})
+        c.post(f"/api/sessions/{sid}/answer", data={"text": "Tidak tahu, tolong lanjut." if lang == "id" else "Not sure, please continue."},
+               headers=OWNERS[sid])
         s = wait(c, sid)
     found, total = parts_rate(s)
     cat = ((s.get("object_report") or {}).get("category") or "")
@@ -91,7 +96,8 @@ def run_step_checks(c: httpx.Client, d: Path, manifest: list[dict[str, Any]], se
         if item.get("role") != "step_check" or item["scenario"] not in sessions:
             continue
         with open(d / item["file"], "rb") as f:
-            r = c.post(f"/api/sessions/{sessions[item['scenario']]}/steps/1/check", files={"photo": ("c.jpg", f, "image/jpeg")})
+            sid = sessions[item["scenario"]]
+            r = c.post(f"/api/sessions/{sid}/steps/1/check", files={"photo": ("c.jpg", f, "image/jpeg")}, headers=OWNERS.get(sid, {}))
         j = r.json() if r.status_code == 200 else {}
         good = r.status_code == 200 and "passed" in j
         out.append({"file": item["file"], "scenario": item["scenario"], "http": r.status_code, "passed": j.get("passed"), "pass": good})

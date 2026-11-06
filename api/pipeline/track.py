@@ -27,6 +27,7 @@ from . import engine, mock
 
 log = logging.getLogger("tukang.track")
 _last: dict[str, float] = {}
+LAST_MAX = 500
 _lock = threading.Lock()
 MAX_POLY = 24
 
@@ -91,34 +92,57 @@ def _segment(frame: Path, phrase: str, seed: int) -> list[dict[str, Any]]:
 
 
 def track_step(sid: str, n: int, frame: Path) -> dict[str, Any]:
-    """Run SAM 3.1 on one live frame for step n's target part. Raises ValueError (no plan / no step) or TooFast."""
+    """Run SAM 3.1 on one live frame for step n's target part. Raises ValueError (no plan / no step) or TooFast.
+    The frame is reserved under the session lock without waiting: while a re-plan holds it the frame is refused
+    as TooFast (the phone simply sends the next one), and the reservation can no longer overwrite the new plan."""
     s = engine.load(sid)
     if not s.get("plan"):
         raise ValueError("no plan yet")
-    tgt = target(s, n)
-    tr = s.setdefault("track", {"frames": 0})
-    used = int(tr.get("frames", 0))
-    out: dict[str, Any] = {"step": n, "component_id": (tgt or {}).get("id"), "name": (tgt or {}).get("name", ""),
-                           "label": (tgt or {}).get("label"), "found": False, "boxes": [], "polygon": [],
-                           "frames_used": used, "frames_left": max(0, settings.max_track_frames - used),
-                           "limit_reached": used >= settings.max_track_frames, "mode": settings.mode}
-    if tgt is None or out["limit_reached"]:
-        return out
+    if s.get("status") not in engine.GUIDED:
+        raise ValueError("this repair is not on its steps right now")
+    with Image.open(frame) as im:  # an unreadable frame fails here (400) before it uses up a frame
+        w, h = im.size
     now = time.monotonic()
     with _lock:
         if now - _last.get(sid, 0.0) < settings.track_min_interval_s:
             raise TooFast()
         _last[sid] = now
-    tr["frames"] = used + 1  # reserve the frame before the (slow) call, so the cap holds under parallel requests
-    engine.save(s)
-    with Image.open(frame) as im:
-        w, h = im.size
+        if len(_last) > LAST_MAX:  # keep memory bounded on a long-running server
+            for k in [k for k, t in _last.items() if t < now - 600]:
+                del _last[k]
+    try:
+        with engine.locked(sid, wait=0):
+            s = engine.load(sid)
+            if s.get("status") not in engine.GUIDED:
+                raise ValueError("this repair is not on its steps right now")
+            tgt = target(s, n)
+            tr = s.setdefault("track", {"frames": 0})
+            used = int(tr.get("frames", 0))
+            out: dict[str, Any] = {"step": n, "component_id": (tgt or {}).get("id"), "name": (tgt or {}).get("name", ""),
+                                   "label": (tgt or {}).get("label"), "found": False, "boxes": [], "polygon": [],
+                                   "frames_used": used, "frames_left": max(0, settings.max_track_frames - used),
+                                   "limit_reached": used >= settings.max_track_frames, "mode": settings.mode}
+            if tgt is None or out["limit_reached"]:
+                return out
+            tr["frames"] = used + 1  # reserve the frame before the (slow) call, so the cap holds under parallel requests
+            engine.save(s)
+    except engine.Busy:
+        raise TooFast() from None
     meter = cost.Meter(settings.max_cost_usd)
     cost.use(meter)
     try:
         recs = _segment(frame, str(tgt["phrase"]), seed=used)
     finally:
         cost.use(None)
+        if meter.spent:
+            with engine.locked(sid, wait=None):
+                try:
+                    s = engine.load(sid)
+                except FileNotFoundError:
+                    s = {}  # erased meanwhile: nothing to bill
+                if s:
+                    engine._add_cost(s, meter)
+                    engine.save(s)
     recs = sorted(recs, key=lambda x: -(x.get("confidence") or 0))[:3]
     out["boxes"] = [{"x1": round(r["left"] / w, 4), "y1": round(r["top"] / h, 4), "x2": round(r["right"] / w, 4),
                      "y2": round(r["bottom"] / h, 4), "confidence": round(float(r.get("confidence") or 0), 3)} for r in recs]
@@ -127,17 +151,6 @@ def track_step(sid: str, n: int, frame: Path) -> dict[str, Any]:
     out["frames_used"] = used + 1
     out["frames_left"] = max(0, settings.max_track_frames - used - 1)
     out["limit_reached"] = out["frames_left"] == 0
-    if meter.spent:
-        s = engine.load(sid)  # reload: a step check may have written meanwhile
-        c = s.get("cost") or {"spent_usd": 0.0, "budget_usd": settings.max_cost_usd, "by_model": {}}
-        c["spent_usd"] = round(float(c.get("spent_usd", 0)) + meter.spent, 4)
-        bm = dict(c.get("by_model") or {})
-        for k, v in meter.items.items():
-            bm[k] = round(bm.get(k, 0) + v, 4)
-        c["by_model"] = bm
-        s["cost"] = c
-        s.setdefault("track", {})["frames"] = max(int(s.get("track", {}).get("frames", 0)), used + 1)
-        engine.save(s)
     return out
 
 

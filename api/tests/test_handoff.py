@@ -7,15 +7,15 @@ from typing import Any
 from urllib.parse import parse_qs, unquote, urlparse
 
 import pytest
-from fastapi.testclient import TestClient
 from PIL import Image
 
 from api import handoff
 from api.main import app
 from api.render import report_pdf
 from api.settings import settings
+from api.tests.owner_auth import OwnerClient
 
-client = TestClient(app)
+client = OwnerClient(app)
 WEB = Path(__file__).resolve().parents[2] / "web"
 SAMPLES = Path(__file__).resolve().parents[2] / "samples"
 
@@ -83,9 +83,13 @@ def test_red_stop_text(lang, hello, tried):
 def test_exhausted_lists_every_cause_tried():
     s = _sample("faucet", "en")
     sid = s["id"]
-    for _ in range(3):
+    for _ in s["diagnosis"]["causes"]:  # one "Still broken" per cause; the last one ends at "exhausted"
         j = client.post(f"/api/sessions/{sid}/replan", data={"report": "still dripping"}).json()
+        if j["status"] == "exhausted":
+            break
     assert j["status"] == "exhausted"
+    # since 1.32.0 a re-plan is only taken from a plan on screen: one more is refused, and no cause is listed twice
+    assert client.post(f"/api/sessions/{sid}/replan", data={"report": "still dripping"}).status_code == 409
     h = _ho(sid)
     assert h["reason"] == "exhausted" and h["title"] == "Time for a repair shop"
     for c in s["diagnosis"]["causes"]:

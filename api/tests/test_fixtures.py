@@ -5,16 +5,16 @@ import time
 from pathlib import Path
 
 import pytest
-from fastapi.testclient import TestClient
 from PIL import Image
 
 from api.main import app
 from api.pipeline.sample_masks import LABEL
+from api.tests.owner_auth import OwnerClient
 
 FIX = Path(__file__).parent / "fixtures"
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = json.loads((FIX / "manifest.json").read_text())["fixtures"]
-client = TestClient(app)
+client = OwnerClient(app)
 
 
 WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool

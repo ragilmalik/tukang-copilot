@@ -11,13 +11,13 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from fastapi.testclient import TestClient
 
 from api.main import app
 from api.settings import settings
 from api.voice import COMMANDS, WORDS, parse_command
+from api.tests.owner_auth import OwnerClient
 
-client = TestClient(app)
+client = OwnerClient(app)
 WEB = Path(__file__).resolve().parents[2] / "web"
 JS = (WEB / "app.js").read_text(encoding="utf-8")
 

@@ -19,12 +19,15 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import shutil
 import threading
 import time
 import traceback
 import uuid
+from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, TypeVar, cast
 
@@ -32,7 +35,7 @@ import numpy as np
 from PIL import Image
 from pydantic import BaseModel, ValidationError
 
-from .. import cost, errors, handoff, prompts, untrusted
+from .. import cost, errors, guard, handoff, prompts, untrusted
 from ..coerce import coerce
 from ..render import overlay
 from ..schemas import Diagnosis, DiagramReview, ObjectReport, RepairPlan, Step, StepCheck, json_schema
@@ -41,14 +44,60 @@ from . import media, mock, safety
 
 log = logging.getLogger("tukang.engine")
 STAGES = ["listen", "gate", "look", "segment", "diagnose", "plan", "safety", "illustrate", "narrate"]
+# One lock per session. Whoever changes a session holds it from load to save: the first analysis (run) for its
+# whole length, a re-plan for its whole length, and the short writers (answer, retry, outcome, the step-check and
+# live-guide bookkeeping) for their few lines. Without it two writers each saved their own copy and the later one
+# silently dropped the other's change (a quick answer lost under the worker's last save, CI 6 Nov 2026).
 _locks: dict[str, threading.Lock] = {}
+_locks_guard = threading.Lock()
 _save_lock = threading.Lock()
-_deleted: set[str] = set()  # sessions the user erased; a still-running worker must not write them back
+_deleted: dict[str, float] = {}  # sid -> erase time; a still-running worker must not write the session back
+DELETED_KEEP_S = 6 * 3600.0  # far longer than any worker can run (budget and HTTP timeouts end it first)
+STALE_TMP_S = 3600.0  # a session.<thread>.tmp this old is left over from a crash mid-save
+LOCK_WAIT_S = 30.0  # how long a short writer waits for a worker that is finishing before answering "busy"
+OUTCOME_WAIT_S = 5.0  # "It works now" during a re-plan: answer busy quickly, the re-plan resets the outcome anyway
+GUIDED = {"ready", "exhausted"}  # the owner is on the steps: step checks and the live guide are allowed
+STARTED_AT = time.time()  # sessions saved before this process started cannot have a worker in it
+SID_RE = re.compile(r"[A-Za-z0-9]{1,32}")
+
+
+class Busy(ValueError):
+    """Another request is changing this repair right now (a re-plan, a retry); the API answers 409."""
+
+
+def session_lock(sid: str) -> threading.Lock:
+    with _locks_guard:
+        lock = _locks.get(sid)
+        if lock is None:
+            lock = _locks[sid] = threading.Lock()
+        return lock
+
+
+@contextmanager
+def locked(sid: str, wait: float | None = LOCK_WAIT_S) -> Iterator[None]:
+    """Hold the session lock. wait=None blocks until free, 0 does not wait at all, else at most `wait` seconds;
+    raises Busy when the lock stays taken."""
+    lock = session_lock(sid)
+    got = lock.acquire() if wait is None else (lock.acquire(blocking=False) if wait <= 0 else lock.acquire(timeout=wait))
+    if not got:
+        raise Busy("This repair is busy with another request. Try again in a moment.")
+    try:
+        yield
+    finally:
+        lock.release()
+
+
+def _forget_lock(sid: str) -> None:
+    """Drop the lock of a session that is gone, unless a worker still holds it (the janitor tries again later)."""
+    with _locks_guard:
+        lock = _locks.get(sid)
+        if lock is not None and not lock.locked():
+            del _locks[sid]
 
 
 # --- storage
 def session_dir(sid: str) -> Path:
-    if not sid or not sid.isalnum() or len(sid) > 32:
+    if not isinstance(sid, str) or not SID_RE.fullmatch(sid):  # ASCII letters and digits only (str.isalnum takes "１２")
         raise ValueError("bad session id")
     return settings.data_dir / "sessions" / sid
 
@@ -538,10 +587,16 @@ def _stop(s: dict[str, Any], reason: str, at: str) -> None:
 
 # --- orchestration
 def run(sid: str) -> dict[str, Any]:
-    """Run (or resume after a follow-up answer) the full analysis."""
-    lock = _locks.setdefault(sid, threading.Lock())
-    with lock:
-        s = load(sid)
+    """Run (or resume after a follow-up answer or a retry) the full analysis. A session that is not waiting for a
+    worker ("created", or "running" after answer() or retry()) is returned untouched: a second start (two Try again
+    taps, WhatsApp and the web at once) must not run diagnose and plan again over a finished repair."""
+    with locked(sid, wait=None):
+        try:
+            s = load(sid)
+        except FileNotFoundError:
+            return {"id": sid, "status": "deleted"}  # erased before the worker got the lock
+        if s.get("status") not in {"created", "running"}:
+            return s
         meter = cost.Meter(settings.max_cost_usd)
         if s.get("cost"):  # resuming after a follow-up answer: keep what was already spent
             meter.spent = s["cost"].get("spent_usd", 0.0)
@@ -588,18 +643,20 @@ def run(sid: str) -> dict[str, Any]:
 
 
 def retry(sid: str) -> dict[str, Any]:
-    """Re-run a session that stopped on an error. Finished stages are kept; failed ones start again."""
-    s = load(sid)
-    if s["status"] != "error":
-        raise ValueError("this session did not fail")
-    for k, v in s["stages"].items():
-        if v["status"] == "error":
-            s["stages"][k] = {"status": "waiting", "note": ""}
-    s["status"], s["error"], s["error_detail"], s["error_kind"] = "running", None, None, None
-    s["retries"] = int(s.get("retries", 0)) + 1
-    _event(s, "retry", n=s["retries"])
-    save(s)
-    return s
+    """Re-run a session that stopped on an error. Finished stages are kept; failed ones start again.
+    Under the session lock, so two quick taps make one retry (the second sees "running" and gets 409)."""
+    with locked(sid):
+        s = load(sid)
+        if s["status"] != "error":
+            raise ValueError("this session did not fail")
+        for k, v in s["stages"].items():
+            if v["status"] == "error":
+                s["stages"][k] = {"status": "waiting", "note": ""}
+        s["status"], s["error"], s["error_detail"], s["error_kind"] = "running", None, None, None
+        s["retries"] = int(s.get("retries", 0)) + 1
+        _event(s, "retry", n=s["retries"])
+        save(s)
+        return s
 
 
 def start(sid: str) -> None:
@@ -610,7 +667,7 @@ def answer(sid: str, text: str) -> dict[str, Any]:
     # Take the run lock: the worker that asked the question still writes the session once more on its way
     # out (the cost line). Without the lock a quick answer could land in between and that last write would
     # put the question back and drop the answer, so the repair asked the same question again.
-    with _locks.setdefault(sid, threading.Lock()):
+    with locked(sid, wait=60.0):
         s = load(sid)
         if s["status"] != "needs_answer":
             raise ValueError("this session is not waiting for an answer")
@@ -624,70 +681,122 @@ class LimitReached(ValueError):
     """A per-repair cap was hit (step checks); the API answers 429."""
 
 
+def _add_cost(s: dict[str, Any], meter: cost.Meter) -> None:
+    """Add a side call's spend (step check, live-guide frame, voice command) to the session cost, so the
+    DAILY_BUDGET_USD cap sees it. The caller holds the session lock and saves."""
+    if not meter.spent:
+        return
+    c = s.get("cost") or {"spent_usd": 0.0, "budget_usd": settings.max_cost_usd, "by_model": {}}
+    c["spent_usd"] = round(float(c.get("spent_usd", 0)) + meter.spent, 4)
+    bm = dict(c.get("by_model") or {})
+    for k, v in meter.items.items():
+        bm[k] = round(bm.get(k, 0) + v, 4)
+    c["by_model"] = bm
+    s["cost"] = c
+
+
 def check_step(sid: str, n: int, photo: Path) -> dict[str, Any]:
-    """Stage 8: compare the user's new photo with the step's expected state."""
-    s = load(sid)
-    if not s.get("plan"):
-        raise ValueError("no plan yet")
-    if int(s.get("checks_used", 0)) >= settings.max_step_checks:
-        raise LimitReached("This repair has used all its photo checks. Use 'Still broken' or the PDF report.")
-    plan = RepairPlan.model_validate(s["plan"])
-    step = next((st for st in plan.steps if st.n == n), None)
-    if step is None:
-        raise ValueError("no such step")
-    d = session_dir(sid)
-    name = f"check_{s['cause_index']}_{n}_{len(s['checks'].get(str(n), {}).get('tries', [])) + 1}.jpg"
-    overlay.normalize_photo(photo, d / name, settings.max_image_side)
+    """Stage 8: compare the user's new photo with the step's expected state.
+
+    Three short locked sections around the (slow, unlocked) model call:
+      1. reserve: validate, count the check against MAX_STEP_CHECKS and store the photo under a unique name, so
+         parallel checks can never all pass the cap or overwrite each other's photo;
+      2. the model call, with no lock held (a re-plan or the live guide may write meanwhile);
+      3. merge: add the spend, and record the result only if the repair is still on the same plan. A check that
+         finishes after "Still broken" belongs to the old plan; recording it would tick a step of the new one.
+    A failed model call gives the reserved check back."""
+    with locked(sid):
+        s = load(sid)
+        if not s.get("plan"):
+            raise ValueError("no plan yet")
+        if s.get("status") not in GUIDED:
+            raise ValueError("this repair is not on its steps right now")
+        used = int(s.get("checks_used", 0))
+        if used >= settings.max_step_checks:
+            raise LimitReached("This repair has used all its photo checks. Use 'Still broken' or the PDF report.")
+        plan = RepairPlan.model_validate(s["plan"])
+        step = next((st for st in plan.steps if st.n == n), None)
+        if step is None:
+            raise ValueError("no such step")
+        cause = int(s.get("cause_index") or 0)
+        d = session_dir(sid)
+        name = f"check_{cause}_{n}_{used + 1}.jpg"  # the running check number keeps every photo name unique
+        overlay.normalize_photo(photo, d / name, settings.max_image_side)
+        s["checks_used"] = used + 1  # survives a re-plan (checks{} is reset per plan)
+        save(s)
+        ref, part_img = d / s["photos"][0], s["parts"].get(step.component_id, {}).get("image")
+        lang, verify_model = s["lang"], s["models"]["verify"]
     meter = cost.Meter(0.05)
     cost.use(meter)
     check_fallback = False
     try:
         content = [{"type": "text", "text": f"Step {n}: {step.instruction}\nEXPECTED: {step.expected_state}\nREFERENCE (before):"},
-                   _photo_part(d / s["photos"][0])]
-        if s["parts"].get(step.component_id, {}).get("image"):
-            content += [{"type": "text", "text": "Highlighted part:"}, _photo_part(d / s["parts"][step.component_id]["image"])]
+                   _photo_part(ref)]
+        if part_img:
+            content += [{"type": "text", "text": "Highlighted part:"}, _photo_part(d / part_img)]
         content += [{"type": "text", "text": "NEW photo:"}, _photo_part(d / name)]
         if settings.offline:
-            res = StepCheck.model_validate(mock.step_check(d / name, s["lang"], step.expected_state))
+            res = StepCheck.model_validate(mock.step_check(d / name, lang, step.expected_state))
         else:
             fb: dict[str, Any] = {}
-            res = _chat_json(StepCheck, prompts.get("verify_step", lang_name=prompts.LANG_NAME[s["lang"]]), content, "step_check",
-                             mock.step_check(d / name, s["lang"], step.expected_state), model=settings.vision_model, effort="medium", fallback_into=fb)
+            res = _chat_json(StepCheck, prompts.get("verify_step", lang_name=prompts.LANG_NAME[lang]), content, "step_check",
+                             mock.step_check(d / name, lang, step.expected_state), model=settings.vision_model, effort="medium", fallback_into=fb)
             check_fallback = bool(fb)
+    except BaseException:
+        try:
+            with locked(sid, wait=None):
+                s = load(sid)
+                s["checks_used"] = max(0, int(s.get("checks_used", 0)) - 1)  # nothing was checked: give it back
+                _add_cost(s, meter)
+                save(s)
+        except FileNotFoundError:
+            pass  # erased meanwhile
+        raise
     finally:
         cost.use(None)
-    s = load(sid)  # reload: the live guide may have written meanwhile
-    s["checks_used"] = int(s.get("checks_used", 0)) + 1  # survives a re-plan (checks{} is reset per plan)
-    if meter.spent:  # step-check spend counts toward the session cost, so DAILY_BUDGET_USD sees it
-        c = s.get("cost") or {"spent_usd": 0.0, "budget_usd": settings.max_cost_usd, "by_model": {}}
-        c["spent_usd"] = round(float(c.get("spent_usd", 0)) + meter.spent, 4)
-        c["by_model"] = {**(c.get("by_model") or {})}
-        for k, v in meter.items.items():
-            c["by_model"][k] = round(c["by_model"].get(k, 0) + v, 4)
-        s["cost"] = c
-    rec = s["checks"].setdefault(str(n), {"passed": False, "fails": 0, "tries": []})
-    rec["tries"].append({"photo": name, **res.model_dump(), **({"fallback": True} if check_fallback else {})})
-    if not check_fallback:  # a demo answer (live API down) never counts as camera-verified, nor as a fail
-        rec["passed"] = res.passed
-        if not res.passed:
-            rec["fails"] += 1
-    escalate = rec["fails"] >= settings.max_check_fails
-    _event(s, "check", model=s["models"]["verify"], step=n, passed=res.passed, fallback=check_fallback, escalate=escalate,
-           cause=int(s.get("cause_index") or 0))  # which plan the step belonged to (the UI links only current-plan checks)
-    out = res.model_dump() | {"fails": rec["fails"], "escalate": escalate, "fallback": check_fallback}
-    if escalate:
-        out["escalate_hint"] = {"id": "Sudah dicoba beberapa kali. Ketuk 'Masih rusak' untuk rencana lain, atau panggil teknisi.",
-                                "jv": "Wis dijajal kaping pirang-pirang. Tutul 'Isih rusak' kanggo rencana liya, utawa undang teknisi.",
-                                "en": "Tried a few times. Tap 'Still broken' for another plan, or call a professional."}[s["lang"]]
-    save(s)
+    out = res.model_dump() | {"fails": 0, "escalate": False, "fallback": check_fallback}
+    with locked(sid, wait=None):
+        try:
+            s = load(sid)
+        except FileNotFoundError:
+            return out | {"stale": True}  # erased while the check ran: nothing left to record it in
+        _add_cost(s, meter)
+        if int(s.get("cause_index") or 0) != cause or s.get("status") not in GUIDED:
+            save(s)  # the spend still counts; the result belongs to a plan that is gone
+            return out | {"stale": True}
+        rec = s["checks"].setdefault(str(n), {"passed": False, "fails": 0, "tries": []})
+        rec["tries"].append({"photo": name, **res.model_dump(), **({"fallback": True} if check_fallback else {})})
+        if not check_fallback:  # a demo answer (live API down) never counts as camera-verified, nor as a fail
+            rec["passed"] = res.passed
+            if not res.passed:
+                rec["fails"] += 1
+        escalate = rec["fails"] >= settings.max_check_fails
+        _event(s, "check", model=verify_model, step=n, passed=res.passed, fallback=check_fallback, escalate=escalate,
+               cause=cause)  # which plan the step belonged to (the UI links only current-plan checks)
+        out |= {"fails": rec["fails"], "escalate": escalate}
+        if escalate:
+            out["escalate_hint"] = {"id": "Sudah dicoba beberapa kali. Ketuk 'Masih rusak' untuk rencana lain, atau panggil teknisi.",
+                                    "jv": "Wis dijajal kaping pirang-pirang. Tutul 'Isih rusak' kanggo rencana liya, utawa undang teknisi.",
+                                    "en": "Tried a few times. Tap 'Still broken' for another plan, or call a professional."}[s["lang"]]
+        save(s)
     return out
 
 
 def replan(sid: str, report: str) -> dict[str, Any]:
-    """'Stuck / didn't work': move to the next likely cause and plan again (agentic re-plan)."""
-    s = load(sid)
-    if not s.get("diagnosis"):
-        raise ValueError("no diagnosis yet")
+    """'Stuck / didn't work': move to the next likely cause and plan again (agentic re-plan).
+    Holds the session lock for the whole re-plan, without waiting for it: a second "Still broken" while one is
+    planning (double tap, a second tab, WhatsApp) gets Busy (409) instead of skipping a cause, and a step check
+    or live-guide write that lands meanwhile waits instead of being overwritten by the new plan."""
+    with locked(sid, wait=0):
+        s = load(sid)
+        if not s.get("diagnosis"):
+            raise ValueError("no diagnosis yet")
+        if s.get("status") != "ready":
+            raise ValueError("this repair has no plan to change right now")
+        return _replan(s, report)
+
+
+def _replan(s: dict[str, Any], report: str) -> dict[str, Any]:
     dx = Diagnosis.model_validate({k: v for k, v in s["diagnosis"].items() if k not in ("cost_estimate_idr", "diy_saving_idr")})
     rep = ObjectReport.model_validate(s["object_report"])
     report = (report or "").strip()[:500]
@@ -772,15 +881,14 @@ def voice_command(sid: str, text: str = "", audio: Path | None = None) -> dict[s
                 finally:
                     cost.use(None)
                 if meter.spent:
-                    s = load(sid)
-                    c = s.get("cost") or {"spent_usd": 0.0, "budget_usd": settings.max_cost_usd, "by_model": {}}
-                    c["spent_usd"] = round(float(c.get("spent_usd", 0)) + meter.spent, 4)
-                    bm = dict(c.get("by_model") or {})
-                    for k, v in meter.items.items():
-                        bm[k] = round(bm.get(k, 0) + v, 4)
-                    c["by_model"] = bm
-                    s["cost"] = c
-                    save(s)
+                    with locked(sid, wait=None):
+                        try:
+                            s = load(sid)
+                        except FileNotFoundError:
+                            s = {}  # erased meanwhile: nothing to bill
+                        if s:
+                            _add_cost(s, meter)
+                            save(s)
         finally:
             tmp.unlink(missing_ok=True)
     return {"text": heard[:200], "command": parse_command(heard, lang), "lang": lang}
@@ -792,9 +900,6 @@ OUTCOMES = ("fixed", "pro")
 def set_outcome(sid: str, result: str, minutes: int | None = None, tester: str = "") -> dict[str, Any]:
     """Close the loop: the owner says it works now ("fixed") or that a professional took over ("pro").
     The saving is only counted for "fixed", and only when the diagnosis carried a shop price."""
-    s = load(sid)
-    if not s.get("plan"):
-        raise ValueError("no plan yet")
     if result not in OUTCOMES:
         raise ValueError("unknown outcome")
     if minutes is not None and not 0 <= minutes <= 600:
@@ -802,10 +907,16 @@ def set_outcome(sid: str, result: str, minutes: int | None = None, tester: str =
     from .. import impact
 
     tester = impact.clean_tester(tester)
-    saved = int((s.get("diagnosis") or {}).get("diy_saving_idr") or 0) if result == "fixed" else 0
-    s["outcome"] = {"result": result, "at": time.time(), "saved_idr": saved, **({"minutes": minutes} if minutes is not None else {})}
-    _event(s, "outcome", result=result)
-    save(s)
+    with locked(sid, wait=OUTCOME_WAIT_S):  # a re-plan in progress would drop it (and pops "outcome" itself): Busy instead
+        s = load(sid)
+        if not s.get("plan"):
+            raise ValueError("no plan yet")
+        if s.get("status") in {"created", "running", "needs_answer"}:
+            raise ValueError("the plan is not ready yet")
+        saved = int((s.get("diagnosis") or {}).get("diy_saving_idr") or 0) if result == "fixed" else 0
+        s["outcome"] = {"result": result, "at": time.time(), "saved_idr": saved, **({"minutes": minutes} if minutes is not None else {})}
+        _event(s, "outcome", result=result)
+        save(s)
     impact.record(s, minutes, tester)  # append-only trial log for scripts/impact_report.py
     return s
 
@@ -828,29 +939,104 @@ def report(sid: str) -> dict[str, Any]:
             "status": s["status"], "created": s["created"], "lang": s["lang"], "outcome": s.get("outcome")}
 
 
+def _erase(sid: str, d: Path) -> None:
+    """Remove one session folder for good: no worker may write it back, and its spend stays in the 24 h cap."""
+    spent, t = 0.0, time.time()
+    try:
+        old = json.loads((d / "session.json").read_text(encoding="utf-8"))
+        spent, t = float((old.get("cost") or {}).get("spent_usd") or 0.0), float(old.get("updated") or t)
+    except (OSError, ValueError, TypeError, AttributeError):
+        pass
+    with _save_lock:
+        _deleted[sid] = time.time()
+        shutil.rmtree(d, ignore_errors=True)
+    if spent > 0:
+        guard.record_erased_spend(spent, t)
+    _forget_lock(sid)
+
+
 def delete(sid: str) -> bool:
     """Erase one session (photos, audio, PDFs) right now, at the user's request. True when something was removed."""
 
     d = session_dir(sid)
     if not (d / "session.json").exists():
         return False
-    with _save_lock:
-        _deleted.add(sid)
-        shutil.rmtree(d, ignore_errors=True)
+    _erase(sid, d)
     return True
 
 
 def cleanup(max_age_hours: float | None = None) -> int:
-    """Delete sessions older than RETENTION_HOURS (privacy, SPEC §7). Returns how many were removed."""
+    """Delete sessions older than RETENTION_HOURS (privacy, SPEC §7). Returns how many were removed.
+    Also removes folders a crash left without a session.json, stale session.*.tmp files, and the lock and
+    erase bookkeeping of sessions that are gone, so a server that stays up for weeks does not grow."""
 
+    root = settings.data_dir / "sessions"
+    now = time.time()
+    with _save_lock:
+        for sid in [k for k, at in _deleted.items() if at < now - DELETED_KEEP_S]:
+            del _deleted[sid]
+    guard.prune_spend_ledger(now)
+    if not root.exists():
+        return 0
+    cutoff = now - 3600 * (settings.retention_hours if max_age_hours is None else max_age_hours)
+    n = 0
+    for d in root.iterdir():
+        if not d.is_dir():
+            continue
+        f = d / "session.json"
+        try:
+            if f.exists():
+                if f.stat().st_mtime < cutoff:
+                    _erase(d.name, d)
+                    n += 1
+                    continue
+                for tmp in d.glob("session.*.tmp"):
+                    if tmp.stat().st_mtime < now - STALE_TMP_S:
+                        tmp.unlink(missing_ok=True)
+            elif d.stat().st_mtime < cutoff:  # never finished creating (process killed): photos must not stay
+                shutil.rmtree(d, ignore_errors=True)
+                n += 1
+        except OSError:
+            continue  # vanished meanwhile (an erase): the next pass looks again
+    with _locks_guard:
+        gone = [k for k, lock in _locks.items() if not lock.locked() and not (root / k).exists()]
+        for k in gone:
+            del _locks[k]
+    return n
+
+
+INTERRUPTED = {
+    "id": "Server dimulai ulang saat perbaikan ini berjalan. Ketuk Coba lagi untuk melanjutkan.",
+    "jv": "Server diwiwiti maneh nalika ndandani iki mlaku. Tutul Jajal maneh kanggo nerusake.",
+    "en": "The server restarted while this repair was running. Tap Try again to carry on.",
+}
+
+
+def recover_interrupted() -> int:
+    """At startup: a session saved as "created" or "running" before this process started has no worker any more
+    (a restart or redeploy killed it), so it would spin forever. Mark it as an error the owner can retry: retry()
+    keeps the finished stages and runs the rest. Sessions a worker in this process holds are left alone."""
     root = settings.data_dir / "sessions"
     if not root.exists():
         return 0
-    cutoff = time.time() - 3600 * (settings.retention_hours if max_age_hours is None else max_age_hours)
     n = 0
-    for d in root.iterdir():
-        f = d / "session.json"
-        if d.is_dir() and f.exists() and f.stat().st_mtime < cutoff:
-            shutil.rmtree(d, ignore_errors=True)
-            n += 1
+    for f in root.glob("*/session.json"):
+        sid = f.parent.name
+        if not SID_RE.fullmatch(sid):
+            continue
+        try:
+            with locked(sid, wait=0):
+                s = load(sid)
+                if s.get("status") not in {"created", "running"} or float(s.get("updated") or 0) >= STARTED_AT:
+                    continue
+                lang = str(s.get("lang")) if s.get("lang") in INTERRUPTED else "id"
+                s["status"], s["error"], s["error_kind"] = "error", INTERRUPTED[lang], "interrupted"
+                s["error_detail"] = "server restarted mid-repair"
+                for k, v in (s.get("stages") or {}).items():
+                    if isinstance(v, dict) and v.get("status") == "running":
+                        s["stages"][k] = {"status": "error", "note": ""}
+                save(s)
+                n += 1
+        except (Busy, OSError, ValueError):
+            continue
     return n

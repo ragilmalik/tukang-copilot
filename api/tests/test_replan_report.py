@@ -3,14 +3,14 @@ link preview card and the guide page description follow the plan being tried, no
 import time
 
 import pytest
-from fastapi.testclient import TestClient
 
 from api import handoff
 from api.main import app
 from api.pipeline import engine
 from api.render import brand, report_pdf, share_card
+from api.tests.owner_auth import OwnerClient
 
-client = TestClient(app)
+client = OwnerClient(app)
 
 
 WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool

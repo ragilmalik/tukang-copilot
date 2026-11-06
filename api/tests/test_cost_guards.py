@@ -3,15 +3,15 @@ session cost (so DAILY_BUDGET_USD sees it); follow-up model calls are rate limit
 import time
 
 import pytest
-from fastapi.testclient import TestClient
 
 from api import guard
 from api.main import app
 from api.pipeline import engine
 from api.settings import settings
 from api.tests.doubles import fake_meta
+from api.tests.owner_auth import OwnerClient
 
-client = TestClient(app)
+client = OwnerClient(app)
 
 
 WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool

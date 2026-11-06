@@ -47,6 +47,8 @@ services:
         value: "10"
       - key: RATE_LIMIT_PER_HOUR
         value: "30"
+      - key: CLIENT_IP_HEADER           # Render serves through Cloudflare, which sets this to the visitor and overwrites
+        value: "cf-connecting-ip"       # a sent one; the rate limit keys on it (check after the first deploy, docs/DEPLOY.md)
       - key: FOLLOWUP_RATE_PER_HOUR
         value: "240"
       - key: MAX_STEP_CHECKS

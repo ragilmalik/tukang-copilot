@@ -100,6 +100,14 @@ class Settings:
     public_base_url: str = field(default_factory=lambda: _env("PUBLIC_BASE_URL").rstrip("/"))
     # Empty = same-origin only (the web app and the API share one host). A comma list allows those origins.
     cors_origins: str = field(default_factory=lambda: _env("CORS_ORIGINS", default=""))
+    # How many proxies in front of the app append to X-Forwarded-For. The visitor's address for the rate limit is
+    # the entry that many places from the right (the one our nearest proxy wrote); entries further left are written
+    # by the visitor and can be anything. 1 fits Render and most hosts; 0 ignores the header (no proxy in front).
+    forwarded_hops: int = field(default_factory=lambda: max(0, int(_env("FORWARDED_HOPS", default="1"))))
+    # A header the edge proxy sets to the visitor's address and overwrites when the visitor sends it (Cloudflare:
+    # cf-connecting-ip). Comma-separated names, first present wins; it beats X-Forwarded-For. Empty = not used.
+    # Only set it when such a proxy is really in front: anyone can send the header to a server without one.
+    client_ip_header: str = field(default_factory=lambda: _env("CLIENT_IP_HEADER", default="").lower())
 
     @property
     def offline(self) -> bool:

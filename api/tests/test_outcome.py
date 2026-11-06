@@ -4,12 +4,11 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from fastapi.testclient import TestClient
 
 from api.main import app
-from api.tests.owner_auth import owner
+from api.tests.owner_auth import OwnerClient, owner
 
-client = TestClient(app)
+client = OwnerClient(app)
 WEB = Path(__file__).resolve().parents[2] / "web"
 
 

@@ -8,11 +8,11 @@ import json
 from pathlib import Path
 
 import pytest
-from fastapi.testclient import TestClient
 
 from api import sample_step
 from api.main import app
 from api.pipeline import mock
+from api.tests.owner_auth import OwnerClient
 
 ROOT = Path(__file__).resolve().parents[2]
 DEMO = json.loads((ROOT / "web" / "replay" / "demo.json").read_text(encoding="utf-8"))
@@ -77,7 +77,7 @@ def test_offline_plans(sample, lang):
 
 
 def test_session_exposes_the_sample_step_and_the_check_passes_there():
-    c = TestClient(app)
+    c = OwnerClient(app)
     sid = c.post("/api/sessions", data={"sample": "motor", "language": "en", "text": "won't start"}).json()["id"]
     with c.stream("GET", f"/api/sessions/{sid}/events") as r:
         "".join(r.iter_text())

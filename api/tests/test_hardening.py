@@ -2,13 +2,13 @@
 import io
 
 import pytest
-from fastapi.testclient import TestClient
 from PIL import Image
 
 from api.main import MAX_PHOTO, app
 from api.settings import settings
+from api.tests.owner_auth import OwnerClient
 
-client = TestClient(app, raise_server_exceptions=False)
+client = OwnerClient(app, raise_server_exceptions=False)
 
 
 _IGNORE: set[str] = set()

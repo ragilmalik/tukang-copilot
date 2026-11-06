@@ -102,8 +102,15 @@ def _delta(before: dict[str, Any], after: dict[str, Any], merge: set[str]) -> di
     return out
 
 
+def _own(sid: str) -> dict[str, str]:
+    """The owner header the phone sends on every request that changes the repair (X-Owner-Token)."""
+    from api.pipeline import engine
+
+    return {"X-Owner-Token": str(engine.load(sid).get("owner_token") or "")}
+
+
 def _check(c: Any, sid: str, n: int, photo: bytes) -> tuple[int, dict[str, Any]]:
-    r = c.post(f"/api/sessions/{sid}/steps/{n}/check", files={"photo": ("check.jpg", photo, "image/jpeg")})
+    r = c.post(f"/api/sessions/{sid}/steps/{n}/check", files={"photo": ("check.jpg", photo, "image/jpeg")}, headers=_own(sid))
     return r.status_code, r.json()
 
 
@@ -167,7 +174,7 @@ def record_lang(c: Any, lang: str, photos: dict[str, bytes], files_dir: Path, ou
             break
         print(f"{lang}: no follow-up question this time ({ask['session']['status']}), recording once more", flush=True)
     assert ask["session"]["status"] == "needs_answer", ask["session"]["status"]
-    assert c.post(f"/api/sessions/{sid}/answer", data={"text": ANSWER[lang]}).status_code == 200
+    assert c.post(f"/api/sessions/{sid}/answer", data={"text": ANSWER[lang]}, headers=_own(sid)).status_code == 200
     ready = _settled(c, sid)
     settings.mock_pace_s = 0.0
     assert ready["session"]["status"] == "ready", ready["session"]["status"]
@@ -188,7 +195,7 @@ def record_lang(c: Any, lang: str, photos: dict[str, bytes], files_dir: Path, ou
         outcome[res] = _delta(before, after, set())
     engine.save(copy.deepcopy(base))
     before = c.get(f"/api/sessions/{sid}").json()
-    replanned = c.post(f"/api/sessions/{sid}/replan", data={"report": REPLAN[lang]}).json()
+    replanned = c.post(f"/api/sessions/{sid}/replan", data={"report": REPLAN[lang]}, headers=_own(sid)).json()
     replan = _delta(before, replanned, set())
     checks1 = _record_checks(c, sid, photos, files_dir) if replanned.get("status") == "ready" else {}
     for f in engine.session_dir(sid).iterdir():  # photos the screens show

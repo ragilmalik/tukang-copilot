@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 from PIL import Image
 
 from api.main import app
+from api.tests.owner_auth import OwnerClient
 
 
 WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
@@ -34,7 +35,7 @@ LANGS = ["id", "jv", "en", "xx", ""]
 
 @pytest.fixture
 def c():
-    return TestClient(app)
+    return OwnerClient(app)
 
 
 def _wait(c: TestClient, sid: str) -> dict[str, Any]:

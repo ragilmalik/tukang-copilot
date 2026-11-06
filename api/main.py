@@ -22,6 +22,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from PIL import Image
 
 from . import __version__, errors, guard, handoff, impact, logs, sample_step, shop
 from .trace import build_trace
@@ -73,6 +74,9 @@ async def _janitor(interval: float) -> None:
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    n = await asyncio.to_thread(engine.recover_interrupted)  # repairs a restart left at "running" with no worker
+    if n:
+        logging.getLogger("tukang").info("marked %d interrupted repairs as retryable", n)
     task = asyncio.create_task(_janitor(CLEANUP_EVERY_S))  # first pass runs at startup, then hourly
     try:
         yield
@@ -154,6 +158,8 @@ async def security_headers(request: Request, call_next: Callable[[Request], Awai
     resp.headers.setdefault("Permissions-Policy", "camera=(self), microphone=(self), geolocation=(self)")
     if resp.headers.get("content-type", "").startswith("text/html"):
         resp.headers.setdefault("Content-Security-Policy", CSP)
+    if request.url.path.startswith(("/api/", "/files/")):  # the owner's photos and repair: never in a shared cache
+        resp.headers.setdefault("Cache-Control", "no-store")
     if request.url.path.startswith("/static/") and resp.status_code in (200, 304):
         resp.headers.setdefault("Cache-Control", static_cache_control(request.url.path, request.url.query))
     if request.headers.get("x-forwarded-proto") == "https":  # Render and other proxies end TLS in front of us
@@ -211,14 +217,37 @@ def _guard_followup(request: Request, sid: str) -> None:
         return
     try:
         guard.check_budget()
-        guard.check_rate(guard.client_key(request.headers.get("x-forwarded-for"), request.client.host if request.client else None),
+        guard.check_rate(guard.request_key(request.headers, request.client.host if request.client else None),
                          bucket="followup")
     except guard.Blocked as b:
         raise HTTPException(b.status, guard.message(b.kind, str(_load(sid).get("lang", "id"))), headers={"Retry-After": str(b.retry_after)})
 
 
+def _busy(sid: str) -> HTTPException:
+    """409 for a request that met another one changing the same repair (engine.Busy), in the owner's language."""
+    try:
+        lang = str(engine.load(sid).get("lang", "id"))
+    except (FileNotFoundError, ValueError):
+        lang = "id"
+    return HTTPException(409, BUSY.get(lang, BUSY["en"]), headers={"Retry-After": "3"})
+
+
+BUSY = {"id": "Perbaikan ini sedang memproses permintaan lain. Tunggu sebentar lalu coba lagi.",
+        "jv": "Ndandani iki lagi ngolah panyuwun liya. Enteni sedhela terus jajal maneh.",
+        "en": "This repair is busy with another request. Wait a moment and try again."}
+BAD_PICTURE = (OSError, Image.DecompressionBombError)  # not a readable picture: a 400 to retake, never "AI busy"
+
+
+def _owner(sid: str, request: Request) -> dict[str, Any]:
+    """Load the session and refuse anyone but the owner's phone (see _require_owner)."""
+    s = _load(sid)
+    _require_owner(s, request)
+    return s
+
+
 def _require_owner(s: dict[str, Any], request: Request) -> None:
-    """Owner-only actions (outcome, erase). A repair made through the web API has an owner token, returned once at
+    """Owner-only actions: every route that changes a repair or spends on it (answer, retry, step check, live
+    guide, voice command, still broken, outcome, erase). A repair made through the web API has an owner token, returned once at
     creation and kept in the owner's browser (localStorage); the shared guide link (/guide/{id}) does not carry it.
     WhatsApp repairs get a token that is never sent anywhere (the chat itself is the owner). Sessions saved before
     1.27.0 have none and stay open."""
@@ -421,7 +450,7 @@ async def create_session(request: Request, photos: list[UploadFile] | None = Fil
     if guard.active():
         try:
             guard.check_budget()
-            guard.check_rate(guard.client_key(request.headers.get("x-forwarded-for"), request.client.host if request.client else None))
+            guard.check_rate(guard.request_key(request.headers, request.client.host if request.client else None))
         except guard.Blocked as b:
             raise HTTPException(b.status, guard.message(b.kind, language), headers={"Retry-After": str(b.retry_after)})
     tmp: list[Path] = []
@@ -528,7 +557,10 @@ async def events(sid: str) -> StreamingResponse:
     async def gen() -> AsyncIterator[str]:
         last = None
         for _ in range(900):  # ~7.5 min max
-            s = engine.load(sid)
+            try:
+                s = engine.load(sid)
+            except FileNotFoundError:  # erased by the owner while the stream was open
+                break
             snap = json.dumps(progress_view(s), ensure_ascii=False)
             if snap != last:
                 yield f"data: {snap}\n\n"
@@ -542,12 +574,14 @@ async def events(sid: str) -> StreamingResponse:
 
 @app.post("/api/sessions/{sid}/answer")
 def post_answer(sid: str, request: Request, text: str = Form(...)) -> dict[str, Any]:
-    _load(sid)
+    _owner(sid, request)
     if len(text) > 2000:
         raise HTTPException(400, "Answer is too long")
     _guard_followup(request, sid)
     try:
         engine.answer(sid, text)
+    except engine.Busy:
+        raise _busy(sid)
     except ValueError as e:
         raise HTTPException(409, str(e))
     engine.start(sid)
@@ -556,11 +590,13 @@ def post_answer(sid: str, request: Request, text: str = Form(...)) -> dict[str, 
 
 @app.post("/api/sessions/{sid}/retry")
 def post_retry(sid: str, request: Request) -> dict[str, Any]:
-    """Run again a session that stopped on an error (busy AI service, dropped signal ...)."""
-    _load(sid)
+    """Run again a session that stopped on an error (busy AI service, dropped signal, a server restart ...)."""
+    _owner(sid, request)
     _guard_followup(request, sid)
     try:
         engine.retry(sid)
+    except engine.Busy:
+        raise _busy(sid)
     except ValueError as e:
         raise HTTPException(409, str(e))
     engine.start(sid)
@@ -569,16 +605,18 @@ def post_retry(sid: str, request: Request) -> dict[str, Any]:
 
 @app.post("/api/sessions/{sid}/steps/{n}/check")
 async def post_check(sid: str, n: int, request: Request, photo: UploadFile = File(...)) -> dict[str, Any]:
-    _load(sid)
+    _owner(sid, request)
     _guard_followup(request, sid)
     p = await _save_upload(photo, IMAGE_TYPES, MAX_PHOTO, ".jpg")
     try:
-        return engine.check_step(sid, n, p)
+        return await asyncio.to_thread(engine.check_step, sid, n, p)  # a model call: never on the event loop
     except engine.LimitReached as e:
         raise HTTPException(429, str(e))
+    except engine.Busy:
+        raise _busy(sid)
     except ValueError as e:
         raise HTTPException(409, str(e))
-    except OSError:  # not a readable picture: the owner should retake it, the service is fine
+    except BAD_PICTURE:  # not a readable picture: the owner should retake it, the service is fine
         raise HTTPException(400, "Could not read that photo. Try a JPG or PNG.")
     except Exception as e:  # Meta API busy or offline: the photo is not lost, the person can simply retake it
         logging.getLogger("tukang").error("step check failed: %s", errors.detail(e))
@@ -591,10 +629,10 @@ MAX_FRAME = 3 * 1024 * 1024
 
 
 @app.post("/api/sessions/{sid}/steps/{n}/track")
-async def post_track(sid: str, n: int, frame: UploadFile = File(...)) -> dict[str, Any]:
+async def post_track(sid: str, n: int, request: Request, frame: UploadFile = File(...)) -> dict[str, Any]:
     """Live guide: one small camera frame -> SAM 3.1 boxes and outline of this step's part (normalised 0..1).
     About one frame per second; too fast gives 429, and after MAX_TRACK_FRAMES the answer has limit_reached."""
-    _load(sid)
+    _owner(sid, request)
     p = await _save_upload(frame, IMAGE_TYPES, MAX_FRAME, ".jpg")
     try:
         return await asyncio.to_thread(track.track_step, sid, n, p)
@@ -602,7 +640,7 @@ async def post_track(sid: str, n: int, frame: UploadFile = File(...)) -> dict[st
         raise HTTPException(429, "Too many frames, slow down", headers={"Retry-After": "1"})
     except ValueError as e:
         raise HTTPException(409, str(e))
-    except OSError:
+    except BAD_PICTURE:
         raise HTTPException(400, "Could not read that frame")
     except Exception as e:  # SAM busy: the live view keeps running, the next frame tries again
         logging.getLogger("tukang").error("track failed: %s", errors.detail(e))
@@ -615,7 +653,7 @@ async def post_track(sid: str, n: int, frame: UploadFile = File(...)) -> dict[st
 async def post_command(sid: str, request: Request, text: str = Form(default=""), audio: UploadFile | None = File(default=None)) -> dict[str, Any]:
     """Hands-free fallback for phones without SpeechRecognition: a push-to-talk clip (or text) -> one command
     (next, back, repeat, check, broken, stop) or null. The clip is transcribed and deleted at once."""
-    _load(sid)
+    _owner(sid, request)
     if len(text) > 200:
         raise HTTPException(400, "Command text is too long")
     if audio is not None and audio.filename:  # typed commands never reach a model
@@ -637,12 +675,14 @@ async def post_command(sid: str, request: Request, text: str = Form(default=""),
 
 @app.post("/api/sessions/{sid}/replan")
 def post_replan(sid: str, request: Request, report: str = Form(default="")) -> dict[str, Any]:
-    _load(sid)
+    _owner(sid, request)
     if len(report) > 2000:
         raise HTTPException(400, "Report is too long")
     _guard_followup(request, sid)
     try:
         return public(engine.replan(sid, report))
+    except engine.Busy:
+        raise _busy(sid)
     except ValueError as e:
         raise HTTPException(409, str(e))
     except Exception as e:
@@ -659,6 +699,8 @@ def post_outcome(sid: str, request: Request, result: str = Form(...), minutes: i
     _require_owner(_load(sid), request)
     try:
         return public(engine.set_outcome(sid, result.strip().lower(), minutes, tester))
+    except engine.Busy:
+        raise _busy(sid)
     except ValueError as e:
         raise HTTPException(409 if "plan" in str(e) else 422, str(e))
 

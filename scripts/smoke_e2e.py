@@ -57,7 +57,7 @@ def main() -> int:
             s = wait(c, sid)
             if s["status"] == "needs_answer":
                 ok(bool(s["question"]), f"agent asked a follow-up: {s['question'][:60]}")
-                c.post(f"/api/sessions/{sid}/answer", data={"text": "Tidak"})
+                c.post(f"/api/sessions/{sid}/answer", data={"text": "Tidak"}, headers=own)
                 s = wait(c, sid)
             ok(s["status"] == expect, f"status {s['status']} (expected {expect}) in {time.time() - t0:.1f}s {s.get('error') or ''}")
             if s.get("parts_image"):
@@ -73,9 +73,13 @@ def main() -> int:
                 if d.get("file"):
                     ok(c.get(f"/files/{sid}/{d['file']}").status_code == 200, f"diagram {d['file']}")
             photo = (ROOT / "samples" / f"{sample}.jpg").read_bytes()
-            r = c.post(f"/api/sessions/{sid}/steps/1/check", files={"photo": ("p.jpg", photo, "image/jpeg")})
+            ok(c.post(f"/api/sessions/{sid}/steps/1/check", files={"photo": ("p.jpg", photo, "image/jpeg")}).status_code == 403,
+               "step check refused without the owner token (a shared link cannot use the owner's checks)")
+            r = c.post(f"/api/sessions/{sid}/steps/1/check", files={"photo": ("p.jpg", photo, "image/jpeg")}, headers=own)
             ok(r.status_code == 200 and "passed" in r.json(), f"check-my-step: passed={r.json().get('passed')}")
-            r = c.post(f"/api/sessions/{sid}/replan", data={"report": "masih rusak"})
+            ok(c.post(f"/api/sessions/{sid}/replan", data={"report": "masih rusak"}).status_code == 403,
+               "re-plan refused without the owner token")
+            r = c.post(f"/api/sessions/{sid}/replan", data={"report": "masih rusak"}, headers=own)
             ok(r.status_code == 200 and r.json()["cause_index"] == 1, "re-plan to next cause")
             kinds = [e.get("kind") for e in r.json().get("agent_log", [])]
             ok({"look", "diagnose", "plan", "check", "replan"} <= set(kinds), f"agent log ({len(kinds)} decisions)")

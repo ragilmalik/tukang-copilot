@@ -96,7 +96,8 @@ def draw_parts(photo: Path, found: list[dict[str, Any]], out: Path, only: str | 
 
 def normalize_photo(src: Path, dst: Path, max_side: int = 1536) -> Path:
     """Apply EXIF rotation (SAM needs the displayed size), cap at 1536 px, save JPEG."""
-    im = ImageOps.exif_transpose(Image.open(src)).convert("RGB")
+    with Image.open(src) as raw:  # closed at once: no open file handle per upload until garbage collection
+        im = ImageOps.exif_transpose(raw).convert("RGB")
     im.thumbnail((max_side, max_side))
     im.save(dst, "JPEG", quality=90)
     return dst

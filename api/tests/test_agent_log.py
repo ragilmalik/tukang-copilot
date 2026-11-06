@@ -5,14 +5,13 @@ import json
 import time
 from typing import Any
 
-from fastapi.testclient import TestClient
 from PIL import Image
 
 from api.main import app
 from api.pipeline import engine
-from api.tests.owner_auth import owner
+from api.tests.owner_auth import OwnerClient, owner
 
-client = TestClient(app)
+client = OwnerClient(app)
 
 
 WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool
@@ -128,14 +127,13 @@ def test_agent_log_is_capped():
 
 def test_check_event_records_which_plan_it_belonged_to():
     """The UI links a step-check log line to the step card only while that plan is current."""
-    from fastapi.testclient import TestClient
 
     from api.main import app
     import io
     import time
     from PIL import Image
 
-    c = TestClient(app)
+    c = OwnerClient(app)
     sid = c.post("/api/sessions", data={"sample": "faucet"}).json()["id"]
     for _ in range(100):
         if c.get(f"/api/sessions/{sid}").json()["status"] == "ready":

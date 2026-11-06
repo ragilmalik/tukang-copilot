@@ -421,6 +421,7 @@ const SERVER_MSGS = [
   [/empty file/i, "emptyFile"], [/video is too short/i, "videoShort"], [/video is too long/i, "videoLong"],
   [/could not read that video/i, "videoBad"], [/could not read the recording/i, "recBad"], [/too long/i, "tooLong"], [/describe the problem by voice or text/i, "needDesc"],
   [/take or upload a photo/i, "needPhoto"], [/^too many requests|rate limit/i, "busyErr"],
+  [/only the owner's phone/i, "ownerOnly"],
 ];
 function localServerMsg(m) {
   const hit = SERVER_MSGS.find(([re]) => re.test(m));
@@ -547,7 +548,7 @@ function setupCapture() {
   on("retryBtn", "click", async () => {
     $("retryBtn").disabled = true; busy($("retryBtn"), true);
     try {
-      const r = await fetch(`/api/sessions/${S.id}/retry`, { method: "POST" });
+      const r = await fetch(`/api/sessions/${S.id}/retry`, { method: "POST", headers: ownerHeaders(S.id) });
       if (r.ok) { $("jobErr").textContent = ""; $("retryBtn").classList.add("hidden"); follow(S.id); }
       else $("jobErr").textContent = (await r.json()).detail || "";
     } catch (e) { $("jobErr").textContent = netMsg(e);
@@ -733,7 +734,7 @@ async function sendAnswer(btn) {
   const tapped = btn && btn.nodeType === 1 ? btn : $("answerBtn");
   busy($("answerBtn"), true); busy(tapped, true);
   try {
-    const r = await fetch(`/api/sessions/${S.id}/answer`, { method: "POST", body: fd });
+    const r = await fetch(`/api/sessions/${S.id}/answer`, { method: "POST", body: fd, headers: ownerHeaders(S.id) });
     if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || t("netErr"));
   } catch (e) { $("jobErr").textContent = netMsg(e); return;
   } finally { busy($("answerBtn"), false); busy(tapped, false); }
@@ -1031,7 +1032,7 @@ async function checkPhoto(f) {
   const pickers = [$("stepPhotoLabel"), $("sampleBad"), $("sampleGood"), $("liveCheck")];
   pickers.forEach((b) => busy(b, true));
   try {
-    const r = await fetch(`/api/sessions/${S.id}/steps/${st.n}/check`, { method: "POST", body: fd });
+    const r = await fetch(`/api/sessions/${S.id}/steps/${st.n}/check`, { method: "POST", body: fd, headers: ownerHeaders(S.id) });
     const j = await r.json();
     if (!r.ok) { $("checkResult").textContent = j.detail; return null; }
     S = await fetchSession(S.id); showCheck(j); renderVerified(); renderAgentLog(S, "agent"); saveGarage(S);  // garage shows the new "n/m ✓"
@@ -1092,7 +1093,7 @@ async function liveTick() {
   try {
     const blob = await grabFrame(LIVE_SIDE, 0.7); if (!blob) return;
     const st = S.plan.steps[stepIdx], fd = new FormData(); fd.append("frame", blob, "frame.jpg");
-    const r = await fetch(`/api/sessions/${S.id}/steps/${st.n}/track`, { method: "POST", body: fd });
+    const r = await fetch(`/api/sessions/${S.id}/steps/${st.n}/track`, { method: "POST", body: fd, headers: ownerHeaders(S.id) });
     if (r.status === 429) return;  // throttled: the next tick tries again
     const j = await r.json(); if (!r.ok) { if ($("liveState")) $("liveState").textContent = "⚠️ " + (j.detail || r.statusText); return; }
     if (j.step !== S.plan.steps[stepIdx].n) return;  // the owner moved to another step meanwhile
@@ -1170,7 +1171,7 @@ function setupResult() {
     const fd = new FormData(); fd.append("report", $("stuckText").value.trim());
     $("stuckBtn").disabled = true; busy($("stuckBtn"), true); $("stuckMsg").textContent = t("working");
     try {
-      const r = await fetch(`/api/sessions/${S.id}/replan`, { method: "POST", body: fd });
+      const r = await fetch(`/api/sessions/${S.id}/replan`, { method: "POST", body: fd, headers: ownerHeaders(S.id) });
       const j = await r.json();
       if (!r.ok) { $("stuckMsg").textContent = "⚠️ " + (j.detail || r.statusText); return; }
       S = j;
@@ -1342,7 +1343,7 @@ async function pushToTalk() {
     const ext = blob.type.includes("mp4") ? "m4a" : blob.type.includes("ogg") ? "ogg" : "webm";
     const fd = new FormData(); fd.append("audio", blob, "command." + ext);
     try {
-      const r = await fetch(`/api/sessions/${S.id}/command`, { method: "POST", body: fd });
+      const r = await fetch(`/api/sessions/${S.id}/command`, { method: "POST", body: fd, headers: ownerHeaders(S.id) });
       const j = await r.json();
       if (!r.ok) { $("voiceState").textContent = "⚠️ " + (j.detail || r.statusText); return; }
       doCommand(j.command, j.text);

@@ -3,12 +3,12 @@ import time
 import types
 
 import pytest
-from fastapi.testclient import TestClient
 
 from api import errors, meta_client
 from api.pipeline import engine
 from api.settings import settings
 from api.tests.doubles import fake_meta
+from api.tests.owner_auth import OwnerClient
 
 BASE = fake_meta.serve_in_thread()
 
@@ -27,7 +27,7 @@ def live(monkeypatch):
     fake_meta.FAULTS.clear()
     from api.main import app
 
-    yield TestClient(app)
+    yield OwnerClient(app)
     fake_meta.FAULTS.clear()
 
 

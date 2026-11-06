@@ -3,12 +3,12 @@ import io
 import time
 
 import pytest
-from fastapi.testclient import TestClient
 from PIL import Image
 
 from api.main import app
+from api.tests.owner_auth import OwnerClient
 
-client = TestClient(app)
+client = OwnerClient(app)
 
 
 WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool

@@ -61,8 +61,10 @@ def test_spend_cap_sums_recent_sessions(monkeypatch, tmp_path):
     assert guard.spent_last_24h(now=now + 90000) == 0.0
 
 
-def test_client_key_prefers_forwarded_for():
-    assert guard.client_key("5.6.7.8, 10.0.0.1", "10.0.0.1") == "5.6.7.8"
+def test_client_key_takes_the_entry_our_proxy_wrote():
+    # 1.32.0: the right-most FORWARDED_HOPS entry, not the left-most one the visitor can write (see test_owner_routes.py)
+    assert guard.client_key("5.6.7.8, 10.0.0.1", "10.0.0.1", hops=1) == "10.0.0.1"
+    assert guard.client_key("5.6.7.8, 10.0.0.1", "10.0.0.1", hops=2) == "5.6.7.8"
     assert guard.client_key(None, "10.0.0.1") == "10.0.0.1"
     assert guard.client_key(None, None) == "unknown"
 

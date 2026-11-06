@@ -3,11 +3,11 @@ edits, Baseten open weights) end to end against the fake Meta server in api/test
 import time
 
 import pytest
-from fastapi.testclient import TestClient
 
 from api.pipeline import engine
 from api.settings import settings
 from api.tests.doubles import fake_meta
+from api.tests.owner_auth import OwnerClient
 
 BASE = fake_meta.serve_in_thread()
 
@@ -23,7 +23,7 @@ def live(monkeypatch):
     fake_meta.CALLS.clear()
     from api.main import app
 
-    return TestClient(app)
+    return OwnerClient(app)
 
 
 def _wait(c, sid):

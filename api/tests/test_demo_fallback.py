@@ -7,13 +7,13 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from fastapi.testclient import TestClient
 from PIL import Image
 
 from api import meta_client
 from api.pipeline import engine
 from api.settings import settings
 from api.tests.doubles import fake_meta
+from api.tests.owner_auth import OwnerClient
 
 BASE = fake_meta.serve_in_thread()
 WEB = Path(__file__).resolve().parents[2] / "web"
@@ -33,7 +33,7 @@ def live(monkeypatch):
     fake_meta.FAULTS.clear()
     from api.main import app
 
-    yield TestClient(app)
+    yield OwnerClient(app)
     fake_meta.FAULTS.clear()
 
 

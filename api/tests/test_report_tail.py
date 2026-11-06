@@ -6,14 +6,14 @@ Seen on 1.29.6: the Basa Jawa report after "Still broken" had a page 3 of 4 with
 import time
 
 import pytest
-from fastapi.testclient import TestClient
 from PIL import Image, ImageDraw
 
 from api.main import app
 from api.pipeline import engine
 from api.render import report_pdf
+from api.tests.owner_auth import OwnerClient
 
-client = TestClient(app)
+client = OwnerClient(app)
 
 
 WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool

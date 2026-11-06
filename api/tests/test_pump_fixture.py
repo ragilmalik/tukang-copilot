@@ -6,13 +6,13 @@ import time
 from pathlib import Path
 from typing import Any
 
-from fastapi.testclient import TestClient
 
 from api.main import app
+from api.tests.owner_auth import OwnerClient
 
 FIX = Path(__file__).parent / "fixtures"
 MANIFEST = json.loads((FIX / "manifest.json").read_text())["fixtures"]
-client = TestClient(app)
+client = OwnerClient(app)
 
 
 WAIT_S = 60  # seconds a repair may take: generous, CI runners are slow and earlier repairs can still hold the worker pool

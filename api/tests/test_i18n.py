@@ -40,3 +40,22 @@ def test_extra_strings_exist_in_all_three_languages_and_differ():
     for k in keys["id"]:
         ph = {lg: sorted(re.findall(r"\{(\w+)\}", keys[lg][k])) for lg in keys}
         assert ph["id"] == ph["jv"] == ph["en"], (k, ph)
+
+
+def _pairs(block: str) -> dict[str, str]:
+    return dict(re.findall(r'(\w+): "((?:[^"\\]|\\.)*)"', block))
+
+
+def test_no_english_string_shows_in_bahasa_or_basa_jawa():
+    # Every label has its own Bahasa Indonesia and Basa Jawa text; none is the English one copied over
+    # (Basa Jawa falls back to Bahasa Indonesia for a missing key, never to English).
+    en = _pairs(JS[JS.index("  en: {"):JS.index("T.jv")])
+    idb = _pairs(JS[JS.index("  id: {"):JS.index("  en: {")])
+    jv_block = JS[JS.index("T.jv = Object.assign"):]
+    jv = _pairs(jv_block[:jv_block.index("});")])
+    same_word = {"red"}  # "STOP" on the red card is the same word in all three on purpose
+    leaks = [(lang, k) for lang, table in (("id", idb), ("jv", jv)) for k, v in table.items()
+             if k in en and v == en[k] and re.search(r"[A-Za-z]{4,}", v) and k not in same_word]
+    assert not leaks, leaks
+    only_en = set(en) - set(idb) - {"savedUnit1"}  # savedUnit1: English singular ("1 repair"); Bahasa has no plural
+    assert not only_en, only_en
