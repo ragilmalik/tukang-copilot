@@ -20,7 +20,7 @@ Findings ranked by user impact, each with its test; the full audit is in CHANGEL
 - [x] Docs filled with the measured numbers (README, HANDOFF, REPORT, JUDGING_MAP, SUBMISSION, WRITEUP, VERIFICATION_REPORT, ONE_PAGER, COMMUNITY_VOTE_KIT)
 - [x] One-pager rebuilt (1 A4 page, 1096 tests and 77-check smoke on it, looked at) and guide bundle rebuilt (54 pages, v1.32.0)
 - [x] Gate on 60047bc: ruff clean, mypy strict 171 files, check_voice 0 hits, offline smoke ALL PASSED (77 checks, port 8765), leak scan clean (history hits are only test fixtures, redaction patterns and Authorization header code); pushed. CI green on 05dc01d (https://github.com/ragilmalik/tukang-copilot/actions/runs/42159090902) and 60047bc (https://github.com/ragilmalik/tukang-copilot/actions/runs/42159375750)
-- [ ] Package (repo zip, video, clip, one-pager, guide bundle, screenshots) and the Drive copy
+- [x] Package built from c234a06 (repo zip 78.6 MB, demo video, X clip, captions, one-pager, guide bundle, thumbnail, 4 docs, 33 screenshots: 44 files) and copied to the Drive folder (screenshots in a subfolder); all 44 match by size and MD5, the folder and files are owner-only. The Drive token only sees files it made, so copies uploaded in earlier sessions were not visible and were not moved to an "old" subfolder; same-name older copies may still sit in that folder
 - [ ] After the first Render deploy: check that `cf-connecting-ip` reaches the app (the rate limit keys on it)
 
 ## 1.31.1 media and docs (6 Nov)
