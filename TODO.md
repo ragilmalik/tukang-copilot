@@ -26,7 +26,7 @@ Findings ranked by user impact, each with its test; the full audit is in CHANGEL
 - [x] D. Vertical X clip (43.5 s, 1080x1920, 12.1 MB), hero GIF (640x1200, 2.2 MB), YouTube thumbnail re-made (pushed 9901da7); the og image is a composed share card that does not show the 1.31.0 screens, looked at and kept
 - [x] E. Docs: every placeholder filled with measured numbers (only `[LIVE_URL]`, `[YOUTUBE_URL]` and `[VOTE_URL]` stay for me to fill), stale wording fixed (CI status, TEST_REPORT live-run line), one-pager rebuilt by `make_launch_assets.py onepager` (1 A4 page, looked at), guide bundle rebuilt
 - [x] F. Final full run on 6 Nov: ruff clean, mypy strict 166 files, 858 non-browser + 147 Chromium tests passed one file at a time (0 failed, 0 skipped), `make_test_report.py` 1005/1005 ALL PASSED, jsdom and axe ran, offline smoke ALL PASSED (69 checks), static build and --check OK, replay fixture up to date; CI green on 09fa5f1 and 7dffd03 (axe-core now runs there too); pushed
-- [ ] G. CI went red twice after F: a screen-timing test (fixed in 0ea30ea) and a real race where a quick answer to the follow-up question was lost (fixed with the session lock, new test). Full suite re-run, CI green confirmed
+- [x] G. CI went red twice after F: a screen-timing test (fixed in 0ea30ea) and a real race where a quick answer to the follow-up question was lost (fixed with the session lock, new test). CI green again on 5d9dd75: https://github.com/ragilmalik/tukang-copilot/actions/runs/42145261120
 
 ## 1.31.0 UI pass (6 Nov)
 - [x] Screen changes through a View Transition (fallback: instant), skipped by the first tap or key, the tap still lands, off under reduced motion
@@ -68,7 +68,7 @@ Only I can do these (my accounts):
 - [ ] Check with the organisers whether a late entry is accepted (the form closed Thu Nov 5, 09:00 WIB)
 - [ ] Upload the video to YouTube with docs/launch/YOUTUBE.md, then put the link in README and SUBMISSION
 - [ ] Post the X thread (docs/launch/X_THREAD.md) with the vertical clip
-- [ ] Paste the docs/SUBMISSION.md fields into Cerebral Valley and submit; answer the AI-tools question honestly (the sample photos are AI-generated and labelled)
+- [ ] Paste the docs/SUBMISSION.md fields into Cerebral Valley and submit; answer the AI-tools question honestly (the sample photos are AI-generated and labelled). Tried on 6 Nov 2026, 09:29 WIB, signed in as ragilmalika (Google): the submit page shows a disabled "Event Finished" button and "That's time! All submissions are due now." No form opened, nothing was submitted. Open only if the organisers accept a late entry
 - [ ] Deploy on Render (docs/DEPLOY.md) if I want a live link, then `deploy_check.py <url> --live`
 - [ ] Rotate the Meta key after judging
 - [ ] Share docs/launch/COMMUNITY_VOTE_KIT.md when voting opens Tue Nov 10, 00:00 WIB

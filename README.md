@@ -38,6 +38,10 @@ What I have not done yet: run it on photos of my own broken things, run user tri
 WhatsApp number (the channel is tested against a Graph API test double and the `/wa` simulator), and run Muse Spark Open
 on Baseten (the switch exists and is tested against a test double, but no real Baseten call has been made).
 
+Submission status: not submitted. I opened the Cerebral Valley submit page on 6 November 2026 at 09:29 WIB, signed
+in with my account, and it showed a disabled "Event Finished" button with "That's time! All submissions are due now."
+No form opened, so nothing was sent.
+
 ### Live results, 5 November 2026
 
 | Scenario | Language | What happened | Photo in to plan ready | SAM 3.1 masks | Cost |

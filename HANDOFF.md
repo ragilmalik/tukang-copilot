@@ -44,4 +44,4 @@ Step by step: [docs/TUTORIAL.md](docs/TUTORIAL.md). Every setting: [docs/SETUP.m
 
 ## Open items
 
-Listed in [TODO.md](TODO.md) under "Only I can do these": the late-entry question for the organisers, YouTube and X posts, the Cerebral Valley form, an optional Render deploy, and rotating the Meta key after judging.
+Listed in [TODO.md](TODO.md) under "Only I can do these": the late-entry question for the organisers (the Cerebral Valley submit page showed "Event Finished" on 6 Nov at 09:29 WIB, so nothing was submitted), YouTube and X posts, an optional Render deploy, and rotating the Meta key after judging.
