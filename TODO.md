@@ -2,6 +2,15 @@
 
 The entry deadline was Thu Nov 5, 2026, 09:00 WIB (Nov 4, 9 PM ET). Code is done; what is left is media, final numbers and the steps only I can do with my accounts.
 
+## 1.33.0 media remake (6 Nov, in progress)
+What I want from it: more realistic images and video, a more natural voice, better music, new realistic sample photos with a live re-recording, every screen shot again, all docs updated.
+- [x] a. Voice A/B of free engines (Kokoro-82M, edge-tts, Piper): narrator edge-tts AndrewMultilingual at -8%; music "Lucky Acoustic" (Jesse Keller, CC BY 3.0); five labelled b-roll stills in docs/launch/broll/
+- [ ] a. Marketing images (thumbnail, cover, square, vertical) with real app screens composited on the phones (after the new screenshots)
+- [ ] b. New photorealistic sample photos for every scenario, labelled "Sample photo (AI-generated)", hand outlines redrawn; old photos kept in the trash folder
+- [ ] c. Live re-recording on the new photos (cap $1.00 from the app's spend log), `record_replay.py --check`, recorded-demo tests, `build_static.py --check`
+- [ ] d. Every screen shot again (id, jv, en; light and dark; laptop view) with docs/demo/screenshots/INDEX.md
+- [ ] e. New video and vertical clip (next pass), docs updated
+
 ## 1.32.0 weakness hunt (6 Nov)
 Findings ranked by user impact, each with its test; the full audit is in CHANGELOG 1.32.0.
 - [x] Session lock on every writer: double re-plan, a step check landing on the next plan, photo-check cap under parallel checks, two checks on one step, double retry, double start, live-guide / voice / outcome writes during a re-plan (test_races.py)
