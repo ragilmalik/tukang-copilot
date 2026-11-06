@@ -224,7 +224,10 @@ def _image_bytes(r: httpx.Response) -> bytes:
     if data[0].get("b64_json"):
         return base64.b64decode(data[0]["b64_json"])
     if data[0].get("url"):
-        return httpx.get(data[0]["url"], timeout=120).content
+        img = httpx.get(data[0]["url"], timeout=120)
+        if img.status_code >= 400:  # an expired link's error page must not be saved as the diagram
+            raise MetaAPIError(f"{img.status_code} from the Muse Image download: {img.text[:200]}")
+        return img.content
     raise MetaAPIError("Muse Image response had neither b64_json nor url")
 
 
@@ -308,6 +311,7 @@ def segment(image_path: Path, prompt: str) -> list[dict[str, Any]]:
         except (httpx.TimeoutException, httpx.TransportError):
             if attempt == 2:
                 raise
+            time.sleep(2 ** attempt * 2)  # 2 s, then 4 s, like every other Meta call
     cost.charge(settings.sam_model, cost.SAM_IMAGE_USD)
     return parse_sam_events(events)
 

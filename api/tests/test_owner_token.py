@@ -114,7 +114,7 @@ def test_index_links_the_simulator_hidden_until_the_server_says_it_is_on():
 
 def test_static_build_has_no_simulator_link_or_page(tmp_path):
     sys.path.insert(0, str(ROOT / "scripts"))
-    import build_static  # type: ignore[import-not-found]
+    import build_static  # type: ignore[import-not-found,unused-ignore]
 
     out = tmp_path / "site"
     build_static.build(out)

@@ -1,6 +1,6 @@
-# Project report: Tukang Copilot 1.33.0
+# Project report: Tukang Copilot 1.33.1
 
-Written 6 November 2026 by me, Malik. Tukang Copilot is my own open-source project. This is the one document that says what I built, how well it works, what I measured, and what is still open. Every number here comes from a real run that is linked; nothing is projected.
+Written 6 November 2026 by me, Malik, and brought up to 1.33.1 on 7 November. Tukang Copilot is my own open-source project. This is the one document that says what I built, how well it works, what I measured, and what is still open. Every number here comes from a real run that is linked; nothing is projected.
 
 ## What (the product)
 
@@ -45,11 +45,15 @@ From [LIVE_RUN.md](LIVE_RUN.md) and [EVAL.md](EVAL.md), 5 November 2026. These r
 
 ## Engineering checks (this release)
 
-- 1104 automated tests passed, 0 failed, 0 skipped ([TEST_REPORT.md](TEST_REPORT.md), run of 6 Nov 2026, 15:53 WIB on commit 1f84cae): 953 without a browser, 151 in real Chromium.
-- mypy strict (`mypy api --strict`): no issues in 172 files. ruff: clean. `scripts/check_voice.py`: 0 hits.
+- 1126 automated tests passed, 0 failed, 0 skipped ([TEST_REPORT.md](TEST_REPORT.md), run of 7 Nov 2026, 01:21 WIB on the 1.33.1 code before its commit): 973 without a browser, 153 in real Chromium.
+- mypy strict: `mypy api --strict` no issues in 175 files, `mypy --strict .` (the whole repo) none in 197. ruff: clean. `scripts/check_voice.py`: 0 hits.
 - HTTP smoke on a running offline server: ALL PASSED, 77 checks.
 - Recorded demo: re-recorded live on 6 November 2026, 14:01 WIB, on the new photorealistic sample photos. The plug cap is visibly off in the new motorbike photo, so the model was 85 to 88% sure of the cause in each language and asked no follow-up question (it asks only under 60%); the sample photo passes on the step it shows.
 - Static build: builds and passes its own check.
+
+## What changed in 1.33.1 (a recheck and bug hunt)
+
+I cloned 1.33.0 fresh, checked it, and then looked for bugs where faults are likely. I found and fixed 9, each with a test that failed on the old code first. The one that mattered most: when the disk filled up in the middle of a repair, every save failed, the last one too, so the repair said "running" with no worker left, and the phone spun for 7.5 minutes until a server restart. It now shows "the server could not save it" with Try again after a minute, in the web app and in WhatsApp. The others: PDFs written in one step (a parallel download could get half a file, and an erase during drawing left the owner's report on disk), the live camera guide now respects the daily spend cap, a failed Muse Image download is an error instead of a broken diagram, SAM 3.1 waits between network retries, the service worker shows the cached app when the server answers 5xx and never serves HTML in place of a script, the progress screen no longer shifts as notes arrive (layout shift 0.007 to 0), and `mypy --strict .` over the whole repo went from 21 errors to 0. Two older open items (the header language pill at 390 px and the Basa Jawa demo button text) turned out fine. No prompt, safety rule or recording changed, and I made no Meta call. Full list: [CHANGELOG.md](../CHANGELOG.md) 1.33.1.
 
 ## What changed in 1.33.0 (new photos and media)
 

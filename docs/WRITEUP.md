@@ -1,6 +1,6 @@
 # Tukang Copilot: write-up
 
-My own open-source project, written up by me (Malik, Semarang) on 6 November 2026, version 1.33.0.
+My own open-source project, written up by me (Malik, Semarang) on 6 November 2026 and brought up to version 1.33.1 on 7 November.
 
 Every phone becomes a mechanic's apprentice. You point it at something broken and say what's wrong in Bahasa
 Indonesia, Javanese or English. It finds the exact part, walks you through the fix, checks each step with your camera,
@@ -83,7 +83,7 @@ or straight away with one tap. Spend is capped per repair and per day. Logs neve
 - The same eval in offline sample mode and against the HTTP test double runs in the test suite on every change, so a
   safety regression fails a test. When I first wrote it, against the v1.24 rules, 12 of 20 red-team texts and 7 of 10
   dangerous plan steps slipped through. I fixed those gaps in 1.25.
-- Engineering: 1104 automated tests, 0 failed, 0 skipped (including real Chromium with a test camera feed, and
+- Engineering: 1126 automated tests, 0 failed, 0 skipped (including real Chromium with a test camera feed, and
   jsdom), a 77-check end-to-end HTTP smoke on an offline server (its 69-check version also passed on a live one), and clean mypy strict and ruff runs
   (docs/TEST_REPORT.md). axe-core finds nothing serious on any main screen, and every page carries a strict
   Content-Security-Policy.

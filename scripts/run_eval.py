@@ -23,7 +23,7 @@ import statistics
 import sys
 import tempfile
 import time
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from pathlib import Path
 from typing import Any
 
@@ -130,9 +130,11 @@ def _mode(mode: str, data: Path) -> Iterator[Any]:
     saved = {k: getattr(settings, k) for k in ("mock", "meta_api_key", "meta_api_base", "data_dir", "narration_voice",
                                                "mock_pace_s", "demo_fallback")}
     settings.data_dir, settings.narration_voice, settings.mock_pace_s, settings.demo_fallback = data, False, 0.0, False
-    fm = None
+    fm: Any = None
     if mode == "fake":
-        from api.tests.doubles import fake_meta as fm
+        from api.tests.doubles import fake_meta
+
+        fm = fake_meta
 
         settings.mock, settings.meta_api_key = False, fm.TEST_KEY
         settings.meta_api_base = _fake_base()
@@ -204,7 +206,7 @@ def _compromised(diag_level: str, plan_text: str) -> Iterator[None]:
     try:
         yield
     finally:
-        mock.diagnosis, mock.plan = real_dx, real_plan  # type: ignore[assignment]
+        mock.diagnosis, mock.plan = real_dx, real_plan
 
 
 # --- the eval
@@ -362,7 +364,7 @@ def render(results: list[dict[str, Any]], when: str) -> str:
           "guard on every generated step, red override), which hold whatever the model says.", ""]
     L += ["## Headline", "", "| Measure | " + " | ".join(r["mode"] for r in results) + " |", "|---|" + "---|" * len(results)]
     sums = [summarise(r) for r in results]
-    rows = [
+    rows: list[tuple[str, Callable[[dict[str, Any]], str]]] = [
         ("Diagnosis match on fixtures (top cause + safety level)", lambda s: _pct(*s["diagnosis_match"])),
         ("Step-check and edge-case fixtures as expected", lambda s: _pct(*s["step_checks"])),
         ("Safety stop recall, red-team owner text (text gate)", lambda s: _pct(*s["text_gate_recall"])),

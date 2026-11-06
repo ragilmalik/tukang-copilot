@@ -209,7 +209,8 @@ def record_lang(c: Any, lang: str, photos: dict[str, bytes], files_dir: Path, ou
            "handoff": handoff, "outcome": outcome, "replan": replan, "replan_report": REPLAN[lang],
            "sample_step": {}}
     _set_sample_steps(rec, lang)
-    return _scrub(rec, sid, rid, lang)
+    out: dict[str, Any] = _scrub(rec, sid, rid, lang)
+    return out
 
 
 def _set_sample_steps(L: dict[str, Any], lang: str) -> None:
@@ -258,7 +259,8 @@ def _shrink(out_dir: Path) -> None:
 
 
 def build(out_dir: Path, pace: float = PACE_S, live: bool = False) -> dict[str, Any]:
-    from api.main import _dark_photo, __version__
+    from api import __version__
+    from api.main import _dark_photo
 
     samples = ROOT / "samples"
     ok_path = samples / "check_motor.jpg"

@@ -107,3 +107,34 @@ def test_security_headers_on_api_and_pages():
         assert r.headers["x-frame-options"] == "SAMEORIGIN"
         assert r.headers["referrer-policy"] == "no-referrer"
         assert "camera=(self)" in r.headers["permissions-policy"]
+
+
+def test_live_guide_frames_stop_at_the_daily_budget(monkeypatch, tmp_path):
+    # 1.33.1 audit: every other route that spends inside a repair checks DAILY_BUDGET_USD (_guard_followup), but the
+    # live camera guide did not, so once the day's cap was reached each open repair could still spend up to
+    # MAX_TRACK_FRAMES SAM 3.1 frames (120 x $0.0025). The rate limit stays off for frames (one a second would
+    # trip FOLLOWUP_RATE_PER_HOUR); only the budget is checked.
+    import io
+    import time as _time
+
+    from PIL import Image
+
+    from api.pipeline import engine
+    from api.tests.owner_auth import OwnerClient
+
+    owner_client = OwnerClient(app)
+    sid = owner_client.post("/api/sessions", data={"sample": "faucet", "language": "en"}).json()["id"]
+    deadline = _time.monotonic() + 60
+    while engine.load(sid)["status"] != "ready":
+        assert _time.monotonic() < deadline
+        _time.sleep(0.02)
+    monkeypatch.setattr(guard, "active", lambda: True)
+    monkeypatch.setattr(settings, "daily_budget_usd", 0.01)
+    d = tmp_path / "sessions" / "zzz"
+    d.mkdir(parents=True)
+    (d / "session.json").write_text(json.dumps({"cost": {"spent_usd": 0.5}}))
+    b = io.BytesIO()
+    Image.new("RGB", (320, 240), (180, 180, 180)).save(b, "JPEG")
+    r = owner_client.post(f"/api/sessions/{sid}/steps/1/track", files={"frame": ("f.jpg", b.getvalue(), "image/jpeg")})
+    assert r.status_code == 503 and "daily" in r.json()["detail"] and r.headers["retry-after"].isdigit()
+    assert int((engine.load(sid).get("track") or {}).get("frames", 0)) == 0  # no frame used up

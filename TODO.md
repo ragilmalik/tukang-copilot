@@ -2,6 +2,23 @@
 
 Tukang Copilot is my own project. I built it first for the Meta AI developer hackathon (Oct to Nov 2026); the submission page had closed when I tried on 6 Nov 2026, so nothing was submitted, and the items that only made sense for the event are marked "dropped" below. What is left: listening to the new film, the steps only I can do with my accounts, and real-world trials.
 
+## 1.33.1 recheck and bug hunt (7 Nov)
+- [x] Fresh clone of main bdefe47: same files as my working copy; ruff clean, `mypy api --strict` clean, offline smoke ALL PASSED
+- [x] A repair whose worker died on a full disk no longer spins until a restart: shown and saved as "stalled" with Try again (test_stalled_repair.py)
+- [x] Report and workshop PDFs written in one step; an erase during drawing leaves no folder (test_pdf_write.py)
+- [x] Live guide frames respect DAILY_BUDGET_USD
+- [x] Muse Image download status checked; SAM 3.1 waits between network retries
+- [x] Service worker: cached app on a 5xx, no home page HTML for a missing script (test_sw_fetch.py), cache v28
+- [x] `mypy --strict .` on the whole repo clean (was 21 errors on 194 files, 0 on 197 now); CI and `scripts/check_all.sh` run it too
+- [x] WhatsApp: a repair whose last save failed gets the error and Try again instead of silence
+- [x] Progress screen layout shift 0.007 to 0 (stage note on its own line from the start; tip bar keeps its height in Basa Jawa)
+- [x] Checked, no bug: header language pill at 360, 390 and 430 px; Basa Jawa demo button text
+- [x] Full run on 7 Nov, 01:21 WIB: 1126 passed, 0 failed, 0 skipped (973 without a browser in 107 files, 153 in real Chromium in 25 files); the 01:01 run had 4 layout failures from an earlier draft of the progress-row fix, fixed before the second run
+- [x] `mypy api --strict` 175 files, `mypy --strict .` 197 files, ruff clean, check_voice 0 hits, `record_replay.py --check` up to date, `build_static.py --check` OK, offline smoke ALL PASSED (77 checks, port 8765)
+- [x] Version 1.33.1, CHANGELOG, README, HANDOFF, REPORT, WRITEUP, TESTING, ONE_PAGER, VERIFICATION_REPORT, TEST_REPORT
+- [ ] One-pager and guide bundle rebuilt, commit, push, CI
+- [ ] Tag v1.33.1, package, GitHub Release, Drive copy (1.33.0 files moved to old-1.33.0)
+
 ## 1.33.0 release (6 Nov)
 - [x] CI fix: the app said 1.32.0 while CHANGELOG headed 1.33.0 (test_version_sync); the version lives only in api/__init__.py and is now 1.33.0. The offline cache name is not tied to the version (v27 since this release's new recording)
 - [x] `mypy api --strict` failed on two test files (test_demo_video.py, test_replay.py) and the demo scripts had 8 more errors; all fixed, clean on 172 files

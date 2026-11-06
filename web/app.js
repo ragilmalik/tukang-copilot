@@ -697,7 +697,7 @@ function renderProgress(s) {
   if (stageSeen.sid !== String(s.id || "")) { stageSeen.sid = String(s.id || ""); stageSeen.t0 = {}; }
   Object.entries(s.stages).forEach(([k, v]) => { if (v.status === "running" && !stageSeen.t0[k]) stageSeen.t0[k] = Date.now(); if (v.status !== "running") delete stageSeen.t0[k]; });
   $("stageList").innerHTML = Object.entries(s.stages).map(([k, v]) =>
-    `<li id="st-${esc(k)}" class="${esc(v.status)}">${esc(t("stages")[k] || k)}${v.status === "skipped" ? "" : ` <code class="tool">${esc(stageTool(s, k))}</code>`}${v.status === "running" ? `<span class="stT" data-st="${esc(k)}"></span>` : ""}<span class="note">${esc(stageNote(v.note))}</span></li>`).join("");
+    `<li id="st-${esc(k)}" class="${esc(v.status)}">${esc(t("stages")[k] || k)}${v.status === "running" ? `<span class="stT" data-st="${esc(k)}"></span>` : ""}<span class="stSub">${v.status === "skipped" ? "" : `<code class="tool">${esc(stageTool(s, k))}</code>`}<span class="note" title="${esc(stageNote(v.note))}">${esc(stageNote(v.note))}</span></span></li>`).join("");
   renderAgentLog(s, "agentLive"); renderPartial(s); reflash(); tickElapsed(); updateTour();
   if ($("progressStatus")) {  // short screen-reader status instead of re-announcing the whole list
     const run = Object.entries(s.stages).find(([, v]) => v.status === "running");

@@ -17,7 +17,7 @@ from api.tests.test_playwright_smoke import _chromium_path  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
-import build_static  # type: ignore[import-not-found]  # noqa: E402
+import build_static  # type: ignore[import-not-found,unused-ignore]  # noqa: E402
 
 
 class _Quiet(http.server.SimpleHTTPRequestHandler):

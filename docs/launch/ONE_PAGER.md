@@ -8,7 +8,7 @@ Every phone becomes a mechanic's apprentice. Point your phone at something broke
 Indonesia, Javanese or English. It outlines the exact part on your own photo, walks you through the fix, checks each
 step with your camera, and says STOP when the job is dangerous.
 
-<div class="tag">My own open-source project · built solo in Semarang since Oct 2026 · v1.33.0</div>
+<div class="tag">My own open-source project · built solo in Semarang since Oct 2026 · v1.33.1</div>
 
 ## The problem
 - Indonesia has **139 million** motorbikes (BPS 2024), and **17%** of households drink water drawn by an electric pump (BPS 2023).
@@ -44,7 +44,7 @@ step with your camera, and says STOP when the job is dangerous.
 - Gas, mains, 220 V internals, brakes and fuel get a red STOP from plain code before any model call; untrusted text is fenced against prompt injection.
 
 ## Evidence
-**1104** automated tests pass (0 failed, 0 skipped; real Chromium + jsdom) · **77-check** HTTP smoke passes · mypy strict, ruff clean ·
+**1126** automated tests pass (0 failed, 0 skipped; real Chromium + jsdom) · **77-check** HTTP smoke passes · mypy strict, ruff clean ·
 live Meta API (5 Nov 2026, earlier sample photos): **7** scenarios run, **9/9** sample photos right on top cause and safety level, **$0.03 to $0.07** per repair ·
 red-team eval: **100%** safety-stop recall on 33 cases, **0** false stops on 17 safe, injections resisted (live 4/4, offline 7/7) ·
 3 languages · 2:25 captioned video of recorded live answers.

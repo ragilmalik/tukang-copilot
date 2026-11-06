@@ -232,6 +232,19 @@ def _busy(sid: str) -> HTTPException:
     return HTTPException(409, BUSY.get(lang, BUSY["en"]), headers={"Retry-After": "3"})
 
 
+def _storage(sid: str) -> HTTPException:
+    """503 when the server could not save (a full disk), in the owner's language."""
+    try:
+        lang = str(engine.load(sid).get("lang", "id"))
+    except (OSError, ValueError):
+        lang = "id"
+    logging.getLogger("tukang").error("session %s: could not save (disk full?)", sid)
+    return HTTPException(503, STORAGE.get(lang, STORAGE["en"]), headers={"Retry-After": "30"})
+
+
+STORAGE = {"id": "Server sedang tidak bisa menyimpan perbaikan. Coba lagi beberapa menit lagi.",
+           "jv": "Server lagi ora bisa nyimpen ndandani. Jajal maneh sawetara menit engkas.",
+           "en": "The server cannot save repairs right now. Try again in a few minutes."}
 BUSY = {"id": "Perbaikan ini sedang memproses permintaan lain. Tunggu sebentar lalu coba lagi.",
         "jv": "Ndandani iki lagi ngolah panyuwun liya. Enteni sedhela terus jajal maneh.",
         "en": "This repair is busy with another request. Wait a moment and try again."}
@@ -537,7 +550,7 @@ def _dark_photo(sample: str = "motor") -> bytes:
 
 @app.get("/api/sessions/{sid}")
 def get_session(sid: str) -> dict[str, Any]:
-    return public(_load(sid))
+    return public(engine.heal(_load(sid)))  # a repair that lost its worker shows Try again instead of spinning
 
 
 @app.delete("/api/sessions/{sid}")
@@ -558,7 +571,7 @@ async def events(sid: str) -> StreamingResponse:
         last = None
         for _ in range(900):  # ~7.5 min max
             try:
-                s = engine.load(sid)
+                s = engine.heal(engine.load(sid))
             except FileNotFoundError:  # erased by the owner while the stream was open
                 break
             snap = json.dumps(progress_view(s), ensure_ascii=False)
@@ -584,6 +597,8 @@ def post_answer(sid: str, request: Request, text: str = Form(...)) -> dict[str, 
         raise _busy(sid)
     except ValueError as e:
         raise HTTPException(409, str(e))
+    except OSError:  # the server's disk is full: nothing was changed, the owner can try again later
+        raise _storage(sid)
     engine.start(sid)
     return {"ok": True}
 
@@ -599,6 +614,8 @@ def post_retry(sid: str, request: Request) -> dict[str, Any]:
         raise _busy(sid)
     except ValueError as e:
         raise HTTPException(409, str(e))
+    except OSError:  # the server's disk is full: nothing was changed, the owner can try again later
+        raise _storage(sid)
     engine.start(sid)
     return {"ok": True}
 
@@ -632,7 +649,12 @@ MAX_FRAME = 3 * 1024 * 1024
 async def post_track(sid: str, n: int, request: Request, frame: UploadFile = File(...)) -> dict[str, Any]:
     """Live guide: one small camera frame -> SAM 3.1 boxes and outline of this step's part (normalised 0..1).
     About one frame per second; too fast gives 429, and after MAX_TRACK_FRAMES the answer has limit_reached."""
-    _owner(sid, request)
+    s = _owner(sid, request)
+    if guard.active():  # each frame is a SAM 3.1 call: the daily cap holds here too (no rate limit, ~1 frame a second)
+        try:
+            guard.check_budget()
+        except guard.Blocked as b:
+            raise HTTPException(b.status, guard.message(b.kind, str(s.get("lang", "id"))), headers={"Retry-After": str(b.retry_after)})
     p = await _save_upload(frame, IMAGE_TYPES, MAX_FRAME, ".jpg")
     try:
         return await asyncio.to_thread(track.track_step, sid, n, p)
@@ -727,7 +749,10 @@ def get_report_pdf(sid: str) -> FileResponse:
         raise HTTPException(409, "The diagnosis is not ready yet")
     from .render import report_pdf
 
-    out = report_pdf.build(engine.report(sid), s, engine.session_dir(sid), engine.session_dir(sid) / "report.pdf")
+    try:
+        out = report_pdf.build(engine.report(sid), s, engine.session_dir(sid), engine.session_dir(sid) / "report.pdf")
+    except FileNotFoundError:  # erased while the PDF was drawn: nothing to send, and no folder is made again
+        raise HTTPException(404, "Session not found")
     return FileResponse(out, media_type="application/pdf", filename=f"tukang-copilot-{sid}.pdf")
 
 
@@ -739,7 +764,10 @@ def get_workshop_pdf(sid: str) -> FileResponse:
         raise HTTPException(409, "The plan is not ready yet")
     from .render import workshop_pdf
 
-    out = workshop_pdf.build(engine.report(sid), s, engine.session_dir(sid), engine.session_dir(sid) / "workshop.pdf")
+    try:
+        out = workshop_pdf.build(engine.report(sid), s, engine.session_dir(sid), engine.session_dir(sid) / "workshop.pdf")
+    except FileNotFoundError:  # erased while the PDF was drawn: nothing to send, and no folder is made again
+        raise HTTPException(404, "Session not found")
     return FileResponse(out, media_type="application/pdf", filename=f"tukang-copilot-workshop-{sid}.pdf")
 
 

@@ -18,7 +18,7 @@ from api.tests.owner_auth import owner
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
-import impact_report  # type: ignore[import-not-found]  # noqa: E402
+import impact_report  # type: ignore[import-not-found,unused-ignore]  # noqa: E402
 
 client = TestClient(app)
 

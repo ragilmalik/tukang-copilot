@@ -585,6 +585,8 @@ def present(conv: Conv, tr: Transport) -> None:
     if not conv.sid:
         return
     s = engine.load(conv.sid)
+    if s["status"] in {"created", "running"}:  # engine.run has returned, so no worker runs it: its last save failed
+        s = engine.heal(s, force=True)  # (a full disk); shown as an error with Try again instead of silence
     st = s["status"]
     if st == "stopped":
         _send_red(conv, tr, str(s.get("stop_reason") or ""), s)

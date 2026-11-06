@@ -138,3 +138,35 @@ def test_fallback_to_canned_answers_is_off_by_default(monkeypatch: pytest.Monkey
     assert Settings().demo_fallback is False
     monkeypatch.setenv("DEMO_FALLBACK", "1")
     assert Settings().demo_fallback is True
+
+
+def test_muse_image_by_url_fails_cleanly_when_the_download_fails(monkeypatch: pytest.MonkeyPatch) -> None:
+    # 1.33.1 audit: when Muse Image answered with a url instead of b64_json, the download's status was never looked
+    # at, so an expired link's error page (HTML) was written into diagram_N.png and only failed later, inside PIL.
+    req = httpx.Request("GET", "https://img.example/x.png")
+    monkeypatch.setattr("api.meta_client.httpx.get", lambda *a, **k: httpx.Response(403, text="<html>expired</html>", request=req))
+    r = httpx.Response(200, json={"data": [{"url": "https://img.example/x.png"}]}, request=req)
+    with pytest.raises(meta_client.MetaAPIError, match="403"):
+        meta_client._image_bytes(r)
+    png = b"\x89PNG\r\n\x1a\n" + b"0" * 16
+    monkeypatch.setattr("api.meta_client.httpx.get", lambda *a, **k: httpx.Response(200, content=png, request=req))
+    assert meta_client._image_bytes(r) == png
+
+
+def test_sam_backs_off_between_network_retries(monkeypatch: pytest.MonkeyPatch, tmp_path: Any) -> None:
+    # 1.33.1 audit: SAM 3.1 retried a dropped connection at once, three times in a row, while every other Meta call
+    # waits 2, 4 s between tries; a brief network drop used up all three tries in a fraction of a second.
+    from PIL import Image
+
+    img = tmp_path / "p.jpg"
+    Image.new("RGB", (32, 32)).save(img)
+    waits: list[float] = []
+    monkeypatch.setattr("api.meta_client.time.sleep", waits.append)
+
+    def boom(*a: Any, **k: Any) -> Any:
+        raise httpx.ConnectError("network down")
+
+    monkeypatch.setattr("api.meta_client.httpx.stream", boom)
+    with pytest.raises(httpx.ConnectError):
+        meta_client.segment(img, "tap handle")
+    assert waits == [2.0, 4.0]

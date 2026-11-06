@@ -19,6 +19,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -35,7 +36,7 @@ FONT = ROOT / "web" / "fonts" / "barlow-600.woff2"
 SAMPLE_FILES = {"motor": "motor", "check_motor": "check_motor", "pump": "pump", "check_pump": "check_pump", "faucet": "faucet",
                 "check_faucet": "check_faucet", "rice": "rice", "tire": "tire", "check_tire": "check_tire"}
 
-FIXTURES: list[dict[str, str]] = [
+FIXTURES: list[dict[str, Any]] = [
     {"file": "sample_motor_plug_area.jpg", "src": "motor", "scenario": "motor", "safety": "amber",
      "text": "Motor Honda Beat saya susah hidup, distarter cuma bunyi.", "category": "motor"},
     {"file": "sample_motor_plug_closeup.jpg", "src": "motor_closeup", "scenario": "motor", "safety": "amber",

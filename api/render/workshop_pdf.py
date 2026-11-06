@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from . import brand
-from .report_pdf import INK, LABELS, M, MUTED, SAFETY_COLOR, W, _Doc, rupiah
+from .report_pdf import INK, LABELS, M, MUTED, SAFETY_COLOR, W, _Doc, rupiah, write_pdf
 
 ORANGE = brand.ORANGE_TEXT  # orange as text: the darker shade, readable on white paper
 
@@ -156,8 +156,5 @@ def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: 
         _done_block(doc, done, disc, T)
     elif not steps:
         doc.text(T["empty"], 32, color=MUTED)
-    pages = doc.finish()
-    out.parent.mkdir(parents=True, exist_ok=True)
-    pages[0].save(out, "PDF", resolution=150.0, save_all=True, append_images=pages[1:])
-    return out
+    return write_pdf(doc.finish(), out)
 

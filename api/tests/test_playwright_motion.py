@@ -176,6 +176,31 @@ def test_skeletons_hold_the_place_of_slow_results_without_layout_shift(browser, 
     assert cls < 0.1, cls  # "good" CLS by the Web Vitals line
 
 
+@pytest.mark.parametrize("lang", ["en", "jv"])
+def test_a_stage_note_arriving_never_changes_the_rows_height(browser, server, monkeypatch, lang):  # noqa: F811
+    """1.33.1: the note ("Honda Beat, spark plug area", the top cause) used to follow the model chip on the same
+    line, so when it arrived the row wrapped to a second line and "Found so far" under the list moved down
+    (about 0.002 layout shift each time, 0.007 in all). The chip and the note now share a second line that is
+    there from the start; a long note is cut with an ellipsis and keeps its full text in the title."""
+    from api.settings import settings
+
+    monkeypatch.setattr(settings, "mock_pace_s", 0.7)
+    pg = _page(browser)
+    pg.set_viewport_size({"width": 360, "height": 740})
+    pg.goto(server + f"/?lang={lang}")
+    pg.wait_for_selector("#demoBtn")
+    heights = "() => [...document.querySelectorAll('#stageList li')].map((li) => Math.round(li.getBoundingClientRect().height))"
+    pg.evaluate("""() => { window.__cls = 0;
+      new PerformanceObserver((l) => l.getEntries().forEach((e) => { if (!e.hadRecentInput) window.__cls += e.value; })).observe({ type: 'layout-shift', buffered: false }); }""")
+    pg.click("#demoBtn")
+    pg.wait_for_selector("#stageList li", timeout=15000)
+    first = pg.evaluate(heights)
+    pg.wait_for_selector("#question:not(.hidden)", timeout=30000)
+    assert pg.evaluate("document.querySelector('#st-diagnose .note').textContent.length") > 0
+    assert pg.evaluate(heights) == first
+    assert pg.evaluate("window.__cls") < 0.001
+
+
 def test_running_stage_shows_its_own_seconds_and_the_model(browser, server, monkeypatch):  # noqa: F811
     from api.settings import settings
 

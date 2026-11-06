@@ -5,7 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
-import build_static  # type: ignore[import-not-found]  # noqa: E402
+import build_static  # type: ignore[import-not-found,unused-ignore]  # noqa: E402
 
 
 def test_build_is_relative_complete_and_flagged(tmp_path):
@@ -17,7 +17,7 @@ def test_build_is_relative_complete_and_flagged(tmp_path):
     assert not (out / "static" / "sw.js").exists() and (out / ".nojekyll").exists()
     rec = (out / "static" / "replay" / "demo.json").read_text(encoding="utf-8")
     assert '"/static/' not in rec and json.loads(rec)["kind"] == "recorded-demo"
-    assert "RECORDED" in info["note"]
+    assert "RECORDED" in str(info["note"])
 
 
 def test_help_explains_build_try_and_host():

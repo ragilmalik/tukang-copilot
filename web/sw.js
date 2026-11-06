@@ -3,7 +3,7 @@
 // sleeps (free Render tier, ~50 s to wake) or the phone is offline.
 // API calls (/api/*), session files (/files/*) and guides are never cached: diagnosis needs the network,
 // and user photos must not linger on the device (24 h retention lives on the server).
-const CACHE = "tukang-shell-v27";  // bump on every release that changes the shell, so phones fetch the new app
+const CACHE = "tukang-shell-v28";  // bump on every release that changes the shell, so phones fetch the new app
 const SHELL = ["/", "/static/style.css", "/static/app.js", "/static/replay.js", "/manifest.webmanifest",
                "/static/icons/icon-192.png", "/static/icons/icon-512.png", "/static/demo-thumb.jpg", "/static/replay/demo.json",
                "/static/fonts/barlow-400.woff2", "/static/fonts/barlow-600.woff2", "/static/fonts/barlow-condensed-700.woff2",
@@ -40,12 +40,16 @@ self.addEventListener("fetch", (e) => {
     if (r.ok) { const copy = r.clone(); caches.open(CACHE).then((c) => c.put(e.request, copy)); }
     return r;
   });
-  const cached = () => caches.match(e.request, { ignoreSearch: true }).then((r) => r || caches.match("/"));
+  // Only a page load may fall back to the cached home page; a script or style sheet that is not cached gets a
+  // network error, never HTML in its place.
+  const page = e.request.mode === "navigate";
+  const cached = () => caches.match(e.request, { ignoreSearch: true }).then((r) => r || (page ? caches.match("/") : undefined));
   e.respondWith(new Promise((resolve) => {
     let done = false;
     const finish = (r) => { if (!done && r) { done = true; resolve(r); } };
     const timer = setTimeout(() => cached().then(finish), SHELL_WAIT_MS);
-    net.then((r) => { clearTimeout(timer); finish(r); })
+    // A 5xx (a free host waking up or redeploying) is treated like no network: the cached copy when there is one.
+    net.then((r) => { clearTimeout(timer); return r.status >= 500 ? cached().then((c) => finish(c || r)) : finish(r); })
       .catch(() => { clearTimeout(timer); cached().then((r) => (r ? finish(r) : finish(Response.error()))); });
   }));
 });

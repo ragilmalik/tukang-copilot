@@ -3,7 +3,9 @@ drawn as an image and saved as a multi-page PDF. Works the same in offline sampl
 """
 from __future__ import annotations
 
+import os
 import re
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -598,9 +600,20 @@ def build(rep: dict[str, Any], session: dict[str, Any], session_dir: Path, out: 
         hood.append(f"- {L.get('st_' + r['stage'], r['stage'])}: {tool}{secs}")
     _hood_and_disclaimer(doc, L, hood)
     _draw_brief(doc, session, session_dir, lang)
-    pages = doc.finish()
-    out.parent.mkdir(parents=True, exist_ok=True)
-    pages[0].save(out, "PDF", resolution=150.0, save_all=True, append_images=pages[1:])
+    return write_pdf(doc.finish(), out)
+
+
+def write_pdf(pages: list[Image.Image], out: Path) -> Path:
+    """Save the pages as one PDF at `out` in a single step: drawn into a temp file beside it, then moved over the
+    old one, so a download running at the same time always sends a whole file. The folder is never made here: a
+    session folder that is gone was erased, and raising FileNotFoundError keeps the owner's report off the disk."""
+    tmp = out.with_name(f".{out.stem}.{os.getpid()}.{threading.get_ident()}.tmp")
+    try:
+        pages[0].save(tmp, "PDF", resolution=150.0, save_all=True, append_images=pages[1:])
+        os.replace(tmp, out)
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
     return out
 
 

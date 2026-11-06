@@ -4,7 +4,7 @@ My notes for whoever picks this up next: a contributor, a friend helping me test
 
 ## What this is
 
-Tukang Copilot 1.33.0 is my own open-source project (MIT). It is a phone web app that looks at a photo of a broken motorbike, pump, tap, tyre or rice cooker, marks the parts with SAM 3.1, diagnoses and plans with Muse Spark 1.3, checks each step from a photo, re-plans, and stops dangerous jobs. It speaks Bahasa Indonesia, Basa Jawa and English. I build it alone in Semarang. Repo: https://github.com/ragilmalik/tukang-copilot
+Tukang Copilot 1.33.1 is my own open-source project (MIT). It is a phone web app that looks at a photo of a broken motorbike, pump, tap, tyre or rice cooker, marks the parts with SAM 3.1, diagnoses and plans with Muse Spark 1.3, checks each step from a photo, re-plans, and stops dangerous jobs. It speaks Bahasa Indonesia, Basa Jawa and English. I build it alone in Semarang. Repo: https://github.com/ragilmalik/tukang-copilot
 
 Release 1.33.0 (tag v1.33.0 on 1156e90): https://github.com/ragilmalik/tukang-copilot/releases/tag/v1.33.0, with the repo zip (154.2 MB), the film and the vertical clip as downloads.
 
@@ -27,9 +27,9 @@ Step by step: [docs/TUTORIAL.md](docs/TUTORIAL.md). Every setting: [docs/SETUP.m
 - **Sample:** the photos in `samples/` are AI-generated and say so on the image. Offline mode answers are pre-written. Prices are estimates.
 - **Not measured:** real owner trials and photos of real broken things.
 
-## Test results (1.33.0)
+## Test results (1.33.1)
 
-1104 automated tests passed, 0 failed, 0 skipped (953 without a browser, 151 in real Chromium), run of 6 Nov 2026, 15:53 WIB on commit 1f84cae; `mypy api --strict` clean on 172 files; ruff clean; offline HTTP smoke ALL PASSED (77 checks, port 8765); `scripts/check_voice.py` 0 hits; every relative Markdown link resolves (test_doc_links.py). Details: [docs/TEST_REPORT.md](docs/TEST_REPORT.md), [docs/VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md). Re-run: [docs/TEST_CHECKLIST.md](docs/TEST_CHECKLIST.md).
+1126 automated tests passed, 0 failed, 0 skipped (973 without a browser, 153 in real Chromium), run of 7 Nov 2026, 01:21 WIB on the 1.33.1 code before its commit (the tree over bdefe47); `mypy api --strict` clean on 175 files and `mypy --strict .` (whole repo) on 197; ruff clean; offline HTTP smoke ALL PASSED (77 checks, port 8765); `scripts/check_voice.py` 0 hits; every relative Markdown link resolves (test_doc_links.py). Details: [docs/TEST_REPORT.md](docs/TEST_REPORT.md), [docs/VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md). Re-run: [docs/TEST_CHECKLIST.md](docs/TEST_CHECKLIST.md).
 
 ## Where things are
 
@@ -45,7 +45,7 @@ Keys stay out of git: `scripts/set_keys.py` writes `.env`, and `.gitignore` cove
 to Meta, and I'd keep it that way, because the per-repair cost cap and the log scrubber only see calls that go through
 it.
 
-After a change I run ruff, `mypy api --strict`, the tests, `python scripts/check_voice.py` (it keeps filler words and
+After a change I run ruff, `mypy api --strict`, `mypy --strict .`, the tests, `python scripts/check_voice.py` (it keeps filler words and
 dashes out of the docs and comments) and then `python scripts/make_test_report.py`, which rewrites docs/TEST_REPORT.md
 from the real run. Then I update CHANGELOG, TODO and whichever docs the change touches. A change to the prompts or to
 the session shape means re-recording the demo with `python scripts/record_replay.py` (needs the key, about $0.60) and

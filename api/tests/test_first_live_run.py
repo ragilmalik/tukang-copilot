@@ -6,7 +6,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
-import first_live_run as flr  # type: ignore[import-not-found]  # noqa: E402
+import first_live_run as flr  # type: ignore[import-not-found,unused-ignore]  # noqa: E402
 
 from api.settings import settings  # noqa: E402
 from api.tests.doubles import fake_meta  # noqa: E402

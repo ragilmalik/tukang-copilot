@@ -12,6 +12,7 @@ from __future__ import annotations
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 import httpx
 
@@ -26,10 +27,10 @@ def ok(cond: bool, what: str) -> None:
         fails.append(what)
 
 
-def wait(c: httpx.Client, sid: str, timeout: float = 240) -> dict:
+def wait(c: httpx.Client, sid: str, timeout: float = 240) -> dict[str, Any]:
     t0 = time.time()
     while time.time() - t0 < timeout:
-        s = c.get(f"/api/sessions/{sid}").json()
+        s: dict[str, Any] = c.get(f"/api/sessions/{sid}").json()
         if s["status"] not in ("created", "running"):
             if s.get("fallback"):  # DEMO_FALLBACK answered a stage because the live call failed (deploy_check flags it)
                 print(f"  FALLBACK session {sid}: demo answer used for {', '.join(map(str, s['fallback']))}")

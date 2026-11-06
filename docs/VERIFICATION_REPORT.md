@@ -229,7 +229,7 @@ These came from playing every flow again on a 390x844 phone and a laptop in all 
 | No cache rule on the owner's photos and JSON; Unicode session ids; a bomb on the step check answered "AI busy" | ✅ | `test_private_repair_data_is_never_cached`, `test_session_ids_are_ascii_letters_and_digits`, `test_a_bomb_on_the_step_check_is_400_not_503` |
 | Console errors on any main screen; progress on a throttled connection; English in the id/jv tables | ✅ (Chromium) | `test_playwright_screens_clean.py`, `test_i18n.py::test_no_english_string_shows_in_bahasa_or_basa_jawa` |
 | test_doc_counts.py had stopped checking (3-digit pattern, 4-digit count) | ✅ | `test_doc_counts.py::test_the_pattern_reads_four_digit_counts` |
-| Disk full during a run leaves the repair at "running" until the next restart | ⬜ (not fixed) | Nothing can be written while the disk is full; `recover_interrupted` marks it retryable at the next start |
+| Disk full during a run leaves the repair at "running" until the next restart | ✅ (fixed in 1.33.1) | `test_stalled_repair.py`: shown as an error with Try again after `STALL_GRACE_S`, saved once the disk takes writes |
 
 **Run numbers (2026-11-06 10:29 WIB, v1.32.0, commit 29823cd):** `make_test_report.py` ALL PASSED on the whole suite in one run: pytest **1096 passed, 0 failed, 0 skipped** (945 without a browser in 103 files, 151 in real Chromium in 25 Playwright files; the jsdom flow and the axe-core check ran, not skipped), ruff clean, `check_keys.py --fake` and the run's own demo-server smoke passed (docs/TEST_REPORT.md). Separately: `mypy api --strict` no issues in 171 files; `smoke_e2e.py` ALL PASSED (77 checks) on an `OFFLINE=1` server on port 8765; `scripts/check_voice.py` 0 hits. No live API calls in this pass.
 
@@ -261,3 +261,22 @@ These came from playing every flow again on a 390x844 phone and a laptop in all 
 | mypy errors in the demo scripts and two test files fixed (the test-file ones made `mypy api` fail) | ✅ | `mypy api --strict` clean on 172 files |
 
 **Run numbers (6 Nov 2026, 15:53 WIB, v1.33.0, commit 1f84cae):** `make_test_report.py` ALL PASSED on the whole suite in one run: pytest **1104 passed, 0 failed, 0 skipped** (953 without a browser in 104 files, 151 in real Chromium in 25 Playwright files), ruff clean, `check_keys.py --fake` and the run's own demo-server smoke passed (docs/TEST_REPORT.md). Separately: `mypy api --strict` no issues in 172 files; offline HTTP smoke on port 8765 ALL PASSED (77 checks); `scripts/check_voice.py` 0 hits. The commits after 1f84cae change docs only.
+
+## 1.33.1 recheck and bug hunt (7 Nov 2026)
+
+A fresh clone of main bdefe47 matched my working copy (only the ignored data/ and dist-static/ differed); ruff, `mypy api --strict` and the offline smoke passed on it before any change. Each fix below had a test that failed on bdefe47 first. No Meta call was made.
+
+| Check | Status | Evidence |
+|---|---|---|
+| Full disk mid-run: the repair kept saying "running" with no worker until a restart; now shown and saved as an error ("stalled") with Try again after 60 s; retry and answer on a full disk are 503, not 500 | ✅ | `test_stalled_repair.py` (6; 4 failed on bdefe47) |
+| The same full disk in WhatsApp left the chat silent; it now gets the error and the Try again button | ✅ | `test_a_repair_that_could_not_save_its_end_gets_try_again_in_whatsapp` |
+| report.pdf and workshop.pdf rewritten in place on every download; an erase during drawing left the owner's report on disk | ✅ | `test_pdf_write.py` (3; all failed on bdefe47) |
+| Live guide frames ignored `DAILY_BUDGET_USD` | ✅ | `test_live_guide_frames_stop_at_the_daily_budget` |
+| Muse Image download status not checked; SAM 3.1 retried a dropped connection with no wait | ✅ | `test_muse_image_by_url_fails_cleanly_when_the_download_fails`, `test_sam_backs_off_between_network_retries` |
+| Service worker showed a 5xx page over the cached app, and served the cached home page in place of an uncached script offline | ✅ | `test_sw_fetch.py` (7; 2 failed on bdefe47), cache v28 |
+| Progress screen layout shift 0.007 at 390x844 (stage notes re-wrapped their rows) and 0.0026 from the tip bar in Basa Jawa at 360 px | ✅ | CLS 0 in both; `test_a_stage_note_arriving_never_changes_the_rows_height[en,jv]` |
+| `mypy --strict .` over the whole repo: 21 errors | ✅ | 0 errors on 197 files; CI and `scripts/check_all.sh` now run it |
+| Header language pill at 360, 390 and 430 px (id, jv) | ✅ (no bug) | pill clear of the app name, page width equals the viewport; `test_playwright_layout.py` |
+| Basa Jawa demo button text | ✅ (no bug) | "Jajal demo sak tutulan" on the home screen and "Puter demo sak tutulan ing kene" on the laptop panel |
+
+**Run numbers (7 Nov 2026, 01:21 WIB, v1.33.1, the code of the 1.33.1 commit before it was made):** `make_test_report.py` ALL PASSED on the whole suite in one run: pytest **1126 passed, 0 failed, 0 skipped** (973 without a browser in 107 files, 153 in real Chromium in 25 Playwright files, 914 s), ruff clean, `check_keys.py --fake` and the run's own demo-server smoke passed (docs/TEST_REPORT.md, whose header names bdefe47 because the fixes were not committed yet). Separately: `mypy api --strict` no issues in 175 files, `mypy --strict .` none in 197; offline HTTP smoke on port 8765 ALL PASSED (77 checks); `scripts/check_voice.py` 0 hits; `record_replay.py --check` up to date; `build_static.py --check` OK. The first run that night (01:01 WIB) had 4 failures in `test_no_element_sticks_out_of_its_card` from an earlier draft of the progress-row fix; they pass on the final code.

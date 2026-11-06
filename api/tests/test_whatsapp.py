@@ -452,3 +452,39 @@ def test_sample_to_step_falls_back_to_the_last_step_and_ignores_unknown_plans():
     conv.step = 1
     assert wa.sample_to_step(conv, s, "") == "" and conv.step == 1
     assert wa.sample_to_step(conv, {"plan": {"steps": []}}, "motor") == "" and conv.step == 1
+
+
+def test_a_repair_that_could_not_save_its_end_gets_try_again_in_whatsapp(samples, monkeypatch):
+    # 1.33.1 audit: WhatsApp runs the repair in its own thread and then reads the result. When the disk was full the
+    # last save failed, the session still said "running", and the chat got no answer at all (no error, no button).
+    import errno
+
+    real_save, real_run = engine.save, engine.run
+    full = {"on": False}
+
+    def save(s):
+        if full["on"] and s.get("status") != "created":
+            raise OSError(errno.ENOSPC, "No space left on device")
+        real_save(s)
+
+    def run(sid):
+        s = engine.load(sid)
+        s["status"] = "running"
+        real_save(s)  # the worker got as far as "running" before the disk filled up
+        full["on"] = True
+        try:
+            return real_run(sid)
+        finally:
+            full["on"] = False
+
+    monkeypatch.setattr(engine, "save", save)
+    monkeypatch.setattr(engine, "run", run)
+    deliver(fg.text_msg(PHONE, FAUCET_ID))
+    deliver(fg.image_msg(PHONE, photo(samples)))
+    inter = last_interactive()
+    assert "menyimpan" in inter["body"]["text"]
+    assert any(b.startswith("retry:") for b in button_ids(inter))
+    assert engine.load(_sid())["status"] == "error"
+    monkeypatch.setattr(engine, "run", real_run)
+    tap("retry")
+    assert "Langkah 1 dari 4" in last_interactive()["body"]["text"]

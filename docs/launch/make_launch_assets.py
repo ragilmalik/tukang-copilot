@@ -51,7 +51,7 @@ def phone(shot: str, crop_top: int, crop_h: int, width: int) -> Image.Image:
     src = Image.open(SHOTS / shot).convert("RGB")
     src = src.crop((0, crop_top, src.width, crop_top + crop_h))
     h = int(src.height * width / src.width)
-    src = src.resize((width, h), Image.LANCZOS)
+    src = src.resize((width, h), Image.Resampling.LANCZOS)
     bezel = 14
     frame = Image.new("RGB", (width + 2 * bezel, h + 2 * bezel), (12, 14, 18))
     frame.paste(src, (bezel, bezel))
@@ -59,7 +59,7 @@ def phone(shot: str, crop_top: int, crop_h: int, width: int) -> Image.Image:
 
 
 def paste_shadow(base: Image.Image, im: Image.Image, xy: tuple[int, int], angle: float) -> None:
-    rot = im.rotate(angle, resample=Image.BICUBIC, expand=True)
+    rot = im.rotate(angle, resample=Image.Resampling.BICUBIC, expand=True)
     shadow = Image.new("RGBA", rot.size, (0, 0, 0, 0))
     alpha = rot.split()[3].point(lambda a: int(a * 0.35))
     shadow.putalpha(alpha)
@@ -124,7 +124,7 @@ def box(d: ImageDraw.ImageDraw, xy: tuple[int, int, int, int], title: str, sub: 
         y += sub_size + 10
 
 
-def arrow(d: ImageDraw.ImageDraw, a: tuple[int, int], b: tuple[int, int], color=NAVY, width: int = 6,
+def arrow(d: ImageDraw.ImageDraw, a: tuple[int, int], b: tuple[int, int], color: tuple[int, int, int] = NAVY, width: int = 6,
           label: str | None = None, label_xy: tuple[int, int] | None = None) -> None:
     d.line([a, b], fill=color, width=width)
     import math

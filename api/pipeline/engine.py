@@ -59,6 +59,12 @@ OUTCOME_WAIT_S = 5.0  # "It works now" during a re-plan: answer busy quickly, th
 GUIDED = {"ready", "exhausted"}  # the owner is on the steps: step checks and the live guide are allowed
 STARTED_AT = time.time()  # sessions saved before this process started cannot have a worker in it
 SID_RE = re.compile(r"[A-Za-z0-9]{1,32}")
+# Workers running in this process, by session id (a count: a retry may queue a second one behind the lock). A repair
+# saved as "created" or "running" with no worker here and no save for STALL_GRACE_S has lost its worker without
+# saving its end (a full disk made the last save fail too): stalled() and heal() turn it into an error with Try again.
+_workers: dict[str, int] = {}
+_workers_guard = threading.Lock()
+STALL_GRACE_S = 60.0  # covers the moment between answer()/retry() saving "running" and start() registering the worker
 
 
 class Busy(ValueError):
@@ -590,6 +596,23 @@ def run(sid: str) -> dict[str, Any]:
     """Run (or resume after a follow-up answer or a retry) the full analysis. A session that is not waiting for a
     worker ("created", or "running" after answer() or retry()) is returned untouched: a second start (two Try again
     taps, WhatsApp and the web at once) must not run diagnose and plan again over a finished repair."""
+    with _workers_guard:
+        _workers[sid] = _workers.get(sid, 0) + 1
+    try:
+        return _run(sid)
+    except OSError as e:  # the last save failed too (a full disk): heal() shows the repair as retryable meanwhile
+        log.error("session %s: could not save its end state: %s", sid, errors.detail(e))
+        return {"id": sid, "status": "error"}
+    finally:
+        with _workers_guard:
+            left = _workers.get(sid, 1) - 1
+            if left > 0:
+                _workers[sid] = left
+            else:
+                _workers.pop(sid, None)
+
+
+def _run(sid: str) -> dict[str, Any]:
     with locked(sid, wait=None):
         try:
             s = load(sid)
@@ -636,9 +659,9 @@ def run(sid: str) -> dict[str, Any]:
                 if v["status"] == "running":
                     s["stages"][k] = {"status": "error", "note": ""}
         finally:
+            cost.use(None)  # first: the save below can fail on a full disk
             s["cost"] = meter.summary()
             save(s)
-            cost.use(None)
         return s
 
 
@@ -990,6 +1013,11 @@ def cleanup(max_age_hours: float | None = None) -> int:
                     _erase(d.name, d)
                     n += 1
                     continue
+                if SID_RE.fullmatch(d.name):
+                    try:
+                        heal(load(d.name))  # a repair whose worker died without saving its end
+                    except (OSError, ValueError):
+                        pass
                 for tmp in d.glob("session.*.tmp"):
                     if tmp.stat().st_mtime < now - STALE_TMP_S:
                         tmp.unlink(missing_ok=True)
@@ -1003,6 +1031,56 @@ def cleanup(max_age_hours: float | None = None) -> int:
         for k in gone:
             del _locks[k]
     return n
+
+
+STALLED = {
+    "id": "Perbaikan ini berhenti sebelum selesai karena server tidak bisa menyimpannya. Ketuk Coba lagi untuk melanjutkan.",
+    "jv": "Ndandani iki mandheg sadurunge rampung amarga server ora bisa nyimpen. Tutul Jajal maneh kanggo nerusake.",
+    "en": "This repair stopped before it finished because the server could not save it. Tap Try again to carry on.",
+}
+
+
+def stalled(s: dict[str, Any], force: bool = False) -> bool:
+    """True for a repair that says "created" or "running" while no worker in this process runs it, and that has
+    not been saved for STALL_GRACE_S (force=True skips that wait: the caller knows its own worker has returned).
+    One server process is the rule (docs/DEPLOY.md), so no worker here means no worker at all."""
+    if s.get("status") not in {"created", "running"}:
+        return False
+    with _workers_guard:
+        if str(s.get("id")) in _workers:
+            return False
+    return force or float(s.get("updated") or 0) < time.time() - STALL_GRACE_S
+
+
+def _mark_error(s: dict[str, Any], messages: dict[str, str], kind: str, detail: str) -> None:
+    lang = str(s.get("lang")) if s.get("lang") in messages else "id"
+    s["status"], s["error"], s["error_kind"], s["error_detail"] = "error", messages[lang], kind, detail
+    for k, v in (s.get("stages") or {}).items():
+        if isinstance(v, dict) and v.get("status") == "running":
+            s["stages"][k] = {"status": "error", "note": ""}
+
+
+def heal(s: dict[str, Any], force: bool = False) -> dict[str, Any]:
+    """Return s, or for a stalled repair a copy marked as an error the owner can retry. The mark is saved when the
+    disk takes it; while it does not (still full), the copy is only shown, and the next read tries again."""
+    if not stalled(s, force):
+        return s
+    sid = str(s["id"])
+    try:
+        with locked(sid, wait=0):
+            cur = load(sid)
+            if not stalled(cur, force):
+                return cur
+            _mark_error(cur, STALLED, "stalled", "worker ended without saving its end state")
+            try:
+                save(cur)
+            except OSError as e:
+                log.warning("session %s: stalled, could not save the error yet: %s", sid, errors.detail(e))
+            return cur
+    except Busy:
+        return s  # someone is changing it right now, so it is not stalled
+    except (OSError, ValueError):
+        return s  # erased meanwhile, or unreadable: the caller's copy stands
 
 
 INTERRUPTED = {
@@ -1029,12 +1107,7 @@ def recover_interrupted() -> int:
                 s = load(sid)
                 if s.get("status") not in {"created", "running"} or float(s.get("updated") or 0) >= STARTED_AT:
                     continue
-                lang = str(s.get("lang")) if s.get("lang") in INTERRUPTED else "id"
-                s["status"], s["error"], s["error_kind"] = "error", INTERRUPTED[lang], "interrupted"
-                s["error_detail"] = "server restarted mid-repair"
-                for k, v in (s.get("stages") or {}).items():
-                    if isinstance(v, dict) and v.get("status") == "running":
-                        s["stages"][k] = {"status": "error", "note": ""}
+                _mark_error(s, INTERRUPTED, "interrupted", "server restarted mid-repair")
                 save(s)
                 n += 1
         except (Busy, OSError, ValueError):
