@@ -39,7 +39,7 @@ _FILL = "x1Y2z3" * 5
     "graph " + "EA" + "A" + _FILL,
     "google " + "AI" + "za" + _FILL,
     "gh " + "gh" + "p_" + _FILL,
-])
+], ids=["bearer", "api-key-json", "openai-style", "graph", "google", "github"])  # ids, not the strings: test ids land in TEST_REPORT.md
 def test_known_secret_shapes_are_scrubbed(raw: str) -> None:
     out = logs.redact(raw)
     assert out != raw and "***" in out
