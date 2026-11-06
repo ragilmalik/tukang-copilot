@@ -23,6 +23,9 @@ def _axe_path() -> Path:
 
 
 AXE = _axe_path()
+# A repair may take this long to reach the screen under test: generous, because CI runners are slow and the repairs the
+# axe walk starts can still hold the worker pool (the listening-note wait timed out at 20 s on a runner).
+REPAIR_WAIT_MS = 60_000
 RUN = """async () => { const r = await axe.run(document, {runOnly: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice']});
   return r.violations.map(v => ({id: v.id, impact: v.impact, at: v.nodes.slice(0, 3).map(n => n.target.join(' '))})); }"""
 
@@ -60,22 +63,22 @@ def test_every_screen_has_one_h1_and_no_serious_axe_findings(phone):
     assert len(_visible_h1(pg)) == 1
     bad += _axe(pg, "home")
     pg.click("#demoBtn")
-    pg.wait_for_selector("#question:not(.hidden)", timeout=30000)
+    pg.wait_for_selector("#question:not(.hidden)", timeout=REPAIR_WAIT_MS)
     assert _visible_h1(pg) == ["progTitle"]
     bad += _axe(pg, "question")
     pg.click('#quickAns button[data-q="qNo"]')
-    pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
+    pg.wait_for_selector("#result:not(.hidden)", timeout=REPAIR_WAIT_MS)
     pg.wait_for_timeout(800)
     assert _visible_h1(pg) == ["dxObject"]
     bad += _axe(pg, "result")
     pg.goto(base + "/?lang=en")
     pg.click('button.sample[data-sample="rice"]')
-    pg.wait_for_selector("#stopBox:not(.hidden)", timeout=30000)
+    pg.wait_for_selector("#stopBox:not(.hidden)", timeout=REPAIR_WAIT_MS)
     assert _visible_h1(pg) == ["progTitle"]
     bad += _axe(pg, "stop")
     sid = pg.evaluate("() => JSON.parse(localStorage.getItem('tc_garage') || '[]').map(g => g.id)[0]")
     pg.goto(f"{base}/guide/{sid}")
-    pg.wait_for_selector("#stopBox:not(.hidden)", timeout=20000)
+    pg.wait_for_selector("#stopBox:not(.hidden)", timeout=REPAIR_WAIT_MS)
     assert _visible_h1(pg) == ["progTitle"]
     bad += _axe(pg, "guide_stop")
     pg.goto(base + "/wa?lang=en")
@@ -106,9 +109,15 @@ def test_file_pickers_are_native_inputs_in_the_tab_order(phone):
 def test_typed_repair_says_why_listening_was_skipped(phone, lang, stage, note):
     phone.goto(f"{phone.base}/?lang={lang}")
     phone.click('button.sample[data-sample="faucet"]')
-    phone.wait_for_selector("#st-listen .note:not(:empty)", timeout=20000)
-    assert phone.inner_text("#st-listen .note") == note
-    assert phone.inner_text("#st-listen").startswith(stage)
+    # On a fast machine the progress screen can already be gone when the note lands, so the row may be
+    # hidden by then. Wait for it in the DOM and read textContent, which does not depend on visibility.
+    phone.wait_for_selector("#st-listen .note:not(:empty)", state="attached", timeout=REPAIR_WAIT_MS)
+    assert _text(phone, "#st-listen .note") == note
+    assert _text(phone, "#st-listen").startswith(stage)
+
+
+def _text(page, selector):
+    return " ".join((page.text_content(selector) or "").split())
 
 
 def test_axe_is_found_where_jsdom_is_found(tmp_path, monkeypatch):
