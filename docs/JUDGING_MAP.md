@@ -79,7 +79,7 @@ live) on labelled AI-generated sample photos.
 | 1-tap demo with no photo needed; a recorded demo plays if the free server is asleep | README "Try it in 60 seconds", `27_recorded_demo.png` |
 | Laptop view: on a screen 1024 px or wider the app sits in a phone frame with a side panel (QR code of the current URL, 1-tap demo, id/jv/en switch) | `29_laptop.png`, `test_playwright_desk.py` |
 | Static judge build with no server and no cold start: `scripts/build_static.py` writes `dist-static/` (recorded demo, relative paths; not hosted yet) | `scripts/build_static.py --help`, `test_playwright_static.py` |
-| 33 screenshots (5 of them from the WhatsApp simulator) and a hero GIF | `docs/demo/screenshots/`, `docs/demo/hero.gif` |
+| 118 screenshots: the numbered set of 33 (5 from the WhatsApp simulator) and a gallery of 85 covering every screen in three languages, light and dark; plus a hero GIF | `docs/demo/screenshots/INDEX.md`, `docs/demo/hero.gif` |
 | Every frame says where its answers come from (recorded live run, or the live camera guide) and that the photos are AI-generated samples | docs/demo/README.md |
 | **Still open (me):** the live URL ([LIVE_URL]) and the YouTube link ([YOUTUBE_URL]) are not filled in. Final judges watch the video live, so the first 10 seconds have to hook them. | docs/launch/YOUTUBE.md |
 | **Still open (me):** a clip of a real phone on a real object (even 20 seconds of a real faucet or pump) inside the video. The answers in the video are live, but the photos are AI-generated samples. | docs/DEMO_SCRIPT.md |

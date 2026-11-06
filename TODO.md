@@ -9,7 +9,8 @@ What I want from it: more realistic images and video, a more natural voice, bett
 - [x] b. New photorealistic sample photos for every scenario, labelled "Sample photo (AI-generated)", hand outlines redrawn; old photos kept in the trash folder
 - [x] c. Live re-recording on the new photos (cap $1.00 from the app's spend log): 1-tap demo in id/jv/en with no follow-up question (the model was 85-88% sure), plus live pump (id), rice cooker red stop (id), faucet with a Muse Image diagram (en) and tyre (jv) sessions for the screenshots; `record_replay.py --check` up to date, recorded-demo and sample tests pass, `build_static.py --check` OK
 - [ ] WhatsApp simulator shots not re-taken: they need about $0.15 of live answers and the $1.00 cap had $0.06 left
-- [ ] d. Every screen shot again (id, jv, en; light and dark; laptop view) with docs/demo/screenshots/INDEX.md
+- [x] d. Every screen shot again (id, jv, en; light and dark; laptop view) with docs/demo/screenshots/INDEX.md: 118 files (26 numbered re-shot + 85 gallery on the new photos, 7 older shots kept and marked: 03_question, 16_live_guide, 30_whatsapp_*)
+- [ ] 16_live_guide on the new photos: the take on the pump photo (20 SAM 3.1 frames, $0.05) did not lock within 30 s; needs budget and maybe a tighter part outline
 - [ ] e. New video and vertical clip (next pass), docs updated
 
 ## 1.32.0 weakness hunt (6 Nov)

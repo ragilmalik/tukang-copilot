@@ -1,0 +1,342 @@
+[
+ {
+  "file": "gallery/id_light_01_home.png",
+  "what": "First screen (Bahasa Indonesia)"
+ },
+ {
+  "file": "gallery/id_light_02_capture.png",
+  "what": "Capture: sample photo picked and the problem typed, nothing sent yet (Bahasa Indonesia)"
+ },
+ {
+  "file": "gallery/id_light_03_progress.png",
+  "what": "Progress: each stage streams in, SAM 3.1 outline already on the photo (Bahasa Indonesia)"
+ },
+ {
+  "file": "gallery/id_light_05_result_top.png",
+  "what": "Result, top: object, safety level, recorded-demo badge (Bahasa Indonesia)"
+ },
+ {
+  "file": "gallery/id_light_06_diagnosis.png",
+  "what": "Diagnosis: likely causes with confidence (Bahasa Indonesia)"
+ },
+ {
+  "file": "gallery/id_light_07_parts.png",
+  "what": "Parts: SAM 3.1 masks numbered on the photo (Bahasa Indonesia)"
+ },
+ {
+  "file": "gallery/id_light_08_safety.png",
+  "what": "Safety: before-you-start list to tick (Bahasa Indonesia)"
+ },
+ {
+  "file": "gallery/id_light_09_step.png",
+  "what": "Step card (Bahasa Indonesia)"
+ },
+ {
+  "file": "gallery/id_light_10_check_fail.png",
+  "what": "Step check fails: photo too dark (Bahasa Indonesia)"
+ },
+ {
+  "file": "gallery/id_light_11_check_pass.png",
+  "what": "Step check passes on the step the photo shows (Bahasa Indonesia)"
+ },
+ {
+  "file": "gallery/id_light_12_hands_free.png",
+  "what": "Hands-free voice bar on (Bahasa Indonesia)"
+ },
+ {
+  "file": "gallery/id_light_13_replan.png",
+  "what": "Re-plan: next cause after 'still broken' (Bahasa Indonesia)"
+ },
+ {
+  "file": "gallery/id_light_14_agent_log.png",
+  "what": "Agent log: every model call and decision (Bahasa Indonesia)"
+ },
+ {
+  "file": "gallery/id_light_15_report_actions.png",
+  "what": "Share, PDF report and hand-off buttons (Bahasa Indonesia)"
+ },
+ {
+  "file": "gallery/id_light_16_handoff.png",
+  "what": "Hand-off to a mechanic (WhatsApp text) (Bahasa Indonesia)"
+ },
+ {
+  "file": "gallery/id_light_20_red_stop.png",
+  "what": "Rice cooker: red safety stop, Bahasa Indonesia"
+ },
+ {
+  "file": "gallery/id_light_21_red_stop_handoff.png",
+  "what": "Red stop: do this now, service buttons, hand-off"
+ },
+ {
+  "file": "gallery/id_light_22_pump_result.png",
+  "what": "Water pump result, Bahasa Indonesia"
+ },
+ {
+  "file": "gallery/id_light_23_faucet_result_en.png",
+  "what": "Kitchen tap result, English"
+ },
+ {
+  "file": "gallery/id_light_24_diagram_step_en.png",
+  "what": "Step with a Muse Image diagram, English"
+ },
+ {
+  "file": "gallery/id_light_25_tire_result_jv.png",
+  "what": "Scooter tyre result, Basa Jawa"
+ },
+ {
+  "file": "gallery/id_light_26_share_page.png",
+  "what": "Share link page (/guide/<id>) of the pump repair"
+ },
+ {
+  "file": "gallery/id_light_27_gone_404.png",
+  "what": "404: a share link whose guide was deleted (HTTP 404 page)"
+ },
+ {
+  "file": "gallery/id_light_28_garage.png",
+  "what": "Garage: repairs opened on this phone"
+ },
+ {
+  "file": "gallery/id_light_35_offline.png",
+  "what": "Offline: the bar the phone shows when it loses its connection"
+ },
+ {
+  "file": "gallery/jv_light_01_home.png",
+  "what": "First screen (Basa Jawa)"
+ },
+ {
+  "file": "gallery/jv_light_02_capture.png",
+  "what": "Capture: sample photo picked and the problem typed, nothing sent yet (Basa Jawa)"
+ },
+ {
+  "file": "gallery/jv_light_03_progress.png",
+  "what": "Progress: each stage streams in, SAM 3.1 outline already on the photo (Basa Jawa)"
+ },
+ {
+  "file": "gallery/jv_light_05_result_top.png",
+  "what": "Result, top: object, safety level, recorded-demo badge (Basa Jawa)"
+ },
+ {
+  "file": "gallery/jv_light_06_diagnosis.png",
+  "what": "Diagnosis: likely causes with confidence (Basa Jawa)"
+ },
+ {
+  "file": "gallery/jv_light_07_parts.png",
+  "what": "Parts: SAM 3.1 masks numbered on the photo (Basa Jawa)"
+ },
+ {
+  "file": "gallery/jv_light_08_safety.png",
+  "what": "Safety: before-you-start list to tick (Basa Jawa)"
+ },
+ {
+  "file": "gallery/jv_light_09_step.png",
+  "what": "Step card (Basa Jawa)"
+ },
+ {
+  "file": "gallery/jv_light_10_check_fail.png",
+  "what": "Step check fails: photo too dark (Basa Jawa)"
+ },
+ {
+  "file": "gallery/jv_light_11_check_pass.png",
+  "what": "Step check passes on the step the photo shows (Basa Jawa)"
+ },
+ {
+  "file": "gallery/jv_light_12_hands_free.png",
+  "what": "Hands-free voice bar on (Basa Jawa)"
+ },
+ {
+  "file": "gallery/jv_light_13_replan.png",
+  "what": "Re-plan: next cause after 'still broken' (Basa Jawa)"
+ },
+ {
+  "file": "gallery/jv_light_14_agent_log.png",
+  "what": "Agent log: every model call and decision (Basa Jawa)"
+ },
+ {
+  "file": "gallery/jv_light_15_report_actions.png",
+  "what": "Share, PDF report and hand-off buttons (Basa Jawa)"
+ },
+ {
+  "file": "gallery/jv_light_16_handoff.png",
+  "what": "Hand-off to a mechanic (WhatsApp text) (Basa Jawa)"
+ },
+ {
+  "file": "gallery/en_light_01_home.png",
+  "what": "First screen (English)"
+ },
+ {
+  "file": "gallery/en_light_02_capture.png",
+  "what": "Capture: sample photo picked and the problem typed, nothing sent yet (English)"
+ },
+ {
+  "file": "gallery/en_light_03_progress.png",
+  "what": "Progress: each stage streams in, SAM 3.1 outline already on the photo (English)"
+ },
+ {
+  "file": "gallery/en_light_05_result_top.png",
+  "what": "Result, top: object, safety level, recorded-demo badge (English)"
+ },
+ {
+  "file": "gallery/en_light_06_diagnosis.png",
+  "what": "Diagnosis: likely causes with confidence (English)"
+ },
+ {
+  "file": "gallery/en_light_07_parts.png",
+  "what": "Parts: SAM 3.1 masks numbered on the photo (English)"
+ },
+ {
+  "file": "gallery/en_light_08_safety.png",
+  "what": "Safety: before-you-start list to tick (English)"
+ },
+ {
+  "file": "gallery/en_light_09_step.png",
+  "what": "Step card (English)"
+ },
+ {
+  "file": "gallery/en_light_10_check_fail.png",
+  "what": "Step check fails: photo too dark (English)"
+ },
+ {
+  "file": "gallery/en_light_11_check_pass.png",
+  "what": "Step check passes on the step the photo shows (English)"
+ },
+ {
+  "file": "gallery/en_light_12_hands_free.png",
+  "what": "Hands-free voice bar on (English)"
+ },
+ {
+  "file": "gallery/en_light_13_replan.png",
+  "what": "Re-plan: next cause after 'still broken' (English)"
+ },
+ {
+  "file": "gallery/en_light_14_agent_log.png",
+  "what": "Agent log: every model call and decision (English)"
+ },
+ {
+  "file": "gallery/en_light_15_report_actions.png",
+  "what": "Share, PDF report and hand-off buttons (English)"
+ },
+ {
+  "file": "gallery/en_light_16_handoff.png",
+  "what": "Hand-off to a mechanic (WhatsApp text) (English)"
+ },
+ {
+  "file": "gallery/id_dark_01_home.png",
+  "what": "First screen (Bahasa Indonesia, dark)"
+ },
+ {
+  "file": "gallery/id_dark_02_capture.png",
+  "what": "Capture: sample photo picked and the problem typed, nothing sent yet (Bahasa Indonesia, dark)"
+ },
+ {
+  "file": "gallery/id_dark_03_progress.png",
+  "what": "Progress: each stage streams in, SAM 3.1 outline already on the photo (Bahasa Indonesia, dark)"
+ },
+ {
+  "file": "gallery/id_dark_05_result_top.png",
+  "what": "Result, top: object, safety level, recorded-demo badge (Bahasa Indonesia, dark)"
+ },
+ {
+  "file": "gallery/id_dark_06_diagnosis.png",
+  "what": "Diagnosis: likely causes with confidence (Bahasa Indonesia, dark)"
+ },
+ {
+  "file": "gallery/id_dark_07_parts.png",
+  "what": "Parts: SAM 3.1 masks numbered on the photo (Bahasa Indonesia, dark)"
+ },
+ {
+  "file": "gallery/id_dark_08_safety.png",
+  "what": "Safety: before-you-start list to tick (Bahasa Indonesia, dark)"
+ },
+ {
+  "file": "gallery/id_dark_09_step.png",
+  "what": "Step card (Bahasa Indonesia, dark)"
+ },
+ {
+  "file": "gallery/id_dark_10_check_fail.png",
+  "what": "Step check fails: photo too dark (Bahasa Indonesia, dark)"
+ },
+ {
+  "file": "gallery/id_dark_11_check_pass.png",
+  "what": "Step check passes on the step the photo shows (Bahasa Indonesia, dark)"
+ },
+ {
+  "file": "gallery/id_dark_12_hands_free.png",
+  "what": "Hands-free voice bar on (Bahasa Indonesia, dark)"
+ },
+ {
+  "file": "gallery/id_dark_13_replan.png",
+  "what": "Re-plan: next cause after 'still broken' (Bahasa Indonesia, dark)"
+ },
+ {
+  "file": "gallery/id_dark_14_agent_log.png",
+  "what": "Agent log: every model call and decision (Bahasa Indonesia, dark)"
+ },
+ {
+  "file": "gallery/id_dark_15_report_actions.png",
+  "what": "Share, PDF report and hand-off buttons (Bahasa Indonesia, dark)"
+ },
+ {
+  "file": "gallery/id_dark_16_handoff.png",
+  "what": "Hand-off to a mechanic (WhatsApp text) (Bahasa Indonesia, dark)"
+ },
+ {
+  "file": "gallery/id_dark_20_red_stop.png",
+  "what": "Rice cooker: red safety stop, Bahasa Indonesia (dark)"
+ },
+ {
+  "file": "gallery/id_dark_21_red_stop_handoff.png",
+  "what": "Red stop: do this now, service buttons, hand-off (dark)"
+ },
+ {
+  "file": "gallery/id_dark_28_garage.png",
+  "what": "Garage: repairs opened on this phone (dark)"
+ },
+ {
+  "file": "gallery/pdf_30_report_pdf_id_p1.png",
+  "what": "PDF report, motorbike, Bahasa Indonesia, page 1 of 4"
+ },
+ {
+  "file": "gallery/pdf_30_report_pdf_id_p2.png",
+  "what": "PDF report, motorbike, Bahasa Indonesia, page 2 of 4"
+ },
+ {
+  "file": "gallery/pdf_31_report_pdf_en_p1.png",
+  "what": "PDF report, motorbike, English, page 1 of 3"
+ },
+ {
+  "file": "gallery/pdf_31_report_pdf_en_p2.png",
+  "what": "PDF report, motorbike, English, page 2 of 3"
+ },
+ {
+  "file": "gallery/pdf_32_stop_pdf_p1.png",
+  "what": "PDF report of the red stop (rice cooker), page 1 of 3"
+ },
+ {
+  "file": "gallery/pdf_32_stop_pdf_p2.png",
+  "what": "PDF report of the red stop (rice cooker), page 2 of 3"
+ },
+ {
+  "file": "gallery/pdf_33_share_card_id.png",
+  "what": "Share card image (link preview), motorbike, Bahasa Indonesia"
+ },
+ {
+  "file": "gallery/laptop_home_en.png",
+  "what": "Laptop: phone frame plus side panel (QR code, 1-tap demo, language switch)"
+ },
+ {
+  "file": "gallery/laptop_home_en_dark.png",
+  "what": "Laptop: phone frame plus side panel (QR code, 1-tap demo, language switch) (dark)"
+ },
+ {
+  "file": "gallery/static_01_home_en.png",
+  "what": "Static build (no server): first screen with the recorded-demo badge, English"
+ },
+ {
+  "file": "gallery/static_02_result_en.png",
+  "what": "Static build: recorded motorbike result, English"
+ },
+ {
+  "file": "gallery/id_light_34_error_retry.png",
+  "what": "Error and Retry: a real failed run (Meta API unreachable, forced for this shot)"
+ }
+]

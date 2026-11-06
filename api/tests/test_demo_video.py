@@ -71,3 +71,30 @@ def test_whatsapp_scene_in_javanese_with_its_screenshots():
     assert keys.index("rice") < keys.index("wa") < keys.index("arch")
     assert "  wa " in (DEMO / "TIMESTAMPS.txt").read_text(encoding="utf-8")
     assert "30_whatsapp_jv_diagnosis" in mda.GIF_SHOTS
+
+
+def test_open_recorded_uses_the_sessions_owner_token(tmp_path, monkeypatch):
+    """Since 1.32.0 the live guide, step checks and "Still broken" answer 403 without the owner token, so the
+    screenshot scripts must read the token stored with a recorded session and put it in the page's store under the
+    same key web/app.js uses (OWNER_KEY)."""
+    from api.settings import settings
+
+    sid = "abc123def456"
+    (tmp_path / "sessions" / sid).mkdir(parents=True)
+    (tmp_path / "sessions" / sid / "session.json").write_text(json.dumps({"id": sid, "owner_token": "tok-1"}), encoding="utf-8")
+    monkeypatch.setattr(settings, "data_dir", tmp_path)
+    assert mda.owner_token(sid) == "tok-1"
+    (tmp_path / "sessions" / sid / "session.json").write_text(json.dumps({"id": sid}), encoding="utf-8")
+    assert mda.owner_token(sid) == ""  # an old session without a token: the page simply gets no header
+    import inspect
+    src = inspect.getsource(mda.open_recorded)
+    app = (ROOT / "web" / "app.js").read_text(encoding="utf-8")
+    assert 'const OWNER_KEY = "tc_owner";' in app and "'tc_owner'" in src
+
+
+def test_screenshot_index_lists_every_png():
+    """docs/demo/screenshots/INDEX.md (scripts/make_screenshot_index.py) names every screenshot on disk."""
+    shots = DEMO / "screenshots"
+    index = (shots / "INDEX.md").read_text(encoding="utf-8")
+    missing = [p.relative_to(shots).as_posix() for p in shots.rglob("*.png") if f"`{p.relative_to(shots).as_posix()}`" not in index]
+    assert not missing, f"not in INDEX.md (run scripts/make_screenshot_index.py): {missing}"

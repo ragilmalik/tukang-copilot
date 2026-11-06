@@ -101,10 +101,10 @@ line goes through a scrubber in [`api/logs.py`](api/logs.py) and carries an `X-R
 | Snap + speak | Parts found (SAM 3.1) | What the AI did | Check my step |
 |---|---|---|---|
 | ![home](docs/demo/screenshots/01_home.png) | ![parts](docs/demo/screenshots/05_parts.png) | ![agent log](docs/demo/screenshots/23_agent_log.png) | ![check](docs/demo/screenshots/07_check_fail.png) |
-| Live camera guide | Bengkel hand-off | Safety stop | Basa Jawa |
-| ![live](docs/demo/screenshots/16_live_guide.png) | ![hand-off](docs/demo/screenshots/18_handoff.png) | ![stop](docs/demo/screenshots/11_rice_stop.png) | ![jawa](docs/demo/screenshots/20_javanese_result.png) |
+| Muse Image diagram | Bengkel hand-off | Safety stop | Basa Jawa |
+| ![diagram](docs/demo/screenshots/28_diagram_step.png) | ![hand-off](docs/demo/screenshots/18_handoff.png) | ![stop](docs/demo/screenshots/11_rice_stop.png) | ![jawa](docs/demo/screenshots/20_javanese_result.png) |
 
-<sub>All 33 screenshots are in [docs/demo/screenshots](docs/demo/screenshots). The phone screenshots were re-shot on 6 November 2026 on the 1.31.0 screens from real Meta API answers recorded on live runs (the recorded 1-tap demo and live sessions), with the labelled AI-generated sample photos. The live camera guide called SAM 3.1 live on Chromium's test camera feed playing a sample photo.</sub>
+<sub>Every screenshot is listed in [docs/demo/screenshots/INDEX.md](docs/demo/screenshots/INDEX.md): the numbered set used by the video, plus a gallery of every screen in Bahasa Indonesia, Basa Jawa and English, light and dark. They were re-shot on 6 November 2026 on the new photorealistic sample photos (labelled AI-generated), from Meta API answers recorded on live runs that day. Seven older shots from the previous photo set are kept and marked in the index until the video is re-made.</sub>
 
 ## Why I built it
 

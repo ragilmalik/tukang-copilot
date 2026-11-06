@@ -221,7 +221,10 @@ def _server() -> tuple[str, Any]:
     settings.rate_limit_per_hour = 1000
     if not settings.offline:
         settings.wa_sim = True
-    s = socket.socket(); s.bind(("127.0.0.1", 0)); port = s.getsockname()[1]; s.close()
+    # DEMO_PORT=8765 pins the port (a shared machine where only one port is ours); default: any free port
+    port = int(os.environ.get("DEMO_PORT") or 0)
+    if not port:
+        s = socket.socket(); s.bind(("127.0.0.1", 0)); port = s.getsockname()[1]; s.close()
     srv = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning"))
     threading.Thread(target=srv.run, daemon=True).start()
     while not srv.started:
@@ -363,9 +366,23 @@ def no_new_runs(ctx: Any, errors: list[str]) -> None:
     ctx.route("**/api/**", check)
 
 
+def owner_token(sid: str) -> str:
+    """The owner token stored with a recorded session (the server gave it to the phone that made the repair)."""
+    from api.settings import settings
+
+    d = json.loads((settings.data_dir / "sessions" / sid / "session.json").read_text(encoding="utf-8"))
+    return str(d.get("owner_token") or "")
+
+
 def open_recorded(pg: Any, origin: str, sid: str, lang: str) -> None:
-    """Open a recorded session the way the app reopens one after a reload (/#id), in the given UI language."""
+    """Open a recorded session the way the app reopens one after a reload (/#id), in the given UI language, as the
+    phone that made it: its owner token goes into the page's store first (web/app.js ownerSet, key tc_owner), since
+    the live camera guide, step checks and "Still broken" answer 403 without it (1.32.0)."""
+    pg.goto(f"{origin}/")
+    pg.evaluate("([id, tok]) => { let m = {}; try { m = JSON.parse(localStorage.getItem('tc_owner') || '{}') || {}; } catch (_) {}"
+                " m[id] = tok; localStorage.setItem('tc_owner', JSON.stringify(m)); }", [sid, owner_token(sid)])
     pg.goto(f"{origin}/#{sid}")
+    pg.reload()
     pg.wait_for_selector("#result:not(.hidden), #stopBox:not(.hidden)", timeout=30000)
     if pg.input_value("#lang") != lang:  # the picker remembers the last language of this browser: switch like an owner would
         pg.select_option("#lang", lang)
@@ -427,7 +444,7 @@ def shots() -> None:
         b = p.chromium.launch(executable_path=_chromium(), args=[
             "--no-proxy-server", "--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream",
             f"--use-file-for-fake-video-capture={cam}"])
-        ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, locale="id-ID",
+        ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=3, is_mobile=True, has_touch=True, locale="id-ID",
                             timezone_id=TZ)
         ctx.grant_permissions(["camera", "microphone"], origin=origin)
         ctx.add_init_script(SR_STUB)
@@ -508,12 +525,16 @@ def shots() -> None:
             top_at("#progress", 72)
             snap("02_progress")
             pg.evaluate("window.TCReplay._state.tick = 900")
-            pg.wait_for_selector("#question:not(.hidden)", timeout=30000)
+            pg.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=30000)
             no_tour()
-            pg.fill("#answerText", ANSWER)  # the "Ya" quick answer; the recorded answer starts with it and is in the log
-            pg.evaluate("document.activeElement && document.activeElement.blur()")
-            top_at("#question"); snap("03_question")
-            pg.click("#answerBtn"); pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
+            if pg.is_visible("#question"):  # only when the recorded run asked its follow-up (demo.json "asked")
+                pg.fill("#answerText", ANSWER)  # the "Ya" quick answer; the recorded answer starts with it and is in the log
+                pg.evaluate("document.activeElement && document.activeElement.blur()")
+                top_at("#question"); snap("03_question")
+                pg.click("#answerBtn")
+            else:
+                print("recorded run asked no follow-up question (top cause sure enough): no 03_question", flush=True)
+            pg.wait_for_selector("#result:not(.hidden)", timeout=30000)
             no_tour()
             top_at("#dxSummary"); snap("04_diagnosis")
             top_at("#partsWrap", 72); snap("05_parts")
@@ -654,7 +675,9 @@ def shots() -> None:
         pg.goto(origin + "/"); pg.select_option("#lang", "jv"); pg.wait_for_timeout(300); snap("14_garage_jv", full=True)
         # recorded demo: what a visitor sees when the server sleeps (forced here with ?replay=1)
         pg.goto(origin + "/?replay=1"); pg.select_option("#lang", "en"); pg.click("#demoBtn")
-        pg.wait_for_selector("#question:not(.hidden)", timeout=20000); pg.click('#quickAns button[data-q="qNo"]')
+        pg.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=20000)
+        if pg.is_visible("#question"):
+            pg.click('#quickAns button[data-q="qNo"]')
         pg.wait_for_selector("#result:not(.hidden)", timeout=20000)
         if pg.is_visible("#tourClose"):
             pg.click("#tourClose")  # the tip bar would sit over the diagnosis in a still
@@ -696,7 +719,7 @@ def wa_shots() -> None:
     with sync_playwright() as p:
         b = p.chromium.launch(executable_path=_chromium(), args=["--no-sandbox", "--no-proxy-server"])
         for lang in ("jv", "en"):
-            pg = b.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2, timezone_id=TZ)
+            pg = b.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=3, timezone_id=TZ)
             errors: list[str] = []
             _console_watch(pg, errors)
 
