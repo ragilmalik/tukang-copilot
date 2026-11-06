@@ -51,6 +51,12 @@ From [LIVE_RUN.md](LIVE_RUN.md) and [EVAL.md](EVAL.md), 5 November 2026:
 - Recorded demo: re-recorded live on 6 November 2026, 01:23 WIB; one yes/no question in each language; the sample photo passes on the step it shows.
 - Static judge build: builds and passes its own check.
 
+## What changed in 1.32.0 (a weakness hunt)
+
+CI found a real race in 1.31.1 (a quick answer to the follow-up question was overwritten by the worker's last save), so I went looking for the same kind of bug everywhere and found it in most writers: two "Still broken" at once, a step check finishing after a re-plan, parallel photo checks getting past their cap, two Try again taps, a live-guide frame or "It works now" during a re-plan. Each repair now has one lock that every writer takes, and each of those cases has a deterministic test (a held lock, a blocked model call or a barrier, never a sleep). Three of them I confirmed by running the same steps on the 1.31.1 code first.
+
+The same pass found a server-wide stall (the live photo check ran on the event loop), repairs stuck at "running" forever after a restart (now they come back with Try again), and four security gaps: anyone with a shared guide link could re-plan or spend on the owner's repair through the API, the rate limit could be skipped with a made-up X-Forwarded-For header, erasing a repair took its spend out of the daily cap, and the owner's photos had no cache rule. All fixed with tests. The full list, ranked by impact, is in [CHANGELOG.md](../CHANGELOG.md) 1.32.0.
+
 ## What changed in 1.31.0 and 1.31.1
 
 1.31.0 is a UI pass: smoother screen changes, instant feedback on every tap, placeholders that stop the progress screen from jumping, and the layout bugs I found at 360 px (CHANGELOG). 1.31.1 re-made the screenshots, the demo video, the X clip, the GIF and the thumbnail on those screens from recorded live answers, fixed the recorded demo's hand-off links (they pointed at the machine it was recorded on), and gave the test suite's waits for a repair a 60 s budget, because CI runners are slower than my machine and three waits of 10 to 15 s timed out there.
@@ -69,7 +75,8 @@ Fourteen fixes found by running the real API and reviewing every screen, each wi
 
 - One close-up sample photo fits only the steps it shows; per-step real photos would be better ([SUGGESTIONS.md](SUGGESTIONS.md) item 3).
 - Repairs take about 80 seconds on the live API, mostly model time.
-- The free host forgets repairs on restart.
+- The free host forgets repairs on restart. A repair whose files survive a restart comes back with Try again.
+- The per-repair lock lives in the server process, so the app runs as one process.
 - WhatsApp is not connected to a real number yet.
 
 ## Next

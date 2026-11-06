@@ -27,8 +27,20 @@ curl -F photos=@bike.jpg -F text="Motor susah hidup" -F language=id -F category=
 curl -F video=@pump.mp4 -F language=id -F category=pump localhost:8000/api/sessions   # video only: frames + its sound
 # {"id":"d2b5d598d8c6","owner_token":"Qk2…"}
 ```
-`owner_token` (since 1.27.0) is returned only here, once. Keep it on the owner's device: the outcome and erase calls
-need it as the `X-Owner-Token` header. No GET returns it, and the shared guide link does not carry it.
+`owner_token` (since 1.27.0) is returned only here, once. Keep it on the owner's device. Since 1.32.0 every call
+that changes a repair or spends on it needs it as the `X-Owner-Token` header: answer, retry, replan, step check,
+live guide (track), voice command, outcome and erase. Without it (or with a wrong one) they answer `403`, so the
+shared guide link is read-only at the API too. No GET returns it, and the shared guide link does not carry it.
+Repairs saved before 1.27.0 have no token and stay open.
+
+**One change at a time (since 1.32.0).** Each repair has a lock. The first analysis and a re-plan hold it for their
+whole run; the short writers (answer, retry, outcome, the bookkeeping of a step check, a live-guide frame or a voice
+command) hold it for a few lines. A request that meets a re-plan in progress answers `409` with `Retry-After: 3`
+and a sentence in the repair's language (a second "Still broken", "It works now" during a re-plan); a live-guide
+frame answers `429` and the phone sends the next one.
+
+**Caching.** Everything under `/api/` and `/files/` is sent with `Cache-Control: no-store` (the owner's photos and
+repair), except the public link-preview card (`card.png`, `max-age=60`).
 Errors: 400 (missing photo/description, bad type, bad language/category, unreadable image), 413 (too large), 429 (too many new repairs from one visitor, live mode only, `Retry-After` set), 503 (rolling 24 h spend cap reached, live mode only).
 
 ## `GET /api/sessions/{id}`
@@ -43,22 +55,29 @@ data: {"status": "needs_answer", "stages": {...}, "question": "Apakah tercium ba
 Closes when the status leaves `created`/`running`. Since v1.23 each message is the trimmed `progress_view`: `status`, `stages`, `question`, `error`, `agent_log`, `models`, `files_base`, plus each stage's result as soon as it exists: `object_report` (object, model guess, component names), `parts_image` + `parts_found` (after SAM 3.1), `diagnosis` (summary, safety level, top 3 causes with confidence) and `plan_steps`. Built from the public session view, so it never carries the owner's own words or raw errors. Offline sample mode holds each finished stage on screen for `MOCK_PACE` seconds (default 0.6, first analysis only, never in live mode).
 
 ## `POST /api/sessions/{id}/answer` (form: `text`)
-Answers the follow-up question and resumes. 409 if the session isn't waiting.
+Answers the follow-up question and resumes. 409 if the session isn't waiting. Owner only. The answer waits for the
+worker that asked the question to finish its last write (up to 60 s), so a quick answer is never lost.
 
 ## `POST /api/sessions/{id}/steps/{n}/check` (multipart: `photo`)
 ```json
 {"passed":false,"observation":"Foto terlalu gelap…","correction":"Nyalakan senter HP…","fails":1,"escalate":false}
 ```
-After `MAX_CHECK_FAILS` fails: `"escalate":true` + `escalate_hint`. 409 for an unknown step or no plan.
+After `MAX_CHECK_FAILS` fails: `"escalate":true` + `escalate_hint`. 409 for an unknown step, no plan, or a repair
+that is not on its steps (status other than `ready` or `exhausted`, so never on a red stop). 429 when the repair has
+used `MAX_STEP_CHECKS`; the check is counted before the model looks (so parallel checks cannot pass the cap) and
+given back if the model call fails. A check that finishes after "Still broken" moved the repair to a new plan is
+answered with `"stale":true` and is not recorded on the new plan (its cost still counts). 400 for a picture that
+cannot be read, including a decompression bomb. Owner only. Runs off the event loop.
 
 ## `DELETE /api/sessions/{id}`
 Erases the repair (photos, voice leftovers, diagrams, PDFs, session JSON) from the server right now: `{"id":"…","deleted":true}`, `404` if it does not exist, `403` without the right `X-Owner-Token` header (owner only, since 1.27.0). A worker still running for that session cannot write it back. The "Delete my photos now" button calls it; "Clear history" in My garage calls it for every saved repair, best effort. The server also purges anything older than `RETENTION_HOURS` at startup and then every hour.
 
 ## `POST /api/sessions/{id}/retry`
-Re-runs a session whose `status` is `error` (busy AI service, dropped signal). Finished stages and the cost so far are kept. `{"ok":true}`; `409` if the session did not fail. Failed sessions carry a friendly `error` in the session language and an `error_kind` (`busy`, `network`, `auth`, `budget`, `invalid`, `generic`); the technical detail is never sent to the browser. Step-check and replan outages answer `503` with the same friendly text and `Retry-After`.
+Re-runs a session whose `status` is `error` (busy AI service, dropped signal, a server restart in the middle of a
+repair: at startup such a repair is marked `error` with `error_kind` `interrupted`). Owner only. Finished stages and the cost so far are kept. `{"ok":true}`; `409` if the session did not fail. Failed sessions carry a friendly `error` in the session language and an `error_kind` (`busy`, `network`, `auth`, `budget`, `invalid`, `generic`, `interrupted`); the technical detail is never sent to the browser. Step-check and replan outages answer `503` with the same friendly text and `Retry-After`.
 
 ## `POST /api/sessions/{id}/replan` (form: `report`)
-Moves to the next likely cause and returns the updated session (`status` `ready`), or `exhausted` with `stop_reason`, or `stopped` if the report trips the safety gate.
+Moves to the next likely cause and returns the updated session (`status` `ready`), or `exhausted` with `stop_reason`, or `stopped` if the report trips the safety gate. Owner only. Only from `ready` (409 otherwise); a second re-plan while one is planning answers 409.
 
 ## `POST /api/sessions/{id}/outcome` (form: `result`)
 Records how the repair ended. `result` is `fixed` (it works now) or `pro` (a mechanic took over). Stores `outcome: {result, at, saved_idr}` on the session (`saved_idr` is the diagnosis `diy_saving_idr` for `fixed`, else 0) and returns the session. `422` for any other value, `409` when there is no plan (red stop), `404` unknown session, `403` without the right `X-Owner-Token` header (owner only, since 1.27.0: someone holding the shared guide link cannot answer for the owner; repairs saved before 1.27.0 have no token and stay open). A re-plan removes the outcome. The PDF report gets a Result line.

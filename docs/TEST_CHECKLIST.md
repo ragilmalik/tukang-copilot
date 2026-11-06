@@ -15,6 +15,7 @@ Set `export NO_PROXY=127.0.0.1,localhost` if a proxy is configured, and put Chro
 - [ ] Live smoke (key set): the same smoke with the live server.
 - [ ] `python scripts/record_replay.py --check` says the recorded demo is up to date.
 - [ ] `python scripts/build_static.py --check` passes.
+- [ ] Races and owner checks: `test_races.py` and `test_owner_routes.py` pass (deterministic, no sleeps), and `test_playwright_screens_clean.py` finds no console error on any main screen.
 - [ ] Layout and motion: `test_playwright_layout.py` (nothing sticks out of its card at 360, 390, 430 and the laptop frame) and `test_playwright_motion.py` pass.
 - [ ] `python scripts/check_keys.py` (key set) passes every required model.
 - [ ] `python scripts/run_eval.py --from-json docs/eval/live-2026-11-05.json` renders [EVAL.md](EVAL.md) without model calls.
@@ -40,12 +41,16 @@ Set `export NO_PROXY=127.0.0.1,localhost` if a proxy is configured, and put Chro
 - [ ] Hands-free mode on a 360 px phone: Back and Listen are square icon buttons, Next fits inside the step card.
 - [ ] On a phone under 400 px wide the header shows "ID / JV / EN" next to the full app name, and the pill opens the language list.
 - [ ] Pull down during a repair: the page does not reload. On the first screen pull-to-refresh still works.
+- [ ] Open the shared guide link on a second phone: it shows the repair, and nothing on it can answer, check a step, re-plan, mark it done or erase it.
+- [ ] Two tabs on one repair: tap "Still broken" in both at once. One moves to plan 2; the other says the repair is busy, and after a reload both show plan 2 (not plan 3).
+- [ ] Stop the server in the middle of a repair and start it again: the phone shows "The server restarted while this repair was running" with Try again, and Try again finishes the repair.
 
 ## C. Manual, on a laptop (1280 x 800)
 
 - [ ] The app sits in a phone frame with the side panel, QR code and demo button.
 - [ ] `/wa` simulator: with `WA_SIM=1` a full chat repair works; without it the page says the simulator is off.
 - [ ] `/health` shows the right mode (`offline` or `live`).
+- [ ] After a live deploy behind a proxy (the limit only runs in live mode): 31 new repairs from one phone within an hour get the "too many requests" message, and a second phone on another network still can start one (the rate limit reads `CLIENT_IP_HEADER` / `FORWARDED_HOPS` right).
 
 ## D. Media, before publishing
 

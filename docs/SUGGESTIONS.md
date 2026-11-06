@@ -22,9 +22,9 @@ Ten things I would build next, most useful first. Features come before polish. T
    *Why:* hands are greasy during a repair. Today the live camera guide samples about one frame a second.
    *How:* realtime Voice Transcribe over WebSocket and SAM video tracking.
 
-6. **Sessions that survive a restart.**
-   *Why:* the free host wipes `/tmp` on restart, so a repair in progress is lost.
-   *How:* Cloudflare R2 for files plus a small SQLite index; the engine already writes everything through one save function.
+6. **Sessions that survive a restart, on more than one server process.**
+   *Why:* the free host wipes `/tmp` on restart, so a repair in progress is lost. Since 1.32.0 a repair whose worker died with a restart comes back with Try again, but only if its files are still on disk. And the per-repair lock lives in the process, so the app must run as one process.
+   *How:* Cloudflare R2 for files plus a small SQLite index with a row lock (or a Redis lock) per repair; the engine already writes everything through one save function and takes the lock through one helper (`engine.locked`).
 
 7. **Send the report to a nearby bengkel.**
    *Why:* jobs the owner can't finish should go to a local mechanic with photos and what was already tried, not start from zero.
@@ -43,6 +43,9 @@ Ten things I would build next, most useful first. Features come before polish. T
     *How:* one session each with a TalkBack and a VoiceOver user, then fix what they hit.
 
 ## Smaller polish I noted
+
+- When a new version takes over (service worker `controllerchange`), tell an open tab to reload once, so it never runs an older app against a newer server (the 1.32.0 owner-token change needs one reload).
+- Show the "busy, another request is changing this repair" answer as a small toast with an automatic retry instead of an error line.
 
 - Let the owner crop or mark the problem area on the photo before sending.
 - Show the bengkel price range next to each part, with the date the price was checked.

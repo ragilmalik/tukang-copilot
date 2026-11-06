@@ -70,7 +70,9 @@ Demo assets: `python scripts/make_demo_assets.py shots|diagram|voice|video|all` 
 | `NARRATION_VOICE` | 1 | Server voice files; 0 = browser voice only |
 | `MAX_COST_PER_SESSION_USD` | 0.50 | Hard stop per repair |
 | `RATE_LIMIT_PER_HOUR` | 30 | New repairs per visitor per hour on a live site (0 = off) |
-| `DAILY_BUDGET_USD` | 10 | Rolling 24 h spend cap for the whole site; new repairs get a friendly "try tomorrow" (0 = off) |
+| `DAILY_BUDGET_USD` | 10 | Rolling 24 h spend cap for the whole site; new repairs get a friendly "try tomorrow" (0 = off). Erased repairs still count for 24 h |
+| `CLIENT_IP_HEADER` | (empty) | A header your edge proxy sets to the visitor's address and overwrites (Cloudflare: `cf-connecting-ip`); the rate limit uses it first. render.yaml sets it. Only set it with such a proxy in front |
+| `FORWARDED_HOPS` | 1 | Proxies in front of the app that append to X-Forwarded-For. The rate limit keys on the entry that many places from the right (the one your proxy wrote); 0 ignores the header (nothing in front) |
 | `MAX_TRACK_FRAMES` | 120 | Live camera guide: max SAM frames per repair |
 | `TRACK_MIN_INTERVAL_S` | 0.6 | Live camera guide: minimum seconds between frames |
 | `MAX_CHECK_FAILS` | 2 | Failed step checks before suggesting re-plan / pro |

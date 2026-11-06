@@ -40,6 +40,7 @@ Tukang Copilot gives no medical advice and doesn't handle high-voltage EV system
 - The voice recording is deleted right after transcription.
 - Photos and sessions live only on the server disk and are deleted after 24 h (`RETENTION_HOURS`): purged at startup, then hourly while the server runs. The "Delete my photos now" button (`DELETE /api/sessions/{id}`) erases a repair at once.
 - `GET /api/sessions/{id}` never returns the raw typed description; `session.json` itself is never served.
-- Session ids are random 12-hex strings; shared links are read-only.
+- Session ids are random 12-hex strings; shared links are read-only, at the API too: every call that changes a repair or spends on it needs the owner token only the owner's phone holds (since 1.32.0).
+- Repair photos and JSON are sent with `Cache-Control: no-store`, so no shared cache keeps them.
 - The app uses Meta Standard-mode model ids, so Meta doesn't train on the content (per Meta's docs). I avoid the Contributor-mode ids on purpose.
 - Keys live in `.env` / Render secrets only, never in code or the browser.

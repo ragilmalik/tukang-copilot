@@ -26,7 +26,7 @@ Owners with a phone and a broken thing, in Bahasa Indonesia, Basa Jawa or Englis
 
 ## Where your data goes
 
-Photos and the repair live in one folder on the server and are deleted after 24 hours, or right away with the erase button. There are no accounts and no tracking. The Meta key stays on the server; the phone never sees it. Logs never contain your text or the key ([SAFETY.md](SAFETY.md)).
+Photos and the repair live in one folder on the server and are deleted after 24 hours, or right away with the erase button. There are no accounts and no tracking. The Meta key stays on the server; the phone never sees it. Logs never contain your text or the key ([SAFETY.md](SAFETY.md)). A guide link you share lets someone read the repair, but only your phone can answer, check a step, re-plan, mark it done or erase it. If the server restarts while a repair is running, the repair comes back with a Try again button and carries on from where it got to.
 
 ## What is real and what is sample
 

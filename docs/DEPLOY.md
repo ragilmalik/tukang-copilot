@@ -62,6 +62,9 @@ Start on Free. Switching later is one click (step 14) and doesn't need a code re
 
 12. Every push to the `main` branch on GitHub redeploys automatically (`autoDeploy: true`). Watch **Events** for *Deploy live*. Run `deploy_check.py` again after big changes.
     - You don't need to purge any cache after a deploy. Files under `/static` send Cache-Control: app.js, style.css and the recorded demo are revalidated on every load, fonts are cached for a year and pictures for a day (DECISIONS D12). A phone that installed the app gets the new version on its next load through the service worker.
+    - A repair that was running when the server restarted or redeployed comes back as an error with a Try again button ("The server restarted while this repair was running"); Try again keeps the stages already done. A tab left open across the 1.32.0 update runs the older app until it is reloaded, and that older app does not send the owner token on answer, step check and Still broken, so those say "only the owner's phone can do this" until one reload.
+    - Keep one server process (the default). The per-repair lock lives in the process; two uvicorn workers would each have their own.
+    - The rate limit needs the visitor's real address. Render appends to an X-Forwarded-For header the visitor may already have filled in, so the left-most entry can be anything. render.yaml sets `CLIENT_IP_HEADER=cf-connecting-ip` because Render serves through Cloudflare, which writes that header itself. I have not checked it on a live Render deploy: after the first deploy, open the site from two networks and look at the log (`tukang.http` lines) or test that 31 new repairs from one phone in an hour get the "too many requests" message. Without such a header the app reads the X-Forwarded-For entry `FORWARDED_HOPS` places from the right (default 1).
 
 ## Roll back (if a new version breaks)
 

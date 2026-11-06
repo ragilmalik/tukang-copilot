@@ -2,6 +2,22 @@
 
 The entry deadline was Thu Nov 5, 2026, 09:00 WIB (Nov 4, 9 PM ET). Code is done; what is left is media, final numbers and the steps only I can do with my accounts.
 
+## 1.32.0 weakness hunt (6 Nov)
+Findings ranked by user impact, each with its test; the full audit is in CHANGELOG 1.32.0.
+- [x] Session lock on every writer: double re-plan, a step check landing on the next plan, photo-check cap under parallel checks, two checks on one step, double retry, double start, live-guide / voice / outcome writes during a re-plan (test_races.py)
+- [x] Status rules: step checks and live guide only on the steps, re-plan only from a plan on screen, outcome not while running
+- [x] Restart mid-repair: marked as an error with Try again at startup (engine.recover_interrupted)
+- [x] Photo check off the event loop (a live check froze the whole server)
+- [x] Owner token on answer, retry, still broken, step check, live guide and voice command; app sends it (test_owner_routes.py)
+- [x] Rate-limit key no longer spoofable (CLIENT_IP_HEADER, FORWARDED_HOPS)
+- [x] Erasing a repair no longer resets the daily spend cap (data/spend-erased.jsonl)
+- [x] Cache-Control no-store on /api and /files, ASCII session ids, decompression bomb is a 400 on check and track
+- [x] Janitor clears locks, erase marks, half-made folders and stale tmp files; erase ends an open progress stream cleanly
+- [x] Every main screen with no console error, restart recovery and slow network in Chromium (test_playwright_screens_clean.py); no English in the id/jv string tables
+- [ ] Full run: ruff, mypy strict, all tests through make_test_report.py, offline smoke, static build, replay check
+- [ ] Docs with the measured numbers, one-pager and guide bundle rebuilt, pushed
+- [ ] After the first Render deploy: check that `cf-connecting-ip` reaches the app (the rate limit keys on it)
+
 ## 1.31.1 media and docs (6 Nov)
 - [x] A. Flaky test_playwright_motion fixed (deterministic waits, 6 clean runs)
 - [x] B. Screenshots re-shot on the 1.31.0 UI from recorded live answers (1-tap demo recording + recorded live sessions); only the live camera guide calls SAM 3.1 live. Recorded hand-off links point at the site you are on (were http://testserver), offline cache v25 (pushed 5dbfa8b)
