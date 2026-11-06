@@ -1178,7 +1178,7 @@ VERTICAL = {  # key: (seconds, where in the recording to start, Bahasa line on t
     "hook": (4.5, 0.0, "Motor mogok, bengkel tutup? Foto + ngomong.", "Bike won't start and the shop is closed? Snap it and say what's wrong."),
     "progress": (4.5, 2.2, "Lihat AI bekerja: hasil muncul tiap tahap.", "Watch the AI work: results appear stage by stage."),
     "parts": (4.5, 0.8, "SAM 3.1 menandai part di foto kamu.", "SAM 3.1 marks the parts on your photo."),
-    "live": (4.5, 4.2, "Kamera langsung: part yang harus dipegang ditandai.", "Live camera: the part to touch is outlined (demo)."),
+    "live": (4.5, 4.2, "Kamera langsung: part yang harus dipegang ditandai.", "Live camera: SAM 3.1 outlines the part to touch (test camera)."),
     "check_pass": (4.5, 0.0, "Tiap langkah dicek kamera.", "Every step is checked by the camera."),
     "rice": (4.5, 4.4, "Bahaya? Dia bilang STOP.", "Dangerous? It says STOP and hands you to a pro."),
     "wa": (4.5, 0.0, "Juga lewat WhatsApp, dalam Basa Jawa.", "Also works in WhatsApp (simulator, live answers)."),

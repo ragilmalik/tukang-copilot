@@ -19,145 +19,145 @@ In Indonesia, a small fault on a motorbike or a water pump can cost a day's wage
 Repair videos can't see your problem, and most aren't in your language.
 
 6
-00:00:20,576 --> 00:00:23,208
+00:00:20,576 --> 00:00:23,048
 Take a photo and say what's wrong.
 
 7
-00:00:23,208 --> 00:00:26,693
-Every answer here is live from Meta's models.
+00:00:23,048 --> 00:00:27,847
+These are real answers from Meta's models, recorded on a live run.
 
 8
-00:00:26,693 --> 00:00:30,180
+00:00:27,847 --> 00:00:31,164
 The photos are AI-generated samples.
 
 9
-00:00:30,180 --> 00:00:37,552
+00:00:31,164 --> 00:00:38,536
 Each result shows up as soon as it's ready: what Muse Spark saw, the parts SAM outlined, then the likely cause.
 
 10
-00:00:37,552 --> 00:00:41,948
+00:00:38,536 --> 00:00:42,932
 If it isn't sure, it asks one short question instead of guessing.
 
 11
-00:00:41,948 --> 00:00:43,248
+00:00:42,932 --> 00:00:44,232
 Then the diagnosis.
 
 12
-00:00:43,248 --> 00:00:51,336
+00:00:44,232 --> 00:00:52,320
 Likely causes with confidence, a safety level, tools and time, and the parts cost next to the bengkel price.
 
 13
-00:00:51,336 --> 00:00:57,292
+00:00:52,320 --> 00:00:58,276
 SAM 3.1 marks the parts on your own photo, not on some generic diagram.
 
 14
-00:00:57,292 --> 00:01:00,306
+00:00:58,276 --> 00:01:01,290
 Before step one, there's a short safety checklist.
 
 15
-00:01:00,306 --> 00:01:03,296
+00:01:01,290 --> 00:01:04,280
 The steps stay locked until it's done.
 
 16
-00:01:03,296 --> 00:01:08,926
+00:01:04,280 --> 00:01:09,910
 Point the camera, and SAM 3.1 outlines the part to touch, about once a second.
 
 17
-00:01:08,926 --> 00:01:13,668
+00:01:09,910 --> 00:01:14,652
 Here it's Chromium's test camera playing a sample photo.
 
 18
-00:01:13,668 --> 00:01:19,212
+00:01:14,652 --> 00:01:20,196
 After each step, you send a photo, and Muse Spark compares it with what it should look like.
 
 19
-00:01:19,212 --> 00:01:22,624
+00:01:20,196 --> 00:01:23,608
 This one's too dark, so it asks for a retake.
 
 20
-00:01:22,624 --> 00:01:27,380
+00:01:23,608 --> 00:01:28,364
 A clear photo of the plug cap back on passes, and it moves on.
 
 21
-00:01:27,380 --> 00:01:28,229
+00:01:28,364 --> 00:01:29,213
 Hands dirty?
 
 22
-00:01:28,229 --> 00:01:29,574
+00:01:29,213 --> 00:01:30,558
 Turn on hands-free.
 
 23
-00:01:29,574 --> 00:01:34,944
+00:01:30,558 --> 00:01:35,928
 It reads each step out loud and listens for simple voice commands.
 
 24
-00:01:34,944 --> 00:01:35,822
+00:01:35,928 --> 00:01:36,806
 Still broken?
 
 25
-00:01:35,822 --> 00:01:40,147
+00:01:36,806 --> 00:01:41,131
 Tell it what happened, and it moves on to the next likely cause.
 
 26
-00:01:40,147 --> 00:01:42,604
+00:01:41,131 --> 00:01:43,588
 Plan, act, check, re-plan.
 
 27
-00:01:42,604 --> 00:01:50,720
+00:01:43,588 --> 00:01:51,704
 When a photo can't show a step, like the washer inside a tap, Muse Image draws a diagram, and Muse Spark checks it.
 
 28
-00:01:50,720 --> 00:01:57,780
+00:01:51,704 --> 00:01:58,764
 Every decision stays on screen: what it saw, why it asked, each photo check, and which model did it.
 
 29
-00:01:57,780 --> 00:02:02,452
+00:01:58,764 --> 00:02:03,436
 When it's a job for a pro, one tap hands it over: a WhatsApp summary,
 
 30
-00:02:02,452 --> 00:02:06,808
+00:02:03,436 --> 00:02:07,792
 the nearest bengkel, and a PDF brief for the mechanic.
 
 31
-00:02:06,808 --> 00:02:08,844
+00:02:07,792 --> 00:02:09,828
 And it knows when to say no.
 
 32
-00:02:08,844 --> 00:02:17,252
+00:02:09,828 --> 00:02:18,236
 A rice cooker that won't heat means opening 220 volt parts, so it stops and sends you to a service centre.
 
 33
-00:02:17,252 --> 00:02:20,545
+00:02:18,236 --> 00:02:21,529
 “Kran pawonku netes terus, piye iki?”
 
 34
-00:02:20,545 --> 00:02:23,234
+00:02:21,529 --> 00:02:24,218
 It works in WhatsApp too, in Javanese.
 
 35
-00:02:23,234 --> 00:02:30,733
+00:02:24,218 --> 00:02:31,717
 Send a photo, and the same agent replies with the marked photo, the diagnosis, and a button for each step.
 
 36
-00:02:30,733 --> 00:02:33,768
+00:02:31,717 --> 00:02:34,752
 A gas leak still gets a red stop.
 
 37
-00:02:33,768 --> 00:02:37,905
+00:02:34,752 --> 00:02:38,889
 Under the hood: Voice Transcribe, Muse Spark to see,
 
 38
-00:02:37,905 --> 00:02:44,509
+00:02:38,889 --> 00:02:45,493
 reason and check, SAM 3.1 for masks and live tracking, and Muse Image for diagrams.
 
 39
-00:02:44,509 --> 00:02:47,596
+00:02:45,493 --> 00:02:48,580
 The safety rules live in code.
 
 40
-00:02:47,596 --> 00:02:48,627
+00:02:48,580 --> 00:02:49,611
 Tukang Copilot.
 
 41
-00:02:48,627 --> 00:02:53,096
+00:02:49,611 --> 00:02:54,080
 Every phone becomes a mechanic's apprentice.

@@ -505,6 +505,8 @@ def card(sc: Any, t: float, shot: Shot, size: tuple[int, int], vertical: bool) -
     d = ImageDraw.Draw(layer)
     x = 150 if not vertical else 90
     y = 300 if not vertical else 560
+    if vertical and sc.key == "close":  # three lines of source note: start higher so the text ends above the phones
+        y = 400
     k1, k2, k3 = _fade(t, 0.1), _fade(t, 0.45), _fade(t, 0.8)
     lw = 1000 if not vertical else 900
     if sc.key == "close" and not vertical:
@@ -555,7 +557,8 @@ def _title_photo(layer: Image.Image, t: float) -> None:
     m = _round_mask(*plate.size, 26)
     plate.paste(im, (12, 12))
     d = ImageDraw.Draw(plate)
-    d.text((16, im.height + 22), "Live SAM 3.1 masks on an AI-generated sample photo", font=font("body", 21), fill=ON_DARK_MUTED + (int(255 * k),))
+    note = "Recorded live SAM 3.1 masks," if played_back() else "Live SAM 3.1 masks on an"
+    d.text((16, im.height + 22), f"{note} AI-generated sample photo", font=font("body", 21), fill=ON_DARK_MUTED + (int(255 * k),))
     plate.putalpha(ImageChops.multiply(m, Image.new("L", plate.size, int(255 * k))))
     layer.alpha_composite(plate, (1180, int(250 + 20 * (1 - k))))
 
@@ -567,7 +570,7 @@ def _close_phones(im: Image.Image, t: float, vertical: bool) -> None:
     names = ["05_parts", "08_check_pass", "11_rice_stop"]
     sc = 0.6 if not vertical else 0.56
     xs = [1300, 1540, 1780] if not vertical else [250, 540, 830]
-    top = 170 if not vertical else 1080
+    top = 170 if not vertical else 1010
     for i, name in enumerate(names):
         k = _fade(t, 0.4 + 0.25 * i, 0.7)
         if k <= 0:

@@ -68,7 +68,7 @@ def thumbnail() -> Path:
     d.polygon([(760, 0), (W, 0), (W, H), (640, H)], fill=NAVY2 + (255,))
 
     parts = phone("05_parts.png", 300, 1300, 270)
-    stop = phone("11_rice_stop.png", 280, 1000, 250)
+    stop = phone("11_rice_stop.png", 200, 1080, 250)  # from the top of the STOP title
     paste_shadow(img, parts, (730, 60), 4)
     paste_shadow(img, stop, (960, 170), -6)
 
