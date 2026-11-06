@@ -21,7 +21,16 @@ def test_recording_is_labelled_and_has_every_language():
     assert set(DATA["langs"]) == {"id", "jv", "en"} and DATA["sample"] == "motor"
     for lang, L in DATA["langs"].items():
         assert L["sid"] == f"replay-motor-{lang}"
-        assert L["ask"]["snaps"][-1]["status"] == "needs_answer" and L["ask"]["session"]["question"]
+        # one take, as the model answered it: the yes/no follow-up only when it was under 60% sure (record_replay.py)
+        assert isinstance(L["asked"], bool)
+        if L["asked"]:
+            assert L["ask"]["snaps"][-1]["status"] == "needs_answer" and L["ask"]["session"]["question"]
+            assert L["answer"] == {"id": "Ya", "jv": "Nggih", "en": "Yes"}[lang]
+        else:
+            assert L["ask"]["snaps"][-1]["status"] == "ready" and not L["ask"]["session"].get("question")
+            assert L["answer"] == "" and L["ready"]["session"] == L["ask"]["session"]
+            top = L["ready"]["session"]["diagnosis"]["causes"][0]["confidence"]
+            assert top >= 60, top                                            # sure enough not to ask (engine threshold)
         assert len(L["ask"]["snaps"]) >= 3                                 # it streams, stage by stage
         assert L["ready"]["session"]["status"] == "ready" and L["ready"]["session"]["mode"] == "live"
         assert not L["ready"]["session"].get("fallback")                     # no stage fell back to canned answers
@@ -129,3 +138,22 @@ def test_sample_photo_is_checked_on_the_step_it_shows_and_passes_there() -> None
         assert L["replan"]["set"]["sample_step"] == L["sample_step"]["1"]
         for plan, ss in L["sample_step"].items():
             assert L["checks"][plan][str(ss["n"])]["ok"]["response"]["passed"] is True, (lang, plan, ss)
+
+
+def test_shape_check_allows_a_recording_without_the_follow_up_question():
+    """The live model asks only when unsure; the offline run asks. The ask part and the log's ask/answer lines are then
+    left out of the comparison, and any other difference still counts."""
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import record_replay  # type: ignore[import-not-found]
+
+    def lang(asked: bool, extra: bool = False) -> dict:
+        log = [{"t": 0, "kind": "gate", "ok": True}] + ([{"t": 1, "kind": "ask", "conf": 55, "threshold": 60}] if asked else [])
+        sess = {"status": "ready", "agent_log": log, **({"new_field": 1} if extra else {})}
+        ask = {"snaps": [{"status": "needs_answer" if asked else "ready", "question": "q" if asked else None}],
+               "session": {"status": "needs_answer", "question": "q"} if asked else sess}
+        return {"asked": asked, "ask": ask, "ready": {"snaps": [sess], "session": sess}}
+
+    offline = {"langs": {"id": lang(True)}}
+    assert record_replay.shape_diff({"langs": {"id": lang(False)}}, offline) == []
+    assert record_replay.shape_diff({"langs": {"id": lang(False, extra=True)}}, offline)  # a real change is still caught
+    assert record_replay.shape_diff({"langs": {"id": lang(True)}}, offline) == []

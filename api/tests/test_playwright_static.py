@@ -53,8 +53,9 @@ def test_static_build_plays_recorded_demo_without_a_server(site, size):
         assert "Recorded demo" in pg.inner_text("#modeBadge")               # labelled from the first second
         assert not pg.is_visible("#wakeNote")
         pg.click("#demoBtn")
-        pg.wait_for_selector("#question:not(.hidden)", timeout=20000)
-        pg.click("#quickAns button >> nth=0")
+        pg.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=20000)
+        if pg.is_visible("#question"):  # only when the recorded run asked its follow-up (demo.json "asked")
+            pg.click("#quickAns button >> nth=0")
         pg.wait_for_selector("#result:not(.hidden)", timeout=20000)
         assert pg.inner_text("#dxObject").strip()
         assert pg.evaluate("document.getElementById('partsImg').naturalWidth") > 0

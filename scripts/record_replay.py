@@ -6,9 +6,9 @@ no server and no model calls at replay time. Every answer in it came from the re
 Muse Image) on the date stored in demo.json; only the photo is a labelled AI-generated sample photo.
 
 Output (all under web/replay/, served at /static/replay/):
-  demo.json          per language (id, jv, en): progress snapshots, the follow-up question, the ready session, and one
-                     "delta" per action (step check with each sample photo, re-plan, outcome) so actions can be
-                     replayed in any order
+  demo.json          per language (id, jv, en): progress snapshots, the follow-up question when the model asked one
+                     ("asked"), the ready session, and one "delta" per action (step check with each sample photo,
+                     re-plan, outcome) so actions can be replayed in any order
   files/*.jpg        the photos the sessions show (sample photo, SAM-marked photo, part crops)
   check_ok.jpg, check_dark.jpg   the two labelled sample "check my step" photos (check_ok shows one step, stored as
                      sample_step per plan; the dark one is checked on whatever step is on screen)
@@ -167,15 +167,19 @@ def record_lang(c: Any, lang: str, photos: dict[str, bytes], files_dir: Path, ou
     files_dir.mkdir(parents=True, exist_ok=True)
     settings.mock_pace_s = pace  # offline only: pacing so the stream has one snapshot per stage (live has real timing)
     rid = f"replay-motor-{lang}"
-    for attempt in range(4):  # live: the model asks a follow-up question when unsure; the recording needs one
-        sid = c.post("/api/sessions", data={"sample": "motor", "language": lang}).json()["id"]
-        ask = _settled(c, sid)
-        if ask["session"]["status"] == "needs_answer" or attempt == 3:
-            break
-        print(f"{lang}: no follow-up question this time ({ask['session']['status']}), recording once more", flush=True)
-    assert ask["session"]["status"] == "needs_answer", ask["session"]["status"]
-    assert c.post(f"/api/sessions/{sid}/answer", data={"text": ANSWER[lang]}, headers=_own(sid)).status_code == 200
-    ready = _settled(c, sid)
+    # One take, recorded as the model answered it. The live model asks its one yes/no follow-up only when its top cause
+    # is under 60% sure (api/pipeline/engine.py); the clear motorbike sample photo (plug cap visibly off) usually makes
+    # it sure, so the run goes straight to the plan. Retrying until it asks would pay for takes and show a flow the
+    # photo does not produce, so the recording keeps whichever happened ("asked" says which). web/replay.js plays both.
+    sid = c.post("/api/sessions", data={"sample": "motor", "language": lang}).json()["id"]
+    ask = _settled(c, sid)
+    asked = ask["session"]["status"] == "needs_answer"
+    if asked:
+        assert c.post(f"/api/sessions/{sid}/answer", data={"text": ANSWER[lang]}, headers=_own(sid)).status_code == 200
+        ready = _settled(c, sid)
+    else:  # already ready: the "ready" part is the same settled run (its last snapshot), never replayed on its own
+        print(f"{lang}: no follow-up question (top cause sure enough), recording the run as it came", flush=True)
+        ready = {"snaps": ask["snaps"][-1:], "session": ask["session"]}
     settings.mock_pace_s = 0.0
     assert ready["session"]["status"] == "ready", ready["session"]["status"]
     checks0 = _record_checks(c, sid, photos, files_dir)
@@ -201,7 +205,7 @@ def record_lang(c: Any, lang: str, photos: dict[str, bytes], files_dir: Path, ou
     for f in engine.session_dir(sid).iterdir():  # photos the screens show
         if f.suffix.lower() in {".jpg", ".png"} and f.name != "card.png" and not f.name.startswith("check_"):
             shutil.copyfile(f, files_dir / f.name)
-    rec = {"sid": rid, "ask": ask, "ready": ready, "answer": ANSWER[lang], "checks": {"0": checks0, "1": checks1},
+    rec = {"sid": rid, "asked": asked, "ask": ask, "ready": ready, "answer": ANSWER[lang] if asked else "", "checks": {"0": checks0, "1": checks1},
            "handoff": handoff, "outcome": outcome, "replan": replan, "replan_report": REPLAN[lang],
            "sample_step": {}}
     _set_sample_steps(rec, lang)
@@ -333,8 +337,27 @@ def key_paths(data: Any) -> tuple[set[str], set[str]]:
     return paths, empty
 
 
+def _without_unmatched_ask(a: dict[str, Any], b: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    """A language where only one side asked its follow-up question: its "ask" part is a paused session on one side and
+    a finished one on the other, so it is left out of the comparison there (the "ready" part still carries the finished
+    session's shape on both sides). Where both asked, the paused session is compared as before."""
+    a, b = copy.deepcopy(a), copy.deepcopy(b)
+    for lang in set(a.get("langs") or {}) & set(b.get("langs") or {}):
+        La, Lb = a["langs"][lang], b["langs"][lang]
+        if La.get("asked", True) != Lb.get("asked", True):
+            for L in (La, Lb):
+                L.pop("ask", None)
+                # the agent log's "ask" and "answer" lines exist only on the side that asked
+                for part in [L.get("ready") or {}, *((L.get("ready") or {}).get("snaps") or [])]:
+                    sess = part.get("session", part)
+                    if isinstance(sess, dict) and isinstance(sess.get("agent_log"), list):
+                        sess["agent_log"] = [e for e in sess["agent_log"] if e.get("kind") not in ("ask", "answer")]
+    return a, b
+
+
 def shape_diff(a: dict[str, Any], b: dict[str, Any]) -> list[str]:
     """Key paths only one side has, ignoring anything under a container that is empty on the other side."""
+    a, b = _without_unmatched_ask(a, b)
     pa, ea = key_paths(a)
     pb, eb = key_paths(b)
 

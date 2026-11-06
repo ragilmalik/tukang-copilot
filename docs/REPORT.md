@@ -48,7 +48,7 @@ From [LIVE_RUN.md](LIVE_RUN.md) and [EVAL.md](EVAL.md), 5 November 2026:
 - 1096 automated tests passed, 0 failed, 0 skipped ([TEST_REPORT.md](TEST_REPORT.md)): 945 without a browser, 151 in real Chromium.
 - mypy strict: no issues in 171 files. ruff: clean. `scripts/check_voice.py`: 0 hits.
 - HTTP smoke on a running offline server: ALL PASSED, 77 checks.
-- Recorded demo: re-recorded live on 6 November 2026, 01:23 WIB; one yes/no question in each language; the sample photo passes on the step it shows.
+- Recorded demo: re-recorded live on 6 November 2026, 14:01 WIB, on the new photorealistic sample photos. The plug cap is visibly off in the new motorbike photo, so the model was 85 to 88% sure of the cause in each language and asked no follow-up question (it asks only under 60%); the sample photo passes on the step it shows.
 - Static judge build: builds and passes its own check.
 
 ## What changed in 1.32.0 (a weakness hunt)

@@ -47,8 +47,13 @@ def _api_down(page):
 def _run_demo(page, lang):
     page.select_option("#lang", lang)
     page.click("#demoBtn")
-    page.wait_for_selector("#question:not(.hidden)", timeout=20000)
-    page.click('#quickAns button[data-q="qNo"]')
+    # the follow-up question shows only when the recorded run asked one (demo.json "asked")
+    page.wait_for_selector("#question:not(.hidden), #result:not(.hidden)", timeout=20000)
+    if DEMO["langs"][lang]["asked"]:
+        page.wait_for_selector("#question:not(.hidden)")
+        page.click('#quickAns button[data-q="qNo"]')
+    else:
+        assert not page.is_visible("#question")
     page.wait_for_selector("#result:not(.hidden)", timeout=20000)
     for b in page.locator("#preList input").all():
         b.check()

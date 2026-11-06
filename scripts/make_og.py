@@ -54,10 +54,14 @@ def main() -> int:
     h = min(im.height, im.width // 2)  # 2:1 band from the top: keeps the photo's "Sample photo (AI-generated)" tag
     thumb = im.crop((0, 0, im.width, h)).resize((640, 320), Image.Resampling.LANCZOS)
     out_thumb = ROOT / "web" / "demo-thumb.jpg"
-    for q in (84, 78, 72, 66, 60, 55, 50):  # a real-looking photo has more detail than the old drawing: stay under 30 KB
+    # a real-looking photo has more detail than the old drawing: stay under 30 KB (test_result_screen_fixes.py), the
+    # first-screen picture on a slow phone. The 1.33 sample photo needs a quality under 50; fail loudly instead of shipping more.
+    for q in (84, 78, 72, 66, 60, 55, 50, 45, 40, 35):
         thumb.save(out_thumb, "JPEG", quality=q, optimize=True, progressive=True)
         if out_thumb.stat().st_size < 29_000:
             break
+    else:
+        raise SystemExit(f"web/demo-thumb.jpg is {out_thumb.stat().st_size} bytes even at quality 35 (limit 30000)")
     print("wrote web/demo-thumb.jpg", out_thumb.stat().st_size, "bytes")
     return 0
 

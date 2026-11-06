@@ -191,8 +191,8 @@ These came from playing every flow again on a 390x844 phone and a laptop in all 
 | Feature | Status | Evidence |
 |---|---|---|
 | "Sample photo: plug cap on" is checked on the step the photo shows (`sample_step` from api/sample_step.py, stored per plan in the recording), the step card moves there and a line says "Checking step N with this sample photo"; "Sample photo: too dark" is checked on the open step | ✅ | `test_sample_step.py`, `test_replay.py`, `test_playwright_replay.py`, `test_playwright_static.py` |
-| In the live recording (6 Nov 2026, 01:23 WIB) the plug cap photo passes on its step in every language and plan: id steps 6 and 5, jv steps 6 and 5, en steps 5 and 4; the dark photo fails on every step | ✅ | `web/replay/demo.json`, `test_replay.py` |
-| The follow-up question asks one yes/no thing (live): id "Apakah suara starter terdengar lemah atau lambat dibanding biasanya?", jv "Sawise distarter bola-bali, knalpot mambu bensin mentah ora?", en "Is there petrol in the tank above empty?" | ✅ | `web/replay/demo.json` |
+| (Recording of 6 Nov 2026, 01:23 WIB, replaced in 1.33.0) In that live recording the plug cap photo passes on its step in every language and plan: id steps 6 and 5, jv steps 6 and 5, en steps 5 and 4; the dark photo fails on every step | ✅ | `web/replay/demo.json`, `test_replay.py` |
+| (Same replaced recording) The follow-up question asks one yes/no thing (live): id "Apakah suara starter terdengar lemah atau lambat dibanding biasanya?", jv "Sawise distarter bola-bali, knalpot mambu bensin mentah ora?", en "Is there petrol in the tank above empty?" | ✅ | `web/replay/demo.json` |
 | WhatsApp simulator label in Bahasa and Basa Jawa matches the English line ("menjalankan" / "nglakokake mesin ...") | ✅ | `test_playwright_wa.py` |
 
 **Run numbers (2026-11-06, v1.30.0):** pytest without a browser **838 passed, 0 failed** (97 files, one by one), Playwright **127 passed, 0 failed** (22 files, real Chromium), ruff clean, `mypy api --strict` no issues in 162 files, `smoke_e2e.py` ALL PASSED (69 checks) on an `OFFLINE=1` server, `build_static.py` and `--check` OK, `record_replay.py --check` up to date. The live recording cost $0.70 by the app's own meter (pipelines, re-plans and 66 step checks in three languages).
@@ -240,3 +240,14 @@ These came from playing every flow again on a 390x844 phone and a laptop in all 
 5. The impact numbers are mock until the real trials run.
 6. The demo video plays real Meta API answers recorded on a live run (6 Nov 2026), not answers made while filming, on AI-generated sample photos and Chromium's test camera feed. All of it is labelled on screen.
 7. The WhatsApp channel has only run against a Graph API test double and in the `/wa` simulator; no real WhatsApp number has sent or received a message (needs the Meta app setup in docs/WHATSAPP.md).
+
+## 1.33.0 media remake: live re-recording on the new sample photos (6 Nov 2026)
+
+| Check | Status | Evidence |
+|---|---|---|
+| 1-tap demo re-recorded live (14:01 WIB), one take per language: top cause "plug cap off the spark plug" at 85% (id), 88% (jv), 88% (en), amber safety, no follow-up question; re-plan goes to the second cause (fouled or worn plug) | ✅ | `web/replay/demo.json`, `test_replay.py` |
+| The plug cap photo passes on its step in every language and plan (id steps 4 and 6, jv 5 and 6, en 4 and 6); the dark photo fails on every step | ✅ | `web/replay/demo.json`, `test_replay.py` |
+| Live sessions for the screenshots: pump (id) "pump lost its prime" 75%; rice cooker (id) red stop by the model (220 V, opening the body), top cause "plug not in the socket" 75%; faucet (en) "worn washer or cartridge seal" 85% with a Muse Image diagram on step 5; tyre (jv) "slow leak from a nail" 88% | ✅ | recorded session folders (outside the repo), `docs/demo/screenshots/` |
+| Spend of the remake by the ledger that wraps the app's cost meter: $0.9405 of the $1.00 cap (first failed take $0.163, recording $0.604, four sessions $0.173) | ✅ | stage notes |
+| `record_replay.py --check` up to date; test_replay, test_playwright_replay, test_playwright_static, test_build_static, test_fixtures, test_sample_masks, test_sample_step, test_whatsapp pass; `build_static.py --check` OK | ✅ | this run |
+
