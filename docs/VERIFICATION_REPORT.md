@@ -63,7 +63,7 @@ Evidence names point to tests in `api/tests/` (TEST_REPORT.md has the run) or to
 | `/health` | ✅ | `test_api::test_health` |
 | Lint (ruff) | ✅ | TEST_REPORT |
 | mypy strict / Playwright / jsdom | ✅ | `mypy api` strict: no issues in 67 files; real-Chromium tests (smoke + live camera with test camera feed); jsdom UI flow (214 checks) |
-| CI on push | ✅ | `.github/workflows/ci.yml` on GitHub Actions: ruff, mypy, the full pytest suite with real Chromium, jsdom and (from 1.31.1) axe-core; green on 09fa5f1 (https://github.com/ragilmalik/tukang-copilot/actions/runs/42134244102) and on later pushes |
+| CI on push | ✅ | `.github/workflows/ci.yml` on GitHub Actions: ruff, mypy, the full pytest suite with real Chromium, jsdom and (from 1.31.1) axe-core; green on 09fa5f1 (https://github.com/ragilmalik/tukang-copilot/actions/runs/42134244102); for 1.32.0 green on 05dc01d (https://github.com/ragilmalik/tukang-copilot/actions/runs/42159090902) and 60047bc (https://github.com/ragilmalik/tukang-copilot/actions/runs/42159375750) |
 | Path traversal / upload validation | ✅ | `test_api::test_not_found_and_path_traversal`, `test_bad_requests` |
 | Performance (< 25 s diagnosis on 4G, < 8 s check) | ⬜ | Measure on a real phone with real models |
 
