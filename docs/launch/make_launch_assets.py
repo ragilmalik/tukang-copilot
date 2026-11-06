@@ -1,10 +1,18 @@
-"""Make the launch images: YouTube thumbnail (1280x720) and architecture diagram (1920x1080).
+"""Make the launch assets: YouTube thumbnail (1280x720), architecture diagram (1920x1080) and the one-pager PDF.
 
-Run from the repo root:  python docs/launch/make_launch_assets.py
-Needs Pillow and the DejaVu fonts (present on most Linux boxes). Uses the demo screenshots in docs/demo/screenshots.
+Run from the repo root:
+    python docs/launch/make_launch_assets.py              # thumbnail + architecture diagram
+    python docs/launch/make_launch_assets.py onepager     # docs/launch/one-pager.pdf from ONE_PAGER.md
+    python docs/launch/make_launch_assets.py thumbnail architecture onepager
+
+The images need Pillow and the DejaVu fonts (present on most Linux boxes) and use the demo screenshots in
+docs/demo/screenshots. The one-pager needs pandoc and WeasyPrint (`pip install weasyprint`); it is styled by
+one-pager.css and must stay exactly one A4 page, so the build stops with an error when the text grows past it.
 """
 from __future__ import annotations
 
+import subprocess
+import sys
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -203,7 +211,42 @@ def architecture() -> Path:
     return out
 
 
-if __name__ == "__main__":
+def check_one_page(pages: int) -> None:
+    """The one-pager is printed and handed out as a single sheet: anything but exactly one page is an error."""
+    if pages != 1:
+        raise SystemExit(f"one-pager.pdf would be {pages} pages; shorten ONE_PAGER.md or tighten one-pager.css")
+
+
+def one_pager() -> Path:
+    """ONE_PAGER.md -> HTML (pandoc) -> PDF (WeasyPrint), checked to be exactly one A4 page before it is written."""
+    import weasyprint  # optional dependency, only needed for this asset
+
+    src = OUT / "ONE_PAGER.md"
+    if "{{" in src.read_text(encoding="utf-8"):
+        raise SystemExit("ONE_PAGER.md still has a {{...}} placeholder; fill it before building the PDF")
+    html = subprocess.run(["pandoc", str(src), "-f", "markdown", "-t", "html5", "-s", "--css", "one-pager.css"],
+                          capture_output=True, text=True, check=True, cwd=OUT).stdout
+    doc = weasyprint.HTML(string=html, base_url=str(OUT)).render()
+    check_one_page(len(doc.pages))
+    out = OUT / "one-pager.pdf"
+    doc.write_pdf(str(out))
+    return out
+
+
+BUILDERS = {"thumbnail": thumbnail, "architecture": architecture, "onepager": one_pager}
+
+
+def main(argv: list[str]) -> int:
+    names = argv or ["thumbnail", "architecture"]
+    unknown = [n for n in names if n not in BUILDERS]
+    if unknown:
+        print(f"unknown asset(s): {', '.join(unknown)}; choose from {', '.join(BUILDERS)}", file=sys.stderr)
+        return 2
     OUT.mkdir(parents=True, exist_ok=True)
-    print(thumbnail())
-    print(architecture())
+    for name in names:
+        print(BUILDERS[name]())
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

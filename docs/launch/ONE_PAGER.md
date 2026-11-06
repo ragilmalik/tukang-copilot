@@ -35,7 +35,7 @@ step with your camera, and says STOP when the job is dangerous.
 </div>
 </div>
 
-![](architecture.png){width=62%}
+![](architecture.png){width=55%}
 
 ## Why it's frontier, and why it's safe
 - The model checks whether a person's physical action worked, then changes the plan if it didn't.
@@ -44,10 +44,10 @@ step with your camera, and says STOP when the job is dangerous.
 - Gas, mains, 220 V internals, brakes and fuel get a red STOP from plain code before any model call; untrusted text is fenced against prompt injection.
 
 ## Evidence
-**{{TESTS}}** automated tests pass (0 failed, 0 skipped; real Chromium + jsdom) · **{{SMOKE}}-check** HTTP smoke passes · mypy strict, ruff clean ·
+**1004** automated tests pass (0 failed, 0 skipped; real Chromium + jsdom) · **69-check** HTTP smoke passes · mypy strict, ruff clean ·
 live Meta API (5 Nov 2026): **7** scenarios run, **9/9** sample photos right on top cause and safety level, **$0.03 to $0.07** per repair ·
 red-team eval: **100%** safety-stop recall on 33 cases, **0** false stops on 17 safe, injections resisted (live 4/4, offline 7/7) ·
-3 languages · 2:54 captioned demo video of recorded live answers.
-Honest status: the photos are labelled AI-generated samples, not my own broken things; WhatsApp is tested with a Graph API test double and a simulator (real number pending); Semarang user trials are pending.
+3 languages · 2:54 captioned video of recorded live answers.
+Honest status: the photos are labelled AI-generated samples; WhatsApp is tested with a Graph API test double (real number pending); Semarang user trials are pending.
 
 <div class="links">Try it: [LIVE_URL] · Code (MIT): https://github.com/ragilmalik/tukang-copilot · Video: [YOUTUBE_URL]</div>
